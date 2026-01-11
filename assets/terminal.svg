@@ -14,23 +14,15 @@
       .green { fill: #9ece6a; }
       .dim { fill: #565f89; }
       .white { fill: #c0caf5; }
-
       .gray { fill: #6b7280; }
-      .yellow { fill: #eab308; }
+      .orange { fill: #ff9e64; }
+      .magenta { fill: #bb9af7; }
     </style>
   </defs>
 
-
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" style="background: #1a1a2e;">
-  <style>
-    .terminal { font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.4; }
-    .cyan { fill: #06b6d4; }
-    .gray { fill: #6b7280; }
-    .white { fill: #f9fafb; }
-    .dim { fill: #6b7280; }
-    .green { fill: #22c55e; }
-    .yellow { fill: #eab308; }
-  </style>
+  <!-- Window -->
+  <rect class="terminal-border" width="960" height="540" rx="12"/>
+  <rect class="terminal-bg" x="1" y="1" width="958" height="538" rx="11"/>
 
   <!-- Title bar -->
   <rect class="title-bar" x="1" y="1" width="958" height="36" rx="11"/>
@@ -43,45 +35,46 @@
 
   <!-- Title -->
   <text x="480" y="24" text-anchor="middle" class="text dim" font-size="13">Terminal</text>
-    <!-- Prompt line -->
-    <text class="text prompt" font-size="15" y="0">~</text>
-    <text class="text dim" font-size="15" x="16" y="0">$</text>
-    <text class="text command" font-size="15" x="36" y="0">npx gsd-opencode</text>
 
-
+  <!-- Content -->
   <g transform="translate(32, 72)">
-     <text x="20" y="40" class="cyan" xml:space="preserve">   ██████╗ ███████╗██████╗</text>
-     <text x="20" y="60" class="cyan" xml:space="preserve">  ██╔════╝ ██╔════╝██╔══██╗</text>
-     <text x="20" y="80" class="cyan" xml:space="preserve">  ██║  ███╗█████╗  ██║  ██║</text>
-    <text x="20" y="100" class="cyan" xml:space="preserve">  ██║   ██║╚════██║██║  ██║</text>
-    <text x="20" y="120" class="cyan" xml:space="preserve">  ╚██████╔╝███████║██████╔╝</text>
-    <text x="20" y="140" class="cyan" xml:space="preserve">   ╚═════╝ ╚══════╝╚═════╝</text>
+    <!-- Prompt line -->
+    <text class="text dim" font-size="15" x="0" y="0">$</text>
+    <text class="text command" font-size="15" x="20" y="0">npx gsd-opencode</text>
 
-    <text x="20" y="170" class="gray" xml:space="preserve">  ▄</text>
-    <text x="20" y="190" class="gray" xml:space="preserve">  █▀▀█ █▀▀█ █▀▀█ █▀▀▄</text><text x="165" y="190" class="white"> █▀▀▀ █▀▀█ █▀▀█ █▀▀█</text>
-    <text x="20" y="210" class="gray" xml:space="preserve">  █░░█ █░░█ █▀▀▀ █░░█</text><text x="165" y="210" class="white"> █░░░ █░░█ █░░█ █▀▀▀</text>
-    <text x="20" y="230" class="gray" xml:space="preserve">  ▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀  ▀</text><text x="165" y="230" class="white"> ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀</text>
+    <!-- GSD ASCII art -->
+    <text class="text cyan" font-size="14" y="48" xml:space="preserve">   ██████╗ ███████╗██████╗</text>
+    <text class="text cyan" font-size="14" y="68" xml:space="preserve">  ██╔════╝ ██╔════╝██╔══██╗</text>
+    <text class="text cyan" font-size="14" y="88" xml:space="preserve">  ██║  ███╗█████╗  ██║  ██║</text>
+    <text class="text cyan" font-size="14" y="108" xml:space="preserve">  ██║   ██║╚════██║██║  ██║</text>
+    <text class="text cyan" font-size="14" y="128" xml:space="preserve">  ╚██████╔╝███████║██████╔╝</text>
+    <text class="text cyan" font-size="14" y="148" xml:space="preserve">   ╚═════╝ ╚══════╝╚═════╝</text>
 
-    <text x="20" y="270" class="white">  Get Shit Done </text><text x="125" y="270" class="dim">v1.3.31</text>
-    <text x="20" y="290" class="dim">  A meta-prompting, context engineering and spec-driven</text>
-    <text x="20" y="310" class="dim">  development system for Cloude Code by TÂCHES</text>
-    <text x="20" y="330" class="dim">  (adopted for OpenCode by rokicool and GLM4.7)</text>
+    <!-- opencode ASCII art -->
 
-    <text x="20" y="380" class="dim">  Where would you like to install?</text>
+    <text class="text gray" font-size="16" y="200" xml:space="preserve">  █▀▀█ █▀▀█ █▀▀█ █▀▀▄ </text>
+    <text class="text gray" font-size="16" y="216" xml:space="preserve">  █░░█ █░░█ █▀▀▀ █░░█ </text>
+    <text class="text gray" font-size="16" y="232" xml:space="preserve">  ▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀  ▀ </text>
 
-    <text x="20" y="420" class="white">  1)</text><text x="32" y="420" class="cyan">Global</text><text x="80" y="420" class="dim"> (~/.config/opencode)</text><text x="260" y="420" class="white"> - available in all projects</text>
-    <text x="20" y="440" class="white">  2)</text><text x="32" y="440" class="cyan">Local</text><text x="80" y="440" class="dim">  (./.opencode)</text><text x="190" y="440" class="white"> - this project only</text>
-  </g>
+    <text class="text white" font-size="16" x="190" y="184" xml:space="preserve">               ▄</text>
+    <text class="text white" font-size="16" x="190" y="200" xml:space="preserve">  █▀▀▀ █▀▀█ █▀▀█ █▀▀█</text>
+    <text class="text white" font-size="16" x="190" y="216" xml:space="preserve">  █░░░ █░░█ █░░█ █▀▀▀</text>
+    <text class="text white" font-size="16" x="190" y="232" xml:space="preserve">  ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀</text>
+
+
+
+    <!-- Title and subtitle -->
+    <text class="text white" font-size="15" y="288">  Get Shit Done <tspan class="cyan">v1.3.32</tspan></text>
+    <text class="text white" font-size="15" y="312">  A meta-prompting, context engineering and spec-driven</text>
+    <text class="text white" font-size="15" y="332">  development system for Cloude Code by TÂCHES</text>
+    <text class="text white" font-size="15" y="352">  (adopted for OpenCode by rokicool and GLM4.7)</text>
 
     <!-- Install output -->
-    <text class="text" font-size="15" y="280"><tspan class="green">  ✓</tspan><tspan class="white"> Installed commands/gsd</tspan></text>
-    <text class="text" font-size="15" y="304"><tspan class="green">  ✓</tspan><tspan class="white"> Installed get-shit-done</tspan></text>
+    <text class="text" font-size="15" y="400"><tspan class="green">  ✓</tspan><tspan class="white"> Installed command/gsd</tspan></text>
+    <text class="text" font-size="15" y="424"><tspan class="green">  ✓</tspan><tspan class="white"> Installed get-shit-done</tspan></text>
 
     <!-- Done message -->
-    <text class="text" font-size="15" y="352"><tspan class="green">  Done!</tspan><tspan class="white"> Run </tspan><tspan class="cyan">/gsd:help</tspan><tspan class="white"> to get started.</tspan></text>
+    <text class="text" font-size="15" y="468"><tspan class="green">  Done!</tspan><tspan class="white"> Run </tspan><tspan class="cyan">/gsd:help</tspan><tspan class="white"> to get started.</tspan></text>
 
-    <!-- New prompt -->
-    <text class="text prompt" font-size="15" y="400">~</text>
-    <text class="text dim" font-size="15" x="16" y="400">$</text>
-    <text class="text white" font-size="15" x="36" y="400">▌</text>
+  </g>
 </svg>
