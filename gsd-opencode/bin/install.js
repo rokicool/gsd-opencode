@@ -10,6 +10,8 @@ const cyan = "\x1b[36m";
 const green = "\x1b[32m";
 const yellow = "\x1b[33m";
 const dim = "\x1b[2m";
+const gray = "\x1b[90m";
+const white = "\x1b[37m";
 const reset = "\x1b[0m";
 
 // Get version from package.json
@@ -23,9 +25,16 @@ ${cyan}   ██████╗ ███████╗██████╗
   ╚██████╔╝███████║██████╔╝
    ╚═════╝ ╚══════╝╚═════╝${reset}
 
+                                   ${white}▄${reset}
+  ${gray}█▀▀█${reset} ${gray}█▀▀█${reset} ${gray}█▀▀█${reset} ${gray}█▀▀▄${reset} ${white}█▀▀▀${reset} ${white}█▀▀█${reset} ${white}█▀▀█${reset} ${white}█▀▀█${reset}
+  ${gray}█░░█${reset} ${gray}█░░█${reset} ${gray}█▀▀▀${reset} ${gray}█░░█${reset} ${white}█░░░${reset} ${white}█░░█${reset} ${white}█░░█${reset} ${white}█▀▀▀${reset}
+  ${gray}▀▀▀▀${reset} ${gray}█▀▀▀${reset} ${gray}▀▀▀▀${reset} ${gray}▀  ▀${reset} ${white}▀▀▀▀${reset} ${white}▀▀▀▀${reset} ${white}▀▀▀▀${reset} ${white}▀▀▀▀${reset}
+
   Get Shit Done ${dim}v${pkg.version}${reset}
   A meta-prompting, context engineering and spec-driven
-  development system for OpenCode by TÂCHES.
+  development system for Cloude Code by TÂCHES
+  (adopted for OpenCode by rokicool and GLM4.7)
+
 `;
 
 // Parse args
@@ -137,7 +146,8 @@ function install(isGlobal) {
   const configDir =
     expandTilde(explicitConfigDir) ||
     expandTilde(process.env.OPENCODE_CONFIG_DIR);
-  const defaultGlobalDir = configDir || path.join(os.homedir(), ".config", "opencode");
+  const defaultGlobalDir =
+    configDir || path.join(os.homedir(), ".config", "opencode");
   const opencodeDir = isGlobal
     ? defaultGlobalDir
     : path.join(process.cwd(), ".opencode");
@@ -189,7 +199,8 @@ function promptLocation() {
   const configDir =
     expandTilde(explicitConfigDir) ||
     expandTilde(process.env.OPENCODE_CONFIG_DIR);
-  const globalPath = configDir || path.join(os.homedir(), ".config", "opencode");
+  const globalPath =
+    configDir || path.join(os.homedir(), ".config", "opencode");
   const globalLabel = globalPath.replace(os.homedir(), "~");
 
   console.log(`  ${yellow}Where would you like to install?${reset}
