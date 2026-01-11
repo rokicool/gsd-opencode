@@ -51,9 +51,9 @@ Other spec-driven development tools exist; BMAD, Speckit... But they all seem to
 
 So I built GSD. The complexity is in the system, not in your workflow. Behind the scenes: context engineering, XML prompt formatting, subagent orchestration, state management. What you see: a few commands that just work.
 
-The system gives OpenCode everything it needs to do the work *and* verify it. I trust the workflow. It just does a good job.
+The system gives Claude Code everything it needs to do the work *and* verify it. I trust the workflow. It just does a good job.
 
-That's what this is. No enterprise roleplay bullshit. Just an incredibly effective system for building cool stuff consistently using OpenCode.
+That's what this is. No enterprise roleplay bullshit. Just an incredibly effective system for building cool stuff consistently using Claude Code.
 
 — **TÂCHES**
 
