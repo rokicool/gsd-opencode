@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" style="background: #1a1a2e;">
+  <style>
+    .terminal { font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.4; }
+    .cyan { fill: #06b6d4; }
+    .gray { fill: #6b7280; }
+    .white { fill: #f9fafb; }
+    .dim { fill: #6b7280; }
+    .green { fill: #22c55e; }
+    .yellow { fill: #eab308; }
+  </style>
+  
+  <g class="terminal">
+    <text x="20" y="40" class="cyan">   ██████╗ ███████╗██████╗</text>
+    <text x="20" y="60" class="cyan">  ██╔════╝ ██╔════╝██╔══██╗</text>
+    <text x="20" y="80" class="cyan">  ██║  ███╗█████╗  ██║  ██║</text>
+    <text x="20" y="100" class="cyan">  ██║   ██║╚════██║██║  ██║</text>
+    <text x="20" y="120" class="cyan">  ╚██████╔╝███████║██████╔╝</text>
+    <text x="20" y="140" class="cyan">   ╚═════╝ ╚══════╝╚═════╝</text>
+    
+    <text x="20" y="170" class="gray">                                   ▄</text>
+    <text x="20" y="190" class="gray">  █▀▀█ █▀▀█ █▀▀█ █▀▀▄</text><text x="165" y="190" class="white"> █▀▀▀ █▀▀█ █▀▀█ █▀▀█</text>
+    <text x="20" y="210" class="gray">  █░░█ █░░█ █▀▀▀ █░░█</text><text x="165" y="210" class="white"> █░░░ █░░█ █░░█ █▀▀▀</text>
+    <text x="20" y="230" class="gray">  ▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀  ▀</text><text x="165" y="230" class="white"> ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀</text>
+    
+    <text x="20" y="270" class="white">  Get Shit Done </text><text x="125" y="270" class="dim">v1.3.31</text>
+    <text x="20" y="290" class="dim">  A meta-prompting, context engineering and spec-driven</text>
+    <text x="20" y="310" class="dim">  development system for Cloude Code by TÂCHES</text>
+    <text x="20" y="330" class="dim">  (adopted for OpenCode by rokicool and GLM4.7)</text>
+    
+    <text x="20" y="380" class="dim">  Where would you like to install?</text>
+    
+    <text x="20" y="420" class="white">  1)</text><text x="32" y="420" class="cyan">Global</text><text x="80" y="420" class="dim"> (~/.config/opencode)</text><text x="260" y="420" class="white"> - available in all projects</text>
+    <text x="20" y="440" class="white">  2)</text><text x="32" y="440" class="cyan">Local</text><text x="80" y="440" class="dim">  (./.opencode)</text><text x="190" y="440" class="white"> - this project only</text>
+  </g>
+</svg>
