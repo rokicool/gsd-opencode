@@ -1,8 +1,8 @@
-<div align="center">
+<div align="left">
 
 # GET SHIT DONE
 
-**A light-weight and powerful meta-prompting, context engineering and spec-driven development system for OpenCode by TÂCHES.**
+**A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (adapted for OpenCode by roki)**
 
 [![npm version](https://img.shields.io/npm/v/gsd-opencode?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/gsd-opencode)
 [![npm downloads](https://img.shields.io/npm/dm/gsd-opencode?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/gsd-opencode)
@@ -33,7 +33,7 @@ npx gsd-opencode
 
 **Trusted by engineers at Amazon, Google, Shopify, and Webflow.**
 
-[Why I Built This](#why-i-built-this) · [How It Works](#how-it-works) · [Commands](#commands) · [Why It Works](#why-it-works)
+[Why I Built This](#-from-the-authour:-why-i-built-this) · [How It Works](#how-it-works) · [Commands](#commands) · [Why It Works](#why-it-works)
 
 </div>
 
@@ -43,7 +43,7 @@ npx gsd-opencode
 
 ## From the authour: Why I Built This 
 
-I'm a solo developer. I don't write code — OpenCode does.
+I'm a solo developer. I don't write code — Claude Code does.
 
 Other spec-driven development tools exist; BMAD, Speckit... But they all seem to make things way more complicated than they need to be (sprint ceremonies, story points, stakeholder syncs, retrospectives, Jira workflows) or lack real big picture understanding of what you're building. I'm not a 50-person software company. I don't want to play enterprise theater. I'm just a creative person trying to build great things that work.
 
@@ -111,16 +111,6 @@ Installs to `.opencode/` for testing modifications before contributing.
 
 </details>
 
-### Recommended: Skip Permissions Mode
-
-GSD is designed for frictionless automation. Run OpenCode with:
-
-```bash
-opencode --dangerously-skip-permissions
-```
-
-> [!TIP]
-> This is how GSD is intended to be used — stopping to approve `date` and `git commit` 50 times defeats the purpose.
 
 <details>
 <summary><strong>Alternative: Granular Permissions</strong></summary>
