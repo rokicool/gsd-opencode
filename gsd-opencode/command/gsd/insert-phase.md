@@ -25,8 +25,8 @@ Purpose: Handle urgent work discovered during execution without renumbering enti
 
 <step name="parse_arguments">
 Parse the command arguments:
-- First argument: integer phase number to insert after
-- Remaining arguments: phase description
+- First argument ($1) : integer phase number to insert after
+- Remaining arguments ($2 $3 $4 $5 $6 $7 $8 $9 $10 $11): phase description
 
 Example: `/gsd:insert-phase 7 Fix critical auth bug`
 → after = 7

@@ -25,7 +25,7 @@ Output: Phase deleted, all subsequent phases renumbered, git commit as historica
 
 <step name="parse_arguments">
 Parse command arguments:
-- Argument is phase number to remove (integer or decimal)
+- Argument ($ARGUMENTS) is phase number to remove (integer or decimal)
 - Example: `/gsd:remove-phase 17` → phase = 17
 - Example: `/gsd:remove-phase 16.1` → phase = 16.1
 
