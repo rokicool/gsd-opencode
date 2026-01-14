@@ -4,6 +4,8 @@
 
 **A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES.**
 
+**Solves context rot — the quality degradation that happens as Claude fills its context window.**
+
 [![npm version](https://img.shields.io/npm/v/get-shit-done-cc?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/get-shit-done-cc)
 [![npm downloads](https://img.shields.io/npm/dm/get-shit-done-cc?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/get-shit-done-cc)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
@@ -73,7 +75,7 @@ People who want to describe what they want and have it built correctly — witho
 npx get-shit-done-cc
 ```
 
-That's it. Verify with `/gsd:help`.
+That's it. Verify with `/gsd:help` inside your Claude Code interface.
 
 <details>
 <summary><strong>Non-interactive Install (Docker, CI, Scripts)</strong></summary>
@@ -172,10 +174,17 @@ Produces:
 
 ```
 /gsd:plan-phase 1      # System creates atomic task plans
-/gsd:execute-plan      # Subagent implements autonomously
+/gsd:execute-phase 1   # Parallel agents execute all plans
 ```
 
-Each phase breaks into 2-3 atomic tasks. Each task runs in a fresh subagent context — 200k tokens purely for implementation, zero degradation.
+Each phase breaks into 2-3 task plans. Each plan runs in a fresh subagent context — 200k tokens purely for implementation, zero degradation. Plans without dependencies run in parallel.
+
+**For single-plan or interactive execution:**
+```
+/gsd:execute-plan      # Run one plan at a time with checkpoints
+```
+
+Use `/gsd:execute-phase` for parallel "walk away" automation (recommended). Use `/gsd:execute-plan` when you need interactive single-plan execution with manual checkpoints.
 
 ### 4. Ship and iterate
 
@@ -221,7 +230,7 @@ Same as greenfield, but the system knows your codebase. Questions focus on what 
 
 ### 3. Continue as normal
 
-From here, it's the same: `/gsd:create-roadmap` → `/gsd:plan-phase` → `/gsd:execute-plan`
+From here, it's the same: `/gsd:create-roadmap` → `/gsd:plan-phase` → `/gsd:execute-phase`
 
 The codebase docs load automatically during planning. Claude knows your patterns, conventions, and where to put things.
 
@@ -243,6 +252,7 @@ GSD handles it for you:
 | `PLAN.md` | Atomic task with XML structure, verification steps |
 | `SUMMARY.md` | What happened, what changed, committed to history |
 | `ISSUES.md` | Deferred enhancements tracked across sessions |
+| `todos/` | Captured ideas and tasks for later work |
 
 Size limits based on where Claude's quality degrades. Stay under, get consistent excellence.
 
@@ -315,7 +325,9 @@ You're never locked in. The system adapts.
 | `/gsd:create-roadmap` | Create roadmap and state tracking |
 | `/gsd:map-codebase` | Map existing codebase for brownfield projects |
 | `/gsd:plan-phase [N]` | Generate task plans for phase |
-| `/gsd:execute-plan` | Run plan via subagent |
+| `/gsd:execute-plan` | Run single plan via subagent |
+| `/gsd:execute-phase <N>` | Execute all plans in phase N with parallel agents |
+| `/gsd:status [--wait]` | Check background agent status from parallel execution |
 | `/gsd:progress` | Where am I? What's next? |
 | `/gsd:verify-work [N]` | User acceptance test of phase or plan ¹ |
 | `/gsd:plan-fix [plan]` | Plan fixes for UAT issues from verify-work |
@@ -331,6 +343,9 @@ You're never locked in. The system adapts.
 | `/gsd:pause-work` | Create handoff file when stopping mid-phase |
 | `/gsd:resume-work` | Restore from last session |
 | `/gsd:consider-issues` | Review deferred issues, close resolved, identify urgent |
+| `/gsd:add-todo [desc]` | Capture idea or task from conversation for later |
+| `/gsd:check-todos [area]` | List pending todos, select one to work on |
+| `/gsd:debug [desc]` | Systematic debugging with persistent state across `/clear` |
 | `/gsd:help` | Show all commands and usage guide |
 
 <sup>¹ Contributed by reddit user OracleGreyBeard</sup>
@@ -351,6 +366,14 @@ You're never locked in. The system adapts.
 ```bash
 npx get-shit-done-cc@latest
 ```
+
+**Using Docker or containerized environments?**
+
+If file reads fail with tilde paths (`~/.claude/...`), set `CLAUDE_CONFIG_DIR` before installing:
+```bash
+CLAUDE_CONFIG_DIR=/home/youruser/.claude npx get-shit-done-cc --global
+```
+This ensures absolute paths are used instead of `~` which may not expand correctly in containers.
 
 ---
 

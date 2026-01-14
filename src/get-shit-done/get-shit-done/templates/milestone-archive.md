@@ -47,7 +47,7 @@ Plans:
 
 Plans:
 
-- [x] 2.1-01: Patch auth vulnerability
+- [x] 02.1-01: Patch auth vulnerability
 
 **Details:**
 {{PHASE_DETAILS_FROM_ROADMAP}}

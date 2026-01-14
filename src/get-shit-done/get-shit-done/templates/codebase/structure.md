@@ -166,7 +166,7 @@ get-shit-done/
 **get-shit-done/workflows/**
 - Purpose: Reusable multi-step procedures
 - Contains: Workflow definitions called by commands
-- Key files: execute-phase.md, research-phase.md
+- Key files: execute-plan.md, research-phase.md
 - Subdirectories: None
 
 ## Key File Locations

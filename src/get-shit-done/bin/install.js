@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-const readline = require("readline");
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const readline = require('readline');
 
 // Colors
-const cyan = "\x1b[36m";
-const green = "\x1b[32m";
-const yellow = "\x1b[33m";
-const dim = "\x1b[2m";
-const reset = "\x1b[0m";
+const cyan = '\x1b[36m';
+const green = '\x1b[32m';
+const yellow = '\x1b[33m';
+const dim = '\x1b[2m';
+const reset = '\x1b[0m';
 
 // Get version from package.json
-const pkg = require("../package.json");
+const pkg = require('../package.json');
 
 const banner = `
 ${cyan}   ██████╗ ███████╗██████╗
@@ -30,34 +30,30 @@ ${cyan}   ██████╗ ███████╗██████╗
 
 // Parse args
 const args = process.argv.slice(2);
-const hasGlobal = args.includes("--global") || args.includes("-g");
-const hasLocal = args.includes("--local") || args.includes("-l");
+const hasGlobal = args.includes('--global') || args.includes('-g');
+const hasLocal = args.includes('--local') || args.includes('-l');
 
 // Parse --config-dir argument
 function parseConfigDirArg() {
-  const configDirIndex = args.findIndex(
-    (arg) => arg === "--config-dir" || arg === "-c",
-  );
+  const configDirIndex = args.findIndex(arg => arg === '--config-dir' || arg === '-c');
   if (configDirIndex !== -1) {
     const nextArg = args[configDirIndex + 1];
     // Error if --config-dir is provided without a value or next arg is another flag
-    if (!nextArg || nextArg.startsWith("-")) {
+    if (!nextArg || nextArg.startsWith('-')) {
       console.error(`  ${yellow}--config-dir requires a path argument${reset}`);
       process.exit(1);
     }
     return nextArg;
   }
   // Also handle --config-dir=value format
-  const configDirArg = args.find(
-    (arg) => arg.startsWith("--config-dir=") || arg.startsWith("-c="),
-  );
+  const configDirArg = args.find(arg => arg.startsWith('--config-dir=') || arg.startsWith('-c='));
   if (configDirArg) {
-    return configDirArg.split("=")[1];
+    return configDirArg.split('=')[1];
   }
   return null;
 }
 const explicitConfigDir = parseConfigDirArg();
-const hasHelp = args.includes("--help") || args.includes("-h");
+const hasHelp = args.includes('--help') || args.includes('-h');
 
 console.log(banner);
 
@@ -96,7 +92,7 @@ if (hasHelp) {
  * Expand ~ to home directory (shell doesn't expand in env vars passed to node)
  */
 function expandTilde(filePath) {
-  if (filePath && filePath.startsWith("~/")) {
+  if (filePath && filePath.startsWith('~/')) {
     return path.join(os.homedir(), filePath.slice(2));
   }
   return filePath;
@@ -116,9 +112,9 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix) {
 
     if (entry.isDirectory()) {
       copyWithPathReplacement(srcPath, destPath, pathPrefix);
-    } else if (entry.name.endsWith(".md")) {
+    } else if (entry.name.endsWith('.md')) {
       // Replace ~/.claude/ with the appropriate prefix in markdown files
-      let content = fs.readFileSync(srcPath, "utf8");
+      let content = fs.readFileSync(srcPath, 'utf8');
       content = content.replace(/~\/\.claude\//g, pathPrefix);
       fs.writeFileSync(destPath, content);
     } else {
@@ -131,48 +127,44 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix) {
  * Install to the specified directory
  */
 function install(isGlobal) {
-  const src = path.join(__dirname, "..");
+  const src = path.join(__dirname, '..');
   // Priority: explicit --config-dir arg > CLAUDE_CONFIG_DIR env var > default ~/.claude
-  const configDir =
-    expandTilde(explicitConfigDir) ||
-    expandTilde(process.env.CLAUDE_CONFIG_DIR);
-  const defaultGlobalDir = configDir || path.join(os.homedir(), ".claude");
+  const configDir = expandTilde(explicitConfigDir) || expandTilde(process.env.CLAUDE_CONFIG_DIR);
+  const defaultGlobalDir = configDir || path.join(os.homedir(), '.claude');
   const claudeDir = isGlobal
     ? defaultGlobalDir
-    : path.join(process.cwd(), ".claude");
+    : path.join(process.cwd(), '.claude');
 
   const locationLabel = isGlobal
-    ? claudeDir.replace(os.homedir(), "~")
-    : claudeDir.replace(process.cwd(), ".");
+    ? claudeDir.replace(os.homedir(), '~')
+    : claudeDir.replace(process.cwd(), '.');
 
   // Path prefix for file references
   // Use actual path when CLAUDE_CONFIG_DIR is set, otherwise use ~ shorthand
   const pathPrefix = isGlobal
-    ? configDir
-      ? `${claudeDir}/`
-      : "~/.claude/"
-    : "./.claude/";
+    ? (configDir ? `${claudeDir}/` : '~/.claude/')
+    : './.claude/';
 
   console.log(`  Installing to ${cyan}${locationLabel}${reset}\n`);
 
   // Create commands directory
-  const commandsDir = path.join(claudeDir, "commands");
+  const commandsDir = path.join(claudeDir, 'commands');
   fs.mkdirSync(commandsDir, { recursive: true });
 
   // Copy commands/gsd with path replacement
-  const gsdSrc = path.join(src, "commands", "gsd");
-  const gsdDest = path.join(commandsDir, "gsd");
+  const gsdSrc = path.join(src, 'commands', 'gsd');
+  const gsdDest = path.join(commandsDir, 'gsd');
   copyWithPathReplacement(gsdSrc, gsdDest, pathPrefix);
   console.log(`  ${green}✓${reset} Installed commands/gsd`);
 
   // Copy get-shit-done skill with path replacement
-  const skillSrc = path.join(src, "get-shit-done");
-  const skillDest = path.join(claudeDir, "get-shit-done");
+  const skillSrc = path.join(src, 'get-shit-done');
+  const skillDest = path.join(claudeDir, 'get-shit-done');
   copyWithPathReplacement(skillSrc, skillDest, pathPrefix);
   console.log(`  ${green}✓${reset} Installed get-shit-done`);
 
   console.log(`
-  ${green}Done!${reset} Run ${cyan}/gsd:help${reset} to get started.
+  ${green}Done!${reset} Launch Claude Code and run ${cyan}/gsd:help${reset}.
 `);
 }
 
@@ -182,14 +174,12 @@ function install(isGlobal) {
 function promptLocation() {
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout,
+    output: process.stdout
   });
 
-  const configDir =
-    expandTilde(explicitConfigDir) ||
-    expandTilde(process.env.CLAUDE_CONFIG_DIR);
-  const globalPath = configDir || path.join(os.homedir(), ".claude");
-  const globalLabel = globalPath.replace(os.homedir(), "~");
+  const configDir = expandTilde(explicitConfigDir) || expandTilde(process.env.CLAUDE_CONFIG_DIR);
+  const globalPath = configDir || path.join(os.homedir(), '.claude');
+  const globalLabel = globalPath.replace(os.homedir(), '~');
 
   console.log(`  ${yellow}Where would you like to install?${reset}
 
@@ -199,8 +189,8 @@ function promptLocation() {
 
   rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
     rl.close();
-    const choice = answer.trim() || "1";
-    const isGlobal = choice !== "2";
+    const choice = answer.trim() || '1';
+    const isGlobal = choice !== '2';
     install(isGlobal);
   });
 }

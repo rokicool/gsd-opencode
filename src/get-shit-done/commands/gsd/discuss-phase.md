@@ -7,7 +7,7 @@ argument-hint: "[phase]"
 <objective>
 Help the user articulate their vision for a phase through collaborative thinking.
 
-Purpose: Understand HOW the user imagines this phase working — what it looks like, what's essential, what's out of scope. You're a thinking partner helping them crystallize their vision, not an interviewer gathering technical requirements.
+Purpose: Understand HOW the user imagines this phase working — what it looks like, what's essential. You're a thinking partner helping them crystallize their vision, not an interviewer gathering technical requirements.
 
 Output: {phase}-CONTEXT.md capturing the user's vision for the phase
 </objective>
@@ -36,7 +36,6 @@ Phase number: $ARGUMENTS (required)
    - Use AskUserQuestion: "How do you imagine this working?" with interpretation options
    - Use AskUserQuestion to follow their thread — probe what excites them
    - Use AskUserQuestion to sharpen the core — what's essential for THIS phase
-   - Use AskUserQuestion to find boundaries — what's explicitly out of scope
    - Use AskUserQuestion for decision gate (ready / ask more / let me add context)
    - Create CONTEXT.md capturing their vision
 5. Offer next steps (research or plan the phase)
@@ -55,6 +54,6 @@ User is the visionary, you are the builder:
 
 - Phase validated against roadmap
 - Vision gathered through collaborative thinking (not interrogation)
-- CONTEXT.md captures: how it works, what's essential, what's out of scope
+- CONTEXT.md captures: how it works, what's essential
 - User knows next steps (research or plan the phase)
 </success_criteria>

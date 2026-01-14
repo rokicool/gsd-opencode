@@ -104,7 +104,7 @@ Examples:
 - Phase 72 with 72.1 → next is 72.2
 - Phase 72 with 72.1, 72.2 → next is 72.3
 
-Store as: `decimal_phase="${after_phase}.${next_decimal}"`
+Store as: `decimal_phase="$(printf "%02d" $after_phase).${next_decimal}"`
 </step>
 
 <step name="generate_slug">
@@ -115,7 +115,7 @@ slug=$(echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' 
 ```
 
 Phase directory name: `{decimal-phase}-{slug}`
-Example: `72.1-fix-critical-auth-bug`
+Example: `06.1-fix-critical-auth-bug` (phase 6 insertion)
 </step>
 
 <step name="create_phase_directory">

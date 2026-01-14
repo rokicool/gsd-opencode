@@ -4,126 +4,100 @@ description: Execute a PLAN.md file
 argument-hint: "[path-to-PLAN.md]"
 allowed-tools:
   - Read
-  - Write
-  - Edit
-  - Bash
   - Glob
   - Grep
+  - Bash
   - Task
+  - TodoWrite
   - AskUserQuestion
-  - SlashCommand
 ---
 
 <objective>
-Execute a PLAN.md file with per-task atomic commits, create SUMMARY.md, update project state.
+Execute a single PLAN.md file by spawning a subagent.
 
-Commit strategy:
-- Each task → 1 commit immediately after completion (feat/fix/test/refactor)
-- Plan completion → 1 metadata commit (docs: SUMMARY + STATE + ROADMAP)
+Orchestrator stays lean: validate plan, spawn subagent, handle checkpoints, report completion. Subagent loads full execute-plan workflow and handles all execution details.
 
-Uses intelligent segmentation:
-- Plans without checkpoints → spawn subagent for full autonomous execution
-- Plans with verify checkpoints → segment execution, pause at checkpoints
-- Plans with decision checkpoints → execute in main context
-  </objective>
+Context budget: ~15% orchestrator, 100% fresh for subagent.
+</objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/execute-phase.md
-@~/.claude/get-shit-done/templates/summary.md
-@~/.claude/get-shit-done/references/checkpoints.md
-@~/.claude/get-shit-done/references/tdd.md
+@~/.claude/get-shit-done/templates/subagent-task-prompt.md
 </execution_context>
 
 <context>
 Plan path: $ARGUMENTS
 
-**Load project state first:**
 @.planning/STATE.md
-
-**Load workflow config:**
-@.planning/config.json
+@.planning/config.json (if exists)
 </context>
 
 <process>
-1. Check .planning/ directory exists (error if not - user should run /gsd:new-project)
-2. Verify plan at $ARGUMENTS exists
-3. Check if SUMMARY.md already exists (plan already executed?)
-4. Load workflow config for mode (interactive/yolo)
-5. Follow execute-phase.md workflow:
-   - Parse plan and determine execution strategy (A/B/C)
-   - Execute tasks (via subagent or main context as appropriate)
-   - Handle checkpoints and deviations
-   - Create SUMMARY.md
-   - Update STATE.md
-   - Commit changes
+1. **Validate plan exists**
+   - Confirm file at $ARGUMENTS exists
+   - Error if not found: "Plan not found: {path}"
+
+2. **Check if already executed**
+   - Derive SUMMARY path from plan path (replace PLAN.md with SUMMARY.md)
+   - If SUMMARY exists: "Plan already executed. SUMMARY: {path}"
+   - Offer: re-execute or exit
+
+3. **Parse plan identifiers**
+   Extract from path like `.planning/phases/03-auth/03-02-PLAN.md`:
+   - phase_number: `03`
+   - phase_name: `auth`
+   - plan_number: `02`
+   - plan_path: full path
+
+4. **Fill and spawn subagent**
+   - Fill subagent-task-prompt template with extracted values
+   - Spawn: `Task(prompt=filled_template, subagent_type="general-purpose")`
+
+5. **Handle subagent return**
+   - If contains "## CHECKPOINT REACHED": Execute checkpoint_handling
+   - If contains "## PLAN COMPLETE": Verify SUMMARY exists, report success
+
+6. **Report completion**
+   - Show SUMMARY path
+   - Show commits from subagent return
+   - Offer next steps
 </process>
 
-<execution_strategies>
-**Strategy A: Fully Autonomous** (no checkpoints)
+<checkpoint_handling>
+When subagent returns with checkpoint:
 
-- Spawn subagent to execute entire plan
-- Subagent creates SUMMARY.md and commits
-- Main context: orchestration only (~5% usage)
+**1. Parse return:**
+```
+## CHECKPOINT REACHED
 
-**Strategy B: Segmented** (has verify-only checkpoints)
+**Type:** [human-verify | decision | human-action]
+**Plan:** {phase}-{plan}
+**Progress:** {completed}/{total} tasks complete
 
-- Execute in segments between checkpoints
-- Subagent for autonomous segments
-- Main context for checkpoints
-- Aggregate results → SUMMARY → commit
+[Checkpoint content]
 
-**Strategy C: Decision-Dependent** (has decision checkpoints)
+**Awaiting:** [Resume signal]
+```
 
-- Execute in main context
-- Decision outcomes affect subsequent tasks
-- Quality maintained through small scope (2-3 tasks per plan)
-  </execution_strategies>
+**2. Present to user:**
+Display the checkpoint content exactly as returned by subagent.
 
-<deviation_rules>
-During execution, handle discoveries automatically:
+**3. Collect response:**
+Wait for user input:
+- human-verify: "approved" or description of issues
+- decision: option selection
+- human-action: "done" when complete
 
-1. **Auto-fix bugs** - Fix immediately, document in Summary
-2. **Auto-add critical** - Security/correctness gaps, add and document
-3. **Auto-fix blockers** - Can't proceed without fix, do it and document
-4. **Ask about architectural** - Major structural changes, stop and ask user
-5. **Log enhancements** - Nice-to-haves, log to ISSUES.md, continue
+**4. Resume subagent:**
+```
+Task(resume="{agent_id}", prompt="User response: {user_input}")
+```
 
-Only rule 4 requires user intervention.
-</deviation_rules>
-
-<commit_rules>
-**Per-Task Commits:**
-
-After each task completes:
-1. Stage only files modified by that task
-2. Commit with format: `{type}({phase}-{plan}): {task-name}`
-3. Types: feat, fix, test, refactor, perf, chore
-4. Record commit hash for SUMMARY.md
-
-**Plan Metadata Commit:**
-
-After all tasks complete:
-1. Stage planning artifacts only: PLAN.md, SUMMARY.md, STATE.md, ROADMAP.md
-2. Commit with format: `docs({phase}-{plan}): complete [plan-name] plan`
-3. NO code files (already committed per-task)
-
-**NEVER use:**
-- `git add .`
-- `git add -A`
-- `git add src/` or any broad directory
-
-**Always stage files individually.**
-
-See ~/.claude/get-shit-done/references/git-integration.md for full commit strategy.
-</commit_rules>
+**5. Repeat:**
+Continue handling returns until "## PLAN COMPLETE" or user stops.
+</checkpoint_handling>
 
 <success_criteria>
-
-- [ ] All tasks executed
-- [ ] Each task committed individually (feat/fix/test/refactor)
-- [ ] SUMMARY.md created with substantive content and commit hashes
-- [ ] STATE.md updated (position, decisions, issues, session)
-- [ ] ROADMAP updated (plan count, phase status)
-- [ ] Metadata committed with docs({phase}-{plan}): complete [plan-name] plan
-- [ ] User informed of next steps
-      </success_criteria>
+- [ ] Plan executed (SUMMARY.md created)
+- [ ] All checkpoints handled
+- [ ] User informed of completion and next steps
+</success_criteria>
