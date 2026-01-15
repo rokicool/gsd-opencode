@@ -20,14 +20,14 @@ Output: .planning/codebase/ folder with 7 structured documents about the codebas
 </objective>
 
 <execution_context>
-@~/.config/opencode/gsd-opencode/workflows/map-codebase.md
-@~/.config/opencode/gsd-opencode/templates/codebase/stack.md
-@~/.config/opencode/gsd-opencode/templates/codebase/architecture.md
-@~/.config/opencode/gsd-opencode/templates/codebase/structure.md
-@~/.config/opencode/gsd-opencode/templates/codebase/conventions.md
-@~/.config/opencode/gsd-opencode/templates/codebase/testing.md
-@~/.config/opencode/gsd-opencode/templates/codebase/integrations.md
-@~/.config/opencode/gsd-opencode/templates/codebase/concerns.md
+@~/.config/opencode/get-shit-done/workflows/map-codebase.md
+@~/.config/opencode/get-shit-done/templates/codebase/stack.md
+@~/.config/opencode/get-shit-done/templates/codebase/architecture.md
+@~/.config/opencode/get-shit-done/templates/codebase/structure.md
+@~/.config/opencode/get-shit-done/templates/codebase/conventions.md
+@~/.config/opencode/get-shit-done/templates/codebase/testing.md
+@~/.config/opencode/get-shit-done/templates/codebase/integrations.md
+@~/.config/opencode/get-shit-done/templates/codebase/concerns.md
 </execution_context>
 
 <context>

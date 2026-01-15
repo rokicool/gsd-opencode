@@ -21,12 +21,12 @@ Output: One or more PLAN.md files in the phase directory (.planning/phases/XX-na
 </objective>
 
 <execution_context>
-@~/.config/opencode/gsd-opencode/workflows/plan-phase.md
-@~/.config/opencode/gsd-opencode/templates/phase-prompt.md
-@~/.config/opencode/gsd-opencode/references/plan-format.md
-@~/.config/opencode/gsd-opencode/references/scope-estimation.md
-@~/.config/opencode/gsd-opencode/references/checkpoints.md
-@~/.config/opencode/gsd-opencode/references/tdd.md
+@~/.config/opencode/get-shit-done/workflows/plan-phase.md
+@~/.config/opencode/get-shit-done/templates/phase-prompt.md
+@~/.config/opencode/get-shit-done/references/plan-format.md
+@~/.config/opencode/get-shit-done/references/scope-estimation.md
+@~/.config/opencode/get-shit-done/references/checkpoints.md
+@~/.config/opencode/get-shit-done/references/tdd.md
 </execution_context>
 
 <context>

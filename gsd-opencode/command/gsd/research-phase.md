@@ -27,9 +27,9 @@ Output: RESEARCH.md with ecosystem knowledge that informs quality planning.
 </objective>
 
 <execution_context>
-@~/.config/opencode/gsd-opencode/workflows/research-phase.md
-@~/.config/opencode/gsd-opencode/templates/research.md
-@~/.config/opencode/gsd-opencode/references/research-pitfalls.md
+@~/.config/opencode/get-shit-done/workflows/research-phase.md
+@~/.config/opencode/get-shit-done/templates/research.md
+@~/.config/opencode/get-shit-done/references/research-pitfalls.md
 </execution_context>
 
 <context>

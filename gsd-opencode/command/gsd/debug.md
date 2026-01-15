@@ -20,8 +20,8 @@ If starting new: gather symptoms, then investigate autonomously.
 </objective>
 
 <execution_context>
-@~/.config/opencode/gsd-opencode/workflows/debug.md
-@~/.config/opencode/gsd-opencode/templates/DEBUG.md
+@~/.config/opencode/get-shit-done/workflows/debug.md
+@~/.config/opencode/get-shit-done/templates/DEBUG.md
 </execution_context>
 
 <context>
@@ -34,7 +34,7 @@ ls .planning/debug/*.md 2>/dev/null | head -5
 </context>
 
 <process>
-Follow the workflow in @~/.config/opencode/gsd-opencode/workflows/debug.md
+Follow the workflow in @~/.config/opencode/get-shit-done/workflows/debug.md
 
 **Quick reference:**
 

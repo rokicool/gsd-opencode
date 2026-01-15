@@ -13,8 +13,8 @@ Output: {phase}-CONTEXT.md capturing the user's vision for the phase
 </objective>
 
 <execution_context>
-@~/.config/opencode/gsd-opencode/workflows/discuss-phase.md
-@~/.config/opencode/gsd-opencode/templates/context.md
+@~/.config/opencode/get-shit-done/workflows/discuss-phase.md
+@~/.config/opencode/get-shit-done/templates/context.md
 </execution_context>
 
 <context>

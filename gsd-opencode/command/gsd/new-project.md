@@ -20,10 +20,10 @@ Creates `.planning/` with PROJECT.md and config.json.
 
 <execution_context>
 
-@~/.config/opencode/gsd-opencode/references/principles.md
-@~/.config/opencode/gsd-opencode/references/questioning.md
-@~/.config/opencode/gsd-opencode/templates/project.md
-@~/.config/opencode/gsd-opencode/templates/config.json
+@~/.config/opencode/get-shit-done/references/principles.md
+@~/.config/opencode/get-shit-done/references/questioning.md
+@~/.config/opencode/get-shit-done/templates/project.md
+@~/.config/opencode/get-shit-done/templates/config.json
 
 </execution_context>
 
@@ -290,7 +290,7 @@ EOF
 
 <step name="done">
 
-Present completion with next steps (see ~/.config/opencode/gsd-opencode/references/continuation-format.md):
+Present completion with next steps (see ~/.config/opencode/get-shit-done/references/continuation-format.md):
 
 ```
 Project initialized:

@@ -21,8 +21,8 @@ Output: Validation of features, any issues logged to phase-scoped ISSUES.md
 </objective>
 
 <execution_context>
-@~/.config/opencode/gsd-opencode/workflows/verify-work.md
-@~/.config/opencode/gsd-opencode/templates/uat-issues.md
+@~/.config/opencode/get-shit-done/workflows/verify-work.md
+@~/.config/opencode/get-shit-done/templates/uat-issues.md
 </execution_context>
 
 <context>

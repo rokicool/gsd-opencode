@@ -19,8 +19,8 @@ Output: {plan}-FIX.md in the phase directory, ready for execution.
 </objective>
 
 <execution_context>
-@~/.config/opencode/gsd-opencode/references/plan-format.md
-@~/.config/opencode/gsd-opencode/references/checkpoints.md
+@~/.config/opencode/get-shit-done/references/plan-format.md
+@~/.config/opencode/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>
@@ -126,8 +126,8 @@ Priority: {critical count} critical, {major count} major, {minor count} minor
 </objective>
 
 <execution_context>
-@~/.config/opencode/gsd-opencode/workflows/execute-plan.md
-@~/.config/opencode/gsd-opencode/templates/summary.md
+@~/.config/opencode/get-shit-done/workflows/execute-plan.md
+@~/.config/opencode/get-shit-done/templates/summary.md
 </execution_context>
 
 <context>

@@ -11,7 +11,7 @@ Output: Context gathered, then routes to /gsd:new-milestone
 </objective>
 
 <execution_context>
-@~/.config/opencode/gsd-opencode/workflows/discuss-milestone.md
+@~/.config/opencode/get-shit-done/workflows/discuss-milestone.md
 </execution_context>
 
 <context>
