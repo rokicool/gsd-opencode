@@ -1,6 +1,6 @@
 # Phase Prompt Template
 
-Template for `.planning/phases/XX-name/{phase}-{plan}-PLAN.md` - executable phase plans.
+Template for `.planning/phases/XX-name/{phase}-{plan}-PLAN.md` - executable phase plans optimized for parallel execution.
 
 **Naming:** Use `{phase}-{plan}-PLAN.md` format (e.g., `01-02-PLAN.md` for Phase 1, Plan 2)
 
@@ -11,29 +11,39 @@ Template for `.planning/phases/XX-name/{phase}-{plan}-PLAN.md` - executable phas
 ```markdown
 ---
 phase: XX-name
+plan: NN
 type: execute
+wave: N                     # Execution wave (1, 2, 3...). Pre-computed at plan time.
+depends_on: []              # Plan IDs this plan requires (e.g., ["01-01"]).
+files_modified: []          # Files this plan modifies.
+autonomous: true            # false if plan has checkpoints requiring user interaction
 domain: [optional - if domain skill loaded]
 ---
 
 <objective>
-[What this phase accomplishes - from roadmap phase goal]
+[What this plan accomplishes]
 
 Purpose: [Why this matters for the project]
 Output: [What artifacts will be created]
 </objective>
 
 <execution_context>
-~/.config/opencode/get-shit-done/workflows/execute-phase.md
-./summary.md
+@~/.config/opencode/get-shit-done/workflows/execute-plan.md
+@~/.config/opencode/get-shit-done/templates/summary.md
 [If plan contains checkpoint tasks (type="checkpoint:*"), add:]
-~/.config/opencode/get-shit-done/references/checkpoints.md
+@~/.config/opencode/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>
 @.planning/PROJECT.md
 @.planning/ROADMAP.md
-[If discovery exists:]
-@.planning/phases/XX-name/DISCOVERY.md
+@.planning/STATE.md
+
+# Only reference prior plan SUMMARYs if genuinely needed:
+# - This plan uses types/exports from prior plan
+# - Prior plan made decision that affects this plan
+# Do NOT reflexively chain: Plan 02 refs 01, Plan 03 refs 02...
+
 [Relevant source files:]
 @src/path/to/relevant.ts
 </context>
@@ -74,14 +84,6 @@ Output: [What artifacts will be created]
   <resume-signal>[How to indicate choice - "Select: option-a or option-b"]</resume-signal>
 </task>
 
-<task type="auto">
-  <name>Task 3: [Action-oriented name]</name>
-  <files>path/to/file.ext</files>
-  <action>[Specific implementation]</action>
-  <verify>[Command or check]</verify>
-  <done>[Acceptance criteria]</done>
-</task>
-
 <task type="checkpoint:human-verify" gate="blocking">
   <what-built>[What Claude just built that needs verification]</what-built>
   <how-to-verify>
@@ -93,12 +95,10 @@ Output: [What artifacts will be created]
   <resume-signal>Type "approved" to continue, or describe issues to fix</resume-signal>
 </task>
 
-[Continue for all tasks - mix of auto and checkpoints as needed...]
-
 </tasks>
 
 <verification>
-Before declaring phase complete:
+Before declaring plan complete:
 - [ ] [Specific test command]
 - [ ] [Build/type check passes]
 - [ ] [Behavior verification]
@@ -109,195 +109,355 @@ Before declaring phase complete:
 - All tasks completed
 - All verification checks pass
 - No errors or warnings introduced
-- [Phase-specific criteria]
+- [Plan-specific criteria]
   </success_criteria>
 
 <output>
-After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`:
-
-# Phase [X] Plan [Y]: [Name] Summary
-
-**[Substantive one-liner - what shipped, not "phase complete"]**
-
-## Accomplishments
-
-- [Key outcome 1]
-- [Key outcome 2]
-
-## Files Created/Modified
-
-- `path/to/file.ts` - Description
-- `path/to/another.ts` - Description
-
-## Decisions Made
-
-[Key decisions and rationale, or "None"]
-
-## Issues Encountered
-
-[Problems and resolutions, or "None"]
-
-## Next Step
-
-[If more plans in this phase: "Ready for {phase}-{next-plan}-PLAN.md"]
-[If phase complete: "Phase complete, ready for next phase"]
+After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 </output>
 ```
 
-<key_elements>
-From create-meta-prompts patterns:
+---
 
-- XML structure for Claude parsing
-- @context references for file loading
-- Task types: auto, checkpoint:human-action, checkpoint:human-verify, checkpoint:decision
-- Action includes "what to avoid and WHY" (from intelligence-rules)
-- Verification is specific and executable
-- Success criteria is measurable
-- Output specification includes SUMMARY.md structure
-  </key_elements>
+## Frontmatter Fields
 
-<scope_guidance>
+| Field | Required | Purpose |
+|-------|----------|---------|
+| `phase` | Yes | Phase identifier (e.g., `01-foundation`) |
+| `plan` | Yes | Plan number within phase (e.g., `01`, `02`) |
+| `type` | Yes | Always `execute` for standard plans, `tdd` for TDD plans |
+| `wave` | Yes | Execution wave number (1, 2, 3...). Pre-computed at plan time. |
+| `depends_on` | Yes | Array of plan IDs this plan requires. |
+| `files_modified` | Yes | Files this plan touches. |
+| `autonomous` | Yes | `true` if no checkpoints, `false` if has checkpoints |
+| `domain` | No | Domain skill if loaded (e.g., `next-js`) |
+
+**Wave is pre-computed:** Wave numbers are assigned during `/gsd:plan-phase`. Execute-phase reads `wave` directly from frontmatter and groups plans by wave number. No runtime dependency analysis needed.
+
+---
+
+## Parallel vs Sequential
+
+<parallel_examples>
+
+**Wave 1 candidates (parallel):**
+
+```yaml
+# Plan 01 - User feature
+wave: 1
+depends_on: []
+files_modified: [src/models/user.ts, src/api/users.ts]
+autonomous: true
+
+# Plan 02 - Product feature (no overlap with Plan 01)
+wave: 1
+depends_on: []
+files_modified: [src/models/product.ts, src/api/products.ts]
+autonomous: true
+
+# Plan 03 - Order feature (no overlap)
+wave: 1
+depends_on: []
+files_modified: [src/models/order.ts, src/api/orders.ts]
+autonomous: true
+```
+
+All three run in parallel (Wave 1) - no dependencies, no file conflicts.
+
+**Sequential (genuine dependency):**
+
+```yaml
+# Plan 01 - Auth foundation
+wave: 1
+depends_on: []
+files_modified: [src/lib/auth.ts, src/middleware/auth.ts]
+autonomous: true
+
+# Plan 02 - Protected features (needs auth)
+wave: 2
+depends_on: ["01"]
+files_modified: [src/features/dashboard.ts]
+autonomous: true
+```
+
+Plan 02 in Wave 2 waits for Plan 01 in Wave 1 - genuine dependency on auth types/middleware.
+
+**Checkpoint plan:**
+
+```yaml
+# Plan 03 - UI with verification
+wave: 3
+depends_on: ["01", "02"]
+files_modified: [src/components/Dashboard.tsx]
+autonomous: false  # Has checkpoint:human-verify
+```
+
+Wave 3 runs after Waves 1 and 2. Pauses at checkpoint, orchestrator presents to user, resumes on approval.
+
+</parallel_examples>
+
+---
+
+## Context Section
+
+**Parallel-aware context:**
+
+```markdown
+<context>
+@.planning/PROJECT.md
+@.planning/ROADMAP.md
+@.planning/STATE.md
+
+# Only include SUMMARY refs if genuinely needed:
+# - This plan imports types from prior plan
+# - Prior plan made decision affecting this plan
+# - Prior plan's output is input to this plan
+#
+# Independent plans need NO prior SUMMARY references.
+# Do NOT reflexively chain: 02 refs 01, 03 refs 02...
+
+@src/relevant/source.ts
+</context>
+```
+
+**Bad pattern (creates false dependencies):**
+```markdown
+<context>
+@.planning/phases/03-features/03-01-SUMMARY.md  # Just because it's earlier
+@.planning/phases/03-features/03-02-SUMMARY.md  # Reflexive chaining
+</context>
+```
+
+---
+
+## Scope Guidance
+
 **Plan sizing:**
 
-- Aim for 2-3 tasks per plan
-- If planning >3 tasks, split into multiple plans (01-01, 01-02, etc.)
-- Target ~50% context usage maximum
-- Complex phases: Create 01-01, 01-02, 01-03 plans instead of one large plan
+- 2-3 tasks per plan
+- ~50% context usage maximum
+- Complex phases: Multiple focused plans, not one large plan
 
 **When to split:**
 
 - Different subsystems (auth vs API vs UI)
-- Clear dependency boundaries (setup → implement → test)
-- Risk of context overflow (>50% estimated usage)
-- **TDD candidates** - Features that warrant TDD become their own TDD plans
-</scope_guidance>
+- >3 tasks
+- Risk of context overflow
+- TDD candidates - separate plans
 
-<tdd_plan_note>
-**TDD features get dedicated plans.**
+**Vertical slices preferred:**
 
-TDD requires 2-3 execution cycles (RED → GREEN → REFACTOR) that consume 40-50% context for a single feature. Features warranting TDD (business logic, validation, algorithms, API contracts) each get their own TDD plan.
+```
+PREFER: Plan 01 = User (model + API + UI)
+        Plan 02 = Product (model + API + UI)
+
+AVOID:  Plan 01 = All models
+        Plan 02 = All APIs
+        Plan 03 = All UIs
+```
+
+---
+
+## TDD Plans
+
+TDD features get dedicated plans with `type: tdd`.
 
 **Heuristic:** Can you write `expect(fn(input)).toBe(output)` before writing `fn`?
-→ Yes: Create a TDD plan (one feature per plan)
+→ Yes: Create a TDD plan
 → No: Standard task in standard plan
 
 See `~/.config/opencode/get-shit-done/references/tdd.md` for TDD plan structure.
-</tdd_plan_note>
 
-<good_examples>
+---
+
+## Task Types
+
+| Type | Use For | Autonomy |
+|------|---------|----------|
+| `auto` | Everything Claude can do independently | Fully autonomous |
+| `checkpoint:human-verify` | Visual/functional verification | Pauses, returns to orchestrator |
+| `checkpoint:decision` | Implementation choices | Pauses, returns to orchestrator |
+| `checkpoint:human-action` | Truly unavoidable manual steps (rare) | Pauses, returns to orchestrator |
+
+**Checkpoint behavior in parallel execution:**
+- Plan runs until checkpoint
+- Agent returns with checkpoint details + agent_id
+- Orchestrator presents to user
+- User responds
+- Orchestrator resumes agent with `resume: agent_id`
+
+---
+
+## Examples
+
+**Autonomous parallel plan:**
 
 ```markdown
 ---
-phase: 01-foundation
+phase: 03-features
+plan: 01
 type: execute
-domain: next-js
+wave: 1
+depends_on: []
+files_modified: [src/features/user/model.ts, src/features/user/api.ts, src/features/user/UserList.tsx]
+autonomous: true
 ---
 
 <objective>
-Set up Next.js project with authentication foundation.
+Implement complete User feature as vertical slice.
 
-Purpose: Establish the core structure and auth patterns all features depend on.
-Output: Working Next.js app with JWT auth, protected routes, and user model.
+Purpose: Self-contained user management that can run parallel to other features.
+Output: User model, API endpoints, and UI components.
+</objective>
+
+<context>
+@.planning/PROJECT.md
+@.planning/ROADMAP.md
+@.planning/STATE.md
+</context>
+
+<tasks>
+<task type="auto">
+  <name>Task 1: Create User model</name>
+  <files>src/features/user/model.ts</files>
+  <action>Define User type with id, email, name, createdAt. Export TypeScript interface.</action>
+  <verify>tsc --noEmit passes</verify>
+  <done>User type exported and usable</done>
+</task>
+
+<task type="auto">
+  <name>Task 2: Create User API endpoints</name>
+  <files>src/features/user/api.ts</files>
+  <action>GET /users (list), GET /users/:id (single), POST /users (create). Use User type from model.</action>
+  <verify>curl tests pass for all endpoints</verify>
+  <done>All CRUD operations work</done>
+</task>
+</tasks>
+
+<verification>
+- [ ] npm run build succeeds
+- [ ] API endpoints respond correctly
+</verification>
+
+<success_criteria>
+- All tasks completed
+- User feature works end-to-end
+</success_criteria>
+
+<output>
+After completion, create `.planning/phases/03-features/03-01-SUMMARY.md`
+</output>
+```
+
+**Plan with checkpoint (non-autonomous):**
+
+```markdown
+---
+phase: 03-features
+plan: 03
+type: execute
+wave: 2
+depends_on: ["03-01", "03-02"]
+files_modified: [src/components/Dashboard.tsx]
+autonomous: false
+---
+
+<objective>
+Build dashboard with visual verification.
+
+Purpose: Integrate user and product features into unified view.
+Output: Working dashboard component.
 </objective>
 
 <execution_context>
-~/.config/opencode/get-shit-done/workflows/execute-phase.md
-./summary.md
+@~/.config/opencode/get-shit-done/workflows/execute-plan.md
+@~/.config/opencode/get-shit-done/templates/summary.md
+@~/.config/opencode/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>
 @.planning/PROJECT.md
 @.planning/ROADMAP.md
-@src/lib/db.ts
+@.planning/phases/03-features/03-01-SUMMARY.md
+@.planning/phases/03-features/03-02-SUMMARY.md
 </context>
 
 <tasks>
-
 <task type="auto">
-  <name>Task 1: Add User model to database schema</name>
-  <files>prisma/schema.prisma</files>
-  <action>Add User model with fields: id (cuid), email (unique), passwordHash, createdAt, updatedAt. Add Session relation. Use @db.VarChar(255) for email to prevent index issues.</action>
-  <verify>npx prisma validate passes, npx prisma generate succeeds</verify>
-  <done>Schema valid, types generated, no errors</done>
+  <name>Task 1: Build Dashboard layout</name>
+  <files>src/components/Dashboard.tsx</files>
+  <action>Create responsive grid with UserList and ProductList components. Use Tailwind for styling.</action>
+  <verify>npm run build succeeds</verify>
+  <done>Dashboard renders without errors</done>
 </task>
 
-<task type="auto">
-  <name>Task 2: Create login API endpoint</name>
-  <files>src/app/api/auth/login/route.ts</files>
-  <action>POST endpoint that accepts {email, password}, validates against User table using bcrypt, returns JWT in httpOnly cookie with 15-min expiry. Use jose library for JWT (not jsonwebtoken - it has CommonJS issues with Next.js).</action>
-  <verify>curl -X POST /api/auth/login -d '{"email":"test@test.com","password":"test"}' -H "Content-Type: application/json" returns 200 with Set-Cookie header</verify>
-  <done>Valid credentials return 200 + cookie, invalid return 401, missing fields return 400</done>
+<task type="checkpoint:human-verify" gate="blocking">
+  <what-built>Responsive dashboard with user and product sections</what-built>
+  <how-to-verify>
+    1. Run: npm run dev
+    2. Visit: http://localhost:3000/dashboard
+    3. Desktop: Verify two-column grid
+    4. Mobile: Verify stacked layout
+    5. Check: No layout shift, no scroll issues
+  </how-to-verify>
+  <resume-signal>Type "approved" or describe issues</resume-signal>
 </task>
-
 </tasks>
 
 <verification>
-Before declaring phase complete:
-- [ ] `npm run build` succeeds without errors
-- [ ] `npx prisma validate` passes
-- [ ] Login endpoint responds correctly to valid/invalid credentials
-- [ ] Protected route redirects unauthenticated users
+- [ ] npm run build succeeds
+- [ ] Visual verification passed
 </verification>
 
 <success_criteria>
-
 - All tasks completed
-- All verification checks pass
-- No TypeScript errors
-- JWT auth flow works end-to-end
-  </success_criteria>
+- User approved visual layout
+</success_criteria>
 
 <output>
-After completion, create `.planning/phases/01-foundation/01-01-SUMMARY.md`
+After completion, create `.planning/phases/03-features/03-03-SUMMARY.md`
 </output>
 ```
 
-</good_examples>
+---
 
-<bad_examples>
+## Anti-Patterns
 
-```markdown
-# Phase 1: Foundation
-
-## Tasks
-
-### Task 1: Set up authentication
-
-**Action**: Add auth to the app
-**Done when**: Users can log in
+**Bad: Reflexive dependency chaining**
+```yaml
+depends_on: ["03-01"]  # Just because 01 comes before 02
 ```
 
-This is useless. No XML structure, no @context, no verification, no specificity.
-</bad_examples>
+**Bad: Horizontal layer grouping**
+```
+Plan 01: All models
+Plan 02: All APIs (depends on 01)
+Plan 03: All UIs (depends on 02)
+```
 
-<guidelines>
-**When to use:**
-- Creating execution plans for each phase
-- One plan per 2-3 tasks, multiple plans per phase if needed
+**Bad: Missing autonomy flag**
+```yaml
+# Has checkpoint but no autonomous: false
+depends_on: []
+files_modified: [...]
+# autonomous: ???  <- Missing!
+```
+
+**Bad: Vague tasks**
+```xml
+<task type="auto">
+  <name>Set up authentication</name>
+  <action>Add auth to the app</action>
+</task>
+```
+
+---
+
+## Guidelines
+
 - Always use XML structure for Claude parsing
-
-**Task types:**
-
-- `type="auto"`: Execute without stopping
-- `type="checkpoint:human-action"`: User must do something (manual step)
-- `type="checkpoint:human-verify"`: User must verify output (testing, visual check)
-- `type="checkpoint:decision"`: User must choose between options
-
-**Gate values:**
-
-- `gate="blocking"`: Must resolve before continuing
-- `gate="optional"`: Can skip or defer
-
-**Context references:**
-
-- Use @path/to/file.md to load files
-- Always include @.planning/PROJECT.md and @.planning/ROADMAP.md
-- Include relevant source files for context
-- Include workflow/template references
-
-**After completion:**
-
-- Create SUMMARY.md in same directory
-- Follow summary.md template structure
-- Document deviations, decisions, issues
-  </guidelines>
+- Include `wave`, `depends_on`, `files_modified`, `autonomous` in every plan
+- Prefer vertical slices over horizontal layers
+- Only reference prior SUMMARYs when genuinely needed
+- Group checkpoints with related auto tasks in same plan
+- 2-3 tasks per plan, ~50% context max

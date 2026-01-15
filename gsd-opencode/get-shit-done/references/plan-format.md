@@ -10,14 +10,50 @@ A plan is Claude-executable when Claude can read the PLAN.md and immediately sta
 If Claude has to guess, interpret, or make assumptions - the task is too vague.
 </core_principle>
 
+<frontmatter>
+Every PLAN.md starts with YAML frontmatter:
+
+```yaml
+---
+phase: XX-name
+plan: NN
+type: execute
+wave: N                     # Execution wave (1, 2, 3...). Pre-computed at plan time.
+depends_on: []              # Plan IDs this plan requires (e.g., ["01-01"])
+files_modified: []          # Files this plan modifies
+autonomous: true            # false if plan has checkpoints
+domain: [optional]          # Domain skill if loaded
+---
+```
+
+| Field | Required | Purpose |
+|-------|----------|---------|
+| `phase` | Yes | Phase identifier (e.g., `01-foundation`) |
+| `plan` | Yes | Plan number within phase (e.g., `01`, `02`) |
+| `type` | Yes | `execute` for standard plans, `tdd` for TDD plans |
+| `wave` | Yes | Execution wave number (1, 2, 3...). Pre-computed during planning. |
+| `depends_on` | Yes | Array of plan IDs this plan requires. |
+| `files_modified` | Yes | Files this plan touches. |
+| `autonomous` | Yes | `true` if no checkpoints, `false` if has checkpoints |
+| `domain` | No | Domain skill if loaded (e.g., `next-js`) |
+
+**Wave is pre-computed:** `/gsd:plan-phase` assigns wave numbers based on `depends_on`. `/gsd:execute-phase` reads `wave` directly from frontmatter and groups plans by wave number. No runtime dependency analysis needed.
+
+**Checkpoint handling:** Plans with `autonomous: false` require user interaction. They run in their assigned wave but pause at checkpoints.
+</frontmatter>
+
 <prompt_structure>
 Every PLAN.md follows this XML structure:
 
 ```markdown
 ---
 phase: XX-name
+plan: NN
 type: execute
-domain: [optional]
+wave: N
+depends_on: []
+files_modified: [path/to/file.ts]
+autonomous: true
 ---
 
 <objective>
@@ -26,9 +62,19 @@ Purpose: [...]
 Output: [...]
 </objective>
 
+<execution_context>
+@~/.config/opencode/get-shit-done/workflows/execute-plan.md
+@~/.config/opencode/get-shit-done/templates/summary.md
+[If checkpoints exist:]
+@~/.config/opencode/get-shit-done/references/checkpoints.md
+</execution_context>
+
 <context>
 @.planning/PROJECT.md
 @.planning/ROADMAP.md
+@.planning/STATE.md
+[Only if genuinely needed:]
+@.planning/phases/XX-name/XX-YY-SUMMARY.md
 @relevant/source/files.ts
 </context>
 
@@ -240,6 +286,14 @@ Use for: Technology selection, architecture decisions, design choices, feature p
 
 **Golden rule:** If Claude CAN automate it, Claude MUST automate it.
 
+**Checkpoint impact on parallelization:**
+- Plans with checkpoints set `autonomous: false` in frontmatter
+- Non-autonomous plans execute after parallel wave or in main context
+- Subagent pauses at checkpoint, returns to orchestrator
+- Orchestrator presents checkpoint to user
+- User responds
+- Orchestrator resumes agent with `resume: agent_id`
+
 See `./checkpoints.md` for comprehensive checkpoint guidance.
 </task_types>
 
@@ -274,14 +328,22 @@ Use @file references to load context for the prompt:
 ```markdown
 <context>
 @.planning/PROJECT.md           # Project vision
-@.planning/ROADMAP.md         # Phase structure
-@.planning/phases/02-auth/DISCOVERY.md  # Discovery results
-@src/lib/db.ts                # Existing database setup
-@src/types/user.ts            # Existing type definitions
+@.planning/ROADMAP.md           # Phase structure
+@.planning/STATE.md             # Current position
+
+# Only include prior SUMMARY if genuinely needed:
+# - This plan imports types from prior plan
+# - Prior plan made decision affecting this plan
+# Independent plans need NO prior SUMMARY references.
+
+@src/lib/db.ts                  # Existing database setup
+@src/types/user.ts              # Existing type definitions
 </context>
 ```
 
 Reference files that Claude needs to understand before implementing.
+
+**Anti-pattern:** Reflexive chaining (02 refs 01, 03 refs 02). Only reference what you actually need.
 </context_references>
 
 <verification_section>
@@ -320,22 +382,7 @@ Specify the SUMMARY.md structure:
 
 ```markdown
 <output>
-After completion, create `.planning/phases/XX-name/SUMMARY.md`:
-
-# Phase X: Name Summary
-
-**[Substantive one-liner]**
-
-## Accomplishments
-
-## Files Created/Modified
-
-## Decisions Made
-
-## Issues Encountered
-
-## Next Phase Readiness
-
+After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 </output>
 ```
 

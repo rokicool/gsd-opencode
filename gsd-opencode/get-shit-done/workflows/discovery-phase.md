@@ -218,7 +218,7 @@ Write `.planning/phases/XX-name/DISCOVERY.md`:
 After creating DISCOVERY.md, check confidence level.
 
 If confidence is LOW:
-Use AskUserQuestion:
+Use question:
 
 - header: "Low Confidence"
 - question: "Discovery confidence is LOW: [reason]. How would you like to proceed?"

@@ -8,7 +8,7 @@ allowed-tools:
   - Glob
   - Grep
   - Write
-  - webfetch
+  - WebFetch
   - WebSearch
   - mcp__context7__*
 ---
@@ -19,7 +19,7 @@ Comprehensive research on HOW to implement a phase before planning.
 This is for niche/complex domains where Claude's training data is sparse or outdated. Research discovers:
 - What libraries exist for this problem
 - What architecture patterns experts use
-- What standard stack looks like
+- What the standard stack looks like
 - What problems people commonly hit
 - What NOT to hand-roll (use existing solutions)
 
@@ -56,7 +56,7 @@ Check for `.planning/phases/XX-name/{phase}-CONTEXT.md` - bonus context from dis
    - Execute comprehensive research via Context7, official docs, WebSearch
    - Cross-verify all findings
    - Create RESEARCH.md with actionable ecosystem knowledge
-6. Offer next steps (plan phase)
+6. Offer next steps (plan the phase)
 </process>
 
 <when_to_use>
@@ -85,7 +85,7 @@ Check for `.planning/phases/XX-name/{phase}-CONTEXT.md` - bonus context from dis
 - [ ] RESEARCH.md created with ecosystem knowledge
 - [ ] Standard stack/libraries identified
 - [ ] Architecture patterns documented
-- [ ] Common pitfalls catalogueed
+- [ ] Common pitfalls catalogued
 - [ ] What NOT to hand-roll is clear
 - [ ] User knows next steps (plan phase)
 </success_criteria>

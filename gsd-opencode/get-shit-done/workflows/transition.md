@@ -449,7 +449,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Plan Phase [X+1] in detail
 ```
 
-Exit skill and invoke SlashCommand("/gsd:plan-phase [X+1]")
+Exit skill and invoke [removed - use /command syntax]("/gsd:plan-phase [X+1]")
 
 </if>
 
@@ -466,7 +466,7 @@ Exit skill and invoke SlashCommand("/gsd:plan-phase [X+1]")
 
 `/gsd:plan-phase [X+1]`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/clear` first → fresh context window*
 
 ---
 
@@ -494,7 +494,7 @@ Phase {X} marked complete.
 ⚡ Auto-continuing: Complete milestone and archive
 ```
 
-Exit skill and invoke SlashCommand("/gsd:complete-milestone {version}")
+Exit skill and invoke [removed - use /command syntax]("/gsd:complete-milestone {version}")
 
 </if>
 
@@ -513,7 +513,7 @@ Exit skill and invoke SlashCommand("/gsd:complete-milestone {version}")
 
 `/gsd:complete-milestone {version}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/clear` first → fresh context window*
 
 ---
 

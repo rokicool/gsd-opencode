@@ -63,7 +63,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 2.1-01: [Description]
+- [ ] 02.1-01: [Description]
 
 ### Phase 3: [Name]
 **Goal**: [What this phase delivers]

@@ -126,7 +126,7 @@ Priority: {critical count} critical, {major count} major, {minor count} minor
 </objective>
 
 <execution_context>
-@~/.config/opencode/get-shit-done/workflows/execute-phase.md
+@~/.config/opencode/get-shit-done/workflows/execute-plan.md
 @~/.config/opencode/get-shit-done/templates/summary.md
 </execution_context>
 

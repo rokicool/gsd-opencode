@@ -6,13 +6,13 @@ allowed-tools:
   - Bash
   - Write
   - question
+  - [removed - use /command syntax]
 ---
 
 <objective>
 Restore complete project context and resume work seamlessly from previous session.
 
-Routes to:
-- resume-project workflow which handles:
+Routes to the resume-project workflow which handles:
 
 - STATE.md loading (or reconstruction if missing)
 - Checkpoint detection (.continue-here files)
@@ -26,7 +26,7 @@ Routes to:
 </execution_context>
 
 <process>
-**Follow resume-project workflow** from `@~/.config/opencode/get-shit-done/workflows/resume-project.md`.
+**Follow the resume-project workflow** from `@~/.config/opencode/get-shit-done/workflows/resume-project.md`.
 
 The workflow handles all resumption logic including:
 

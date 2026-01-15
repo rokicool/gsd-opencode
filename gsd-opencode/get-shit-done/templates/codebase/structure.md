@@ -125,7 +125,7 @@ Template for `.planning/codebase/STRUCTURE.md` - captures physical file organiza
 ```
 get-shit-done/
 ├── bin/                # Executable entry points
-├── commands/           # Slash command definitions
+├── command/           # Slash command definitions
 │   └── gsd/           # GSD-specific commands
 ├── get-shit-done/     # Skill resources
 │   ├── references/    # Principle documents
@@ -145,8 +145,8 @@ get-shit-done/
 - Key files: install.js - handles npx installation
 - Subdirectories: None
 
-**commands/gsd/**
-- Purpose: Slash command definitions for Claude Code
+**command/gsd/**
+- Purpose: Slash command definitions for OpenCode
 - Contains: *.md files (one per command)
 - Key files: new-project.md, plan-phase.md, execute-plan.md
 - Subdirectories: None (flat structure)
@@ -166,7 +166,7 @@ get-shit-done/
 **get-shit-done/workflows/**
 - Purpose: Reusable multi-step procedures
 - Contains: Workflow definitions called by commands
-- Key files: execute-phase.md, research-phase.md
+- Key files: execute-plan.md, research-phase.md
 - Subdirectories: None
 
 ## Key File Locations
@@ -186,7 +186,7 @@ get-shit-done/
 
 **Documentation:**
 - `README.md` - User-facing installation and usage guide
-- `CLAUDE.md` - Instructions for Claude Code when working in this repo
+- `CLAUDE.md` - Instructions for OpenCode when working in this repo
 
 ## Naming Conventions
 
@@ -197,7 +197,7 @@ get-shit-done/
 
 **Directories:**
 - kebab-case: All directories
-- Plural for collections: templates/, commands/, workflows/
+- Plural for collections: templates/, command/, workflows/
 
 **Special Patterns:**
 - {command-name}.md: Slash command definition
@@ -206,8 +206,8 @@ get-shit-done/
 ## Where to Add New Code
 
 **New Slash Command:**
-- Primary code: `commands/gsd/{command-name}.md`
-- Tests: `tests/commands/{command-name}.test.js` (if testing implemented)
+- Primary code: `command/gsd/{command-name}.md`
+- Tests: `tests/command/{command-name}.test.js` (if testing implemented)
 - Documentation: Update `README.md` with new command
 
 **New Template:**
@@ -220,7 +220,7 @@ get-shit-done/
 
 **New Reference Document:**
 - Implementation: `get-shit-done/references/{name}.md`
-- Usage: Reference from commands/workflows as needed
+- Usage: Reference from command/workflows as needed
 
 **Utilities:**
 - No utilities yet (`install.js` is monolithic)
@@ -233,8 +233,8 @@ get-shit-done/
 - Source: Copied by bin/install.js during installation
 - Committed: Yes (source of truth)
 
-**commands/**
-- Purpose: Slash commands installed to ~/.config/opencode/commands/
+**command/**
+- Purpose: Slash commands installed to ~/.config/opencode/command/
 - Source: Copied by bin/install.js during installation
 - Committed: Yes (source of truth)
 

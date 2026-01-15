@@ -1,6 +1,6 @@
 ---
 name: gsd:insert-phase
-description: Insert urgent work as decimal phase (e.g., 7.1) between existing phases
+description: Insert urgent work as decimal phase (e.g., 72.1) between existing phases
 argument-hint: <after> <description>
 allowed-tools:
   - Read
@@ -11,7 +11,7 @@ allowed-tools:
 <objective>
 Insert a decimal phase for urgent work discovered mid-milestone that must be completed between existing integer phases.
 
-Uses decimal numbering (7.1, 7.2, etc.) to preserve the logical sequence of planned phases while accommodating urgent insertions.
+Uses decimal numbering (72.1, 72.2, etc.) to preserve the logical sequence of planned phases while accommodating urgent insertions.
 
 Purpose: Handle urgent work discovered during execution without renumbering entire roadmap.
 </objective>
@@ -25,11 +25,11 @@ Purpose: Handle urgent work discovered during execution without renumbering enti
 
 <step name="parse_arguments">
 Parse the command arguments:
-- First argument ($1) : integer phase number to insert after
-- Remaining arguments ($2 $3 $4 $5 $6 $7 $8 $9 $10 $11): phase description
+- First argument: integer phase number to insert after
+- Remaining arguments: phase description
 
-Example: `/gsd:insert-phase 7 Fix critical auth bug`
-→ after = 7
+Example: `/gsd:insert-phase 72 Fix critical auth bug`
+→ after = 72
 → description = "Fix critical auth bug"
 
 Validation:
@@ -38,7 +38,7 @@ Validation:
 if [ $# -lt 2 ]; then
   echo "ERROR: Both phase number and description required"
   echo "Usage: /gsd:insert-phase <after> <description>"
-  echo "Example: /gsd:insert-phase 7 Fix critical auth bug"
+  echo "Example: /gsd:insert-phase 72 Fix critical auth bug"
   exit 1
 fi
 ```
@@ -94,17 +94,17 @@ Verify that the target phase exists in the roadmap:
 Find existing decimal phases after the target phase:
 
 1. Search for all "### Phase {after_phase}.N:" headings
-2. Extract decimal suffixes (e.g., for Phase 7: find 7.1, 7.2, 7.3)
+2. Extract decimal suffixes (e.g., for Phase 72: find 72.1, 72.2, 72.3)
 3. Find the highest decimal suffix
 4. Calculate next decimal: max + 1
 
 Examples:
 
-- Phase 7 with no decimals → next is 7.1
-- Phase 7 with 7.1 → next is 7.2
-- Phase 7 with 7.1, 7.2 → next is 7.3
+- Phase 72 with no decimals → next is 72.1
+- Phase 72 with 72.1 → next is 72.2
+- Phase 72 with 72.1, 72.2 → next is 72.3
 
-Store as: `decimal_phase="${after_phase}.${next_decimal}"`
+Store as: `decimal_phase="$(printf "%02d" $after_phase).${next_decimal}"`
 </step>
 
 <step name="generate_slug">
@@ -115,7 +115,7 @@ slug=$(echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' 
 ```
 
 Phase directory name: `{decimal-phase}-{slug}`
-Example: `7.1-fix-critical-auth-bug`
+Example: `06.1-fix-critical-auth-bug` (phase 6 insertion)
 </step>
 
 <step name="create_phase_directory">

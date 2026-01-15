@@ -60,6 +60,12 @@ Recent decisions affecting current work:
 
 None yet.
 
+### Pending Todos
+
+[From .planning/todos/pending/ — ideas captured during sessions]
+
+None yet.
+
 ### Blockers/Concerns
 
 [Issues that affect future work]
@@ -151,6 +157,11 @@ Updated after each plan completion.
 - Phase where discovered
 - Effort estimate if known
 - Helps phase planning identify what to address
+
+**Pending Todos:** Ideas captured via /gsd:add-todo
+- Count of pending todos
+- Reference to .planning/todos/pending/
+- Brief list if few, count if many (e.g., "5 pending todos — see /gsd:check-todos")
 
 **Blockers/Concerns:** From "Next Phase Readiness" sections
 - Issues that affect future work

@@ -8,6 +8,7 @@ allowed-tools:
   - Glob
   - Edit
   - question
+  - [removed - use /command syntax]
 ---
 
 <objective>

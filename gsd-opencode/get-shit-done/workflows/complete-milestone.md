@@ -575,7 +575,7 @@ Tag: v[X.Y]
 
 `/gsd:discuss-milestone`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/clear` first → fresh context window*
 
 ---
 

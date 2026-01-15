@@ -9,7 +9,7 @@ allowed-tools:
   - Glob
   - Grep
   - question
-  - webfetch
+  - WebFetch
   - mcp__context7__*
 ---
 

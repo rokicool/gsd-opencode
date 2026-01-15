@@ -13,9 +13,9 @@ allowed-tools:
 ---
 
 <objective>
-Guide user through manual acceptance testing of recently built features.
+Guide the user through manual acceptance testing of recently built features.
 
-Purpose: Validate that what Claude thinks was built actually works from user's perspective. The USER performs all testing — Claude generates test checklist, guides process, and captures issues.
+Purpose: Validate that what Claude thinks was built actually works from the user's perspective. The USER performs all testing — Claude generates the test checklist, guides the process, and captures issues.
 
 Output: Validation of features, any issues logged to phase-scoped ISSUES.md
 </objective>
@@ -55,7 +55,7 @@ Scope: $ARGUMENTS (optional)
 <anti_patterns>
 - Don't run automated tests (that's for CI/test suites)
 - Don't make assumptions about test results — USER reports outcomes
-- Don't skip guidance — walk through each test
+- Don't skip the guidance — walk through each test
 - Don't dismiss minor issues — log everything user reports
 - Don't fix issues during testing — capture for later
 </anti_patterns>

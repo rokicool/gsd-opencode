@@ -6,6 +6,7 @@ allowed-tools:
   - Bash
   - Grep
   - Glob
+  - [removed - use /command syntax]
 ---
 
 <objective>
@@ -44,7 +45,7 @@ If missing STATE.md or ROADMAP.md: inform what's missing, suggest running `/gsd:
 <step name="recent">
 **Gather recent work context:**
 
-- Find 2-3 most recent SUMMARY.md files
+- Find the 2-3 most recent SUMMARY.md files
 - Extract from each: what was accomplished, key decisions, any issues logged
 - This shows "what we've been working on"
   </step>
@@ -56,6 +57,8 @@ If missing STATE.md or ROADMAP.md: inform what's missing, suggest running `/gsd:
 - Calculate: total plans, completed plans, remaining plans
 - Note any blockers, concerns, or deferred issues
 - Check for CONTEXT.md: For phases without PLAN.md files, check if `{phase}-CONTEXT.md` exists in phase directory
+- Count pending todos: `ls .planning/todos/pending/*.md 2>/dev/null | wc -l`
+- Check for active debug sessions: `ls .planning/debug/*.md 2>/dev/null | grep -v resolved | wc -l`
   </step>
 
 <step name="report">
@@ -82,6 +85,13 @@ CONTEXT: [✓ if CONTEXT.md exists | - if not]
 ## Open Issues
 - [any deferred issues or blockers]
 
+## Pending Todos
+- [count] pending — /gsd:check-todos to review
+
+## Active Debug Sessions
+- [count] active — /gsd:debug to continue
+(Only show this section if count > 0)
+
 ## What's Next
 [Next phase/plan objective from ROADMAP]
 ```
@@ -93,7 +103,7 @@ CONTEXT: [✓ if CONTEXT.md exists | - if not]
 
 **Step 1: Count plans, summaries, and issues in current phase**
 
-List files in current phase directory:
+List files in the current phase directory:
 
 ```bash
 ls -1 .planning/phases/[current-phase-dir]/*-PLAN.md 2>/dev/null | wc -l
@@ -128,7 +138,7 @@ Track:
 
 **Route A: Unexecuted plan exists**
 
-Find first PLAN.md without matching SUMMARY.md.
+Find the first PLAN.md without matching SUMMARY.md.
 Read its `<objective>` section.
 
 ```
@@ -223,9 +233,9 @@ ISSUES.md exists without matching FIX.md. User needs to plan fixes.
 
 Read ROADMAP.md and identify:
 1. Current phase number
-2. All phase numbers in current milestone section
+2. All phase numbers in the current milestone section
 
-Count total phases and identify highest phase number.
+Count total phases and identify the highest phase number.
 
 State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
 
@@ -240,7 +250,7 @@ State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
 
 **Route C: Phase complete, more phases remain**
 
-Read ROADMAP.md to get next phase's name and goal.
+Read ROADMAP.md to get the next phase's name and goal.
 
 ```
 ---

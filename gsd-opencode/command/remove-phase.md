@@ -10,9 +10,9 @@ allowed-tools:
 ---
 
 <objective>
-Remove an unstarted future phase from roadmap and renumber all subsequent phases to maintain a clean, linear sequence.
+Remove an unstarted future phase from the roadmap and renumber all subsequent phases to maintain a clean, linear sequence.
 
-Purpose: Clean removal of work you've decided not to do, without poluting context with cancelled/deferred markers.
+Purpose: Clean removal of work you've decided not to do, without polluting context with cancelled/deferred markers.
 Output: Phase deleted, all subsequent phases renumbered, git commit as historical record.
 </objective>
 
@@ -24,8 +24,8 @@ Output: Phase deleted, all subsequent phases renumbered, git commit as historica
 <process>
 
 <step name="parse_arguments">
-Parse command arguments:
-- Argument ($ARGUMENTS) is phase number to remove (integer or decimal)
+Parse the command arguments:
+- Argument is the phase number to remove (integer or decimal)
 - Example: `/gsd:remove-phase 17` → phase = 17
 - Example: `/gsd:remove-phase 16.1` → phase = 16.1
 
@@ -52,7 +52,7 @@ Parse current phase number from STATE.md "Current Position" section.
 </step>
 
 <step name="validate_phase_exists">
-Verify that target phase exists in ROADMAP.md:
+Verify the target phase exists in ROADMAP.md:
 
 1. Search for `### Phase {target}:` heading
 2. If not found:
@@ -66,7 +66,7 @@ Verify that target phase exists in ROADMAP.md:
 </step>
 
 <step name="validate_future_phase">
-Verify that phase is a future phase (not started):
+Verify the phase is a future phase (not started):
 
 1. Compare target phase to current phase from STATE.md
 2. Target must be > current phase number
@@ -106,7 +106,7 @@ Exit.
 </step>
 
 <step name="gather_phase_info">
-Collect information about phase being removed:
+Collect information about the phase being removed:
 
 1. Extract phase name from ROADMAP.md heading: `### Phase {target}: {Name}`
 2. Find phase directory: `.planning/phases/{target}-{slug}/`
@@ -147,12 +147,12 @@ Wait for confirmation.
 </step>
 
 <step name="delete_phase_directory">
-Delete target phase directory if it exists:
+Delete the target phase directory if it exists:
 
 ```bash
 if [ -d ".planning/phases/{target}-{slug}" ]; then
-  rm -rf ".planning/phases/{target}-${slug}"
-  echo "Deleted: .planning/phases/{target}-${slug}/"
+  rm -rf ".planning/phases/{target}-{slug}"
+  echo "Deleted: .planning/phases/{target}-{slug}/"
 fi
 ```
 
@@ -179,7 +179,7 @@ Also rename decimal phase directories:
 <step name="rename_files_in_directories">
 Rename plan files inside renumbered directories:
 
-For each renumbered directory, rename files that contain phase number:
+For each renumbered directory, rename files that contain the phase number:
 
 ```bash
 # Inside 17-dashboard (was 18-dashboard):
@@ -195,14 +195,14 @@ Also handle CONTEXT.md and DISCOVERY.md (these don't have phase prefixes, so no 
 <step name="update_roadmap">
 Update ROADMAP.md:
 
-1. **Remove** phase section entirely:
-   - Delete from `### Phase {target}:` to next phase heading (or section end)
+1. **Remove the phase section entirely:**
+   - Delete from `### Phase {target}:` to the next phase heading (or section end)
 
 2. **Remove from phase list:**
    - Delete line `- [ ] **Phase {target}: {Name}**` or similar
 
 3. **Remove from Progress table:**
-   - Delete of row for Phase {target}
+   - Delete the row for Phase {target}
 
 4. **Renumber all subsequent phases:**
    - `### Phase 18:` → `### Phase 17:`
@@ -212,7 +212,7 @@ Update ROADMAP.md:
 
 5. **Update dependency references:**
    - `**Depends on:** Phase 18` → `**Depends on:** Phase 17`
-   - For phase that depended on removed phase:
+   - For the phase that depended on the removed phase:
      - `**Depends on:** Phase 17` (removed) → `**Depends on:** Phase 16`
 
 6. **Renumber decimal phases:**
@@ -231,7 +231,7 @@ Update STATE.md:
 2. **Recalculate progress percentage:**
    - New percentage based on completed plans / new total plans
 
-Do NOT add a "Roadmap Evolution" note - git commit is the record.
+Do NOT add a "Roadmap Evolution" note - the git commit is the record.
 
 Write updated STATE.md.
 </step>
@@ -240,7 +240,7 @@ Write updated STATE.md.
 Search for and update phase references inside plan files:
 
 ```bash
-# Find files that reference to old phase numbers
+# Find files that reference the old phase numbers
 grep -r "Phase 18" .planning/phases/17-*/ 2>/dev/null
 grep -r "Phase 19" .planning/phases/18-*/ 2>/dev/null
 # etc.
@@ -250,7 +250,7 @@ Update any internal references to reflect new numbering.
 </step>
 
 <step name="commit">
-Stage and commit removal:
+Stage and commit the removal:
 
 ```bash
 git add .planning/
@@ -308,7 +308,7 @@ Would you like to:
 - Simpler operation
 
 **No subsequent phases to renumber:**
-- Removing last phase (e.g., Phase 20 when that's the end)
+- Removing the last phase (e.g., Phase 20 when that's the end)
 - Just delete and update ROADMAP.md, no renumbering needed
 
 **Phase directory doesn't exist:**

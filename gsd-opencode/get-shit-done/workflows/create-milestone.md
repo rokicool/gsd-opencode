@@ -368,7 +368,7 @@ Milestone v[X.Y] [Name] created:
 
 `/gsd:plan-phase [N]`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/clear` first → fresh context window*
 
 ---
 

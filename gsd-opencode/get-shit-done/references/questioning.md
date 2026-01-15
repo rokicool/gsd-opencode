@@ -10,9 +10,9 @@ Don't interrogate. Collaborate.
 </philosophy>
 
 <critical_rule>
-**ALL questions MUST use AskUserQuestion.**
+**ALL questions MUST use question.**
 
-Never ask questions inline as plain text. Every exploration question uses the AskUserQuestion tool with thoughtful options that help the user articulate their vision.
+Never ask questions inline as plain text. Every exploration question uses the question tool with thoughtful options that help the user articulate their vision.
 
 This applies to:
 - Opening questions ("What do you want to build?")
@@ -21,13 +21,13 @@ This applies to:
 - Boundary questions ("What's out of scope?")
 - Decision gates ("Ready to proceed?")
 
-The AskUserQuestion format helps users think by presenting concrete options to react to, rather than facing a blank text field.
+The question format helps users think by presenting concrete options to react to, rather than facing a blank text field.
 </critical_rule>
 
 <conversation_arc>
 **1. Open**
 
-Use AskUserQuestion:
+Use question:
 - header: "Vision"
 - question: "What do you want to build?"
 - options: Contextual starting points if available, otherwise broad categories + "Let me describe it"
@@ -38,7 +38,7 @@ Let them respond. Then follow up based on what they said.
 
 Whatever they said — dig into it. What excited them? What problem sparked this?
 
-Use AskUserQuestion with options that probe what they mentioned:
+Use question with options that probe what they mentioned:
 - header: "[Topic they mentioned]"
 - question: "You mentioned [X] — what would that actually look like?"
 - options: 2-3 interpretations of what they might mean + "Something else"
@@ -47,7 +47,7 @@ Use AskUserQuestion with options that probe what they mentioned:
 
 Help them distinguish the essential from the nice-to-have.
 
-Use AskUserQuestion:
+Use question:
 - header: "Core"
 - question: "If you could only nail one thing, what would it be?"
 - options: Key features/aspects they've mentioned + "All equally important" + "Something else"
@@ -56,7 +56,7 @@ Use AskUserQuestion:
 
 What is this NOT? Explicit exclusions prevent scope creep later.
 
-Use AskUserQuestion:
+Use question:
 - header: "Scope"
 - question: "What's explicitly NOT in v1?"
 - options: Things that might be tempting to include + "Nothing specific" + "Let me list them"
@@ -65,7 +65,7 @@ Use AskUserQuestion:
 
 Only ask about constraints that actually exist. Don't invent concerns.
 
-Use AskUserQuestion:
+Use question:
 - header: "Constraints"
 - question: "Any hard constraints?"
 - options: Common constraint types relevant to context + "None" + "Yes, let me explain"
@@ -77,7 +77,7 @@ Use AskUserQuestion:
 - Free-form "Tell me more about X" without options
 - Any question that leaves the user staring at a blank input
 
-**GOOD — AskUserQuestion with options:**
+**GOOD — question with options:**
 - header: "Audience"
 - question: "Who is this for?"
 - options: ["Just me", "My team", "Public users", "Let me describe"]
@@ -96,11 +96,11 @@ Use AskUserQuestion:
 - Ask about audience → ask about constraints → ask about tech stack (regardless of what user said)
 
 **GOOD — Following threads with targeted options:**
-- User mentions frustration → AskUserQuestion with specific frustration interpretations as options → their selection reveals the core value prop
+- User mentions frustration → question with specific frustration interpretations as options → their selection reveals the core value prop
 </good_vs_bad>
 
 <probing_techniques>
-When answers are vague, don't accept them. Probe with AskUserQuestion:
+When answers are vague, don't accept them. Probe with question:
 
 **"Make it good"** →
 - header: "Good"
@@ -135,7 +135,7 @@ If gaps remain, weave questions naturally into the conversation. Don't suddenly 
 </coverage_check>
 
 <decision_gate>
-When you feel you understand the vision, use AskUserQuestion:
+When you feel you understand the vision, use question:
 
 - header: "Ready?"
 - question: "Ready to create PROJECT.md, or explore more?"

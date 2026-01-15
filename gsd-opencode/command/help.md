@@ -107,14 +107,37 @@ Result: Creates `.planning/phases/01-foundation/01-01-PLAN.md`
 ### Execution
 
 **`/gsd:execute-plan <path>`**
-Execute a PLAN.md file directly.
+Execute a single PLAN.md file.
 
 - Runs plan tasks sequentially
 - Creates SUMMARY.md after completion
 - Updates STATE.md with accumulated context
-- Fast execution without loading full skill context
+- Use for interactive execution with checkpoints
 
 Usage: `/gsd:execute-plan .planning/phases/01-foundation/01-01-PLAN.md`
+
+**`/gsd:execute-phase <phase-number>`**
+Execute all unexecuted plans in a phase with parallel background agents.
+
+- Analyzes plan dependencies and spawns independent plans concurrently
+- Use when phase has 2+ plans and you want "walk away" execution
+- Respects max_concurrent_agents from config.json
+
+Usage: `/gsd:execute-phase 5`
+
+Options (via `.planning/config.json` parallelization section):
+- `max_concurrent_agents`: Limit parallel agents (default: 3)
+- `skip_checkpoints`: Skip human checkpoints in background (default: true)
+- `min_plans_for_parallel`: Minimum plans to trigger parallelization (default: 2)
+
+**`/gsd:status [--wait]`**
+Check status of background agents from parallel execution.
+
+- Shows running/completed agents from agent-history.json
+- Uses TaskOutput to poll agent status
+- With `--wait`: blocks until all agents complete
+
+Usage: `/gsd:status` or `/gsd:status --wait`
 
 ### Roadmap Management
 
@@ -225,6 +248,46 @@ Review deferred issues with codebase context.
 
 Usage: `/gsd:consider-issues`
 
+### Debugging
+
+**`/gsd:debug [issue description]`**
+Systematic debugging with persistent state across context resets.
+
+- Gathers symptoms through adaptive questioning
+- Creates `.planning/debug/[slug].md` to track investigation
+- Investigates using scientific method (evidence → hypothesis → test)
+- Survives `/clear` — run `/gsd:debug` with no args to resume
+- Archives resolved issues to `.planning/debug/resolved/`
+
+Usage: `/gsd:debug "login button doesn't work"`
+Usage: `/gsd:debug` (resume active session)
+
+### Todo Management
+
+**`/gsd:add-todo [description]`**
+Capture idea or task as todo from current conversation.
+
+- Extracts context from conversation (or uses provided description)
+- Creates structured todo file in `.planning/todos/pending/`
+- Infers area from file paths for grouping
+- Checks for duplicates before creating
+- Updates STATE.md todo count
+
+Usage: `/gsd:add-todo` (infers from conversation)
+Usage: `/gsd:add-todo Add auth token refresh`
+
+**`/gsd:check-todos [area]`**
+List pending todos and select one to work on.
+
+- Lists all pending todos with title, area, age
+- Optional area filter (e.g., `/gsd:check-todos api`)
+- Loads full context for selected todo
+- Routes to appropriate action (work now, add to phase, brainstorm)
+- Moves todo to done/ when work begins
+
+Usage: `/gsd:check-todos`
+Usage: `/gsd:check-todos api`
+
 ### Utility Commands
 
 **`/gsd:help`**
@@ -239,6 +302,11 @@ Show this command reference.
 ├── STATE.md              # Project memory & context
 ├── ISSUES.md             # Deferred enhancements (created when needed)
 ├── config.json           # Workflow mode & gates
+├── todos/                # Captured ideas and tasks
+│   ├── pending/          # Todos waiting to be worked on
+│   └── done/             # Completed todos
+├── debug/                # Active debug sessions
+│   └── resolved/         # Archived resolved issues
 ├── codebase/             # Codebase map (brownfield projects)
 │   ├── STACK.md          # Languages, frameworks, dependencies
 │   ├── ARCHITECTURE.md   # Patterns, layers, data flow
@@ -304,6 +372,24 @@ Change anytime by editing `.planning/config.json`
 ```
 /gsd:complete-milestone 1.0.0
 /gsd:new-project  # Start next milestone
+```
+
+**Capturing ideas during work:**
+
+```
+/gsd:add-todo                    # Capture from conversation context
+/gsd:add-todo Fix modal z-index  # Capture with explicit description
+/gsd:check-todos                 # Review and work on todos
+/gsd:check-todos api             # Filter by area
+```
+
+**Debugging an issue:**
+
+```
+/gsd:debug "form submission fails silently"  # Start debug session
+# ... investigation happens, context fills up ...
+/clear
+/gsd:debug                                    # Resume from where you left off
 ```
 
 ## Getting Help

@@ -32,17 +32,6 @@ Template for `.planning/phases/XX-name/{phase}-CONTEXT.md` - captures the user's
 
 </essential>
 
-<boundaries>
-## What's Out of Scope
-
-[Explicit exclusions for this phase. What are we NOT building? Where does this phase end and the next begin?]
-
-- [Not doing X - that's Phase Y]
-- [Not including Z - deferred]
-- [Explicitly excluding W]
-
-</boundaries>
-
 <specifics>
 ## Specific Ideas
 
@@ -90,16 +79,6 @@ The main thing is seeing their active projects and what needs attention. Think o
 - **Personal feel** - This is YOUR dashboard, not a team dashboard. It should feel like opening your personal notebook.
 
 </essential>
-
-<boundaries>
-## What's Out of Scope
-
-- Team features (shared dashboards, permissions) - that's a future milestone
-- Analytics/reporting - just show what needs attention, not graphs
-- Customizable layouts - keep it simple, one good layout
-- Mobile optimization - desktop first for now
-
-</boundaries>
 
 <specifics>
 ## Specific Ideas

@@ -139,7 +139,7 @@ Logged to .planning/ISSUES.md for future consideration:
 
 **Patterns:** Established conventions future phases should maintain.
 
-**Population:** Frontmatter is populated during summary creation in execute-phase.md. See `<step name="create_summary">` for field-by-field guidance.
+**Population:** Frontmatter is populated during summary creation in execute-plan.md. See `<step name="create_summary">` for field-by-field guidance.
 </frontmatter_guidance>
 
 <one_liner_rules>
@@ -238,7 +238,7 @@ Logged to .planning/ISSUES.md for future consideration:
 <guidelines>
 **When to create:**
 - After completing each phase plan
-- Required output from execute-phase workflow
+- Required output from execute-plan workflow
 - Documents what actually happened vs what was planned
 
 **Frontmatter completion:**

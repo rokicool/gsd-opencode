@@ -124,7 +124,7 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 **Command Layer:**
 - Purpose: Parse user input and route to appropriate handler
 - Contains: Command definitions, argument parsing, help text
-- Location: `src/commands/*.ts`
+- Location: `src/command/*.ts`
 - Depends on: Service layer for business logic
 - Used by: CLI entry point (`src/index.ts`)
 
@@ -148,7 +148,7 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 
 1. User runs: `gsd new-project`
 2. Commander parses args and flags
-3. Command handler invoked (`src/commands/new-project.ts`)
+3. Command handler invoked (`src/command/new-project.ts`)
 4. Handler calls service methods (`src/services/project.ts` → `create()`)
 5. Service reads templates, processes files, writes output
 6. Results logged to console
@@ -168,7 +168,7 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 
 **Command:**
 - Purpose: CLI command definition
-- Examples: `src/commands/new-project.ts`, `src/commands/plan-phase.ts`
+- Examples: `src/command/new-project.ts`, `src/command/plan-phase.ts`
 - Pattern: Commander.js command registration
 
 **Template:**
@@ -184,7 +184,7 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 - Responsibilities: Register commands, parse args, display help
 
 **Commands:**
-- Location: `src/commands/*.ts`
+- Location: `src/command/*.ts`
 - Triggers: Matched command from CLI
 - Responsibilities: Validate input, call services, format output
 
