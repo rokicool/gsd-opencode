@@ -18,7 +18,7 @@ Use /gsd:execute-plan when:
 </when_to_use>
 
 <required_reading>
-read STATE.md before any operation to load project context.
+Read STATE.md before any operation to load project context.
 </required_reading>
 
 <process>
@@ -188,7 +188,7 @@ Example dependency graph:
 ├─────────┼───────────────────────┼─────────────────────────────┼──────────────┤
 │ 10-01   │ []                    │ [workflows/execute-plan.md] │ false        │
 │ 10-02   │ [10-01]               │ [workflows/execute-phase.md]│ false        │
-│ 10-03   │ [10-02]               │ [command/execute-phase.md] │ false        │
+│ 10-03   │ [10-02]               │ [commands/execute-phase.md] │ false        │
 │ 10-04   │ []                    │ [templates/agent-history.md]│ false        │
 └─────────┴───────────────────────┴─────────────────────────────┴──────────────┘
 ```
@@ -333,7 +333,7 @@ If dependency detection is uncertain (e.g., complex file patterns, unclear requi
 </step>
 
 <step name="parallelization_config">
-**read parallelization configuration.**
+**Read parallelization configuration.**
 
 ```bash
 cat .planning/config.json 2>/dev/null
@@ -441,11 +441,11 @@ You are executing plan: {plan_path} as part of a PARALLEL phase execution.
 
 <plan_context>
 @{plan_path}
-read the plan for full context, tasks, and deviation rules.
+Read the plan for full context, tasks, and deviation rules.
 </plan_context>
 
 <execution_protocol>
-1. read plan file and context files
+1. Read plan file and context files
 2. Execute each task in order
 3. For each task:
    - Implement the action
@@ -485,7 +485,7 @@ END_REPORT
 **5. Record spawn in agent-history.json:**
 
 ```bash
-# read current entries
+# Read current entries
 ENTRIES=$(jq '.entries' .planning/agent-history.json)
 
 # Create new entry
@@ -828,7 +828,7 @@ Commits created: {commit_count}
 <step name="offer_next">
 **Present next steps after phase completion.**
 
-read ROADMAP.md to determine milestone status.
+Read ROADMAP.md to determine milestone status.
 
 **If more phases remain in milestone:**
 ```

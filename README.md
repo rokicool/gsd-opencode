@@ -1,6 +1,6 @@
 <div align="left">
 
-# GET SHIT DONE
+# GET SHIT DONE for OpenCode. (Based on v1.4.15)
 
 **A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (Adapted for OpenCode by rokicool)**
 
@@ -244,6 +244,7 @@ GSD handles it for you:
 | `PLAN.md` | Atomic task with XML structure, verification steps |
 | `SUMMARY.md` | What happened, what changed, committed to history |
 | `ISSUES.md` | Deferred enhancements tracked across sessions |
+| `todos/` | Captured ideas and tasks for later work |
 
 Size limits based on where OpenCode's quality degrades. Stay under, get consistent excellence.
 
@@ -316,7 +317,9 @@ You're never locked in. The system adapts.
 | `/gsd:create-roadmap` | Create roadmap and state tracking |
 | `/gsd:map-codebase` | Map existing codebase for brownfield projects |
 | `/gsd:plan-phase [N]` | Generate task plans for phase |
-| `/gsd:execute-plan` | Run plan via subagent |
+| `/gsd:execute-plan` | Run single plan via subagent |
+| `/gsd:execute-phase <N>` | Execute all plans in phase N with parallel agents |
+| `/gsd:status [--wait]` | Check background agent status from parallel execution |
 | `/gsd:progress` | Where am I? What's next? |
 | `/gsd:verify-work [N]` | User acceptance test of phase or plan ¹ |
 | `/gsd:plan-fix [plan]` | Plan fixes for UAT issues from verify-work |
@@ -332,6 +335,9 @@ You're never locked in. The system adapts.
 | `/gsd:pause-work` | Create handoff file when stopping mid-phase |
 | `/gsd:resume-work` | Restore from last session |
 | `/gsd:consider-issues` | Review deferred issues, close resolved, identify urgent |
+| `/gsd:add-todo [desc]` | Capture idea or task from conversation for later |
+| `/gsd:check-todos [area]` | List pending todos, select one to work on |
+| `/gsd:debug [desc]` | Systematic debugging with persistent state across `/clear` |
 | `/gsd:help` | Show all commands and usage guide |
 
 <sup>¹ Contributed by reddit user OracleGreyBeard</sup>
