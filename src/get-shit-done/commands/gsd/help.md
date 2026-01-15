@@ -56,7 +56,7 @@ Usage: `/gsd:create-roadmap`
 **`/gsd:map-codebase`**
 Map an existing codebase for brownfield projects.
 
-- Analyzes codebase with parallel Explore agents
+- Analyzes codebase with parallel explore agents
 - Creates `.planning/codebase/` with 7 focused documents
 - Covers stack, architecture, structure, conventions, testing, integrations, concerns
 - Use before `/gsd:new-project` on existing codebases

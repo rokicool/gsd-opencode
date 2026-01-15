@@ -1,6 +1,6 @@
 ---
 name: gsd:map-codebase
-description: Analyze codebase with parallel Explore agents to produce .planning/codebase/ documents
+description: Analyze codebase with parallel explore agents to produce .planning/codebase/ documents
 argument-hint: "[optional: specific area to map, e.g., 'api' or 'auth']"
 allowed-tools:
   - Read
@@ -12,9 +12,9 @@ allowed-tools:
 ---
 
 <objective>
-Analyze existing codebase using parallel Explore agents to produce structured codebase documents.
+Analyze existing codebase using parallel explore agents to produce structured codebase documents.
 
-This command spawns multiple Explore agents to analyze different aspects of the codebase in parallel, each with fresh context.
+This command spawns multiple explore agents to analyze different aspects of the codebase in parallel, each with fresh context.
 
 Output: .planning/codebase/ folder with 7 structured documents about the codebase state.
 </objective>
@@ -58,7 +58,7 @@ Check for .planning/STATE.md - loads context if project already initialized
 <process>
 1. Check if .planning/codebase/ already exists (offer to refresh or skip)
 2. Create .planning/codebase/ directory structure
-3. Spawn 4 parallel Explore agents to analyze codebase:
+3. Spawn 4 parallel explore agents to analyze codebase:
    - Agent 1: Stack + Integrations (technology focus)
    - Agent 2: Architecture + Structure (organization focus)
    - Agent 3: Conventions + Testing (quality focus)

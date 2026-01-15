@@ -1,5 +1,5 @@
 <purpose>
-Orchestrate parallel Explore agents to analyze codebase and produce structured documents in .planning/codebase/
+Orchestrate parallel explore agents to analyze codebase and produce structured documents in .planning/codebase/
 
 Each agent has fresh context and focuses on specific aspects. Output is concise and actionable for planning.
 </purpose>
@@ -69,15 +69,15 @@ Continue to spawn_agents.
 </step>
 
 <step name="spawn_agents">
-Spawn 4 parallel Explore agents to analyze codebase.
+Spawn 4 parallel explore agents to analyze codebase.
 
-Use Task tool with `subagent_type="Explore"` and `run_in_background=true` for parallel execution.
+Use Task tool with `subagent_type="explore"` and `run_in_background=true` for parallel execution.
 
 **Agent 1: Stack + Integrations (Technology Focus)**
 
 Task tool parameters:
 ```
-subagent_type: "Explore"
+subagent_type: "explore"
 run_in_background: true
 task_description: "Analyze codebase technology stack and external integrations"
 ```
@@ -121,7 +121,7 @@ If something is not found, note "Not detected" for that category.
 
 Task tool parameters:
 ```
-subagent_type: "Explore"
+subagent_type: "explore"
 run_in_background: true
 task_description: "Analyze codebase architecture patterns and directory structure"
 ```
@@ -164,7 +164,7 @@ If something is not clear, provide best-guess interpretation based on code struc
 
 Task tool parameters:
 ```
-subagent_type: "Explore"
+subagent_type: "explore"
 run_in_background: true
 task_description: "Analyze coding conventions and test patterns"
 ```
@@ -208,7 +208,7 @@ Look at actual code files to infer conventions if config files are missing.
 
 Task tool parameters:
 ```
-subagent_type: "Explore"
+subagent_type: "explore"
 run_in_background: true
 task_description: "Identify technical debt and areas of concern"
 ```
@@ -424,7 +424,7 @@ End workflow.
 
 <success_criteria>
 - .planning/codebase/ directory created
-- 4 parallel Explore agents spawned with run_in_background=true
+- 4 parallel explore agents spawned with run_in_background=true
 - Agent prompts are specific and actionable
 - TaskOutput used to collect all agent results
 - All 7 codebase documents written using template filling
