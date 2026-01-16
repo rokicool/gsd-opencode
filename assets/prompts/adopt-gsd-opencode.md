@@ -22,3 +22,4 @@ There are several complications.
 - ./assets/\*
 - ./gsd-opencode/bin/\*
 - ./gsd-opencode/package.json
+- ./src/\*
