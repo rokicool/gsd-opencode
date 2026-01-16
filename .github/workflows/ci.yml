@@ -111,7 +111,7 @@ jobs:
       - name: Validate workflow structure
         run: |
           echo "Checking workflow files..."
-          workflows_dir="gsd-opencode/workflows"
+          workflows_dir="gsd-opencode/get-shit-done/workflows"
           if [ -d "$workflows_dir" ]; then
             for workflow_file in "$workflows_dir"/*.md; do
               if [ -f "$workflow_file" ]; then
@@ -216,13 +216,13 @@ jobs:
       - name: Check file count consistency - GSD commands
         run: |
           echo "Checking .md file count consistency for gsd commands..."
-          
+
           src_count=$(find ./src/get-shit-done/commands/gsd -name "*.md" -type f 2>/dev/null | wc -l)
           gsd_count=$(find ./gsd-opencode/command/gsd -name "*.md" -type f 2>/dev/null | wc -l)
-          
+
           echo "Source directory (./src/get-shit-done/commands/gsd): $src_count .md files"
           echo "GSD directory (./gsd-opencode/command/gsd): $gsd_count .md files"
-          
+
           if [ "$src_count" -eq "$gsd_count" ]; then
             echo "✓ GSD commands file count matches ($src_count files)"
           else
@@ -240,13 +240,13 @@ jobs:
       - name: Check file count consistency - get-shit-done
         run: |
           echo "Checking .md file count consistency for get-shit-done..."
-          
+
           src_count=$(find ./src/get-shit-done/get-shit-done -name "*.md" -type f 2>/dev/null | wc -l)
           gsd_count=$(find ./gsd-opencode/get-shit-done -name "*.md" -type f 2>/dev/null | wc -l)
-          
+
           echo "Source directory (./src/get-shit-done/get-shit-done): $src_count .md files"
           echo "GSD directory (./gsd-opencode/get-shit-done): $gsd_count .md files"
-          
+
           if [ "$src_count" -eq "$gsd_count" ]; then
             echo "✓ get-shit-done file count matches ($src_count files)"
           else
