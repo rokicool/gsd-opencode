@@ -217,8 +217,11 @@ jobs:
         run: |
           echo "Checking .md file count consistency for gsd commands..."
 
-          src_count=$(find ./src/get-shit-done/commands/gsd -name "*.md" -type f 2>/dev/null | wc -l)
-          gsd_count=$(find ./gsd-opencode/command/gsd -name "*.md" -type f 2>/dev/null | wc -l)
+          src_files=$(find ./src/get-shit-done/commands/gsd -name "*.md" -type f 2>/dev/null | sort)
+          gsd_files=$(find ./gsd-opencode/command/gsd -name "*.md" -type f 2>/dev/null | sort)
+          
+          src_count=$(echo "$src_files" | wc -l)
+          gsd_count=$(echo "$gsd_files" | wc -l)
 
           echo "Source directory (./src/get-shit-done/commands/gsd): $src_count .md files"
           echo "GSD directory (./gsd-opencode/command/gsd): $gsd_count .md files"
@@ -231,8 +234,14 @@ jobs:
             echo "   Difference: $difference files"
             if [ "$src_count" -gt "$gsd_count" ]; then
               echo "   Source has $difference more files than GSD directory"
+              echo ""
+              echo "Files in source but not in GSD directory:"
+              comm -23 <(echo "$src_files" | sed 's|.*/||') <(echo "$gsd_files" | sed 's|.*/||')
             else
               echo "   GSD directory has $((-difference)) more files than source"
+              echo ""
+              echo "Files in GSD directory but not in source:"
+              comm -13 <(echo "$src_files" | sed 's|.*/||') <(echo "$gsd_files" | sed 's|.*/||')
             fi
             exit 1
           fi
