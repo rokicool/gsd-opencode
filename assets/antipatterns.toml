@@ -1,0 +1,13 @@
+title = "Checks"
+
+[checklist]
+folder  = "./gsd-opencode/"
+file    = "*.md"
+exclude_dir = ""
+forbidden_strings = [
+        "Claude Code", 
+        "<sub>",
+        'general-purpose',
+        'subagent_type="explore"',
+        "~/.claude"
+        ]
