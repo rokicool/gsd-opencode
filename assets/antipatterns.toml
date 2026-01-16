@@ -5,9 +5,9 @@ folder  = "./gsd-opencode/"
 file    = "*.md"
 exclude_dir = ""
 forbidden_strings = [
-        "Claude Code", 
+        "Claude Code",
         "<sub>",
         'general-purpose',
-        'subagent_type="explore"',
+        'subagent_type="Explore"',
         "~/.claude"
         ]
