@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./gsd-opencode
-        run: npm ci
+        run: npm install
 
       - name: Check Node.js syntax
         working-directory: ./gsd-opencode
