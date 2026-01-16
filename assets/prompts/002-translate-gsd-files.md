@@ -139,6 +139,7 @@ Use grep to verify:
 - `grep -r "Claude Code" ./gsd-opencode/ --exclude-dir=command 2>/dev/null` should return nothing
 - `grep -r "<sub>" ./gsd-opencode/ --exclude-dir=command 2>/dev/null` should return nothing
 - `grep -r "general-purpose" ./gsd-opencode/ --exclude-dir=command 2>/dev/null` should return nothing
+- `grep -r 'subagent_type="explore"'./gsd-opencode/ --exclude-dir=command 2>/dev/null` should return nothing
 - `grep -r "~/.claude" ./gsd-opencode/ --exclude-dir=command 2>/dev/null` should return nothing
 </verification>
 
