@@ -144,7 +144,7 @@ jobs:
           # Check for kebab-case in markdown files
           find gsd-opencode -name "*.md" -type f | while read file; do
             basename=$(basename "$file" .md)
-            if [[ ! "$basename" =~ ^[a-z0-9-]+$ ]] && [[ "$basename" != "README" ]] && [[ "$basename" != "GSD-STYLE" ]]; then
+            if [[ ! "$basename" =~ ^[a-z0-9-]+$ ]] && [[ "$basename" != "README" ]] && [[ "$basename" != "GSD-STYLE" ]] && [[ "$basename" != "DEBUG" ]]; then
               echo "❌ File name should be kebab-case: $file"
               exit 1
             fi
