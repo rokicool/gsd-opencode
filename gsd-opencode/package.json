@@ -1,5 +1,5 @@
 {
-  "name": "gsd-opencode",
+  "name": "@rokicool/gsd-opencode",
   "version": "1.4.4",
   "description": "A meta-prompting, context engineering and spec-driven development system for OpenCode by TÂCHES.",
   "keywords": [
