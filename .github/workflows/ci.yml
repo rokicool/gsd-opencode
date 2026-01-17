@@ -498,7 +498,7 @@ jobs:
           echo "Publishing $TARBALL with version $VERSION"
 
           # Publish to GitHub npm registry
-          npm publish "$TARBALL" --registry=https://npm.pkg.github.com
+          npm publish "$TARBALL"
 
           echo "✓ Published to GitHub npm registry"
 
