@@ -4,6 +4,10 @@ on:
   push:
     branches: ["**"]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   validate_code:
     name: Validate Code Quality
@@ -384,3 +388,141 @@ jobs:
           echo "✓ File count consistency checks passed"
           echo ""
           echo "🎉 GSD compliance validation completed successfully!"
+
+  generate_version:
+    name: Generate Version
+    runs-on: ubuntu-latest
+    needs: [validate_code, validate_gsd]
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate version
+        id: version
+        run: |
+          echo "Generating version..."
+
+          # Get the latest version tag that is an ancestor of the current commit
+          LATEST_TAG=$(git describe --tags --match "v*.*.*" --abbrev=0 HEAD)
+
+          if [ -z "$LATEST_TAG" ]; then
+            echo "❌ No version tag found in current branch history"
+            exit 1
+          fi
+
+          BASE_VERSION="${LATEST_TAG#v}"
+          echo "Latest version from branch history: $BASE_VERSION"
+
+          # Get current branch name
+          BRANCH_NAME="${{ github.ref_name }}"
+          echo "Current branch: $BRANCH_NAME"
+
+          # Get first 4 characters of commit SHA
+          COMMIT_SHORT="${{ github.sha }}"
+          COMMIT_SHORT="${COMMIT_SHORT:0:4}"
+          echo "Commit short: $COMMIT_SHORT"
+
+          # Generate version string
+          NEW_VERSION="v${BASE_VERSION}-${BRANCH_NAME}-${COMMIT_SHORT}"
+          echo "Generated version: $NEW_VERSION"
+
+          # Output version for next jobs
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+  build_and_publish:
+    name: Build and Publish Package
+    runs-on: ubuntu-latest
+    needs: [validate_code, validate_gsd, generate_version]
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          registry-url: "https://npm.pkg.github.com"
+          cache: "npm"
+          cache-dependency-path: "gsd-opencode/package.json"
+
+      - name: Install dependencies
+        working-directory: ./gsd-opencode
+        run: npm install
+
+      - name: Update package.json version
+        working-directory: ./gsd-opencode
+        run: |
+          VERSION="${{ needs.generate_version.outputs.version }}"
+          echo "Updating package.json to version: $VERSION"
+
+          # Remove 'v' prefix for npm version
+          NPM_VERSION="${VERSION#v}"
+          npm version "$NPM_VERSION" --no-git-tag-version --allow-same-version
+
+          # Verify update
+          UPDATED_VERSION=$(node -p "require('./package.json').version")
+          echo "Updated package.json version to: $UPDATED_VERSION"
+
+      - name: Build package
+        working-directory: ./gsd-opencode
+        run: |
+          echo "Building package..."
+          npm pack
+          echo "✓ Package built"
+
+      - name: Publish to GitHub npm registry
+        working-directory: ./gsd-opencode
+        run: |
+          echo "Publishing to GitHub npm registry..."
+
+          TARBALL=$(ls gsd-opencode-*.tgz)
+          VERSION="${{ needs.generate_version.outputs.version }}"
+
+          echo "Publishing $TARBALL with version $VERSION"
+
+          # Publish to GitHub Packages
+          npm publish "$TARBALL" --registry=https://npm.pkg.github.com
+
+          echo "✓ Published to GitHub npm registry"
+
+  notify:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: [validate_code, validate_gsd, generate_version, build_and_publish]
+    if: always()
+
+    steps:
+      - name: Build summary
+        run: |
+          echo "## CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ needs.generate_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Job Status" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Validate Code | ${{ needs.validate_code.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Validate GSD | ${{ needs.validate_gsd.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Generate Version | ${{ needs.generate_version.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build and Publish | ${{ needs.build_and_publish.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ needs.validate_code.result }}" == "success" && "${{ needs.validate_gsd.result }}" == "success" && "${{ needs.generate_version.result }}" == "success" && "${{ needs.build_and_publish.result }}" == "success" ]]; then
+            echo "🎉 **Overall Status: SUCCESS**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "All validations passed and package published successfully." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Overall Status: FAILED**" >> $GITHUB_STEP_SUMMARY
+          fi
