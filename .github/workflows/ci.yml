@@ -5,7 +5,7 @@ on:
     branches: ["**"]
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -439,7 +439,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [validate_code, validate_gsd, generate_version]
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
@@ -452,17 +452,11 @@ jobs:
           node-version: "18"
           cache: "npm"
           cache-dependency-path: "gsd-opencode/package.json"
+          registry-url: 'https://npm.pkg.github.com'
 
       - name: Install dependencies
         working-directory: ./gsd-opencode
         run: npm install
-
-      - name: Configure npm for GitHub registry
-        working-directory: ./gsd-opencode
-        run: |
-          echo "Configuring npm for GitHub registry..."
-          echo "@rokicool:registry=https://npm.pkg.github.com" > .npmrc
-          echo "//npm.pkg.github.com/:_authToken=\${{ secrets.GITHUB_TOKEN }}" >> .npmrc
 
       - name: Update package.json for GitHub npm
         working-directory: ./gsd-opencode
