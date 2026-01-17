@@ -451,6 +451,7 @@ jobs:
         with:
           node-version: "18"
           registry-url: 'https://npm.pkg.github.com'
+          token: ${{ secrets.GITHUB_TOKEN }}
           cache: "npm"
           cache-dependency-path: "gsd-opencode/package.json"
 
@@ -481,6 +482,8 @@ jobs:
 
       - name: Publish to GitHub npm registry
         working-directory: ./gsd-opencode
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Publishing to GitHub npm registry..."
 

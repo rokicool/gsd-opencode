@@ -1,6 +1,9 @@
 {
   "name": "@rokicool/gsd-opencode",
   "version": "1.4.4",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "description": "A meta-prompting, context engineering and spec-driven development system for OpenCode by TÂCHES.",
   "keywords": [
     "opencode",
