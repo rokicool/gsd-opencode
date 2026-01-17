@@ -440,7 +440,7 @@ jobs:
     needs: [validate_code, validate_gsd, generate_version]
     permissions:
       contents: read
-      id-token: write
+      packages: write
 
     steps:
       - name: Checkout code
@@ -450,6 +450,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
+          registry-url: 'https://npm.pkg.github.com'
           cache: "npm"
           cache-dependency-path: "gsd-opencode/package.json"
 
@@ -489,7 +490,7 @@ jobs:
           echo "Publishing $TARBALL with version $VERSION"
 
           # Publish to GitHub Packages
-          npm publish "$TARBALL" --registry=https://npm.pkg.github.com
+          npm publish "$TARBALL"
 
           echo "✓ Published to GitHub npm registry"
 
