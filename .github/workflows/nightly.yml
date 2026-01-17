@@ -11,6 +11,9 @@ name: Nightly Build
         required: false
         type: string
 
+permissions:
+  id-token: write
+
 jobs:
   validate:
     name: Validate Code and GSD Compliance
@@ -221,14 +224,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm nightly tag (optional)
-        if: github.ref == 'refs/heads/main' && secrets.NPM_TOKEN != ''
+        if: github.ref == 'refs/heads/main'
         run: |
-          echo "Publishing nightly build to npm..."
+          echo "Publishing nightly build to npm using OIDC..."
           
           cd ./gsd-opencode
-          
-          # Configure npm
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           
           # Find the tarball
           TARBALL=$(ls gsd-opencode-*.tgz)
@@ -237,36 +237,21 @@ jobs:
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           NIGHTLY_VERSION="0.0.0-nightly-$(date +%Y%m%d)"
           
-          echo "Publishing $TARBALL as $PACKAGE_NAME@$NIGHTLY_VERSION"
+          echo "Publishing $TARBALL as $PACKAGE_NAME@$NIGHTLY_VERSION using OIDC token"
           
-          # Publish to npm with nightly tag
+          # Publish to npm with nightly tag using OIDC
           npm publish "$TARBALL" --tag nightly --access public
           
-          echo "✓ Published nightly build to npm"
+          echo "✓ Published nightly build to npm using OIDC"
           echo "Install with: npm install -g $PACKAGE_NAME@nightly"
-          
-          # Clean up npm config
-          rm ~/.npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish to npm nightly tag (disabled)
-        if: github.ref == 'refs/heads/main' && secrets.NPM_TOKEN == ''
-        run: |
-          echo "⚠️  NPM_TOKEN not found, skipping npm nightly publish"
-          echo "To enable nightly npm publishing, add NPM_TOKEN to repository secrets"
-          echo ""
-          echo "Steps to enable npm publishing:"
-          echo "1. Create an npm account or use existing one"
-          echo "2. Create an npm access token with 'publish' permissions"
-          echo "3. Add NPM_TOKEN as a repository secret in GitHub settings"
-          echo "4. Ensure you have publish access to the npm package"
+
 
   publish_npm:
     name: Publish to npm (Nightly)
     runs-on: ubuntu-latest
     needs: [validate, comprehensive_test, build]
-    if: github.ref == 'refs/heads/main' && secrets.NPM_TOKEN != ''
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Download build artifacts
@@ -279,11 +264,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Publish to npm nightly tag
         run: |
-          echo "Publishing nightly build to npm..."
+          echo "Publishing nightly build to npm using OIDC..."
           
           cd ./build-artifacts
           
@@ -294,17 +278,15 @@ jobs:
           PACKAGE_NAME=$(node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).name")
           NIGHTLY_VERSION="0.0.0-nightly-$(date +%Y%m%d-%H%M%S)"
           
-          echo "Publishing $TARBALL as $PACKAGE_NAME@$NIGHTLY_VERSION to npm nightly tag"
+          echo "Publishing $TARBALL as $PACKAGE_NAME@$NIGHTLY_VERSION to npm nightly tag using OIDC"
           
-          # Publish to npm with nightly tag
+          # Publish to npm with nightly tag using OIDC
           npm publish "$TARBALL" --tag nightly --access public
           
-          echo "✓ Published nightly build to npm successfully"
+          echo "✓ Published nightly build to npm successfully using OIDC"
           echo "📦 Package: $PACKAGE_NAME@$NIGHTLY_VERSION"
           echo "🔗 Install with: npm install -g $PACKAGE_NAME@nightly"
           echo "🌐 NPM page: https://www.npmjs.com/package/$PACKAGE_NAME"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   notify:
     name: Send Build Notifications

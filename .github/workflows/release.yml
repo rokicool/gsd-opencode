@@ -271,6 +271,7 @@ jobs:
     needs: [validate, comprehensive_test, build_production]
     permissions:
       contents: write
+      id-token: write
 
     steps:
       - name: Download artifacts
@@ -347,14 +348,11 @@ jobs:
           echo "✓ All release assets uploaded"
 
       - name: Publish to npm
-        if: startsWith(github.ref, 'refs/tags/v') && secrets.NPM_TOKEN != ''
+        if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          echo "Publishing production release to npm..."
+          echo "Publishing production release to npm using OIDC..."
           
           cd ./release-artifacts
-          
-          # Configure npm
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           
           # Find the tarball
           TARBALL=$(ls gsd-opencode-*.tgz)
@@ -363,31 +361,17 @@ jobs:
           PACKAGE_NAME=$(node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).name")
           VERSION="${{ github.ref_name }}"
           
-          echo "Publishing $TARBALL as $PACKAGE_NAME@$VERSION to npm"
+          echo "Publishing $TARBALL as $PACKAGE_NAME@$VERSION to npm using OIDC token"
           
-          # Publish to npm (latest tag by default)
+          # Publish to npm using OIDC token (latest tag by default)
           npm publish "$TARBALL" --access public
           
-          echo "✓ Published production release to npm successfully"
+          echo "✓ Published production release to npm successfully using OIDC"
           echo "📦 Package: $PACKAGE_NAME@$VERSION"
           echo "🔗 Install with: npm install -g $PACKAGE_NAME@$VERSION"
           echo "🌐 NPM page: https://www.npmjs.com/package/$PACKAGE_NAME"
-          
-          # Clean up npm config
-          rm ~/.npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Skip npm publish (token missing)
-        if: startsWith(github.ref, 'refs/tags/v') && secrets.NPM_TOKEN == ''
-        run: |
-          echo "⚠️  NPM_TOKEN not found, skipping npm publish"
-          echo "To enable production npm publishing:"
-          echo "1. Create an npm access token with 'publish' permissions"
-          echo "2. Add NPM_TOKEN as a repository secret in GitHub settings"
-          echo "3. Ensure you have publish access to the npm package"
-          echo ""
-          echo "The GitHub release and artifacts are still available for manual npm publishing."
+
 
       - name: Update latest tag
         run: |
