@@ -461,7 +461,8 @@ jobs:
         working-directory: ./gsd-opencode
         run: |
           echo "Configuring npm for GitHub registry..."
-          echo "//npm.pkg.github.com/:_authToken=\${{ secrets.GITHUB_TOKEN }}" > .npmrc
+          echo "@rokicool:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=\${{ secrets.GITHUB_TOKEN }}" >> .npmrc
 
       - name: Update package.json for GitHub npm
         working-directory: ./gsd-opencode
