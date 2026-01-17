@@ -1,0 +1,382 @@
+name: Nightly Build
+
+"on":
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual trigger'
+        required: false
+        type: string
+
+jobs:
+  validate:
+    name: Validate Code and GSD Compliance
+    uses: ./.github/workflows/validate.yml
+    with:
+      working_directory: './gsd-opencode'
+
+  comprehensive_test:
+    name: Run Comprehensive Tests
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: "gsd-opencode/package.json"
+
+      - name: Install dependencies
+        working-directory: ./gsd-opencode
+        run: npm install
+
+      - name: Run comprehensive linting
+        working-directory: ./gsd-opencode
+        run: |
+          echo "Running comprehensive code quality checks..."
+          
+          # Check for potential security issues
+          echo "Checking for security vulnerabilities..."
+          npm audit --audit-level=high || echo "⚠️  Security audit completed with warnings"
+          
+          # Check package.json for common issues
+          echo "Validating package.json structure..."
+          node -e "
+            const pkg = JSON.parse(require('fs').readFileSync('package.json', 'utf8'));
+            console.log('✓ Package name:', pkg.name);
+            console.log('✓ Package version:', pkg.version);
+            console.log('✓ Package description:', pkg.description);
+            
+            if (!pkg.scripts || !pkg.scripts.test) {
+              console.log('⚠️  No test script found - consider adding tests');
+            }
+          "
+          
+          echo "✓ Comprehensive linting completed"
+
+      - name: Validate CLI functionality
+        working-directory: ./gsd-opencode
+        run: |
+          echo "Testing CLI installation and basic functionality..."
+          
+          # Test the CLI installation
+          npm pack
+          tarball=$(ls gsd-opencode-*.tgz)
+          echo "Created tarball: $tarball"
+          
+          # Test CLI script syntax
+          node -c bin/install.js
+          echo "✓ CLI script syntax is valid"
+          
+          # Test CLI help (if available)
+          if node bin/install.js --help > /dev/null 2>&1; then
+            echo "✓ CLI help command works"
+          else
+            echo "ℹ️  CLI help command not available (optional)"
+          fi
+          
+          echo "✓ CLI functionality validation completed"
+
+      - name: Archive linting results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linting-results-${{ github.run_number }}
+          path: |
+            gsd-opencode/package-lock.json
+            gsd-opencode/gsd-opencode-*.tgz
+          retention-days: 7
+
+  build:
+    name: Build and Package CLI Tool
+    runs-on: ubuntu-latest
+    needs: [validate, comprehensive_test]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: "gsd-opencode/package.json"
+
+      - name: Install dependencies
+        working-directory: ./gsd-opencode
+        run: npm install
+
+      - name: Build CLI package
+        working-directory: ./gsd-opencode
+        run: |
+          echo "Building CLI package..."
+          
+          # Create build directory
+          mkdir -p build
+          
+          # Copy essential files
+          cp -r bin build/
+          cp -r command build/
+          cp -r get-shit-done build/
+          cp package.json build/
+          cp README.md build/ 2>/dev/null || echo "README.md not found, skipping"
+          cp LICENSE build/ 2>/dev/null || echo "LICENSE not found, skipping"
+          
+          # Create version file
+          echo "Build: $(date -u +%Y-%m-%dT%H:%M:%SZ)" > build/BUILD_INFO
+          echo "Commit: ${{ github.sha }}" >> build/BUILD_INFO
+          echo "Version: $(node -p "require('./package.json').version")" >> build/BUILD_INFO
+          
+          # Create npm package
+          npm pack
+          
+          echo "✓ Build completed successfully"
+
+      - name: Generate checksums
+        working-directory: ./gsd-opencode
+        run: |
+          echo "Generating SHA256 checksums..."
+          
+          # Generate checksum for tarball
+          tarball=$(ls gsd-opencode-*.tgz)
+          sha256sum "$tarball" > "$tarball.sha256"
+          
+          # Generate checksum for build directory
+          cd build
+          find . -type f -exec sha256sum {} + | sort > ../build-checksums.sha256
+          cd ..
+          
+          echo "✓ Checksums generated"
+          echo "Checksum file: $tarball.sha256"
+          echo "Build checksums: build-checksums.sha256"
+
+      - name: Create build metadata
+        working-directory: ./gsd-opencode
+        run: |
+          echo "Creating build metadata..."
+          
+          cat > build-metadata.json << EOF
+          {
+            "build_id": "${{ github.run_number }}",
+            "commit_sha": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "build_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "version": "$(node -p "require('./package.json').version")",
+            "node_version": "$(node --version)",
+            "platform": "ubuntu-latest",
+            "trigger": "schedule",
+            "workflow": "nightly"
+          }
+          EOF
+          
+          echo "✓ Build metadata created"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gsd-opencode-nightly-${{ github.run_number }}
+          path: |
+            gsd-opencode/build/
+            gsd-opencode/gsd-opencode-*.tgz
+            gsd-opencode/gsd-opencode-*.tgz.sha256
+            gsd-opencode/build-metadata.json
+            gsd-opencode/build-checksums.sha256
+          retention-days: 30
+
+      - name: Upload to nightly release (optional)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Checking if nightly release exists..."
+          
+          # Get the latest nightly release tag
+          NIGHTLY_TAG="nightly"
+          
+          # Create or update nightly release
+          gh release view "$NIGHTLY_TAG" > /dev/null 2>&1 && \
+            echo "Nightly release exists, updating..." || \
+            echo "Creating nightly release..." && \
+            gh release create "$NIGHTLY_TAG" \
+              --title "Nightly Build - $(date +'%Y-%m-%d')" \
+              --notes "Automated nightly build from commit ${{ github.sha }}. Built on $(date -u +%Y-%m-%dT%H:%M:%SZ)."
+          
+          # Upload artifacts to nightly release
+          echo "Uploading artifacts to nightly release..."
+          for file in gsd-opencode/gsd-opencode-*.tgz gsd-opencode/gsd-opencode-*.tgz.sha256; do
+            if [ -f "$file" ]; then
+              gh release upload "$NIGHTLY_TAG" "$file" --clobber
+            fi
+          done
+          
+          echo "✓ Nightly release updated"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to npm nightly tag (optional)
+        if: github.ref == 'refs/heads/main' && secrets.NPM_TOKEN != ''
+        run: |
+          echo "Publishing nightly build to npm..."
+          
+          cd ./gsd-opencode
+          
+          # Configure npm
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          
+          # Find the tarball
+          TARBALL=$(ls gsd-opencode-*.tgz)
+          
+          # Extract package info
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          NIGHTLY_VERSION="0.0.0-nightly-$(date +%Y%m%d)"
+          
+          echo "Publishing $TARBALL as $PACKAGE_NAME@$NIGHTLY_VERSION"
+          
+          # Publish to npm with nightly tag
+          npm publish "$TARBALL" --tag nightly --access public
+          
+          echo "✓ Published nightly build to npm"
+          echo "Install with: npm install -g $PACKAGE_NAME@nightly"
+          
+          # Clean up npm config
+          rm ~/.npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to npm nightly tag (disabled)
+        if: github.ref == 'refs/heads/main' && secrets.NPM_TOKEN == ''
+        run: |
+          echo "⚠️  NPM_TOKEN not found, skipping npm nightly publish"
+          echo "To enable nightly npm publishing, add NPM_TOKEN to repository secrets"
+          echo ""
+          echo "Steps to enable npm publishing:"
+          echo "1. Create an npm account or use existing one"
+          echo "2. Create an npm access token with 'publish' permissions"
+          echo "3. Add NPM_TOKEN as a repository secret in GitHub settings"
+          echo "4. Ensure you have publish access to the npm package"
+
+  publish_npm:
+    name: Publish to npm (Nightly)
+    runs-on: ubuntu-latest
+    needs: [validate, comprehensive_test, build]
+    if: github.ref == 'refs/heads/main' && secrets.NPM_TOKEN != ''
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: gsd-opencode-nightly-${{ github.run_number }}
+          path: ./build-artifacts
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish to npm nightly tag
+        run: |
+          echo "Publishing nightly build to npm..."
+          
+          cd ./build-artifacts
+          
+          # Find the tarball
+          TARBALL=$(ls gsd-opencode-*.tgz)
+          
+          # Extract package info
+          PACKAGE_NAME=$(node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).name")
+          NIGHTLY_VERSION="0.0.0-nightly-$(date +%Y%m%d-%H%M%S)"
+          
+          echo "Publishing $TARBALL as $PACKAGE_NAME@$NIGHTLY_VERSION to npm nightly tag"
+          
+          # Publish to npm with nightly tag
+          npm publish "$TARBALL" --tag nightly --access public
+          
+          echo "✓ Published nightly build to npm successfully"
+          echo "📦 Package: $PACKAGE_NAME@$NIGHTLY_VERSION"
+          echo "🔗 Install with: npm install -g $PACKAGE_NAME@nightly"
+          echo "🌐 NPM page: https://www.npmjs.com/package/$PACKAGE_NAME"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  notify:
+    name: Send Build Notifications
+    runs-on: ubuntu-latest
+    needs: [validate, comprehensive_test, build, publish_npm]
+    if: always()
+
+    steps:
+      - name: Build notification summary
+        run: |
+          echo "## Nightly Build Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Build ID:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Date:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Job status
+          echo "### Job Status" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Validate | ${{ needs.validate.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Comprehensive Test | ${{ needs.comprehensive_test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| NPM Publish | ${{ needs.publish_npm.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Overall status
+          if [[ "${{ needs.validate.result }}" == "success" && "${{ needs.comprehensive_test.result }}" == "success" && "${{ needs.build.result }}" == "success" ]]; then
+            if [[ "${{ needs.publish_npm.result }}" == "success" || "${{ needs.publish_npm.result }}" == "skipped" ]]; then
+              echo "🎉 **Overall Status: SUCCESS**" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "All checks passed and artifacts were created successfully." >> $GITHUB_STEP_SUMMARY
+              if [[ "${{ needs.publish_npm.result }}" == "success" ]]; then
+                echo "📦 Nightly build published to npm (nightly tag)" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "⚠️  NPM publishing skipped (NPM_TOKEN not configured)" >> $GITHUB_STEP_SUMMARY
+              fi
+            else
+              echo "⚠️  **Overall Status: PARTIAL**" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "Build completed but npm publishing failed." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "❌ **Overall Status: FAILED**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "One or more jobs failed. Check the job logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Artifacts & Installation" >> $GITHUB_STEP_SUMMARY
+          echo "- **GitHub Artifacts**: [Actions tab](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "- **Nightly Release**: [nightly tag](https://github.com/${{ github.repository }}/releases/tag/nightly)" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.publish_npm.result }}" == "success" ]]; then
+            PACKAGE_NAME=$(cd ./build-artifacts && node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).name" 2>/dev/null || echo "gsd-opencode")
+            echo "- **NPM Nightly**: \`npm install -g $PACKAGE_NAME@nightly\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **NPM Package**: [https://www.npmjs.com/package/$PACKAGE_NAME](https://www.npmjs.com/package/$PACKAGE_NAME)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Notify on failure
+        if: needs.validate.result == 'failure' || needs.comprehensive_test.result == 'failure' || needs.build.result == 'failure'
+        run: |
+          echo "❌ Nightly build failed!"
+          echo "Build ID: ${{ github.run_number }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Check the logs for details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          exit 1
+
+      - name: Notify on npm publishing failure
+        if: needs.publish_npm.result == 'failure'
+        run: |
+          echo "⚠️  NPM publishing failed!"
+          echo "Build completed successfully but npm publishing encountered an error."
+          echo "Check the 'Publish to npm (Nightly)' job logs for details."
+          echo "GitHub artifacts are still available for download."

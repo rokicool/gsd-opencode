@@ -1,0 +1,390 @@
+name: Reusable Validation Workflow
+
+"on":
+  workflow_call:
+    inputs:
+      working_directory:
+        required: false
+        type: string
+        default: './gsd-opencode'
+
+jobs:
+  validate_code:
+    name: Validate Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: "${{ inputs.working_directory }}/package.json"
+
+      - name: Install dependencies
+        working-directory: ${{ inputs.working_directory }}
+        run: npm install
+
+      - name: Check Node.js syntax
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          node -c bin/install.js
+          echo "✓ JavaScript syntax validation passed"
+
+      - name: Validate package.json
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          node -e "console.log('✓ package.json is valid JSON'); JSON.parse(require('fs').readFileSync('package.json', 'utf8'))"
+
+      - name: Check for common issues
+        working-directory: ${{ inputs.working_directory }}
+        run: |
+          echo "Checking for console.log statements in production code..."
+          if grep -r "console\.log" bin/ --exclude-dir=node_modules; then
+            echo "⚠️  Warning: console.log found in bin/install.js"
+          else
+            echo "✓ No console.log statements found"
+          fi
+
+          echo "Checking file permissions..."
+          if [ -x bin/install.js ]; then
+            echo "✓ bin/install.js is executable"
+          else
+            echo "❌ bin/install.js is not executable"
+            exit 1
+          fi
+
+  validate_gsd:
+    name: Validate GSD Compliance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Check GSD-STYLE.md exists
+        run: |
+          if [ -f "${{ inputs.working_directory }}/GSD-STYLE.md" ]; then
+            echo "✓ GSD-STYLE.md found"
+          else
+            echo "❌ GSD-STYLE.md not found"
+            exit 1
+          fi
+
+      - name: Validate command structure
+        run: |
+          echo "Checking command files..."
+          command_dir="${{ inputs.working_directory }}/command"
+          if [ -d "$command_dir" ]; then
+            for cmd_file in "$command_dir"/gsd/*.md; do
+              if [ -f "$cmd_file" ]; then
+                echo "Checking $cmd_file..."
+
+                # Check for required YAML frontmatter
+                if ! grep -q "^name:" "$cmd_file"; then
+                  echo "❌ Missing 'name:' in $cmd_file"
+                  exit 1
+                fi
+
+                if ! grep -q "^description:" "$cmd_file"; then
+                  echo "❌ Missing 'description:' in $cmd_file"
+                  exit 1
+                fi
+
+                # Check for required sections
+                if ! grep -q "<objective>" "$cmd_file"; then
+                  echo "❌ Missing <objective> section in $cmd_file"
+                  exit 1
+                fi
+
+                echo "✓ $cmd_file structure valid"
+              fi
+            done
+          else
+            echo "⚠️  No commands directory found"
+          fi
+
+      - name: Validate workflow structure
+        run: |
+          echo "Checking workflow files..."
+          workflows_dir="${{ inputs.working_directory }}/get-shit-done/workflows"
+          if [ -d "$workflows_dir" ]; then
+            for workflow_file in "$workflows_dir"/*.md; do
+              if [ -f "$workflow_file" ]; then
+                echo "Checking $workflow_file..."
+
+                # Check for semantic XML tags (not generic ones)
+                if grep -q "<section>" "$workflow_file" || grep -q "<item>" "$workflow_file"; then
+                  echo "❌ Found generic XML tags in $workflow_file"
+                  exit 1
+                fi
+
+                # Check for proper semantic tags
+                if grep -E "<(purpose|when_to_use|process|step)>" "$workflow_file" > /dev/null || \
+                   grep -E "<(objective|context|execution_context)>" "$workflow_file" > /dev/null; then
+                  echo "✓ $workflow_file uses semantic XML tags"
+                else
+                  echo "⚠️  $workflow_file may need semantic XML tags"
+                fi
+              fi
+            done
+          else
+            echo "❌ Workflows directory not found"
+            exit 1
+          fi
+
+      - name: Validate file naming conventions
+        run: |
+          echo "Checking file naming conventions..."
+
+          # Check for kebab-case in markdown files
+          find ${{ inputs.working_directory }} -name "*.md" -type f | while read file; do
+            basename=$(basename "$file" .md)
+            if [[ ! "$basename" =~ ^[a-z0-9-]+$ ]] && [[ "$basename" != "README" ]] && [[ "$basename" != "GSD-STYLE" ]] && [[ "$basename" != "DEBUG" ]]; then
+              echo "❌ File name should be kebab-case: $file"
+              exit 1
+            fi
+          done
+          echo "✓ File naming follows kebab-case convention"
+
+      - name: Check for anti-patterns
+        run: |
+          echo "Checking for banned patterns..."
+
+          # Check for enterprise patterns
+          if grep -r -i "story point\|sprint\|raci\|knowledge transfer" ${{ inputs.working_directory }} --exclude-dir=node_modules --exclude="*.md"; then
+            echo "⚠️  Found enterprise patterns - check manually"
+          fi
+
+          # Check for temporal language in implementation docs
+          for file in ${{ inputs.working_directory }}/workflows/*.md; do
+            if [ -f "$file" ]; then
+              if grep -E "(previously|no longer|instead of|we changed)" "$file" > /dev/null; then
+                echo "❌ Found temporal language in $file"
+                exit 1
+              fi
+            fi
+          done
+          echo "✓ No temporal language found in workflows"
+
+      - name: Validate template structure
+        run: |
+          echo "Checking template files..."
+          templates_dir="${{ inputs.working_directory }}/templates"
+          if [ -d "$templates_dir" ]; then
+            for template_file in "$templates_dir"/*.md; do
+              if [ -f "$template_file" ]; then
+                basename=$(basename "$template_file" .md)
+
+                # Check for proper template header
+                if ! grep -q "# \[.*\] Template\|# $basename Template\|# $basename" "$template_file"; then
+                  echo "⚠️  $template_file may need proper template header"
+                fi
+
+                # Check for placeholder conventions
+                if grep -q "\[.*\]" "$template_file" || grep -q "{.*}" "$template_file"; then
+                  echo "✓ $template_file uses proper placeholder conventions"
+                fi
+              fi
+            done
+          fi
+
+      - name: Validate reference structure
+        run: |
+          echo "Checking reference files..."
+          refs_dir="${{ inputs.working_directory }}/references"
+          if [ -d "$refs_dir" ]; then
+            for ref_file in "$refs_dir"/*.md; do
+              if [ -f "$ref_file" ]; then
+                basename=$(basename "$ref_file" .md)
+
+                # Check for semantic outer containers
+                if grep -E "<$basename>" "$ref_file" > /dev/null || \
+                   grep -E "<(overview|core_principle|checkpoint_types|principles)>" "$ref_file" > /dev/null; then
+                  echo "✓ $ref_file uses semantic containers"
+                else
+                  echo "⚠️  $ref_file may need semantic outer containers"
+                fi
+              fi
+            done
+          fi
+
+      - name: Check file count consistency - GSD commands
+        run: |
+          echo "Checking .md file count consistency for gsd commands..."
+
+          src_files=$(find ./src/get-shit-done/commands/gsd -name "*.md" -type f 2>/dev/null | grep -v "_archive" | sort)
+          gsd_files=$(find ${{ inputs.working_directory }}/command/gsd -name "*.md" -type f 2>/dev/null | grep -v "_archive" | sort)
+          
+          src_count=$(echo "$src_files" | wc -l)
+          gsd_count=$(echo "$gsd_files" | wc -l)
+
+          echo "Source directory (./src/get-shit-done/commands/gsd): $src_count .md files"
+          echo "GSD directory (${{ inputs.working_directory }}/command/gsd): $gsd_count .md files"
+
+          if [ "$src_count" -eq "$gsd_count" ]; then
+            echo "✓ GSD commands file count matches ($src_count files)"
+          else
+            difference=$((src_count - gsd_count))
+            echo "❌ GSD commands file count mismatch!"
+            echo "   Difference: $difference files"
+            if [ "$src_count" -gt "$gsd_count" ]; then
+              echo "   Source has $difference more files than GSD directory"
+              echo ""
+              echo "Files in source but not in GSD directory:"
+              comm -23 <(echo "$src_files" | sed 's|.*/||') <(echo "$gsd_files" | sed 's|.*/||')
+            else
+              echo "   GSD directory has $((-difference)) more files than source"
+              echo ""
+              echo "Files in GSD directory but not in source:"
+              comm -13 <(echo "$src_files" | sed 's|.*/||') <(echo "$gsd_files" | sed 's|.*/||')
+            fi
+            exit 1
+          fi
+
+      - name: Check file count consistency - get-shit-done
+        run: |
+          echo "Checking .md file count consistency for get-shit-done..."
+
+          src_count=$(find ./src/get-shit-done/get-shit-done -name "*.md" -type f 2>/dev/null | wc -l)
+          gsd_count=$(find ${{ inputs.working_directory }}/get-shit-done -name "*.md" -type f 2>/dev/null | wc -l)
+
+          echo "Source directory (./src/get-shit-done/get-shit-done): $src_count .md files"
+          echo "GSD directory (${{ inputs.working_directory }}/get-shit-done): $gsd_count .md files"
+
+          if [ "$src_count" -eq "$gsd_count" ]; then
+            echo "✓ get-shit-done file count matches ($src_count files)"
+          else
+            difference=$((src_count - gsd_count))
+            echo "❌ get-shit-done file count mismatch!"
+            echo "   Difference: $difference files"
+            if [ "$src_count" -gt "$gsd_count" ]; then
+              echo "   Source has $difference more files than GSD directory"
+            else
+              echo "   GSD directory has $((-difference)) more files than source"
+            fi
+            exit 1
+          fi
+
+      - name: Check forbidden strings in antipatterns
+        run: |
+          echo "Checking forbidden strings from antipatterns.toml..."
+          
+          # Install TOML parser
+          npm install @iarna/toml
+          
+          # Create Node.js script to check forbidden strings
+          cat > check_forbidden_strings.js << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+          const toml = require('@iarna/toml');
+          
+          // Find files matching pattern
+          function findFiles(dir, pattern, excludeDirs) {
+            const files = [];
+            const patternRegex = new RegExp(pattern.replace('*', '.*'));
+            
+            function traverse(currentDir) {
+              const items = fs.readdirSync(currentDir);
+              
+              for (const item of items) {
+                const itemPath = path.join(currentDir, item);
+                const stat = fs.statSync(itemPath);
+                
+                if (stat.isDirectory()) {
+                  // Skip excluded directories
+                  if (excludeDirs.includes(item)) continue;
+                  traverse(itemPath);
+                } else if (stat.isFile() && patternRegex.test(item)) {
+                  files.push(itemPath);
+                }
+              }
+            }
+            
+            traverse(dir);
+            return files;
+          }
+          
+          try {
+            const tomlContent = fs.readFileSync('./assets/antipatterns.toml', 'utf8');
+            const config = toml.parse(tomlContent);
+            const checklist = config.checklist;
+            
+            if (!checklist) {
+              console.error('❌ No [checklist] section found in antipatters.toml');
+              process.exit(1);
+            }
+            
+            const folder = checklist.folder || './gsd-opencode/';
+            const filePattern = checklist.file || '*.md';
+            const excludeDirs = checklist.exclude_dir ? checklist.exclude_dir.split(',').map(d => d.trim()) : [];
+            const forbiddenStrings = checklist.forbidden_strings || [];
+            
+            console.log(`Scanning folder: ${folder}`);
+            console.log(`File pattern: ${filePattern}`);
+            console.log(`Exclude dirs: ${excludeDirs.join(', ') || 'none'}`);
+            console.log(`Forbidden strings: ${forbiddenStrings.length} strings to check`);
+            console.log('');
+            
+            const files = findFiles(folder, filePattern, excludeDirs);
+            console.log(`Found ${files.length} files to check`);
+            console.log('');
+            
+            let violationsFound = false;
+            
+            for (const file of files) {
+              const content = fs.readFileSync(file, 'utf8');
+              const lines = content.split('\n');
+              
+              for (const forbiddenString of forbiddenStrings) {
+                for (let i = 0; i < lines.length; i++) {
+                  if (lines[i].includes(forbiddenString)) {
+                    console.log(`❌ Found forbidden string "${forbiddenString}" in ${file}:${i + 1}`);
+                    console.log(`   Line ${i + 1}: ${lines[i].trim()}`);
+                    console.log('');
+                    violationsFound = true;
+                  }
+                }
+              }
+            }
+            
+            if (!violationsFound) {
+              console.log('✓ No forbidden strings found');
+            } else {
+              console.log('❌ Forbidden strings detected in files');
+              process.exit(1);
+            }
+            
+          } catch (error) {
+            console.error('❌ Error during check:', error.message);
+            process.exit(1);
+          }
+          EOF
+          
+          # Run the Node.js script
+          node check_forbidden_strings.js
+          
+          # Clean up
+          rm check_forbidden_strings.js
+
+      - name: Final validation summary
+        run: |
+          echo "=== GSD Validation Summary ==="
+          echo "✓ GSD-STYLE.md exists and accessible"
+          echo "✓ Command structure validated"
+          echo "✓ Workflow structure validated"
+          echo "✓ File naming conventions followed"
+          echo "✓ Anti-patterns check passed"
+          echo "✓ Template structure validated"
+          echo "✓ Reference structure validated"
+          echo "✓ File count consistency checks passed"
+          echo ""
+          echo "🎉 GSD compliance validation completed successfully!"
