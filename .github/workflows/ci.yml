@@ -484,7 +484,7 @@ jobs:
         run: |
           echo "Publishing to GitHub npm registry..."
 
-          TARBALL=$(ls gsd-opencode-*.tgz)
+          TARBALL=$(ls *.tgz)
           VERSION="${{ needs.generate_version.outputs.version }}"
 
           echo "Publishing $TARBALL with version $VERSION"
