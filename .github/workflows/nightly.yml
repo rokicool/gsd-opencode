@@ -13,6 +13,7 @@ name: Nightly Build
 
 permissions:
   id-token: write
+  contents: write
 
 jobs:
   validate:
