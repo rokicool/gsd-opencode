@@ -450,8 +450,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          registry-url: 'https://npm.pkg.github.com'
-          token: ${{ secrets.GITHUB_TOKEN }}
           cache: "npm"
           cache-dependency-path: "gsd-opencode/package.json"
 
@@ -480,22 +478,20 @@ jobs:
           npm pack
           echo "✓ Package built"
 
-      - name: Publish to GitHub npm registry
+      - name: Publish to npm registry
         working-directory: ./gsd-opencode
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Publishing to GitHub npm registry..."
+          echo "Publishing to npm registry..."
 
           TARBALL=$(ls *.tgz)
           VERSION="${{ needs.generate_version.outputs.version }}"
 
           echo "Publishing $TARBALL with version $VERSION"
 
-          # Publish to GitHub Packages
-          npm publish "$TARBALL"
+          # Publish to npm public registry
+          npm publish "$TARBALL" --access public
 
-          echo "✓ Published to GitHub npm registry"
+          echo "✓ Published to npm registry"
 
   notify:
     name: Build Summary
@@ -525,7 +521,7 @@ jobs:
           if [[ "${{ needs.validate_code.result }}" == "success" && "${{ needs.validate_gsd.result }}" == "success" && "${{ needs.generate_version.result }}" == "success" && "${{ needs.build_and_publish.result }}" == "success" ]]; then
             echo "🎉 **Overall Status: SUCCESS**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "All validations passed and package published successfully." >> $GITHUB_STEP_SUMMARY
+            echo "All validations passed and package published to npmjs.org successfully." >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Overall Status: FAILED**" >> $GITHUB_STEP_SUMMARY
           fi

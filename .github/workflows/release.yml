@@ -46,6 +46,14 @@ jobs:
 
           echo "✓ Package version updated to match tag"
 
+      - name: Update package name for npmjs.org
+        working-directory: ./gsd-opencode
+        run: |
+          echo "Updating package name for npmjs.org..."
+          npm pkg set name=gsd-opencode
+          UPDATED_NAME=$(node -p "require('./package.json').name")
+          echo "✓ Package name updated to: $UPDATED_NAME"
+
   comprehensive_test:
     name: Run Production Tests
     runs-on: ubuntu-latest
