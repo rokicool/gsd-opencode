@@ -10,7 +10,7 @@ allowed-tools:
 ---
 
 <objective>
-Mark milestone {{version}} complete, archive to milestones/, and update ROADMAP.md.
+Mark milestone $ARGUMENTS complete, archive to milestones/, and update ROADMAP.md.
 
 Purpose: Create historical record of shipped version, collapse completed work in roadmap, and prepare for next milestone.
 Output: Milestone archived, roadmap reorganized, git tagged.
@@ -31,7 +31,7 @@ Output: Milestone archived, roadmap reorganized, git tagged.
 
 **User input:**
 
-- Version: {{version}} (e.g., "1.0", "1.1", "2.0")
+- Version: $ARGUMENTS (e.g., "1.0", "1.1", "2.0")
   </context>
 
 <process>
@@ -59,7 +59,7 @@ Output: Milestone archived, roadmap reorganized, git tagged.
 
 4. **Archive milestone:**
 
-   - Create `.planning/milestones/v{{version}}-ROADMAP.md`
+   - Create `.planning/milestones/v$ARGUMENTS-ROADMAP.md`
    - Extract full phase details from ROADMAP.md
    - Fill milestone-archive.md template
    - Update ROADMAP.md to one-line summary with link
@@ -74,8 +74,8 @@ Output: Milestone archived, roadmap reorganized, git tagged.
 6. **Commit and tag:**
 
    - Stage: MILESTONES.md, PROJECT.md, ROADMAP.md, STATE.md, archive file
-   - Commit: `chore: archive v{{version}} milestone`
-   - Tag: `git tag -a v{{version}} -m "[milestone summary]"`
+   - Commit: `chore: archive v$ARGUMENTS milestone`
+   - Tag: `git tag -a v$ARGUMENTS -m "[milestone summary]"`
    - Ask about pushing tag
 
 7. **Offer next steps:**
@@ -87,10 +87,10 @@ Output: Milestone archived, roadmap reorganized, git tagged.
 
 <success_criteria>
 
-- Milestone archived to `.planning/milestones/v{{version}}-ROADMAP.md`
+- Milestone archived to `.planning/milestones/v$ARGUMENTS-ROADMAP.md`
 - ROADMAP.md collapsed to one-line entry
 - PROJECT.md updated with current state
-- Git tag v{{version}} created
+- Git tag v$ARGUMENTS created
 - Commit successful
 - User knows next steps
   </success_criteria>
