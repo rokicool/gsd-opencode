@@ -457,6 +457,12 @@ jobs:
         working-directory: ./gsd-opencode
         run: npm install
 
+      - name: Configure npm for GitHub registry
+        working-directory: ./gsd-opencode
+        run: |
+          echo "Configuring npm for GitHub registry..."
+          echo "//npm.pkg.github.com/:_authToken=\${{ secrets.GITHUB_TOKEN }}" > .npmrc
+
       - name: Update package.json version
         working-directory: ./gsd-opencode
         run: |
@@ -467,8 +473,13 @@ jobs:
           NPM_VERSION="${VERSION#v}"
           npm version "$NPM_VERSION" --no-git-tag-version --allow-same-version
 
+          # Update package name to GitHub scoped package
+          npm pkg set name='@rokicool/gsd-opencode'
+
           # Verify update
           UPDATED_VERSION=$(node -p "require('./package.json').version")
+          UPDATED_NAME=$(node -p "require('./package.json').name")
+          echo "Updated package name to: $UPDATED_NAME"
           echo "Updated package.json version to: $UPDATED_VERSION"
 
       - name: Build package
@@ -481,17 +492,17 @@ jobs:
       - name: Publish to npm registry
         working-directory: ./gsd-opencode
         run: |
-          echo "Publishing to npm registry..."
+          echo "Publishing to GitHub npm registry..."
 
           TARBALL=$(ls *.tgz)
           VERSION="${{ needs.generate_version.outputs.version }}"
 
           echo "Publishing $TARBALL with version $VERSION"
 
-          # Publish to npm public registry
-          npm publish "$TARBALL" --access public
+          # Publish to GitHub npm registry
+          npm publish "$TARBALL" --registry=https://npm.pkg.github.com
 
-          echo "✓ Published to npm registry"
+          echo "✓ Published to GitHub npm registry"
 
   notify:
     name: Build Summary
@@ -521,7 +532,7 @@ jobs:
           if [[ "${{ needs.validate_code.result }}" == "success" && "${{ needs.validate_gsd.result }}" == "success" && "${{ needs.generate_version.result }}" == "success" && "${{ needs.build_and_publish.result }}" == "success" ]]; then
             echo "🎉 **Overall Status: SUCCESS**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "All validations passed and package published to npmjs.org successfully." >> $GITHUB_STEP_SUMMARY
+            echo "All validations passed and package published to GitHub npm registry successfully." >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Overall Status: FAILED**" >> $GITHUB_STEP_SUMMARY
           fi
