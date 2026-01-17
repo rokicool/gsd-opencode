@@ -463,7 +463,7 @@ jobs:
           echo "Configuring npm for GitHub registry..."
           echo "//npm.pkg.github.com/:_authToken=\${{ secrets.GITHUB_TOKEN }}" > .npmrc
 
-      - name: Update package.json version
+      - name: Update package.json for GitHub npm
         working-directory: ./gsd-opencode
         run: |
           VERSION="${{ needs.generate_version.outputs.version }}"
@@ -475,6 +475,9 @@ jobs:
 
           # Update package name to GitHub scoped package
           npm pkg set name='@rokicool/gsd-opencode'
+
+          # Configure publish registry for GitHub
+          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
 
           # Verify update
           UPDATED_VERSION=$(node -p "require('./package.json').version")
