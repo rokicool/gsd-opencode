@@ -452,7 +452,6 @@ jobs:
           node-version: "18"
           cache: "npm"
           cache-dependency-path: "gsd-opencode/package.json"
-          registry-url: 'https://npm.pkg.github.com'
 
       - name: Install dependencies
         working-directory: ./gsd-opencode
