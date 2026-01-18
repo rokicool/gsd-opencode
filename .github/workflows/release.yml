@@ -428,6 +428,9 @@ jobs:
         with:
           node-version: "18"
 
+      - name: Upgrade npm to 11.5.1+ for OIDC support
+        run: npm install -g npm@latest
+
       - name: Debug OIDC setup
         run: |
           echo "=== OIDC Debug Info ==="
