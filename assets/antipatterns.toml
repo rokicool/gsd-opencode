@@ -9,5 +9,6 @@ forbidden_strings = [
         "<sub>",
         'general-purpose',
         'subagent_type="Explore"',
-        "~/.claude"
+        "~/.claude",
+        "/gsd:"
         ]

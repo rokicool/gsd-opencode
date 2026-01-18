@@ -4,7 +4,7 @@
 
 **A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (Adapted for OpenCode by rokicool)**
 
-[Original GitHub Repository](https://github.com/glittercowboy/get-shit-done)
+[TÂCHES Original GitHub Repository](https://github.com/glittercowboy/get-shit-done)
 
 [![npm version](https://img.shields.io/npm/v/gsd-opencode?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/gsd-opencode)
 [![npm downloads](https://img.shields.io/npm/dm/gsd-opencode?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/gsd-opencode)
@@ -63,6 +63,30 @@ That's what this is. No enterprise roleplay bullshit. Just an incredibly effecti
 I just love both GSD and OpenCode. I felt like having GSD available only for Claude Code is not fair. 
 
 — **Roman**
+
+## Version 1.5.0 - Breaking Change: Command Naming Convention Update
+
+**⚠️ Important: Breaking Change in Command Syntax**
+
+We've made an update to align GSD's command naming convention with OpenCode's standard `kebab-case` format. Unfortunately, this introduces a breaking change to the visible command syntax that users have been accustomed to.
+
+### What Changed
+
+**Command Naming:** All GSD commands have been updated from the `/gsd:` prefix to the `/gsd-` format.
+
+### Why This Change?
+
+The `gsd-kebab-case` naming convention follows OpenCode's standard command format. This alignment ensures consistency across the ecosystem and improves compatibility.
+**Note:** We understand this is an unfortunate breaking change to the visible command syntax. If/when it becomes possible in the future, we may consider restoring the original `/gsd:` syntax while maintaining backward compatibility.
+
+### Migration Guide
+
+For users upgrading to version 1.5.0, simply replace the colon (`:`) in all GSD commands with a hyphen (`-`):
+
+- Old: `/gsd:plan-phase 1`
+- New: `/gsd-plan-phase 1`
+
+All functionality remains the same—only the command prefix has changed.
 
 ---
 

@@ -64,7 +64,7 @@
 
 
     <!-- Title and subtitle -->
-    <text class="text white" font-size="15" y="288">  Get Shit Done <tspan class="cyan">v1.3.32</tspan></text>
+    <text class="text white" font-size="15" y="288">  Get Shit Done <tspan class="cyan">v1.4.15</tspan></text>
     <text class="text white" font-size="15" y="312">  A meta-prompting, context engineering and spec-driven</text>
     <text class="text white" font-size="15" y="332">  development system for Cloude Code by TÂCHES</text>
     <text class="text white" font-size="15" y="352">  (adopted for OpenCode by rokicool and GLM4.7)</text>
