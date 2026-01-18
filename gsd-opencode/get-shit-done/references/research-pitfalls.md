@@ -58,13 +58,13 @@ Search queries (use WebSearch):
 
 <pitfall_tool_variations>
 **What**: Conflating capabilities across different tools/environments
-**Example**: "Claude Code or Desktop supports X" ≠ "OpenCode supports X"
+**Example**: "OpenCode or Desktop supports X" ≠ "OpenCode supports X"
 **Why it happens**: Not explicitly checking each environment separately
 **Prevention**:
 ```xml
 <verification_checklist>
 □ OpenCode capabilities
-□ Claude Code or Desktop capabilities
+□ OpenCode or Desktop capabilities
 □ VS Code extension capabilities
 □ API/SDK capabilities
 Document which environment supports which features
