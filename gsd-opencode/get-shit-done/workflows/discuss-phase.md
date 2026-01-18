@@ -192,7 +192,7 @@ Created: .planning/phases/${PHASE}-${SLUG}/${PHASE}-CONTEXT.md
 
 `/gsd-plan-phase ${PHASE}`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

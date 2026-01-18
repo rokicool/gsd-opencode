@@ -149,7 +149,7 @@ Read its `<objective>` section.
 
 `/gsd-execute-plan [full-path-to-PLAN.md]`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 ```
@@ -172,7 +172,7 @@ Check if `{phase}-CONTEXT.md` exists in phase directory.
 
 `/gsd-plan-phase {phase-number}`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 ```
@@ -188,7 +188,7 @@ Check if `{phase}-CONTEXT.md` exists in phase directory.
 
 `/gsd-plan-phase {phase}`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 
@@ -215,7 +215,7 @@ ISSUES.md exists without matching FIX.md. User needs to plan fixes.
 
 `/gsd-plan-fix {plan}`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 
@@ -262,7 +262,7 @@ Read ROADMAP.md to get the next phase's name and goal.
 
 `/gsd-plan-phase {Z+1}`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 
@@ -291,7 +291,7 @@ All {N} phases finished!
 
 `/gsd-complete-milestone`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

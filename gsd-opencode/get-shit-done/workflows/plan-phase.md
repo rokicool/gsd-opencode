@@ -645,7 +645,7 @@ Wave 2: {plan-03}
 
 `/gsd-execute-phase {X}`
 
-*`/clear` first - fresh context window*
+*`/new` first - fresh context window*
 
 ---
 

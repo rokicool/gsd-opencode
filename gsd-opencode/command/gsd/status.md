@@ -110,7 +110,7 @@ All parallel agents finished. Review results:
 
 `/gsd-progress`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 ```

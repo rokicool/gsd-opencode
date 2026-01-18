@@ -1685,7 +1685,7 @@ Summary: .planning/phases/{phase-dir}/{phase}-{plan}-SUMMARY.md
 
 `/gsd-execute-plan .planning/phases/{phase-dir}/{phase}-{next-plan}-PLAN.md`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 
@@ -1746,7 +1746,7 @@ All {Y} plans finished.
 
 `/gsd-plan-phase {Z+1}`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 
@@ -1786,7 +1786,7 @@ Milestone is 100% done.
 
 `/gsd-complete-milestone`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

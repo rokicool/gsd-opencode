@@ -324,7 +324,7 @@ Use subagents for autonomous work. Reserve main context for user interaction.
 
 `{copy-paste command}`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

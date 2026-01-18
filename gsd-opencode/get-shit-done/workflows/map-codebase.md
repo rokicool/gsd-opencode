@@ -405,7 +405,7 @@ Created .planning/codebase/:
 
 `/gsd-new-project`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

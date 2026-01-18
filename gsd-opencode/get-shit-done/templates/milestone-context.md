@@ -2,7 +2,7 @@
 
 Template for `.planning/MILESTONE-CONTEXT.md` - temporary handoff file from discuss-milestone to create-milestone.
 
-**Purpose:** Persist milestone discussion context so `/clear` can be used between commands. This file is consumed by `/gsd-new-milestone` and deleted after the milestone is created.
+**Purpose:** Persist milestone discussion context so `/new` can be used between commands. This file is consumed by `/gsd-new-milestone` and deleted after the milestone is created.
 
 ---
 
@@ -70,11 +70,11 @@ Template for `.planning/MILESTONE-CONTEXT.md` - temporary handoff file from disc
 <guidelines>
 **This is a handoff artifact, not permanent documentation.**
 
-The file exists only to pass context from `discuss-milestone` to `create-milestone` across a `/clear` boundary.
+The file exists only to pass context from `discuss-milestone` to `create-milestone` across a `/new` boundary.
 
 **Lifecycle:**
 1. `/gsd-discuss-milestone` creates this file at end of discussion
-2. User runs `/clear` (safe now - context is persisted)
+2. User runs `/new` (safe now - context is persisted)
 3. `/gsd-new-milestone` reads this file
 4. `/gsd-new-milestone` uses context to populate milestone
 5. `/gsd-new-milestone` deletes this file after successful creation

@@ -13,7 +13,7 @@ allowed-tools:
 ---
 
 <objective>
-Debug issues using scientific method with a persistent debug document that survives `/clear`.
+Debug issues using scientific method with a persistent debug document that survives `/new`.
 
 If resuming (no arguments and active session exists): pick up where you left off.
 If starting new: gather symptoms, then investigate autonomously.
@@ -45,7 +45,7 @@ Follow the workflow in @~/.config/opencode/get-shit-done/workflows/debug.md
 5. **Fix and verify** - Minimal fix, verify against original symptoms
 6. **Archive** - Move to `.planning/debug/resolved/`
 
-**Key principle:** The DEBUG.md is your memory. Update it constantly. It survives `/clear`.
+**Key principle:** The DEBUG.md is your memory. Update it constantly. It survives `/new`.
 </process>
 
 <success_criteria>

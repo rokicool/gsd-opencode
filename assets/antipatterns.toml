@@ -1,8 +1,8 @@
 title = "Checks"
 
 [checklist]
-folder  = "./gsd-opencode/"
-file    = "*.md"
+folder = "./gsd-opencode/"
+file = "*.md"
 exclude_dir = ""
 forbidden_strings = [
         "Claude Code",
@@ -10,5 +10,6 @@ forbidden_strings = [
         'general-purpose',
         'subagent_type="Explore"',
         "~/.claude",
-        "/gsd:"
-        ]
+        "/gsd:",
+        "/clear",
+]

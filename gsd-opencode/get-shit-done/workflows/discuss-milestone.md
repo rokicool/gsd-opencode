@@ -216,7 +216,7 @@ Context saved to `.planning/MILESTONE-CONTEXT.md`
 
 `/gsd-new-milestone`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 ```

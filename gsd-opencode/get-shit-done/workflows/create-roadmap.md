@@ -432,7 +432,7 @@ Project initialized:
 
 `/gsd-plan-phase 1`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

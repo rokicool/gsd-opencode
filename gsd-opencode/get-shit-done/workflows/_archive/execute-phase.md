@@ -844,7 +844,7 @@ All {N} plans finished via parallel execution.
 
 `/gsd-plan-phase {X+1}`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

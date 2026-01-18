@@ -466,7 +466,7 @@ Exit skill and invoke [removed - use /command syntax]("/gsd-plan-phase [X+1]")
 
 `/gsd-plan-phase [X+1]`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 
@@ -513,7 +513,7 @@ Exit skill and invoke [removed - use /command syntax]("/gsd-complete-milestone {
 
 `/gsd-complete-milestone {version}`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

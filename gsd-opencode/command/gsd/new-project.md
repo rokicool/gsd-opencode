@@ -307,7 +307,7 @@ Project initialized:
 
 `/gsd-create-roadmap`
 
-*`/clear` first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 ```

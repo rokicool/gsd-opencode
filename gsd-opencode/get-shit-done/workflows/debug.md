@@ -281,7 +281,7 @@ If ELIMINATED:
 
 After significant investigation (5+ evidence entries), check if context is heavy.
 If so, ensure Current Focus is fully updated and suggest:
-"Context filling up. Safe to /clear - run /gsd-debug to resume."
+"Context filling up. Safe to /new - run /gsd-debug to resume."
 </step>
 
 <step name="resume_from_file">
@@ -420,7 +420,7 @@ Use question:
 - [ ] Current Focus always reflects NOW
 - [ ] Evidence appended for every finding
 - [ ] Eliminated prevents re-investigation
-- [ ] Can resume perfectly from any /clear
+- [ ] Can resume perfectly from any /new
 - [ ] Root cause confirmed with evidence before fixing
 - [ ] Fix verified against original symptoms
 </success_criteria>

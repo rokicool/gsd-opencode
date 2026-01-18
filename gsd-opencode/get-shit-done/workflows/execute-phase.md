@@ -316,7 +316,7 @@ Present next steps based on milestone status:
 
 `/gsd-plan-phase {X+1}`
 
-*`/clear` first for fresh context*
+*`/new` first for fresh context*
 ```
 
 **If milestone complete:**
