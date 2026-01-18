@@ -1,5 +1,5 @@
 ---
-name: gsd:research-phase
+name: gsd-research-phase
 description: Research how to implement a phase before planning
 argument-hint: "[phase]"
 allowed-tools:
@@ -33,7 +33,7 @@ Output: RESEARCH.md with ecosystem knowledge that informs quality planning.
 </execution_context>
 
 <context>
-Phase number: ($ARGUMENTS) (required)
+Phase number: $ARGUMENTS (required)
 
 **Load project state:**
 @.planning/STATE.md

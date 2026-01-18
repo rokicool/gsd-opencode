@@ -1,5 +1,5 @@
 ---
-name: gsd:discuss-milestone
+name: gsd-discuss-milestone
 description: Gather context for next milestone through adaptive questioning
 ---
 
@@ -7,7 +7,7 @@ description: Gather context for next milestone through adaptive questioning
 Help you figure out what to build in the next milestone through collaborative thinking.
 
 Purpose: After completing a milestone, explore what features you want to add, improve, or fix. Features first — scope and phases derive from what you want to build.
-Output: Context gathered, then routes to /gsd:new-milestone
+Output: Context gathered, then routes to /gsd-new-milestone
 </objective>
 
 <execution_context>
@@ -33,7 +33,7 @@ Output: Context gathered, then routes to /gsd:new-milestone
    - Use question to dig into features they mention
    - Use question to help them articulate what matters most
    - Use question for decision gate (ready / ask more / let me add context)
-4. Hand off to /gsd:new-milestone with gathered context
+4. Hand off to /gsd-new-milestone with gathered context
 
 **CRITICAL: ALL questions use question. Never ask inline text questions.**
 </process>
@@ -43,5 +43,5 @@ Output: Context gathered, then routes to /gsd:new-milestone
 - Project state loaded and presented
 - Previous milestone context summarized
 - Milestone scope gathered through adaptive questioning
-- Context handed off to /gsd:new-milestone
+- Context handed off to /gsd-new-milestone
   </success_criteria>

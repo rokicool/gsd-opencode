@@ -1,5 +1,5 @@
 ---
-name: gsd:status
+name: gsd-status
 description: Check status of background agents from parallel execution
 argument-hint: "[--wait]"
 allowed-tools:
@@ -9,14 +9,14 @@ allowed-tools:
 ---
 
 <objective>
-Monitor background agent status from /gsd:execute-phase parallel execution.
+Monitor background agent status from /gsd-execute-phase parallel execution.
 
 Shows running/completed agents from agent-history.json.
 With --wait flag, blocks until all agents complete.
 </objective>
 
 <context>
-Arguments: ($ARGUMENTS)
+Arguments: $ARGUMENTS
 </context>
 
 <process>
@@ -32,7 +32,7 @@ If file doesn't exist or has no entries:
 ```
 No background agents tracked.
 
-Run /gsd:execute-phase to spawn parallel agents.
+Run /gsd-execute-phase to spawn parallel agents.
 ```
 Exit.
 </step>
@@ -63,7 +63,7 @@ Background Agents
 Progress: 2/3 complete
 
 ════════════════════════════════════════
-Wait for all: /gsd:status --wait
+Wait for all: /gsd-status --wait
 ```
 
 **Status icons:**
@@ -108,7 +108,7 @@ Update agent-history.json with completion status for each.
 
 All parallel agents finished. Review results:
 
-`/gsd:progress`
+`/gsd-progress`
 
 *`/clear` first → fresh context window*
 

@@ -1,5 +1,5 @@
 ---
-name: gsd:discuss-phase
+name: gsd-discuss-phase
 description: Gather phase context through adaptive questioning before planning
 argument-hint: "[phase]"
 ---
@@ -18,7 +18,7 @@ Output: {phase}-CONTEXT.md capturing the user's vision for the phase
 </execution_context>
 
 <context>
-Phase number: ($ARGUMENTS) (required)
+Phase number: $ARGUMENTS (required)
 
 **Load project state first:**
 @.planning/STATE.md

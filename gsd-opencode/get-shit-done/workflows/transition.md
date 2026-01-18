@@ -449,7 +449,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Plan Phase [X+1] in detail
 ```
 
-Exit skill and invoke [removed - use /command syntax]("/gsd:plan-phase [X+1]")
+Exit skill and invoke [removed - use /command syntax]("/gsd-plan-phase [X+1]")
 
 </if>
 
@@ -464,15 +464,15 @@ Exit skill and invoke [removed - use /command syntax]("/gsd:plan-phase [X+1]")
 
 **Phase [X+1]: [Name]** — [Goal from ROADMAP.md]
 
-`/gsd:plan-phase [X+1]`
+`/gsd-plan-phase [X+1]`
 
 *`/clear` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:discuss-phase [X+1]` — gather context first
-- `/gsd:research-phase [X+1]` — investigate unknowns
+- `/gsd-discuss-phase [X+1]` — gather context first
+- `/gsd-research-phase [X+1]` — investigate unknowns
 - Review roadmap
 
 ---
@@ -494,7 +494,7 @@ Phase {X} marked complete.
 ⚡ Auto-continuing: Complete milestone and archive
 ```
 
-Exit skill and invoke [removed - use /command syntax]("/gsd:complete-milestone {version}")
+Exit skill and invoke [removed - use /command syntax]("/gsd-complete-milestone {version}")
 
 </if>
 
@@ -511,7 +511,7 @@ Exit skill and invoke [removed - use /command syntax]("/gsd:complete-milestone {
 
 **Complete Milestone {version}** — archive and prepare for next
 
-`/gsd:complete-milestone {version}`
+`/gsd-complete-milestone {version}`
 
 *`/clear` first → fresh context window*
 

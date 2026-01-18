@@ -1,5 +1,5 @@
 ---
-name: gsd:check-todos
+name: gsd-check-todos
 description: List pending todos and select one to work on
 argument-hint: [area filter]
 allowed-tools:
@@ -19,6 +19,8 @@ Enables reviewing captured ideas and deciding what to work on next.
 <context>
 @.planning/STATE.md
 @.planning/ROADMAP.md
+
+Area filter: $ARGUMENTS
 </context>
 
 <process>
@@ -33,14 +35,14 @@ If count is 0:
 ```
 No pending todos.
 
-Todos are captured during work sessions with /gsd:add-todo.
+Todos are captured during work sessions with /gsd-add-todo.
 
 ---
 
 Would you like to:
 
-1. Continue with current phase (/gsd:progress)
-2. Add a todo now (/gsd:add-todo)
+1. Continue with current phase (/gsd-progress)
+2. Add a todo now (/gsd-add-todo)
 ```
 
 Exit.
@@ -48,8 +50,8 @@ Exit.
 
 <step name="parse_filter">
 Check for area filter in arguments:
-- `/gsd:check-todos` → show all
-- `/gsd:check-todos api` → filter to area:api only
+- `/gsd-check-todos` → show all
+- `/gsd-check-todos api` → filter to area:api only
 </step>
 
 <step name="list_todos">
@@ -74,7 +76,7 @@ Pending Todos:
 ---
 
 Reply with a number to view details, or:
-- `/gsd:check-todos [area]` to filter by area
+- `/gsd-check-todos [area]` to filter by area
 - `q` to exit
 ```
 
@@ -138,7 +140,7 @@ Use question:
 - question: "What would you like to do with this todo?"
 - options:
   - "Work on it now" — move to done, start working
-  - "Create a phase" — /gsd:add-phase with this scope
+  - "Create a phase" — /gsd-add-phase with this scope
   - "Brainstorm approach" — think through before deciding
   - "Put it back" — return to list
 </step>
@@ -154,7 +156,7 @@ Update STATE.md todo count. Present problem/solution context. Begin work or ask 
 Note todo reference in phase planning notes. Keep in pending. Return to list or exit.
 
 **Create a phase:**
-Display: `/gsd:add-phase [description from todo]`
+Display: `/gsd-add-phase [description from todo]`
 Keep in pending. User runs command in fresh context.
 
 **Brainstorm approach:**
@@ -202,7 +204,7 @@ Confirm: "Committed: docs: start work on todo - [title]"
 <anti_patterns>
 - Don't delete todos — move to done/ when work begins
 - Don't start work without moving to done/ first
-- Don't create plans from this command — route to /gsd:plan-phase or /gsd:add-phase
+- Don't create plans from this command — route to /gsd-plan-phase or /gsd-add-phase
 </anti_patterns>
 
 <success_criteria>

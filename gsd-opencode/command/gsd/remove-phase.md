@@ -1,5 +1,5 @@
 ---
-name: gsd:remove-phase
+name: gsd-remove-phase
 description: Remove a future phase from roadmap and renumber subsequent phases
 argument-hint: <phase-number>
 allowed-tools:
@@ -19,6 +19,8 @@ Output: Phase deleted, all subsequent phases renumbered, git commit as historica
 <execution_context>
 @.planning/ROADMAP.md
 @.planning/STATE.md
+
+Phase number: $ARGUMENTS
 </execution_context>
 
 <process>
@@ -26,15 +28,15 @@ Output: Phase deleted, all subsequent phases renumbered, git commit as historica
 <step name="parse_arguments">
 Parse the command arguments:
 - Argument is the phase number to remove (integer or decimal)
-- Example: `/gsd:remove-phase 17` → phase = 17
-- Example: `/gsd:remove-phase 16.1` → phase = 16.1
+- Example: `/gsd-remove-phase 17` → phase = 17
+- Example: `/gsd-remove-phase 16.1` → phase = 16.1
 
 If no argument provided:
 
 ```
 ERROR: Phase number required
-Usage: /gsd:remove-phase <phase-number>
-Example: /gsd:remove-phase 17
+Usage: /gsd-remove-phase <phase-number>
+Example: /gsd-remove-phase 17
 ```
 
 Exit.
@@ -80,7 +82,7 @@ Only future phases can be removed:
 - Current phase: {current}
 - Phase {target} is current or completed
 
-To abandon current work, use /gsd:pause-work instead.
+To abandon current work, use /gsd-pause-work instead.
 ```
 
 Exit.
@@ -280,7 +282,7 @@ Current position: Phase {current} of {new-total}
 ## What's Next
 
 Would you like to:
-- `/gsd:progress` — see updated roadmap status
+- `/gsd-progress` — see updated roadmap status
 - Continue with current phase
 - Review roadmap
 

@@ -1,5 +1,5 @@
 ---
-name: gsd:map-codebase
+name: gsd-map-codebase
 description: Analyze codebase with parallel explore agents to produce .planning/codebase/ documents
 argument-hint: "[optional: specific area to map, e.g., 'api' or 'auth']"
 allowed-tools:
@@ -31,14 +31,14 @@ Output: .planning/codebase/ folder with 7 structured documents about the codebas
 </execution_context>
 
 <context>
-Focus area: ($ARGUMENTS) (optional - if provided, tells agents to focus on specific subsystem)
+Focus area: $ARGUMENTS (optional - if provided, tells agents to focus on specific subsystem)
 
 **Load project state if exists:**
 Check for .planning/STATE.md - loads context if project already initialized
 
 **This command can run:**
-- Before /gsd:new-project (brownfield codebases) - creates codebase map first
-- After /gsd:new-project (greenfield codebases) - updates codebase map as code evolves
+- Before /gsd-new-project (brownfield codebases) - creates codebase map first
+- After /gsd-new-project (greenfield codebases) - updates codebase map as code evolves
 - Anytime to refresh codebase understanding
 </context>
 
@@ -72,7 +72,7 @@ Check for .planning/STATE.md - loads context if project already initialized
    - TESTING.md - Test structure, coverage, practices
    - INTEGRATIONS.md - APIs, databases, external services
    - CONCERNS.md - Technical debt, risks, issues
-6. Offer next steps (typically: /gsd:new-project or /gsd:plan-phase)
+6. Offer next steps (typically: /gsd-new-project or /gsd-plan-phase)
 </process>
 
 <success_criteria>

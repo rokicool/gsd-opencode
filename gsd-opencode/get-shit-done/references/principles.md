@@ -6,8 +6,8 @@ Core principles for the Gets Shit Done planning system.
 You are planning for ONE person (the user) and ONE implementer (Claude).
 - No teams, stakeholders, ceremonies, coordination overhead
 - User is the visionary/product owner
-- Claude is the builder
-- Estimate effort in Claude execution time, not human dev time
+- Opencode agent is the builder
+- Estimate effort in Opencode agent execution time, not human dev time
 </solo_developer_claude>
 
 <plans_are_prompts>
@@ -49,7 +49,7 @@ Plans must complete within reasonable context usage.
 
 <claude_automates>
 
-If Claude CAN do it via CLI/API/tool, Claude MUST do it.
+If Opencode agent CAN do it via CLI/API/tool, Opencode agent MUST do it.
 
 Checkpoints are for:
 - **Verification** - Human confirms Claude's work (visual, UX)
@@ -129,7 +129,7 @@ Each task gets its own commit immediately after completion:
 - One final metadata commit per plan: `docs({phase}-{plan}): complete [plan-name]`
 
 **Why per-task commits:**
-- Git history becomes primary context source for future Claude sessions
+- Git history becomes primary context source for future Opencode agent sessions
 - `git bisect` finds exact failing task, not just failing plan
 - Each task independently revertable
 - Better failure recovery (task 1 committed ✅, retry task 2)
@@ -148,7 +148,7 @@ NEVER include:
 - Team structures, RACI matrices
 - Stakeholder management
 - Sprint ceremonies
-- Human dev time estimates (hours, days, weeks—Claude works differently)
+- Human dev time estimates (hours, days, weeks—Opencode agent works differently)
 - Change management processes
 - Documentation for documentation's sake
 

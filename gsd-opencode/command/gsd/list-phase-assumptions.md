@@ -1,5 +1,5 @@
 ---
-name: gsd:list-phase-assumptions
+name: gsd-list-phase-assumptions
 description: Surface OpenCode's assumptions about a phase approach before planning
 argument-hint: "[phase]"
 allowed-tools:
@@ -21,7 +21,7 @@ Output: Conversational output only (no file creation) - ends with "What do you t
 </execution_context>
 
 <context>
-Phase number: ($ARGUMENTS) (required)
+Phase number: $ARGUMENTS (required)
 
 **Load project state first:**
 @.planning/STATE.md

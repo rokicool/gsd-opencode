@@ -11,7 +11,7 @@ Rules for editing files in `commands/gsd/`.
 
 ```yaml
 ---
-name: gsd:command-name
+name: gsd-command-name
 description: One-line description
 argument-hint: "<required>" or "[optional]"
 allowed-tools: [Read, Write, Bash, Glob, Grep, AskUserQuestion]

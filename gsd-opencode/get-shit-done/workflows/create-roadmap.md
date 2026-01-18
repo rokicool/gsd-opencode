@@ -293,7 +293,7 @@ mkdir -p .planning/phases
 Use template from `~/.config/opencode/get-shit-done/templates/roadmap.md`.
 
 Initial roadmaps use integer phases (1, 2, 3...).
-Decimal phases added later via /gsd:insert-phase command (if it exists).
+Decimal phases added later via /gsd-insert-phase command (if it exists).
 
 Write to `.planning/ROADMAP.md` with:
 
@@ -386,7 +386,7 @@ Resume file: None
 **Key points:**
 
 - Project Reference points to PROJECT.md for full context
-- Claude reads PROJECT.md directly for requirements, constraints, decisions
+- Opencode agent reads PROJECT.md directly for requirements, constraints, decisions
 - This file will be read first in every future operation
 - This file will be updated after every execution
 
@@ -430,15 +430,15 @@ Project initialized:
 
 **Phase 1: [Name]** — [Goal from ROADMAP.md]
 
-`/gsd:plan-phase 1`
+`/gsd-plan-phase 1`
 
 *`/clear` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:discuss-phase 1` — gather context first
-- `/gsd:research-phase 1` — investigate unknowns
+- `/gsd-discuss-phase 1` — gather context first
+- `/gsd-research-phase 1` — investigate unknowns
 - Review roadmap
 
 ---

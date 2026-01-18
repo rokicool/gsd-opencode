@@ -28,7 +28,7 @@ The GSD (Get Shit Done) system has many supporting files (templates, workflows, 
 - ./gsd-opencode/bin/*
 - ./gsd-opencode/package.json
 
-**Note:** These files do NOT need "name: gsd:<name>" in their frontmatter because they are not commands. They are supporting files referenced by commands.
+**Note:** These files do NOT need "name: gsd-<name>" in their frontmatter because they are not commands. They are supporting files referenced by commands.
 </context>
 
 <requirements>

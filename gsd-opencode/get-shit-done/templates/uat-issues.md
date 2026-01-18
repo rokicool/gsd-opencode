@@ -2,7 +2,7 @@
 
 Template for `.planning/phases/XX-name/{phase}-{plan}-ISSUES.md` - phase-scoped issues discovered during user acceptance testing.
 
-**Purpose:** Capture issues found during /gsd:verify-work. Unlike global ISSUES.md (for deferred enhancements), this file tracks bugs and problems in specific delivered work.
+**Purpose:** Capture issues found during /gsd-verify-work. Unlike global ISSUES.md (for deferred enhancements), this file tracks bugs and problems in specific delivered work.
 
 **Location:** Same directory as the SUMMARY.md being tested.
 
@@ -15,7 +15,7 @@ Template for `.planning/phases/XX-name/{phase}-{plan}-ISSUES.md` - phase-scoped 
 
 **Tested:** [date]
 **Source:** [path to SUMMARY.md that was tested]
-**Tester:** User via /gsd:verify-work
+**Tester:** User via /gsd-verify-work
 
 ## Open Issues
 
@@ -36,7 +36,7 @@ Template for `.planning/phases/XX-name/{phase}-{plan}-ISSUES.md` - phase-scoped 
 
 ## Resolved Issues
 
-[Moved here after /gsd:plan-fix executes and fixes are verified]
+[Moved here after /gsd-plan-fix executes and fixes are verified]
 
 ### UAT-001: [Brief description]
 **Resolved:** [date] - Fixed in [phase]-[plan]-FIX.md
@@ -76,7 +76,7 @@ Template for `.planning/phases/XX-name/{phase}-{plan}-ISSUES.md` - phase-scoped 
 
 **Tested:** 2025-01-15
 **Source:** .planning/phases/05-auth/05-02-SUMMARY.md
-**Tester:** User via /gsd:verify-work
+**Tester:** User via /gsd-verify-work
 
 ## Open Issues
 
@@ -119,7 +119,7 @@ Template for `.planning/phases/XX-name/{phase}-{plan}-ISSUES.md` - phase-scoped 
 
 <guidelines>
 **When to create:**
-- First time /gsd:verify-work finds an issue for a plan
+- First time /gsd-verify-work finds an issue for a plan
 - One file per plan tested
 
 **Location:**
@@ -131,8 +131,8 @@ Template for `.planning/phases/XX-name/{phase}-{plan}-ISSUES.md` - phase-scoped 
 - UAT ISSUES.md: Actual problems found during testing
 
 **Workflow:**
-1. /gsd:verify-work creates this file with issues
-2. /gsd:plan-fix reads this file and creates FIX.md plan
+1. /gsd-verify-work creates this file with issues
+2. /gsd-plan-fix reads this file and creates FIX.md plan
 3. After FIX.md executes, issues move to "Resolved" section
 4. File becomes historical record of what was found and fixed
 

@@ -84,7 +84,7 @@ People who want to describe what they want and have it built correctly — witho
 npx gsd-opencode
 ```
 
-That's it. Verify with `/gsd:help`.
+That's it. Verify with `/gsd-help`.
 
 <details>
 <summary><strong>Non-interactive Install (Docker, CI, Scripts)</strong></summary>
@@ -154,7 +154,7 @@ If you prefer not to use that flag, add this to your project's `.opencode/settin
 ### 1. Start with an idea
 
 ```
-/gsd:new-project
+/gsd-new-project
 ```
 
 The system asks questions. Keeps asking until it has everything — your goals, constraints, tech preferences, edge cases. You go back and forth until the idea is fully captured. Creates **PROJECT.md**.
@@ -162,7 +162,7 @@ The system asks questions. Keeps asking until it has everything — your goals, 
 ### 2. Create roadmap
 
 ```
-/gsd:create-roadmap
+/gsd-create-roadmap
 ```
 
 Produces:
@@ -172,8 +172,8 @@ Produces:
 ### 3. Plan and execute phases
 
 ```
-/gsd:plan-phase 1      # System creates atomic task plans
-/gsd:execute-plan      # Subagent implements autonomously
+/gsd-plan-phase 1      # System creates atomic task plans
+/gsd-execute-plan      # Subagent implements autonomously
 ```
 
 Each phase breaks into 2-3 atomic tasks. Each task runs in a fresh subagent context — 200k tokens purely for implementation, zero degradation.
@@ -181,9 +181,9 @@ Each phase breaks into 2-3 atomic tasks. Each task runs in a fresh subagent cont
 ### 4. Ship and iterate
 
 ```
-/gsd:complete-milestone   # Archive v1, prep for v2
-/gsd:add-phase            # Append new work
-/gsd:insert-phase 2       # Slip urgent work between phases
+/gsd-complete-milestone   # Archive v1, prep for v2
+/gsd-add-phase            # Append new work
+/gsd-insert-phase 2       # Slip urgent work between phases
 ```
 
 Ship your MVP in a day. Add features. Insert hotfixes. The system stays modular — you're never stuck.
@@ -197,7 +197,7 @@ Already have code? Start here instead.
 ### 1. Map the codebase
 
 ```
-/gsd:map-codebase
+/gsd-map-codebase
 ```
 
 Spawns parallel agents to analyze your code. Creates `.planning/codebase/` with 7 documents:
@@ -215,14 +215,14 @@ Spawns parallel agents to analyze your code. Creates `.planning/codebase/` with 
 ### 2. Initialize project
 
 ```
-/gsd:new-project
+/gsd-new-project
 ```
 
 Same as greenfield, but the system knows your codebase. Questions focus on what you're adding/changing, not starting from scratch.
 
 ### 3. Continue as normal
 
-From here, it's the same: `/gsd:create-roadmap` → `/gsd:plan-phase` → `/gsd:execute-plan`
+From here, it's the same: `/gsd-create-roadmap` → `/gsd-plan-phase` → `/gsd-execute-plan`
 
 The codebase docs load automatically during planning. OpenCode knows your patterns, conventions, and where to put things.
 
@@ -313,32 +313,32 @@ You're never locked in. The system adapts.
 
 | Command | What it does |
 |---------|--------------|
-| `/gsd:new-project` | Extract your idea through questions, create PROJECT.md |
-| `/gsd:create-roadmap` | Create roadmap and state tracking |
-| `/gsd:map-codebase` | Map existing codebase for brownfield projects |
-| `/gsd:plan-phase [N]` | Generate task plans for phase |
-| `/gsd:execute-plan` | Run single plan via subagent |
-| `/gsd:execute-phase <N>` | Execute all plans in phase N with parallel agents |
-| `/gsd:status [--wait]` | Check background agent status from parallel execution |
-| `/gsd:progress` | Where am I? What's next? |
-| `/gsd:verify-work [N]` | User acceptance test of phase or plan ¹ |
-| `/gsd:plan-fix [plan]` | Plan fixes for UAT issues from verify-work |
-| `/gsd:complete-milestone` | Ship it, prep next version |
-| `/gsd:discuss-milestone` | Gather context for next milestone |
-| `/gsd:new-milestone [name]` | Create new milestone with phases |
-| `/gsd:add-phase` | Append phase to roadmap |
-| `/gsd:insert-phase [N]` | Insert urgent work |
-| `/gsd:remove-phase [N]` | Remove future phase, renumber subsequent |
-| `/gsd:discuss-phase [N]` | Gather context before planning |
-| `/gsd:research-phase [N]` | Deep ecosystem research for niche domains |
-| `/gsd:list-phase-assumptions [N]` | See what OpenCode thinks before you correct it |
-| `/gsd:pause-work` | Create handoff file when stopping mid-phase |
-| `/gsd:resume-work` | Restore from last session |
-| `/gsd:consider-issues` | Review deferred issues, close resolved, identify urgent |
-| `/gsd:add-todo [desc]` | Capture idea or task from conversation for later |
-| `/gsd:check-todos [area]` | List pending todos, select one to work on |
-| `/gsd:debug [desc]` | Systematic debugging with persistent state across `/clear` |
-| `/gsd:help` | Show all commands and usage guide |
+| `/gsd-new-project` | Extract your idea through questions, create PROJECT.md |
+| `/gsd-create-roadmap` | Create roadmap and state tracking |
+| `/gsd-map-codebase` | Map existing codebase for brownfield projects |
+| `/gsd-plan-phase [N]` | Generate task plans for phase |
+| `/gsd-execute-plan` | Run single plan via subagent |
+| `/gsd-execute-phase <N>` | Execute all plans in phase N with parallel agents |
+| `/gsd-status [--wait]` | Check background agent status from parallel execution |
+| `/gsd-progress` | Where am I? What's next? |
+| `/gsd-verify-work [N]` | User acceptance test of phase or plan ¹ |
+| `/gsd-plan-fix [plan]` | Plan fixes for UAT issues from verify-work |
+| `/gsd-complete-milestone` | Ship it, prep next version |
+| `/gsd-discuss-milestone` | Gather context for next milestone |
+| `/gsd-new-milestone [name]` | Create new milestone with phases |
+| `/gsd-add-phase` | Append phase to roadmap |
+| `/gsd-insert-phase [N]` | Insert urgent work |
+| `/gsd-remove-phase [N]` | Remove future phase, renumber subsequent |
+| `/gsd-discuss-phase [N]` | Gather context before planning |
+| `/gsd-research-phase [N]` | Deep ecosystem research for niche domains |
+| `/gsd-list-phase-assumptions [N]` | See what OpenCode thinks before you correct it |
+| `/gsd-pause-work` | Create handoff file when stopping mid-phase |
+| `/gsd-resume-work` | Restore from last session |
+| `/gsd-consider-issues` | Review deferred issues, close resolved, identify urgent |
+| `/gsd-add-todo [desc]` | Capture idea or task from conversation for later |
+| `/gsd-check-todos [area]` | List pending todos, select one to work on |
+| `/gsd-debug [desc]` | Systematic debugging with persistent state across `/clear` |
+| `/gsd-help` | Show all commands and usage guide |
 
 <sup>¹ Contributed by reddit user OracleGreyBeard</sup>
 
@@ -351,7 +351,7 @@ You're never locked in. The system adapts.
 - Verify files exist in `~/.config/opencode/command/gsd/` (global) or `.opencode/command/gsd/` (local)
 
 **Commands not working as expected?**
-- Run `/gsd:help` to verify installation
+- Run `/gsd-help` to verify installation
 - Re-run `npx gsd-opencode` to reinstall
 
 **Updating to the latest version?**

@@ -2,7 +2,7 @@
 
 Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and patterns.
 
-**Purpose:** Document how code is written in this codebase. Prescriptive guide for Claude to match existing style.
+**Purpose:** Document how code is written in this codebase. Prescriptive guide for Opencode agent to match existing style.
 
 ---
 

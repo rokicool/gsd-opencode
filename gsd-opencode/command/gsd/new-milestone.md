@@ -1,5 +1,5 @@
 ---
-name: gsd:new-milestone
+name: gsd-new-milestone
 description: Create a new milestone with phases for an existing project
 argument-hint: "[milestone name, e.g., 'v2.0 Features']"
 ---
@@ -17,7 +17,7 @@ Output: New milestone in ROADMAP.md, updated STATE.md, phase directories created
 </execution_context>
 
 <context>
-Milestone name: ($ARGUMENTS) (optional - will prompt if not provided)
+Milestone name: $ARGUMENTS (optional - will prompt if not provided)
 
 **Load project state first:**
 @.planning/STATE.md
@@ -34,7 +34,7 @@ Milestone name: ($ARGUMENTS) (optional - will prompt if not provided)
 2. Calculate next milestone version and starting phase number
 3. If milestone name provided in arguments, use it; otherwise prompt
 4. Gather phases (per depth setting: quick 3-5, standard 5-8, comprehensive 8-12):
-   - If called from /gsd:discuss-milestone, use provided context
+   - If called from /gsd-discuss-milestone, use provided context
    - Otherwise, prompt for phase breakdown
 5. Detect research needs for each phase
 6. Confirm phases (respect config.json gate settings)

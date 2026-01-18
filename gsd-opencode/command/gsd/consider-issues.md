@@ -1,5 +1,5 @@
 ---
-name: gsd:consider-issues
+name: gsd-consider-issues
 description: Review deferred issues with codebase context, close resolved ones, identify urgent ones
 allowed-tools:
   - read
@@ -154,12 +154,12 @@ Use question with appropriate options based on findings:
 - "Review each first" - Show details before closing
 
 **If urgent issues exist:**
-- "Insert urgent phase" - Create phase to address urgent issues (/gsd:insert-phase)
+- "Insert urgent phase" - Create phase to address urgent issues (/gsd-insert-phase)
 - "Add to current plan" - Include in next plan being created
 - "Defer anyway" - Keep as-is despite urgency
 
 **If natural fits exist:**
-- "Note for phase planning" - Will be picked up during /gsd:plan-phase
+- "Note for phase planning" - Will be picked up during /gsd-plan-phase
 - "Add explicit reminder" - Update issue with "Include in Phase X"
 
 **Always include:**
@@ -182,11 +182,11 @@ Use question with appropriate options based on findings:
 4. Update STATE.md deferred issues count
 
 **If inserting urgent phase:**
-- Display the command for user to run after clearing: `/gsd:insert-phase [after-phase] Address urgent issues ISS-XXX, ISS-YYY`
+- Display the command for user to run after clearing: `/gsd-insert-phase [after-phase] Address urgent issues ISS-XXX, ISS-YYY`
 
 **If noting for phase planning:**
 - Update issue's "Suggested phase" field with specific phase number
-- These will be picked up by /gsd:plan-phase workflow
+- These will be picked up by /gsd-plan-phase workflow
 </step>
 
 </process>

@@ -19,7 +19,7 @@ The GSD (Get Shit Done) system was originally created for Claude Code. We need t
 1. Tool names: Read→read, Write→write, Edit→edit, Glob→glob, Grep→grep, Bash→bash, Task→task, TodoWrite→todowrite, AskUserQuestion→question
 2. Agent names: "general-purpose"→"general"
 3. Paths: ~/.claude/→~/.config/opencode/ OR .opencode/
-4. Command syntax: Add "name: gsd:<name>" to YAML frontmatter
+4. Command syntax: Add "name: gsd-<name>" to YAML frontmatter
 5. Tag format: <sub>text</sub> → *text*
 6. Variables: "All arguments" → ($ARGUMENTS)
 7. Directory name: commands → command (singular)
@@ -37,7 +37,7 @@ The GSD (Get Shit Done) system was originally created for Claude Code. We need t
 3. For each file, perform the following translations:
 
    **YAML Frontmatter updates:**
-   - Add or update `name: gsd:<filename-without-extension>` (e.g., name: gsd:help)
+   - Add or update `name: gsd-<filename-without-extension>` (e.g., name: gsd-help)
    - Keep existing `description` and `argument-hint` if present
    - Update `allowed-tools` section:
      - Read → read
@@ -105,7 +105,7 @@ Use these mappings consistently:
 <output>
 Create translated command files in `./gsd-opencode/command/gsd/`:
 - All 27 command files from ./src/get-shit-done/commands/gsd/ translated to OpenCode format
-- Each file should have proper YAML frontmatter with name: gsd:<name>
+- Each file should have proper YAML frontmatter with name: gsd-<name>
 - All Claude Code references replaced with OpenCode equivalents
 </output>
 
@@ -115,7 +115,7 @@ Create translated command files in `./gsd-opencode/command/gsd/`:
 3. For each source file:
    a. Read the full content
    b. Apply all translations (tools, agents, paths, tags, variables)
-   c. Add/update name field in YAML frontmatter: name: gsd:<basename>
+   c. Add/update name field in YAML frontmatter: name: gsd-<basename>
    d. Write translated file to ./gsd-opencode/command/gsd/
 4. Verify all translations are complete and accurate
 5. Confirm 27 translated files exist in destination
@@ -126,7 +126,7 @@ Before declaring complete, verify:
 
 1. Directory ./gsd-opencode/command/gsd/ exists
 2. Count: 27 .md files in ./gsd-opencode/command/gsd/ (matching source)
-3. Each file has name: gsd:<name> in YAML frontmatter
+3. Each file has name: gsd-<name> in YAML frontmatter
 4. No Claude Code references remain in translated files
 5. No <sub>...</sub> tags remain (replaced with *...*)
 6. All tool names use OpenCode naming (lowercase)
@@ -139,7 +139,7 @@ Use grep to verify:
 - `grep -r "Claude Code" ./gsd-opencode/command/gsd/` should return nothing
 - `grep -r "<sub>" ./gsd-opencode/command/gsd/` should return nothing
 - `grep -r "general-purpose" ./gsd-opencode/command/gsd/` should return nothing
-- `grep -c "name: gsd:" ./gsd-opencode/command/gsd/*.md` should show 27 matches
+- `grep -c "name: gsd-" ./gsd-opencode/command/gsd/*.md` should show 27 matches
 </verification>
 
 <success_criteria>
@@ -149,7 +149,7 @@ Use grep to verify:
 - [ ] All path references updated to OpenCode config locations
 - [ ] All <sub>...</sub> tags replaced with *...*
 - [ ] All "All arguments" replaced with ($ARGUMENTS)
-- [ ] Each file has proper name: gsd:<name> frontmatter
+- [ ] Each file has proper name: gsd-<name> frontmatter
 - [ ] YAML frontmatter is valid for all files
 - [ ] No Claude Code references remain
 - [ ] README.md, assets/*, gsd-opencode/bin/*, gsd-opencode/package.json remain unchanged

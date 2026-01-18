@@ -1,5 +1,5 @@
 ---
-name: gsd:debug
+name: gsd-debug
 description: Systematic debugging with persistent state across context resets
 argument-hint: [issue description]
 allowed-tools:
@@ -25,7 +25,7 @@ If starting new: gather symptoms, then investigate autonomously.
 </execution_context>
 
 <context>
-User's issue: ($ARGUMENTS)
+User's issue: $ARGUMENTS
 
 Check for active debug sessions:
 ```bash

@@ -1,20 +1,20 @@
 <purpose>
 Comprehensive research on HOW to implement a phase before planning.
 
-Triggered by /gsd:research-phase command when the domain is niche, complex, or Claude's training is likely stale.
+Triggered by /gsd-research-phase command when the domain is niche, complex, or Claude's training is likely stale.
 
 Produces RESEARCH.md with ecosystem knowledge that informs quality planning - not just "which library" but "how do experts build this."
 </purpose>
 
 <when_to_use>
-**This workflow is for domains where Claude fails without research:**
+**This workflow is for domains where Opencode agent fails without research:**
 - 3D graphics (Three.js, Babylon.js, procedural generation, level design)
 - Game development (physics engines, collision, AI, ECS patterns)
 - Audio/music (Web Audio, DSP, synthesis, MIDI)
 - Shaders (GLSL, Metal, ISF, compute shaders)
 - ML/AI integration (model serving, inference, vector DBs)
 - Real-time systems (WebSockets, WebRTC, CRDT sync)
-- Specialized frameworks with active ecosystems Claude may not know
+- Specialized frameworks with active ecosystems Opencode agent may not know
 
 **Skip this for commodity domains:**
 - Standard auth (JWT, OAuth)
@@ -32,7 +32,7 @@ For niche domains, the question isn't library selection - it's:
 - What's the established architecture pattern?
 - What libraries form the standard stack?
 - What problems do people commonly hit?
-- What's SOTA vs what Claude thinks is SOTA?
+- What's SOTA vs what Opencode agent thinks is SOTA?
 - What should NOT be hand-rolled?
 </key_insight>
 
@@ -53,7 +53,7 @@ fi
 ```
 Error: Phase ${PHASE} not found in roadmap.
 
-Use /gsd:progress to see available phases.
+Use /gsd-progress to see available phases.
 ```
 Exit workflow.
 
@@ -103,7 +103,7 @@ Load available context to inform research direction:
 cat .planning/PROJECT.md 2>/dev/null | head -50
 ```
 
-**2. Phase context (if exists from /gsd:discuss-phase):**
+**2. Phase context (if exists from /gsd-discuss-phase):**
 ```bash
 cat .planning/phases/${PHASE}-*/${PHASE}-CONTEXT.md 2>/dev/null
 ```
@@ -292,7 +292,7 @@ Before creating RESEARCH.md, run through research-pitfalls.md checklist:
 - [ ] "What might I have missed?" review completed
 
 **Additional checks for ecosystem research:**
-- [ ] Checked for libraries Claude might not know about
+- [ ] Checked for libraries Opencode agent might not know about
 - [ ] Verified version numbers are current
 - [ ] Confirmed patterns still recommended (not deprecated)
 - [ ] Looked for "don't do this" warnings in docs
@@ -371,7 +371,7 @@ Created: .planning/phases/${PHASE}-${SLUG}/${PHASE}-RESEARCH.md
 **Confidence:** [HIGH/MEDIUM/LOW] - [brief reason]
 
 What's next?
-1. Plan this phase (/gsd:plan-phase ${PHASE}) - RESEARCH.md will be loaded automatically
+1. Plan this phase (/gsd-plan-phase ${PHASE}) - RESEARCH.md will be loaded automatically
 2. Dig deeper - Research specific areas more thoroughly
 3. Review full RESEARCH.md
 4. Done for now
@@ -418,7 +418,7 @@ Confirm: "Committed: docs(${PHASE}): complete phase research"
 </success_criteria>
 
 <integration_with_planning>
-When /gsd:plan-phase runs after research:
+When /gsd-plan-phase runs after research:
 
 1. plan-phase detects RESEARCH.md exists in phase directory
 2. RESEARCH.md loaded as @context reference
@@ -428,7 +428,7 @@ When /gsd:plan-phase runs after research:
 6. "Architecture patterns" inform task structure
 7. "Code examples" can be referenced in task actions
 
-This produces higher quality plans because Claude knows:
+This produces higher quality plans because Opencode agent knows:
 - What tools experts use
 - What patterns to follow
 - What mistakes to avoid

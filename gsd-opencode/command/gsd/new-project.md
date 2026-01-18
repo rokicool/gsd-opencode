@@ -1,5 +1,5 @@
 ---
-name: gsd:new-project
+name: gsd-new-project
 description: Initialize a new project with deep context gathering and PROJECT.md
 allowed-tools:
   - read
@@ -35,7 +35,7 @@ Creates `.planning/` with PROJECT.md and config.json.
 
 1. **Abort if project exists:**
    ```bash
-   [ -f .planning/PROJECT.md ] && echo "ERROR: Project already initialized. Use /gsd:progress" && exit 1
+   [ -f .planning/PROJECT.md ] && echo "ERROR: Project already initialized. Use /gsd-progress" && exit 1
    ```
 
 2. **Initialize git repo in THIS directory** (required even if inside a parent repo):
@@ -73,12 +73,12 @@ Use question:
 - header: "Existing Code"
 - question: "I detected existing code in this directory. Would you like to map the codebase first?"
 - options:
-  - "Map codebase first" — Run /gsd:map-codebase to understand existing architecture (Recommended)
+  - "Map codebase first" — Run /gsd-map-codebase to understand existing architecture (Recommended)
   - "Skip mapping" — Proceed with project initialization
 
 **If "Map codebase first":**
 ```
-Run `/gsd:map-codebase` first, then return to `/gsd:new-project`
+Run `/gsd-map-codebase` first, then return to `/gsd-new-project`
 ```
 Exit command.
 
@@ -305,7 +305,7 @@ Project initialized:
 
 **[Project Name]** — create roadmap
 
-`/gsd:create-roadmap`
+`/gsd-create-roadmap`
 
 *`/clear` first → fresh context window*
 

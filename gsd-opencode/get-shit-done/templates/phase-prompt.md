@@ -85,7 +85,7 @@ Output: [What artifacts will be created]
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>[What Claude just built that needs verification]</what-built>
+  <what-built>[What Opencode agent just built that needs verification]</what-built>
   <how-to-verify>
     1. Run: [command to start dev server/app]
     2. Visit: [URL to check]
@@ -132,7 +132,7 @@ After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 | `autonomous` | Yes | `true` if no checkpoints, `false` if has checkpoints |
 | `domain` | No | Domain skill if loaded (e.g., `next-js`) |
 
-**Wave is pre-computed:** Wave numbers are assigned during `/gsd:plan-phase`. Execute-phase reads `wave` directly from frontmatter and groups plans by wave number. No runtime dependency analysis needed.
+**Wave is pre-computed:** Wave numbers are assigned during `/gsd-plan-phase`. Execute-phase reads `wave` directly from frontmatter and groups plans by wave number. No runtime dependency analysis needed.
 
 ---
 
@@ -274,7 +274,7 @@ See `~/.config/opencode/get-shit-done/references/tdd.md` for TDD plan structure.
 
 | Type | Use For | Autonomy |
 |------|---------|----------|
-| `auto` | Everything Claude can do independently | Fully autonomous |
+| `auto` | Everything Opencode agent can do independently | Fully autonomous |
 | `checkpoint:human-verify` | Visual/functional verification | Pauses, returns to orchestrator |
 | `checkpoint:decision` | Implementation choices | Pauses, returns to orchestrator |
 | `checkpoint:human-action` | Truly unavoidable manual steps (rare) | Pauses, returns to orchestrator |
@@ -455,7 +455,7 @@ files_modified: [...]
 
 ## Guidelines
 
-- Always use XML structure for Claude parsing
+- Always use XML structure for Opencode agent parsing
 - Include `wave`, `depends_on`, `files_modified`, `autonomous` in every plan
 - Prefer vertical slices over horizontal layers
 - Only reference prior SUMMARYs when genuinely needed

@@ -26,7 +26,7 @@ ls .planning/PROJECT.md 2>/dev/null && echo "Project file exists"
 
 **If STATE.md exists:** Proceed to load_state
 **If only ROADMAP.md/PROJECT.md exist:** Offer to reconstruct STATE.md
-**If .planning/ doesn't exist:** This is a new project - route to /gsd:new-project
+**If .planning/ doesn't exist:** This is a new project - route to /gsd-new-project
 </step>
 
 <step name="load_state">
@@ -121,7 +121,7 @@ Present complete project status to user:
     Task: [task description from agent-history.json]
     Interrupted: [timestamp]
 
-    Resume with: /gsd:resume-task
+    Resume with: /gsd-resume-task
 
 [If deferred issues exist:]
 📋 [N] deferred issues awaiting attention
@@ -141,7 +141,7 @@ Present complete project status to user:
 Based on project state, determine the most logical next action:
 
 **If interrupted agent exists:**
-→ Primary: Resume interrupted agent (/gsd:resume-task)
+→ Primary: Resume interrupted agent (/gsd-resume-task)
 → Option: Start fresh (abandon agent work)
 
 **If .continue-here file exists:**
@@ -178,15 +178,15 @@ Present contextual options based on project state:
 What would you like to do?
 
 [Primary action based on state - e.g.:]
-1. Resume interrupted agent (/gsd:resume-task) [if interrupted agent found]
+1. Resume interrupted agent (/gsd-resume-task) [if interrupted agent found]
    OR
-1. Resume from checkpoint (/gsd:execute-plan .planning/phases/XX-name/.continue-here-02-01.md)
+1. Resume from checkpoint (/gsd-execute-plan .planning/phases/XX-name/.continue-here-02-01.md)
    OR
-1. Execute next plan (/gsd:execute-plan .planning/phases/XX-name/02-02-PLAN.md)
+1. Execute next plan (/gsd-execute-plan .planning/phases/XX-name/02-02-PLAN.md)
    OR
-1. Discuss Phase 3 context (/gsd:discuss-phase 3) [if CONTEXT.md missing]
+1. Discuss Phase 3 context (/gsd-discuss-phase 3) [if CONTEXT.md missing]
    OR
-1. Plan Phase 3 (/gsd:plan-phase 3) [if CONTEXT.md exists or discuss option declined]
+1. Plan Phase 3 (/gsd-plan-phase 3) [if CONTEXT.md exists or discuss option declined]
 
 [Secondary options:]
 2. Review current phase status
@@ -217,7 +217,7 @@ Based on user selection, route to appropriate workflow:
 
   **{phase}-{plan}: [Plan Name]** — [objective from PLAN.md]
 
-  `/gsd:execute-plan [path]`
+  `/gsd-execute-plan [path]`
 
   *`/clear` first → fresh context window*
 
@@ -231,15 +231,15 @@ Based on user selection, route to appropriate workflow:
 
   **Phase [N]: [Name]** — [Goal from ROADMAP.md]
 
-  `/gsd:plan-phase [phase-number]`
+  `/gsd-plan-phase [phase-number]`
 
   *`/clear` first → fresh context window*
 
   ---
 
   **Also available:**
-  - `/gsd:discuss-phase [N]` — gather context first
-  - `/gsd:research-phase [N]` — investigate unknowns
+  - `/gsd-discuss-phase [N]` — gather context first
+  - `/gsd-research-phase [N]` — investigate unknowns
 
   ---
   ```

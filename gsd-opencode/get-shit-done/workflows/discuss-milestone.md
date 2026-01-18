@@ -24,8 +24,8 @@ Current milestone in progress: v[X.Y] [Name]
 Phases [N]-[M], [P]% complete
 
 Did you want to:
-1. Complete current milestone first (/gsd:complete-milestone)
-2. Add phases to current milestone (/gsd:add-phase)
+1. Complete current milestone first (/gsd-complete-milestone)
+2. Add phases to current milestone (/gsd-add-phase)
 3. Continue anyway - discuss next milestone scope
 
 ```
@@ -113,7 +113,7 @@ Use question:
 - header: "Ready?"
 - question: "Ready to create the milestone, or explore more?"
 - options (ALL THREE REQUIRED):
-  - "Create milestone" - Proceed to /gsd:new-milestone
+  - "Create milestone" - Proceed to /gsd-new-milestone
   - "Ask more questions" - Help me think through this more
   - "Let me add context" - I have more to share
 
@@ -142,7 +142,7 @@ cat > .planning/MILESTONE-CONTEXT.md << 'EOF'
 # Milestone Context
 
 **Generated:** [today's date]
-**Status:** Ready for /gsd:new-milestone
+**Status:** Ready for /gsd-new-milestone
 
 <features>
 ## Features to Build
@@ -187,7 +187,7 @@ cat > .planning/MILESTONE-CONTEXT.md << 'EOF'
 
 ---
 
-*This file is temporary. It will be deleted after /gsd:new-milestone creates the milestone.*
+*This file is temporary. It will be deleted after /gsd-new-milestone creates the milestone.*
 EOF
 ```
 </step>
@@ -214,7 +214,7 @@ Context saved to `.planning/MILESTONE-CONTEXT.md`
 
 **Create Milestone v[X.Y]** — [Theme Name]
 
-`/gsd:new-milestone`
+`/gsd-new-milestone`
 
 *`/clear` first → fresh context window*
 
@@ -232,5 +232,5 @@ Context saved to `.planning/MILESTONE-CONTEXT.md`
 - Features explored with clarifying questions
 - Scope synthesized from features (not asked abstractly)
 - **MILESTONE-CONTEXT.md created** with features, scope, and phase mapping
-- Context handed off to /gsd:new-milestone
+- Context handed off to /gsd-new-milestone
 </success_criteria>

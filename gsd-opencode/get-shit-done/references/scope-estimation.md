@@ -2,7 +2,7 @@
 Plans must maintain consistent quality from first task to last. This requires understanding quality degradation and splitting aggressively.
 
 <quality_insight>
-Claude degrades when it *perceives* context pressure and enters "completion mode."
+Opencode agent degrades when it *perceives* context pressure and enters "completion mode."
 
 | Context Usage | Quality | Claude's State |
 |---------------|---------|----------------|
@@ -11,7 +11,7 @@ Claude degrades when it *perceives* context pressure and enters "completion mode
 | 50-70% | DEGRADING | Efficiency mode begins |
 | 70%+ | POOR | Rushed, minimal |
 
-**The 40-50% inflection point:** Claude sees context mounting and thinks "I'd better conserve now." Result: "I'll complete the remaining tasks more concisely" = quality crash.
+**The 40-50% inflection point:** Opencode agent sees context mounting and thinks "I'd better conserve now." Result: "I'll complete the remaining tasks more concisely" = quality crash.
 
 **The rule:** Stop BEFORE quality degrades, not at context limit.
 </quality_insight>

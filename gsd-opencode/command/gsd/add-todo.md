@@ -1,5 +1,5 @@
 ---
-name: gsd:add-todo
+name: gsd-add-todo
 description: Capture idea or task as todo from current conversation context
 argument-hint: [optional description]
 allowed-tools:
@@ -17,6 +17,8 @@ Enables "thought → capture → continue" flow without losing context or derail
 
 <context>
 @.planning/STATE.md
+
+Todo title: $ARGUMENTS
 </context>
 
 <process>
@@ -36,8 +38,8 @@ Note existing areas for consistency in infer_area step.
 </step>
 
 <step name="extract_content">
-**With arguments:** Use ($ARGUMENTS) as the title/focus.
-- `/gsd:add-todo Add auth token refresh` → title = "Add auth token refresh"
+**With arguments:** Use `$ARGUMENTS` as the title/focus.
+- `/gsd-add-todo Add auth token refresh` → title = "Add auth token refresh"
 
 **Without arguments:** Analyze recent conversation to extract:
 - The specific problem, idea, or task discussed
@@ -108,7 +110,7 @@ files:
 
 ## Problem
 
-[problem description - enough context for future Claude to understand weeks later]
+[problem description - enough context for future Opencode agent to understand weeks later]
 
 ## Solution
 
@@ -154,7 +156,7 @@ Would you like to:
 
 1. Continue with current work
 2. Add another todo
-3. View all todos (/gsd:check-todos)
+3. View all todos (/gsd-check-todos)
 ```
 </step>
 

@@ -183,7 +183,7 @@ function install(isGlobal) {
   console.log(`  ${green}✓${reset} Installed get-shit-done`);
 
   console.log(`
-  ${green}Done!${reset} Run ${cyan}/gsd:help${reset} to get started.
+  ${green}Done!${reset} Run ${cyan}/gsd-help${reset} to get started.
   `);
 }
 

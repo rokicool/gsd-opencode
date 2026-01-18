@@ -5,7 +5,7 @@ You are the debugger. The user knows what's wrong (behavior), not why (root caus
 </purpose>
 
 <philosophy>
-**User = reporter. Claude = investigator.**
+**User = reporter. Opencode agent = investigator.**
 
 The user knows:
 - What they expected to happen
@@ -281,7 +281,7 @@ If ELIMINATED:
 
 After significant investigation (5+ evidence entries), check if context is heavy.
 If so, ensure Current Focus is fully updated and suggest:
-"Context filling up. Safe to /clear - run /gsd:debug to resume."
+"Context filling up. Safe to /clear - run /gsd-debug to resume."
 </step>
 
 <step name="resume_from_file">
@@ -391,7 +391,7 @@ Use question:
 - header: "Next"
 - question: "What now?"
 - options:
-  - "Continue working" - Back to /gsd:progress
+  - "Continue working" - Back to /gsd-progress
   - "Test more" - Verify related functionality
   - "Done" - End session
 </step>

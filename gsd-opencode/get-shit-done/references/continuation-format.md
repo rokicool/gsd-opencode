@@ -44,7 +44,7 @@ Standard format for presenting next steps after completing a command or workflow
 
 **02-03: Refresh Token Rotation** — Add /api/auth/refresh with sliding expiry
 
-`/gsd:execute-plan .planning/phases/02-auth/02-03-PLAN.md`
+`/gsd-execute-plan .planning/phases/02-auth/02-03-PLAN.md`
 
 *`/clear` first → fresh context window*
 
@@ -52,7 +52,7 @@ Standard format for presenting next steps after completing a command or workflow
 
 **Also available:**
 - Review plan before executing
-- `/gsd:list-phase-assumptions 2` — check assumptions
+- `/gsd-list-phase-assumptions 2` — check assumptions
 
 ---
 ```
@@ -69,7 +69,7 @@ Add note that this is the last plan and what comes after:
 **02-03: Refresh Token Rotation** — Add /api/auth/refresh with sliding expiry
 *Final plan in Phase 2*
 
-`/gsd:execute-plan .planning/phases/02-auth/02-03-PLAN.md`
+`/gsd-execute-plan .planning/phases/02-auth/02-03-PLAN.md`
 
 *`/clear` first → fresh context window*
 
@@ -91,15 +91,15 @@ Add note that this is the last plan and what comes after:
 
 **Phase 2: Authentication** — JWT login flow with refresh tokens
 
-`/gsd:plan-phase 2`
+`/gsd-plan-phase 2`
 
 *`/clear` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:discuss-phase 2` — gather context first
-- `/gsd:research-phase 2` — investigate unknowns
+- `/gsd-discuss-phase 2` — gather context first
+- `/gsd-research-phase 2` — investigate unknowns
 - Review roadmap
 
 ---
@@ -120,15 +120,15 @@ Show completion status before next action:
 
 **Phase 3: Core Features** — User dashboard, settings, and data export
 
-`/gsd:plan-phase 3`
+`/gsd-plan-phase 3`
 
 *`/clear` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:discuss-phase 3` — gather context first
-- `/gsd:research-phase 3` — investigate unknowns
+- `/gsd-discuss-phase 3` — gather context first
+- `/gsd-research-phase 3` — investigate unknowns
 - Review what Phase 2 built
 
 ---
@@ -145,11 +145,11 @@ When there's no clear primary action:
 
 **Phase 3: Core Features** — User dashboard, settings, and data export
 
-**To plan directly:** `/gsd:plan-phase 3`
+**To plan directly:** `/gsd-plan-phase 3`
 
-**To discuss context first:** `/gsd:discuss-phase 3`
+**To discuss context first:** `/gsd-discuss-phase 3`
 
-**To research unknowns:** `/gsd:research-phase 3`
+**To research unknowns:** `/gsd-research-phase 3`
 
 *`/clear` first → fresh context window*
 
@@ -169,14 +169,14 @@ All 4 phases shipped
 
 **Plan v1.1** — Enhanced features and optimizations
 
-`/gsd:discuss-milestone`
+`/gsd-discuss-milestone`
 
 *`/clear` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:new-milestone` — create directly if scope is clear
+- `/gsd-new-milestone` — create directly if scope is clear
 - Review accomplishments before moving on
 
 ---
@@ -220,7 +220,7 @@ Extract: `**02-03: Refresh Token Rotation** — Add /api/auth/refresh with slidi
 ## To Continue
 
 Run `/clear`, then paste:
-/gsd:execute-plan .planning/phases/02-auth/02-03-PLAN.md
+/gsd-execute-plan .planning/phases/02-auth/02-03-PLAN.md
 ```
 
 User has no idea what 02-03 is about.
@@ -228,7 +228,7 @@ User has no idea what 02-03 is about.
 ### Don't: Missing /clear explanation
 
 ```
-`/gsd:plan-phase 3`
+`/gsd-plan-phase 3`
 
 Run /clear first.
 ```
@@ -248,7 +248,7 @@ Sounds like an afterthought. Use "Also available:" instead.
 
 ```
 ```
-/gsd:plan-phase 3
+/gsd-plan-phase 3
 ```
 ```
 

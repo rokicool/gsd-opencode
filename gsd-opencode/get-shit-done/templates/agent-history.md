@@ -230,7 +230,7 @@ jq '.entries[] | select(.status == "spawned" and .parallel_group != null)' .plan
 
 ### Resume Command
 
-`/gsd:resume-task` accepts:
+`/gsd-resume-task` accepts:
 - No argument: Resume most recent interrupted agent
 - Agent ID: Resume specific agent
 - `--batch`: Resume entire parallel group

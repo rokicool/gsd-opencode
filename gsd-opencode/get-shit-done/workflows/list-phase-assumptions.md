@@ -1,7 +1,7 @@
 <purpose>
 Surface Claude's assumptions about a phase before planning, enabling users to correct misconceptions early.
 
-Key difference from discuss-phase: This is ANALYSIS of what Claude thinks, not INTAKE of what user knows. No file output - purely conversational to prompt discussion.
+Key difference from discuss-phase: This is ANALYSIS of what Opencode agent thinks, not INTAKE of what user knows. No file output - purely conversational to prompt discussion.
 </purpose>
 
 <process>
@@ -14,8 +14,8 @@ Phase number: $ARGUMENTS (required)
 ```
 Error: Phase number required.
 
-Usage: /gsd:list-phase-assumptions [phase-number]
-Example: /gsd:list-phase-assumptions 3
+Usage: /gsd-list-phase-assumptions [phase-number]
+Example: /gsd-list-phase-assumptions 3
 ```
 
 Exit workflow.
@@ -53,13 +53,13 @@ Continue to analyze_phase.
 Based on roadmap description and project context, identify assumptions across five areas:
 
 **1. Technical Approach:**
-What libraries, frameworks, patterns, or tools would Claude use?
+What libraries, frameworks, patterns, or tools would Opencode agent use?
 - "I'd use X library because..."
 - "I'd follow Y pattern because..."
 - "I'd structure this as Z because..."
 
 **2. Implementation Order:**
-What would Claude build first, second, third?
+What would Opencode agent build first, second, third?
 - "I'd start with X because it's foundational"
 - "Then Y because it depends on X"
 - "Finally Z because..."
@@ -71,13 +71,13 @@ What's included vs excluded in Claude's interpretation?
 - "Boundary ambiguities: G could go either way"
 
 **4. Risk Areas:**
-Where does Claude expect complexity or challenges?
+Where does Opencode agent expect complexity or challenges?
 - "The tricky part is X because..."
 - "Potential issues: Y, Z"
 - "I'd watch out for..."
 
 **5. Dependencies:**
-What does Claude assume exists or needs to be in place?
+What does Opencode agent assume exists or needs to be in place?
 - "This assumes X from previous phases"
 - "External dependencies: Y, Z"
 - "This will be consumed by..."
@@ -153,8 +153,8 @@ Present next steps:
 
 ```
 What's next?
-1. Discuss context (/gsd:discuss-phase ${PHASE}) - Let me ask you questions to build comprehensive context
-2. Plan this phase (/gsd:plan-phase ${PHASE}) - Create detailed execution plans
+1. Discuss context (/gsd-discuss-phase ${PHASE}) - Let me ask you questions to build comprehensive context
+2. Plan this phase (/gsd-plan-phase ${PHASE}) - Create detailed execution plans
 3. Re-examine assumptions - I'll analyze again with your corrections
 4. Done for now
 ```

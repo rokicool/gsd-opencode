@@ -2,7 +2,7 @@
 
 Template for `.planning/phases/XX-name/{phase}-RESEARCH.md` - comprehensive ecosystem research before planning.
 
-**Purpose:** Document what Claude needs to know to implement a phase well - not just "which library" but "how do experts build this."
+**Purpose:** Document what Opencode agent needs to know to implement a phase well - not just "which library" but "how do experts build this."
 
 ---
 

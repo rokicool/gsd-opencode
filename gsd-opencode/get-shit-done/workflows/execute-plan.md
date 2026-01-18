@@ -1069,7 +1069,7 @@ TASK_COMMITS+=("Task ${TASK_NUM}: ${TASK_COMMIT}")
 - Each task independently revertable
 - Git bisect finds exact failing task
 - Git blame traces line to specific task context
-- Clear history for Claude in future sessions
+- Clear history for Opencode agent in future sessions
 - Better observability for AI-automated workflow
 
 </task_commit>
@@ -1077,7 +1077,7 @@ TASK_COMMITS+=("Task ${TASK_NUM}: ${TASK_COMMIT}")
 <step name="checkpoint_protocol">
 When encountering `type="checkpoint:*"`:
 
-**Critical: Claude automates everything with CLI/API before checkpoints.** Checkpoints are for verification and decisions, not manual work.
+**Critical: Opencode agent automates everything with CLI/API before checkpoints.** Checkpoints are for verification and decisions, not manual work.
 
 **Display checkpoint clearly:**
 
@@ -1129,7 +1129,7 @@ Options:
 **For checkpoint:human-action (1% - rare, only for truly unavoidable manual steps):**
 
 ```
-I automated: [what Claude already did via CLI/API]
+I automated: [what Opencode agent already did via CLI/API]
 
 Need your help with: [the ONE thing with no CLI/API - email link, 2FA code]
 
@@ -1224,7 +1224,7 @@ You will NOT be resumed. A new agent continues from where you stopped, using you
 
 **How to know if you were spawned:**
 
-If you're reading this workflow because an orchestrator spawned you (vs running directly from /gsd:execute-plan), the orchestrator's prompt will include checkpoint return instructions. Follow those instructions when you hit a checkpoint.
+If you're reading this workflow because an orchestrator spawned you (vs running directly from /gsd-execute-plan), the orchestrator's prompt will include checkpoint return instructions. Follow those instructions when you hit a checkpoint.
 
 **If running in main context (not spawned):**
 
@@ -1609,18 +1609,18 @@ Use question:
 - header: "Phase Issues"
 - question: "[N] issues were logged during this phase. Review now?"
 - options:
-  - "Review issues" - Analyze with /gsd:consider-issues
+  - "Review issues" - Analyze with /gsd-consider-issues
   - "Continue" - Address later, proceed to next work
 
 **If "Review issues" selected:**
-- Invoke: `[removed - use /command syntax]("/gsd:consider-issues")`
+- Invoke: `[removed - use /command syntax]("/gsd-consider-issues")`
 - After consider-issues completes, return to offer_next
 
 **If "Continue" selected or no issues found:**
 - Proceed to offer_next step
 
 **In YOLO mode:**
-- Note issues were logged but don't prompt: `📋 [N] issues logged this phase (review later with /gsd:consider-issues)`
+- Note issues were logged but don't prompt: `📋 [N] issues logged this phase (review later with /gsd-consider-issues)`
 - Continue to offer_next automatically
 </step>
 
@@ -1683,14 +1683,14 @@ Summary: .planning/phases/{phase-dir}/{phase}-{plan}-SUMMARY.md
 
 **{phase}-{next-plan}: [Plan Name]** — [objective from next PLAN.md]
 
-`/gsd:execute-plan .planning/phases/{phase-dir}/{phase}-{next-plan}-PLAN.md`
+`/gsd-execute-plan .planning/phases/{phase-dir}/{phase}-{next-plan}-PLAN.md`
 
 *`/clear` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:verify-work {phase}-{plan}` — manual acceptance testing before continuing
+- `/gsd-verify-work {phase}-{plan}` — manual acceptance testing before continuing
 - Review what was built before continuing
 
 ---
@@ -1744,16 +1744,16 @@ All {Y} plans finished.
 
 **Phase {Z+1}: {Next Phase Name}** — {Goal from ROADMAP.md}
 
-`/gsd:plan-phase {Z+1}`
+`/gsd-plan-phase {Z+1}`
 
 *`/clear` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:verify-work {Z}` — manual acceptance testing before continuing
-- `/gsd:discuss-phase {Z+1}` — gather context first
-- `/gsd:research-phase {Z+1}` — investigate unknowns
+- `/gsd-verify-work {Z}` — manual acceptance testing before continuing
+- `/gsd-discuss-phase {Z+1}` — gather context first
+- `/gsd-research-phase {Z+1}` — investigate unknowns
 - Review phase accomplishments before continuing
 
 ---
@@ -1784,15 +1784,15 @@ Milestone is 100% done.
 
 **Complete Milestone** — archive and prepare for next
 
-`/gsd:complete-milestone`
+`/gsd-complete-milestone`
 
 *`/clear` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:verify-work` — manual acceptance testing before completing milestone
-- `/gsd:add-phase <description>` — add another phase before completing
+- `/gsd-verify-work` — manual acceptance testing before completing milestone
+- `/gsd-add-phase <description>` — add another phase before completing
 - Review accomplishments before archiving
 
 ---

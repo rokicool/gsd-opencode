@@ -1,5 +1,5 @@
 ---
-name: gsd:plan-fix
+name: gsd-plan-fix
 description: Plan fixes for UAT issues from verify-work
 argument-hint: "[plan, e.g., '04-02']"
 allowed-tools:
@@ -24,7 +24,7 @@ Output: {plan}-FIX.md in the phase directory, ready for execution.
 </execution_context>
 
 <context>
-Plan number: ($ARGUMENTS) (required - e.g., "04-02" or "09-01")
+Plan number: $ARGUMENTS (required - e.g., "04-02" or "09-01")
 
 **Load project state:**
 @.planning/STATE.md
@@ -36,14 +36,14 @@ Plan number: ($ARGUMENTS) (required - e.g., "04-02" or "09-01")
 <step name="parse">
 **Parse plan argument:**
 
-($ARGUMENTS) should be a plan number like "04-02" or "09-01".
+$ARGUMENTS should be a plan number like "04-02" or "09-01".
 Extract phase number (XX) and plan number (NN).
 
 If no argument provided:
 ```
 Error: Plan number required.
 
-Usage: /gsd:plan-fix 04-02
+Usage: /gsd-plan-fix 04-02
 
 This creates a fix plan from .planning/phases/XX-name/04-02-ISSUES.md
 ```
@@ -62,7 +62,7 @@ If not found:
 ```
 No ISSUES.md found for plan {plan}.
 
-ISSUES.md files are created by /gsd:verify-work when UAT finds issues.
+ISSUES.md files are created by /gsd-verify-work when UAT finds issues.
 If no issues were found during testing, no fix plan is needed.
 ```
 Exit.
@@ -192,7 +192,7 @@ Would you like to:
 ```
 
 Use question to get response.
-If execute: `/gsd:execute-plan .planning/phases/XX-name/{plan}-FIX.md`
+If execute: `/gsd-execute-plan .planning/phases/XX-name/{plan}-FIX.md`
 </step>
 
 </process>
