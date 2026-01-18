@@ -302,7 +302,7 @@ Template for `.planning/codebase/CONCERNS.md` - captures known issues and areas 
 - Estimating risk of changes
 - Understanding where to be careful
 - Prioritizing improvements
-- Onboarding new Opencode agent contexts
+- Onboarding new OpenCode contexts
 - Planning refactoring work
 
 **How this gets populated:**

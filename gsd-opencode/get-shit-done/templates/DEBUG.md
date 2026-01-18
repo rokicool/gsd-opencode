@@ -67,8 +67,8 @@ files_changed: []
 
 **Current Focus:**
 - OVERWRITE entirely on each update
-- Always reflects what Opencode agent is doing RIGHT NOW
-- If Opencode agent reads this after /clear, it knows exactly where to resume
+- Always reflects what OpenCode is doing RIGHT NOW
+- If OpenCode reads this after /clear, it knows exactly where to resume
 - Fields: hypothesis, test, expecting, next_action
 
 **Symptoms:**
@@ -135,7 +135,7 @@ files_changed: []
 
 <resume_behavior>
 
-When Opencode agent reads this file after /clear:
+When OpenCode reads this file after /clear:
 
 1. Parse frontmatter → know status
 2. Read Current Focus → know exactly what was happening
@@ -143,7 +143,7 @@ When Opencode agent reads this file after /clear:
 4. Read Evidence → know what's been learned
 5. Continue from next_action
 
-The file IS the debugging brain. Opencode agent should be able to resume perfectly from any interruption point.
+The file IS the debugging brain. OpenCode should be able to resume perfectly from any interruption point.
 
 </resume_behavior>
 

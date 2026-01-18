@@ -15,7 +15,7 @@ Each agent has fresh context and focuses on specific aspects. Output is concise 
 Include enough detail to be useful as reference. Prioritize practical examples (especially code patterns) over arbitrary brevity. A 200-line TESTING.md with real patterns is more valuable than a 74-line summary.
 
 **Always include file paths:**
-Documents are reference material for Opencode agent when planning/executing. Vague descriptions like "UserService handles users" are not actionable. Always include actual file paths formatted with backticks: `src/services/user.ts`. This allows Opencode agent to navigate directly to relevant code without re-searching. Do NOT include line numbers (they go stale), just file paths.
+Documents are reference material for OpenCode when planning/executing. Vague descriptions like "UserService handles users" are not actionable. Always include actual file paths formatted with backticks: `src/services/user.ts`. This allows OpenCode to navigate directly to relevant code without re-searching. Do NOT include line numbers (they go stale), just file paths.
 </philosophy>
 
 <process>

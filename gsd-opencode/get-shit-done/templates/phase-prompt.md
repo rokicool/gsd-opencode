@@ -85,7 +85,7 @@ Output: [What artifacts will be created]
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>[What Opencode agent just built that needs verification]</what-built>
+  <what-built>[What OpenCode just built that needs verification]</what-built>
   <how-to-verify>
     1. Run: [command to start dev server/app]
     2. Visit: [URL to check]
@@ -274,7 +274,7 @@ See `~/.config/opencode/get-shit-done/references/tdd.md` for TDD plan structure.
 
 | Type | Use For | Autonomy |
 |------|---------|----------|
-| `auto` | Everything Opencode agent can do independently | Fully autonomous |
+| `auto` | Everything OpenCode can do independently | Fully autonomous |
 | `checkpoint:human-verify` | Visual/functional verification | Pauses, returns to orchestrator |
 | `checkpoint:decision` | Implementation choices | Pauses, returns to orchestrator |
 | `checkpoint:human-action` | Truly unavoidable manual steps (rare) | Pauses, returns to orchestrator |
@@ -455,7 +455,7 @@ files_modified: [...]
 
 ## Guidelines
 
-- Always use XML structure for Opencode agent parsing
+- Always use XML structure for OpenCode parsing
 - Include `wave`, `depends_on`, `files_modified`, `autonomous` in every plan
 - Prefer vertical slices over horizontal layers
 - Only reference prior SUMMARYs when genuinely needed

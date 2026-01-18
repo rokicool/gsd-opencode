@@ -63,7 +63,7 @@ Type "approved" or describe issues to fix.
 ### Checkpoint Details
 
 **Automation attempted:**
-[What Opencode agent tried to do]
+[What OpenCode tried to do]
 
 **Error encountered:**
 [Exact error message or auth failure]
@@ -73,7 +73,7 @@ Type "approved" or describe issues to fix.
 2. [Step 2]
 
 **I'll verify after:**
-[How Opencode agent will confirm completion]
+[How OpenCode will confirm completion]
 
 ### Awaiting
 

@@ -20,7 +20,7 @@ Not a strict rule — check the file you're editing.
 ## Internal Structure
 
 Internal organization varies. Common patterns:
-- Semantic sub-containers (`<solo_developer_claude>`, `<plans_are_prompts>`)
+- Semantic sub-containers (`<solo_developer_opencode>`, `<plans_are_prompts>`)
 - Markdown headers within XML
 - Code examples in fenced blocks
 

@@ -116,10 +116,10 @@ The user is the visionary. They know:
 - References to things they like
 
 The user does NOT know (and shouldn't be asked):
-- Codebase patterns (Opencode agent reads the code)
-- Technical risks (Opencode agent identifies during research)
-- Implementation constraints (Opencode agent figures out)
-- Success metrics (Opencode agent infers from the work)
+- Codebase patterns (OpenCode reads the code)
+- Technical risks (OpenCode identifies during research)
+- Implementation constraints (OpenCode figures out)
+- Success metrics (OpenCode infers from the work)
 
 **Content should read like:**
 - A founder describing their product vision

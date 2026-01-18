@@ -32,7 +32,7 @@ Decimal phases enable urgent work insertion without renumbering:
 <purpose>
 Create executable phase prompts (PLAN.md files) optimized for parallel execution.
 
-PLAN.md IS the prompt that Opencode agent executes. Plans are grouped into execution waves based on dependencies - independent plans run in parallel, dependent plans wait for predecessors.
+PLAN.md IS the prompt that OpenCode executes. Plans are grouped into execution waves based on dependencies - independent plans run in parallel, dependent plans wait for predecessors.
 </purpose>
 
 <planning_principles>
@@ -679,7 +679,7 @@ If you can't specify Files + Action + Verify + Done, the task is too vague.
 - No acceptance criteria committees
 - No sub-sub-sub tasks
 - **No reflexive sequential chaining** (Plan 02 depends on 01 "just because")
-Tasks are instructions for Claude, not Jira tickets.
+Tasks are instructions for OpenCode, not Jira tickets.
 </anti_patterns>
 
 <success_criteria>

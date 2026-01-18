@@ -1,13 +1,13 @@
 <overview>
-Claude-executable plans have a specific format that enables Opencode agent to implement without interpretation. This reference defines what makes a plan executable vs. vague.
+OpenCode-executable plans have a specific format that enables OpenCode to implement without interpretation. This reference defines what makes a plan executable vs. vague.
 
-**Key insight:** PLAN.md IS the executable prompt. It contains everything Opencode agent needs to execute the phase, including objective, context references, tasks, verification, success criteria, and output specification.
+**Key insight:** PLAN.md IS the executable prompt. It contains everything OpenCode needs to execute the phase, including objective, context references, tasks, verification, success criteria, and output specification.
 </overview>
 
 <core_principle>
-A plan is Claude-executable when Opencode agent can read the PLAN.md and immediately start implementing without asking clarifying questions.
+A plan is OpenCode-executable when OpenCode can read the PLAN.md and immediately start implementing without asking clarifying questions.
 
-If Opencode agent has to guess, interpret, or make assumptions - the task is too vague.
+If OpenCode has to guess, interpret, or make assumptions - the task is too vague.
 </core_principle>
 
 <frontmatter>
@@ -88,7 +88,7 @@ Output: [...]
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>[what Opencode agent automated]</what-built>
+  <what-built>[what OpenCode automated]</what-built>
   <how-to-verify>[numbered verification steps]</how-to-verify>
   <resume-signal>[how to continue - "approved" or describe issues]</resume-signal>
 </task>
@@ -170,7 +170,7 @@ Should be testable without subjective judgment.
 Tasks have a `type` attribute that determines how they execute:
 
 <type name="auto">
-**Default task type** - Opencode agent executes autonomously.
+**Default task type** - OpenCode executes autonomously.
 
 **Structure:**
 
@@ -184,11 +184,11 @@ Tasks have a `type` attribute that determines how they execute:
 </task>
 ```
 
-Use for: Everything Opencode agent can do independently (code, tests, builds, file operations).
+Use for: Everything OpenCode can do independently (code, tests, builds, file operations).
 </type>
 
 <type name="checkpoint:human-action">
-**RARELY USED** - Only for actions with NO CLI/API. Opencode agent automates everything possible first.
+**RARELY USED** - Only for actions with NO CLI/API. OpenCode automates everything possible first.
 
 **Structure:**
 
@@ -196,10 +196,10 @@ Use for: Everything Opencode agent can do independently (code, tests, builds, fi
 <task type="checkpoint:human-action" gate="blocking">
   <action>[Unavoidable manual step - email link, 2FA code]</action>
   <instructions>
-    [What Opencode agent already automated]
+    [What OpenCode already automated]
     [The ONE thing requiring human action]
   </instructions>
-  <verification>[What Opencode agent can check afterward]</verification>
+  <verification>[What OpenCode can check afterward]</verification>
   <resume-signal>[How to continue]</resume-signal>
 </task>
 ```
@@ -208,11 +208,11 @@ Use ONLY for: Email verification links, SMS 2FA codes, manual approvals with no 
 
 Do NOT use for: Anything with a CLI (Vercel, Stripe, Upstash, Railway, GitHub), builds, tests, file creation, deployments.
 
-**Execution:** Opencode agent automates everything with CLI/API, stops only for truly unavoidable manual steps.
+**Execution:** OpenCode automates everything with CLI/API, stops only for truly unavoidable manual steps.
 </type>
 
 <type name="checkpoint:human-verify">
-**Human must verify Claude's work** - Visual checks, UX testing.
+**Human must verify OpenCode's work** - Visual checks, UX testing.
 
 **Structure:**
 
@@ -233,7 +233,7 @@ Do NOT use for: Anything with a CLI (Vercel, Stripe, Upstash, Railway, GitHub), 
 
 Use for: UI/UX verification, visual design checks, animation smoothness, accessibility testing.
 
-**Execution:** Opencode agent builds the feature, stops, provides testing instructions, waits for approval/feedback.
+**Execution:** OpenCode builds the feature, stops, provides testing instructions, waits for approval/feedback.
 </type>
 
 <type name="checkpoint:decision">
@@ -268,23 +268,23 @@ Use for: UI/UX verification, visual design checks, animation smoothness, accessi
 
 Use for: Technology selection, architecture decisions, design choices, feature prioritization.
 
-**Execution:** Opencode agent presents options with balanced pros/cons, waits for decision, proceeds with chosen direction.
+**Execution:** OpenCode presents options with balanced pros/cons, waits for decision, proceeds with chosen direction.
 </type>
 
 **When to use checkpoints:**
 
-- Visual/UX verification (after Opencode agent builds) → `checkpoint:human-verify`
+- Visual/UX verification (after OpenCode builds) → `checkpoint:human-verify`
 - Implementation direction choice → `checkpoint:decision`
 - Truly unavoidable manual actions (email links, 2FA) → `checkpoint:human-action` (rare)
 
 **When NOT to use checkpoints:**
 
-- Anything with CLI/API (Opencode agent automates it) → `type="auto"`
+- Anything with CLI/API (OpenCode automates it) → `type="auto"`
 - Deployments (Vercel, Railway, Fly) → `type="auto"` with CLI
 - Creating resources (Upstash, Stripe, GitHub) → `type="auto"` with CLI/API
 - File operations, tests, builds → `type="auto"`
 
-**Golden rule:** If Opencode agent CAN automate it, Opencode agent MUST automate it.
+**Golden rule:** If OpenCode CAN automate it, OpenCode MUST automate it.
 
 **Checkpoint impact on parallelization:**
 - Plans with checkpoints set `autonomous: false` in frontmatter
@@ -341,7 +341,7 @@ Use @file references to load context for the prompt:
 </context>
 ```
 
-Reference files that Opencode agent needs to understand before implementing.
+Reference files that OpenCode needs to understand before implementing.
 
 **Anti-pattern:** Reflexive chaining (02 refs 01, 03 refs 02). Only reference what you actually need.
 </context_references>
@@ -401,7 +401,7 @@ After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 </task>
 ```
 
-Claude: "How? What type? What library? Where?"
+OpenCode: "How? What type? What library? Where?"
 </too_vague>
 
 <just_right>
@@ -416,7 +416,7 @@ Claude: "How? What type? What library? Where?"
 </task>
 ```
 
-Opencode agent can implement this immediately.
+OpenCode can implement this immediately.
 </just_right>
 
 <note_on_tdd>
@@ -426,7 +426,7 @@ If email validation warrants TDD, create a TDD plan for it. See `./tdd.md` for T
 </note_on_tdd>
 
 <too_detailed>
-Writing the actual code in the plan. Trust Opencode agent to implement from clear instructions.
+Writing the actual code in the plan. Trust OpenCode to implement from clear instructions.
 </too_detailed>
 </specificity_levels>
 
@@ -438,7 +438,7 @@ Writing the actual code in the plan. Trust Opencode agent to implement from clea
 - "Make it production-ready"
 - "Add proper error handling"
 
-These require Opencode agent to decide WHAT to do. Specify it.
+These require OpenCode to decide WHAT to do. Specify it.
 </vague_actions>
 
 <unverifiable_completion>
@@ -457,12 +457,12 @@ These require subjective judgment. Make it objective.
 - "Follow best practices"
 - "Like the other endpoints"
 
-Opencode agent doesn't know your standards. Be explicit.
+OpenCode doesn't know your standards. Be explicit.
 </missing_context>
 </anti_patterns>
 
 <sizing_tasks>
-Good task size: 15-60 minutes of Opencode agent work.
+Good task size: 15-60 minutes of OpenCode work.
 
 **Too small**: "Add import statement for bcrypt" (combine with related task)
 **Just right**: "Create login endpoint with JWT validation" (focused, specific)

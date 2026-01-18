@@ -85,7 +85,7 @@ Use question:
 **BAD — Corporate speak:**
 - "What are your success criteria?"
 - "What's your budget?"
-- "Have you done X before?" (irrelevant — Opencode agent builds)
+- "Have you done X before?" (irrelevant — OpenCode builds)
 
 **GOOD — Concrete options that help them think:**
 - header: "Done"
@@ -155,7 +155,7 @@ Loop until "Create PROJECT.md" selected.
 - **Corporate speak** - "What are your success criteria?" "Who are your stakeholders?"
 - **Rushing** - Minimizing questions to get to "the work"
 - **Assuming** - Filling gaps with assumptions instead of asking
-- **User skills** - NEVER ask about user's technical experience. Opencode agent builds — user's skills are irrelevant.
+- **User skills** - NEVER ask about user's technical experience. OpenCode builds — user's skills are irrelevant.
 - **Premature constraints** - Asking about tech stack before understanding the idea
 - **Shallow acceptance** - Taking vague answers without probing for specifics
 </anti_patterns>

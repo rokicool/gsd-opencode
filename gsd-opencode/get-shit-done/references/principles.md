@@ -1,14 +1,14 @@
 <principles>
 Core principles for the Gets Shit Done planning system.
 
-<solo_developer_claude>
+<solo_developer_opencode>
 
-You are planning for ONE person (the user) and ONE implementer (Claude).
+You are planning for ONE person (the user) and ONE implementer (OpenCode).
 - No teams, stakeholders, ceremonies, coordination overhead
 - User is the visionary/product owner
-- Opencode agent is the builder
-- Estimate effort in Opencode agent execution time, not human dev time
-</solo_developer_claude>
+- OpenCode is the builder
+- Estimate effort in OpenCode execution time, not human dev time
+</solo_developer_opencode>
 
 <plans_are_prompts>
 
@@ -47,12 +47,12 @@ Plans must complete within reasonable context usage.
 - Better to have many small plans than few large ones
 </scope_control>
 
-<claude_automates>
+<opencode_automates>
 
-If Opencode agent CAN do it via CLI/API/tool, Opencode agent MUST do it.
+If OpenCode CAN do it via CLI/API/tool, OpenCode MUST do it.
 
 Checkpoints are for:
-- **Verification** - Human confirms Claude's work (visual, UX)
+- **Verification** - Human confirms OpenCode's work (visual, UX)
 - **Decision** - Human makes implementation choice
 
 Not for:
@@ -60,7 +60,7 @@ Not for:
 - Creating resources (use CLI/API)
 - Running builds/tests (use Bash)
 - Writing files (use Write tool)
-</claude_automates>
+</opencode_automates>
 
 <deviation_rules>
 
@@ -121,7 +121,7 @@ Milestones mark shipped versions (v1.0 → v1.1 → v2.0).
 
 <atomic_commits>
 
-**Git commits = context engineering for Claude.**
+**Git commits = context engineering for OpenCode.**
 
 Each task gets its own commit immediately after completion:
 - Format: `{type}({phase}-{plan}): {task-description}`
@@ -129,7 +129,7 @@ Each task gets its own commit immediately after completion:
 - One final metadata commit per plan: `docs({phase}-{plan}): complete [plan-name]`
 
 **Why per-task commits:**
-- Git history becomes primary context source for future Opencode agent sessions
+- Git history becomes primary context source for future OpenCode sessions
 - `git bisect` finds exact failing task, not just failing plan
 - Each task independently revertable
 - Better failure recovery (task 1 committed ✅, retry task 2)
@@ -148,7 +148,7 @@ NEVER include:
 - Team structures, RACI matrices
 - Stakeholder management
 - Sprint ceremonies
-- Human dev time estimates (hours, days, weeks—Opencode agent works differently)
+- Human dev time estimates (hours, days, weeks—OpenCode works differently)
 - Change management processes
 - Documentation for documentation's sake
 

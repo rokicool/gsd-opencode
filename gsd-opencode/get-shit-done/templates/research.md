@@ -2,7 +2,7 @@
 
 Template for `.planning/phases/XX-name/{phase}-RESEARCH.md` - comprehensive ecosystem research before planning.
 
-**Purpose:** Document what Opencode agent needs to know to implement a phase well - not just "which library" but "how do experts build this."
+**Purpose:** Document what OpenCode needs to know to implement a phase well - not just "which library" but "how do experts build this."
 
 ---
 
@@ -501,7 +501,7 @@ function useVehicleControls(rigidBodyRef) {
 
 **When to create:**
 - Before planning phases in niche/complex domains
-- When Claude's training data is likely stale or sparse
+- When OpenCode's training data is likely stale or sparse
 - When "how do experts do this" matters more than "which library"
 
 **Structure:**

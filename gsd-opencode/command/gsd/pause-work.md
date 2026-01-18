@@ -86,7 +86,7 @@ Start with: [specific first action when resuming]
 </next_action>
 ```
 
-Be specific enough for a fresh Opencode agent to understand immediately.
+Be specific enough for a fresh OpenCode to understand immediately.
 </step>
 
 <step name="commit">

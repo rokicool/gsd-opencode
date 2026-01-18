@@ -84,4 +84,4 @@ Types: `feat`, `fix`, `test`, `refactor`, `docs`, `chore`
 Rules:
 - One commit per task
 - Stage files individually (never `git add .`)
-- Include `Co-Authored-By: Claude` line
+- Include `Co-Authored-By: OpenCode` line

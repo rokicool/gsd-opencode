@@ -1,7 +1,7 @@
 <purpose>
 Guide manual user acceptance testing of recently built features. Extract deliverables from SUMMARY.md, generate test checklist, guide user through each test, log issues to phase-scoped file.
 
-The USER performs all testing — Opencode agent generates the checklist, guides the process, and captures issues.
+The USER performs all testing — OpenCode generates the checklist, guides the process, and captures issues.
 </purpose>
 
 <process>

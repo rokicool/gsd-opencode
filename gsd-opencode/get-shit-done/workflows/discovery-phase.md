@@ -22,7 +22,7 @@ NOTE: For comprehensive ecosystem research ("how do experts build this"), use /g
 <source_hierarchy>
 **MANDATORY: Context7 BEFORE WebSearch**
 
-Claude's training data is 6-18 months stale. Always verify.
+OpenCode's training data is 6-18 months stale. Always verify.
 
 1. **Context7 MCP FIRST** - Current docs, no hallucination
 2. **Official docs** - When Context7 lacks coverage

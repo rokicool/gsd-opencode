@@ -386,7 +386,7 @@ Resume file: None
 **Key points:**
 
 - Project Reference points to PROJECT.md for full context
-- Opencode agent reads PROJECT.md directly for requirements, constraints, decisions
+- OpenCode reads PROJECT.md directly for requirements, constraints, decisions
 - This file will be read first in every future operation
 - This file will be updated after every execution
 

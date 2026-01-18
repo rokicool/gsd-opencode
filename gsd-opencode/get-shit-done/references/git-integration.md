@@ -231,14 +231,14 @@ Each plan produces 2-4 commits (tasks + metadata). Clear, granular, bisectable.
 ## Why Per-Task Commits?
 
 **Context engineering for AI:**
-- Git history becomes primary context source for future Opencode agent sessions
+- Git history becomes primary context source for future OpenCode sessions
 - `git log --grep="{phase}-{plan}"` shows all work for a plan
 - `git diff <hash>^..<hash>` shows exact changes per task
 - Less reliance on parsing SUMMARY.md = more context for actual work
 
 **Failure recovery:**
 - Task 1 committed ✅, Task 2 failed ❌
-- Opencode agent in next session: sees task 1 complete, can retry task 2
+- OpenCode in next session: sees task 1 complete, can retry task 2
 - Can `git reset --hard` to last successful task
 
 **Debugging:**
@@ -247,8 +247,8 @@ Each plan produces 2-4 commits (tasks + metadata). Clear, granular, bisectable.
 - Each commit is independently revertable
 
 **Observability:**
-- Solo developer + Opencode agent workflow benefits from granular attribution
+- Solo developer + OpenCode workflow benefits from granular attribution
 - Atomic commits are git best practice
-- "Commit noise" irrelevant when consumer is Claude, not humans
+- "Commit noise" irrelevant when consumer is OpenCode, not humans
 
 </commit_strategy_rationale>

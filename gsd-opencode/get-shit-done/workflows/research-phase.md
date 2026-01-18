@@ -1,20 +1,20 @@
 <purpose>
 Comprehensive research on HOW to implement a phase before planning.
 
-Triggered by /gsd-research-phase command when the domain is niche, complex, or Claude's training is likely stale.
+Triggered by /gsd-research-phase command when the domain is niche, complex, or OpenCode's training is likely stale.
 
 Produces RESEARCH.md with ecosystem knowledge that informs quality planning - not just "which library" but "how do experts build this."
 </purpose>
 
 <when_to_use>
-**This workflow is for domains where Opencode agent fails without research:**
+**This workflow is for domains where OpenCode fails without research:**
 - 3D graphics (Three.js, Babylon.js, procedural generation, level design)
 - Game development (physics engines, collision, AI, ECS patterns)
 - Audio/music (Web Audio, DSP, synthesis, MIDI)
 - Shaders (GLSL, Metal, ISF, compute shaders)
 - ML/AI integration (model serving, inference, vector DBs)
 - Real-time systems (WebSockets, WebRTC, CRDT sync)
-- Specialized frameworks with active ecosystems Opencode agent may not know
+- Specialized frameworks with active ecosystems OpenCode may not know
 
 **Skip this for commodity domains:**
 - Standard auth (JWT, OAuth)
@@ -32,7 +32,7 @@ For niche domains, the question isn't library selection - it's:
 - What's the established architecture pattern?
 - What libraries form the standard stack?
 - What problems do people commonly hit?
-- What's SOTA vs what Opencode agent thinks is SOTA?
+- What's SOTA vs what OpenCode thinks is SOTA?
 - What should NOT be hand-rolled?
 </key_insight>
 
@@ -145,7 +145,7 @@ Categories to consider:
 
 **1. Core Technology:**
 - What's the primary technology/framework?
-- What version is current? (Claude's training may be stale)
+- What version is current? (OpenCode's training may be stale)
 - What's the standard setup/toolchain?
 
 **2. Ecosystem/Stack:**
@@ -193,7 +193,7 @@ Execute research systematically for each domain identified.
 
 **CRITICAL: Source hierarchy - Context7 BEFORE WebSearch**
 
-Claude's training data is 6-18 months stale. Treat pre-existing knowledge as hypothesis, not fact.
+OpenCode's training data is 6-18 months stale. Treat pre-existing knowledge as hypothesis, not fact.
 
 <research_protocol>
 
@@ -247,7 +247,7 @@ Execute research queries and document findings as you go:
 
 **Core Technology Findings:**
 - Current version: [from Context7]
-- Key changes since [Claude's training]: [from docs/WebSearch]
+- Key changes since [OpenCode's training]: [from docs/WebSearch]
 - Setup approach: [verified pattern]
 
 **Ecosystem Stack:**
@@ -292,7 +292,7 @@ Before creating RESEARCH.md, run through research-pitfalls.md checklist:
 - [ ] "What might I have missed?" review completed
 
 **Additional checks for ecosystem research:**
-- [ ] Checked for libraries Opencode agent might not know about
+- [ ] Checked for libraries OpenCode might not know about
 - [ ] Verified version numbers are current
 - [ ] Confirmed patterns still recommended (not deprecated)
 - [ ] Looked for "don't do this" warnings in docs
@@ -428,7 +428,7 @@ When /gsd-plan-phase runs after research:
 6. "Architecture patterns" inform task structure
 7. "Code examples" can be referenced in task actions
 
-This produces higher quality plans because Opencode agent knows:
+This produces higher quality plans because OpenCode knows:
 - What tools experts use
 - What patterns to follow
 - What mistakes to avoid

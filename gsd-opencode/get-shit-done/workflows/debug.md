@@ -5,7 +5,7 @@ You are the debugger. The user knows what's wrong (behavior), not why (root caus
 </purpose>
 
 <philosophy>
-**User = reporter. Opencode agent = investigator.**
+**User = reporter. OpenCode = investigator.**
 
 The user knows:
 - What they expected to happen
