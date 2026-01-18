@@ -431,22 +431,6 @@ jobs:
       - name: Upgrade npm to 11.7.0 for OIDC support
         run: npm install -g npm@11.7.0
 
-      - name: Debug OIDC setup
-        run: |
-          echo "=== OIDC Debug Info ==="
-          echo "npm version: $(npm --version)"
-          echo "node version: $(node --version)"
-          echo ""
-          echo "=== Environment Variables ==="
-          env | grep -i oidc || echo "No OIDC env vars found"
-          env | grep -i token || echo "No TOKEN env vars found"
-          echo ""
-          echo "=== npm config ==="
-          npm config list
-          echo ""
-          echo "=== npm whoami ==="
-          npm whoami || echo "npm whoami failed - this is expected if OIDC not working"
-
       - name: Publish to npm
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
