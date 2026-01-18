@@ -326,7 +326,7 @@ jobs:
           retention-days: 365
 
   create_release:
-    name: Create GitHub Release
+    name: Release to GH and NPM
     runs-on: ubuntu-latest
     needs: [validate, update_version, comprehensive_test, build_production]
     permissions:
