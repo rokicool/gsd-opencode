@@ -1,8 +1,8 @@
 <div align="left">
 
-# GET SHIT DONE for OpenCode. (Based on v1.4.15)
+# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.6.4)
 
-**A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (Adapted for OpenCode by rokicool)**
+**A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (Adapted for OpenCode by rokicool and enthusiasts)**
 
 [TÂCHES Original GitHub Repository](https://github.com/glittercowboy/get-shit-done)
 
@@ -14,7 +14,12 @@
 <br>
 
 ```bash
-npx gsd-opencode
+$ npx gsd-opencode
+
+or
+
+$ npx gsd-opencode@latest
+
 ```
 
 **Works on Mac, Windows, and Linux.**
@@ -63,6 +68,19 @@ That's what this is. No enterprise roleplay bullshit. Just an incredibly effecti
 I just love both GSD and OpenCode. I felt like having GSD available only for Claude Code is not fair. 
 
 — **Roman**
+
+## Vesrion 1.6.0 - We started using git submodules
+
+If you clone this repo dont forget to execute the next command after cloning:
+
+```
+$ git submodule update --init --recursive 
+```
+
+It will update/populate ./original/get-shit-done folder from TÂCHES repo. 
+
+Here is a nice compact article about git submodules: [Working with submodules](https://github.blog/open-source/git/working-with-submodules/). 
+Thanks to @borisnaydis for pointing that out.
 
 ## Version 1.5.0 - Breaking Change: Command Naming Convention Update
 

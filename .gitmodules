@@ -1,0 +1,3 @@
+[submodule "original/get-shit-done"]
+	path = original/get-shit-done
+	url = https://github.com/glittercowboy/get-shit-done
