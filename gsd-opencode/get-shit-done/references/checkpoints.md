@@ -80,7 +80,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 
 **Use ONLY for:** Email verification links, SMS 2FA codes, manual account approvals, 3D Secure payment flows, OAuth app approvals.
 
-**Do NOT use for:** Deployments (use CLI), creating resources (use CLI/API), builds/tests (use Bash), file operations (use Write/Edit).
+**Do NOT use for:** Deployments (use CLI), creating resources (use CLI/API), builds/tests (use bash tool), file operations (use write/edit tools).
 
 **Structure:**
 ```xml
@@ -197,7 +197,7 @@ Task [X] of [Y]: [Name]
 | Node | `npm`/`pnpm` | `install`, `run build`, `test` | N/A |
 | Xcode | `xcodebuild` | `-project`, `-scheme`, `build`, `test` | N/A |
 
-**Env files:** Use Write/Edit tools. Never ask human to create .env manually.
+**Env files:** Use write/edit tools. Never ask human to create .env manually.
 
 **Quick reference:**
 
@@ -205,7 +205,7 @@ Task [X] of [Y]: [Name]
 |--------|--------------|-----------------|
 | Deploy to Vercel | Yes (`vercel`) | YES |
 | Create Stripe webhook | Yes (API) | YES |
-| Write .env file | Yes (Write tool) | YES |
+| Write .env file | Yes (write/edit tools) | YES |
 | Create Upstash DB | Yes (`upstash`) | YES |
 | Run tests | Yes (`npm test`) | YES |
 | Click email verification link | No | NO |

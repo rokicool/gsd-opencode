@@ -14,7 +14,7 @@ Rules for editing files in `commands/gsd/`.
 name: gsd-command-name
 description: One-line description
 argument-hint: "<required>" or "[optional]"
-allowed-tools: [Read, Write, Bash, Glob, Grep, AskUserQuestion]
+allowed-tools: [read, write, edit, bash, glob, grep, question]
 ---
 ```
 

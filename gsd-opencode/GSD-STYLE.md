@@ -23,7 +23,7 @@ GSD is a **meta-prompting system** where every file is both implementation and s
 name: gsd-command-name
 description: One-line description
 argument-hint: "<required>" or "[optional]"
-allowed-tools: [Read, Write, Bash, Glob, Grep, AskUserQuestion]
+allowed-tools: [read, write, edit, bash, glob, grep, xquestion]
 ---
 ```
 
@@ -337,7 +337,7 @@ Use subagents for autonomous work. Reserve main context for user interaction.
 
 ### Decision Gates
 
-Always use AskUserQuestion with concrete options. Never plain text prompts.
+Always use question tool with concrete options. Never plain text prompts.
 
 Include escape hatch: "Something else", "Let me describe"
 
@@ -423,7 +423,7 @@ How to make tests pass
 8. **Temporal language banned** — current state only
 9. **Plans ARE prompts** — executable, not documents
 10. **Atomic commits** — Git history as context source
-11. **AskUserQuestion for all exploration** — always options
+11. **question tool for all exploration** — always options
 12. **Checkpoints post-automation** — automate first, verify after
 13. **Deviation rules are automatic** — no permission for bugs/critical
 14. **Depth controls compression** — derive from actual work

@@ -58,8 +58,8 @@ Checkpoints are for:
 Not for:
 - Deploying (use CLI)
 - Creating resources (use CLI/API)
-- Running builds/tests (use Bash)
-- Writing files (use Write tool)
+- Running builds/tests (use bash tool)
+- Writing files (use write/edit tools)
 </opencode_automates>
 
 <deviation_rules>

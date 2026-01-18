@@ -57,7 +57,7 @@ Creates `.planning/` with PROJECT.md and config.json.
    HAS_CODEBASE_MAP=$([ -d .planning/codebase ] && echo "yes")
    ```
 
-   **You MUST run all bash commands above using the Bash tool before proceeding.**
+   **You MUST run all bash commands above using the bash tool before proceeding.**
 
 </step>
 
