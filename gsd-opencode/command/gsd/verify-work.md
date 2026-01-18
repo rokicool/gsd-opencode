@@ -1,5 +1,6 @@
 ---
 description: Validate built features through conversational UAT
+name: gsd-verify-work
 tools:
   read: true
   bash: true

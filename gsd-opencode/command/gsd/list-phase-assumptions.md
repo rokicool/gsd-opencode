@@ -1,5 +1,6 @@
 ---
 description: Surface Claude's assumptions about a phase approach before planning
+name: gsd-list-phase-assumptions
 tools:
   read: true
   bash: true

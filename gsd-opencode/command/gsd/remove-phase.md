@@ -1,5 +1,6 @@
 ---
 description: Remove a future phase from roadmap and renumber subsequent phases
+name: gsd-remove-phase
 tools:
   read: true
   write: true

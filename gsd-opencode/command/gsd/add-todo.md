@@ -1,5 +1,6 @@
 ---
 description: Capture idea or task as todo from current conversation context
+name: gsd-add-todo
 tools:
   read: true
   write: true

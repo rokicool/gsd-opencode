@@ -1,5 +1,6 @@
 ---
 description: Execute all plans in a phase with wave-based parallelization
+name: gsd-execute-phase
 tools:
   read: true
   write: true

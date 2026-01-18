@@ -1,5 +1,6 @@
 ---
 description: Create phases to close all gaps identified by milestone audit
+name: gsd-plan-milestone-gaps
 tools:
   read: true
   write: true

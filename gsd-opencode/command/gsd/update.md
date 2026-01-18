@@ -1,5 +1,6 @@
 ---
 description: Update GSD to latest version with changelog display
+name: gsd-update
 ---
 
 <objective>

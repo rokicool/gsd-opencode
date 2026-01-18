@@ -1,5 +1,6 @@
 ---
 description: Check project progress, show context, and route to next action (execute or plan)
+name: gsd-progress
 tools:
   read: true
   bash: true

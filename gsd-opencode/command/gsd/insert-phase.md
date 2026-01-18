@@ -1,5 +1,6 @@
 ---
 description: Insert urgent work as decimal phase (e.g., 7.2) between existing phases
+name: gsd-insert-phase
 tools:
   read: true
   write: true

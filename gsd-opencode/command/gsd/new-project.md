@@ -1,5 +1,6 @@
 ---
 description: Initialize a new project with deep context gathering and PROJECT.md
+name: gsd-new-project
 tools:
   read: true
   bash: true

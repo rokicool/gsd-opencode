@@ -1,5 +1,6 @@
 ---
 description: Systematic debugging with persistent state across context resets
+name: gsd-debug
 tools:
   read: true
   bash: true

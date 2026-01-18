@@ -1,6 +1,6 @@
 {
   "name": "gsd-opencode",
-  "version": "1.4.4",
+  "version": "1.6.0",
   "description": "A meta-prompting, context engineering and spec-driven development system for OpenCode by TÂCHES.",
   "keywords": [
     "opencode",
@@ -25,6 +25,7 @@
     "gsd-opencode": "bin/install.js"
   },
   "files": [
+    "agents",
     "bin",
     "command",
     "get-shit-done"

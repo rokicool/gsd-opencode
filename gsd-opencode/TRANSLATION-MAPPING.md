@@ -68,7 +68,7 @@ This document provides a comprehensive mapping between Claude Code conventions (
 **Claude Code Agent Frontmatter:**
 ```yaml
 ---
-name: gsd-planner
+name: gsd:planner
 description: Creates executable phase plans with task breakdown...
 tools: Read, Write, Bash, Glob, Grep, WebFetch, mcp__context7__*
 color: green
@@ -78,6 +78,7 @@ color: green
 **OpenCode Agent Frontmatter:**
 ```yaml
 ---
+name: gsd-planner
 description: Creates executable phase plans with task breakdown...
 mode: subagent
 model: anthropic/claude-sonnet-4-5
@@ -148,6 +149,7 @@ allowed-tools:
 ```yaml
 ---
 description: Create detailed execution plan for a phase with verification loop
+name: gsd-plan-phase
 agent: planner
 model: anthropic/claude-sonnet-4-5
 tools:

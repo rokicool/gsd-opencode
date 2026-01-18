@@ -1,5 +1,6 @@
 ---
 description: Create context handoff when pausing work mid-phase
+name: gsd-pause-work
 tools:
   read: true
   write: true

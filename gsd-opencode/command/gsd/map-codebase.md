@@ -1,5 +1,6 @@
 ---
 description: Analyze codebase with parallel mapper agents to produce .planning/codebase/ documents
+name: gsd-map-codebase
 tools:
   read: true
   bash: true

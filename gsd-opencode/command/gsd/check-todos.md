@@ -1,5 +1,6 @@
 ---
 description: List pending todos and select one to work on
+name: gsd-check-todos
 tools:
   read: true
   write: true

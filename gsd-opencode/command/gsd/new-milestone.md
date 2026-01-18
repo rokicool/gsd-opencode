@@ -1,5 +1,6 @@
 ---
 description: Start a new milestone cycle — update PROJECT.md and route to requirements
+name: gsd-new-milestone
 tools:
   read: true
   write: true

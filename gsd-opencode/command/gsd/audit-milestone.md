@@ -1,5 +1,6 @@
 ---
 description: Audit milestone completion against original intent before archiving
+name: gsd-audit-milestone
 tools:
   read: true
   glob: true

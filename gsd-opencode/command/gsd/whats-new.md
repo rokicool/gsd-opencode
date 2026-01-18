@@ -1,5 +1,6 @@
 ---
 description: See what's new in GSD since your installed version
+name: gsd-whats-new
 ---
 
 <objective>

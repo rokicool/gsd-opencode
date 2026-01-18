@@ -1,5 +1,6 @@
 ---
 description: Resume work from previous session with full context restoration
+name: gsd-resume-work
 tools:
   read: true
   bash: true

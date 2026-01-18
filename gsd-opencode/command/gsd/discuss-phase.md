@@ -1,5 +1,6 @@
 ---
 description: Gather phase context through adaptive questioning before planning
+name: gsd-discuss-phase
 tools:
   read: true
   write: true

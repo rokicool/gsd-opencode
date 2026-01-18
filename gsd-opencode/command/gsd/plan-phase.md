@@ -1,5 +1,6 @@
 ---
 description: Create detailed execution plan for a phase (PLAN.md) with verification loop
+name: gsd-plan-phase
 agent: gsd-planner
 subtask: true
 tools:

@@ -1,6 +1,7 @@
 ---
 type: prompt
 description: Archive completed milestone and prepare for next version
+name: gsd-complete-milestone
 tools:
   read: true
   write: true

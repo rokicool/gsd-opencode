@@ -1,5 +1,6 @@
 ---
 description: Research how to implement a phase (standalone - usually use /gsd-plan-phase instead)
+name: gsd-research-phase
 tools:
   read: true
   bash: true
