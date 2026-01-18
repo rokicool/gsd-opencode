@@ -462,6 +462,7 @@ jobs:
         run: |
           echo "@rokicool:registry=https://npm.pkg.github.com" > .npmrc
           echo "//npm.pkg.github.com/:_authToken=\${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+          echo "//npm.pkg.github.com/:always-auth=true" >> .npmrc
           echo "Created .npmrc with contents:"
           cat .npmrc
 
