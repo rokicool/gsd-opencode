@@ -433,8 +433,11 @@ jobs:
           # Find the tarball
           TARBALL=$(ls gsd-opencode-*.tgz)
 
-          # Extract package info
+          # Extract package.json from tarball to get package name
+          tar -xzf "$TARBALL" package/package.json --strip-components=1
           PACKAGE_NAME=$(node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).name")
+          rm package.json
+
           VERSION="${{ needs.update_version.outputs.version }}"
 
           echo "Publishing $TARBALL as $PACKAGE_NAME@$VERSION to npm using OIDC token"
