@@ -391,13 +391,23 @@ jobs:
         run: |
           echo "Creating GitHub release for v${{ needs.update_version.outputs.version }}..."
 
-          # Create release
-          gh release create "v${{ needs.update_version.outputs.version }}" \
-            --title "gsd-opencode v${{ needs.update_version.outputs.version }}" \
-            --notes-file release-notes.md \
-            --latest
+          # Check if release already exists
+          if gh release view "v${{ needs.update_version.outputs.version }}" &>/dev/null; then
+            echo "Release v${{ needs.update_version.outputs.version }} already exists, updating..."
+            # Update existing release
+            gh release edit "v${{ needs.update_version.outputs.version }}" \
+              --title "gsd-opencode v${{ needs.update_version.outputs.version }}" \
+              --notes-file release-notes.md \
+              --latest
+          else
+            # Create new release
+            gh release create "v${{ needs.update_version.outputs.version }}" \
+              --title "gsd-opencode v${{ needs.update_version.outputs.version }}" \
+              --notes-file release-notes.md \
+              --latest
+          fi
 
-          echo "✓ GitHub release created"
+          echo "✓ GitHub release updated/created"
 
       - name: Upload release assets
         run: |
