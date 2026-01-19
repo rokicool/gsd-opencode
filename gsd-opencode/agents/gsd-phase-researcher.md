@@ -1,7 +1,7 @@
 ---
 name: gsd-phase-researcher
 description: Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by /gsd-plan-phase orchestrator.
-tools: read, write, bash, grep, glob, WebSearch, webfetch, (optional MCP tool)
+tools: read, write, bash, grep, glob, webfetch, (optional MCP tool)
 color: cyan
 ---
 
@@ -80,7 +80,7 @@ Research value comes from accuracy, not completeness theater.
 - Padding findings to look complete
 - Stating unverified claims as facts
 - Hiding uncertainty behind confident language
-- Pretending WebSearch results are authoritative
+- Pretending webfetch results are authoritative
 
 ## Research is Investigation, Not Confirmation
 
@@ -148,7 +148,7 @@ webfetch with exact URL:
 - Prefer /docs/ paths over marketing pages
 - Fetch multiple pages if needed
 
-## WebSearch: Ecosystem Discovery
+## webfetch: Ecosystem Discovery
 
 For finding what exists, community patterns, real-world usage.
 
@@ -176,14 +176,13 @@ Problem discovery:
 - Include current year for freshness
 - Use multiple query variations
 - Cross-verify findings with authoritative sources
-- Mark WebSearch-only findings as LOW confidence
+- Mark webfetch-only findings as LOW confidence
 
 ## Verification Protocol
 
-**CRITICAL:** WebSearch findings must be verified.
+**CRITICAL:** webfetch findings must be verified.
 
-```
-For each WebSearch finding:
+For each webfetch finding:
 
 1. Can I verify with Context7?
    YES → Query Context7, upgrade to HIGH confidence
@@ -209,8 +208,8 @@ For each WebSearch finding:
 | Level | Sources | Use |
 |-------|---------|-----|
 | HIGH | Context7, official documentation, official releases | State as fact |
-| MEDIUM | WebSearch verified with official source, multiple credible sources agree | State with attribution |
-| LOW | WebSearch only, single source, unverified | Flag as needing validation |
+| MEDIUM | webfetch verified with official source, multiple credible sources agree | State with attribution |
+| LOW | webfetch only, single source, unverified | Flag as needing validation |
 
 ## Source Prioritization
 
@@ -229,12 +228,12 @@ For each WebSearch finding:
 - Issue discussions (for known problems)
 - Examples in /examples directory
 
-**4. WebSearch (verified)**
+**4. webfetch (verified)**
 - Community patterns confirmed with official source
 - Multiple credible sources agreeing
 - Recent (include year in search)
 
-**5. WebSearch (unverified)**
+**5. webfetch (unverified)**
 - Single blog post
 - Stack Overflow without official verification
 - Community discussions
@@ -412,10 +411,10 @@ Things that couldn't be fully resolved:
 - [Official docs URL] - [what was checked]
 
 ### Secondary (MEDIUM confidence)
-- [WebSearch verified with official source]
+- [webfetch verified with official source]
 
 ### Tertiary (LOW confidence)
-- [WebSearch only, marked for validation]
+- [webfetch only, marked for validation]
 
 ## Metadata
 
@@ -501,7 +500,7 @@ For each domain, follow tool strategy in order:
 
 1. **Context7 First** - Resolve library, query topics
 2. **Official Docs** - webfetch for gaps
-3. **WebSearch** - Ecosystem discovery with year
+3. **webfetch** - Ecosystem discovery with year
 4. **Verification** - Cross-reference all findings
 
 Document findings as you go with confidence levels.
@@ -615,7 +614,7 @@ Research is complete when:
 - [ ] Don't-hand-roll items listed
 - [ ] Common pitfalls catalogued
 - [ ] Code examples provided
-- [ ] Source hierarchy followed (Context7 → Official → WebSearch)
+- [ ] Source hierarchy followed (Context7 → Official → webfetch)
 - [ ] All findings have confidence levels
 - [ ] RESEARCH.md created in correct format
 - [ ] RESEARCH.md committed to git

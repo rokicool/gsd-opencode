@@ -189,10 +189,10 @@ Things that couldn't be fully resolved:
 - [Official docs URL] - [what was checked]
 
 ### Secondary (MEDIUM confidence)
-- [WebSearch verified with official source] - [finding + verification]
+- [webfetch verified with official source] - [finding + verification]
 
 ### Tertiary (LOW confidence - needs validation)
-- [WebSearch only] - [finding, marked for validation during implementation]
+- [webfetch only] - [finding, marked for validation during implementation]
 </sources>
 
 <metadata>

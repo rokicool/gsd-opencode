@@ -6,7 +6,7 @@ Take ./original/get-shit-done system of metaprompts for Claude Code and build si
 There are several complications.
 
 1. The main goal is ability to run the get-shit-done propmpts as commands in OpenCode (https://opencode.ai). All the tools, agents, names related to Claude Code should be translated to similar tools, agents, names for OpenCode.
-2. Examine OpenCode documentation https://opencode.ai/docs and Claude Code documentation https://code.claude.com/docs/en/settings#tools-available-to-claude
+2. Examine OpenCode documentation https://opencode.ai/docs.
 3. The config folder for opencode is ~/.config/opencode OR .opencode/ (not ~/.claude).
 4. Claude Code supports "/gsd:subcommand" syntax for the command. Opencode doesn't support ":" in command names. Add "name: gsd-<name-of-command>" to the header of every command
 5. In ./original/get-shit-done the custom commands are located in the ./orginial/get-shit-done/commands/gsd. It is a Cloud Code notation. In OpenCode the same commands must be put into ./gsd-opencode/command/gsd folder. Important: "command" instead of "commands"
@@ -20,14 +20,16 @@ There are several complications.
 10. Replace Claude Code agent names with similar OpenCode agents names.
 11. The author of the prompts is TACHES (https://github.com/glittercowboy/get-shit-done).
 12. The name of the current project is "gds-opencode".
-13. When original prompt uses "<sub>something</sub>" tags - replace the tags with one star '*': *something\* in the OpenCode adopted version
-14. When orignial prompt uses "/clear" command - replace it with "/new" command
-15. Forbidden strings in the target (./gsd-opencode) folder:
+13. All references in target folder (./gsd-opencode) to `get-shit-done-cc` should be replaced with `gsd-opencode`
+14. All references in target folder (./gsd-opencode) to `https://raw.githubusercontent.com/glittercowboy/get-shit-done` should be replaced with `https://raw.githubusercontent.com/rokicool/gsd-opencode`
+15. When original prompt uses "<sub>something</sub>" tags - replace the tags with one star '*': *something\* in the OpenCode adopted version
+16. When orignial prompt uses "/clear" command - replace it with "/new" command
+17. Forbidden strings in the target (./gsd-opencode) folder:
     There is a utility "assets/bin/check-forbidden-strings.js" that can check the "gsd-opencode/" for forbidden strings. You can utilize the utility to final check the translation.
-16. You can define TRANSLATION-MAPPING.md document to reference for every translation prompt.
-17. DO NOT modify:
+18. You can define /TRANSLATION-MAPPING.md document to reference for every translation prompt.
+19. DO NOT modify:
 - ./README.md
-- ./assets/\*
-- ./gsd-opencode/bin/\*
+- ./assets/*
+- ./gsd-opencode/bin/*
 - ./gsd-opencode/package.json
-- ./original/\*
+- ./original/*

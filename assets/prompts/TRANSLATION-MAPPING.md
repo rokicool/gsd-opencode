@@ -46,6 +46,7 @@ This document maps all transformations from the original Claude Code get-shit-do
 | Glob | glob |
 | Grep | grep |
 | WebFetch | webfetch |
+| WebSearch | utilize webfetch with access to search engines |
 | AskUserQuestion | question |
 | TodoWrite | todowrite |
 | SlashCommand | (invoke via direct /command execution) |
