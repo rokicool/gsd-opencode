@@ -143,7 +143,7 @@ jobs:
   notify:
     name: Build Summary
     runs-on: ubuntu-latest
-    needs: [validate_code, validate_gsd, generate_version, build_and_publish]
+    needs: [validate_code, generate_version, build_and_publish]
     if: always()
 
     steps:
@@ -160,12 +160,12 @@ jobs:
           echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| Validate Code | ${{ needs.validate_code.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Validate GSD | ${{ needs.validate_gsd.result }} |" >> $GITHUB_STEP_SUMMARY
+
           echo "| Generate Version | ${{ needs.generate_version.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Build and Publish | ${{ needs.build_and_publish.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          if [[ "${{ needs.validate_code.result }}" == "success" && "${{ needs.validate_gsd.result }}" == "success" && "${{ needs.generate_version.result }}" == "success" && "${{ needs.build_and_publish.result }}" == "success" ]]; then
+          if [[ "${{ needs.validate_code.result }}" == "success" && "${{ needs.generate_version.result }}" == "success" && "${{ needs.build_and_publish.result }}" == "success" ]]; then
             echo "🎉 **Overall Status: SUCCESS**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "All validations passed and package published to GitHub npm registry successfully." >> $GITHUB_STEP_SUMMARY
