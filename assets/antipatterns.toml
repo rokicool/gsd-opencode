@@ -12,5 +12,7 @@ forbidden_strings = [
         "~/.claude",
         "/gsd:",
         "get-shit-done-cc",
-        "glittercowboy"
+        "glittercowboy",
+        "AskUserQuestion",
+        "All arguments become"
         ]

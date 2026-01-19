@@ -96,7 +96,7 @@ tools:
 
 1. **Naming:**
    - Claude Code: `name: agent-name` (required)
-   - OpenCode: Filename defines agent name (e.g., `planner.md` creates `planner` agent)
+   - OpenCode: `name: agent-name` (required)
 
 2. **Tool Specification:**
    - Claude Code: Comma-separated list `tools: Read, Write, Bash`
@@ -148,9 +148,9 @@ allowed-tools:
 **OpenCode Command:**
 ```yaml
 ---
-description: Create detailed execution plan for a phase with verification loop
 name: gsd-plan-phase
-agent: planner
+description: Create detailed execution plan for a phase with verification loop
+agent: gsd-planner
 model: anthropic/claude-sonnet-4-5
 tools:
   read: true
@@ -167,7 +167,7 @@ tools:
 
 | Claude Code Field | OpenCode Field | Translation Rule |
 |------------------|----------------|-----------------|
-| `name: gsd:name` | **N/A** | Use filename instead (e.g., `plan-phase.md`) |
+| `name: gsd:name` | `name: gsd-name` | Replace colon `:` in the name with `-` |
 | `argument-hint` | **N/A** | Not supported, document usage in description |
 | `allowed-tools` | `tools` object | Convert array to key-value object |
 | `agent: agent-name` | `agent: agent-name` | Same field, reference OpenCode agent |
@@ -184,7 +184,7 @@ tools:
 
 **OpenCode:**
 - Syntax: `/command-name` (no colons)
-- Location: `~/.config/opencode/commands/*.md` or `.opencode/commands/*.md`
+- Location: `~/.config/opencode/command/gsd/*.md` or `.opencode/command/gsd/*.md`
 
 **Translation Rule:**
 ```
@@ -209,10 +209,11 @@ Note: OpenCode doesn't support `:` in command names. Replace `:` with `-`.
 **OpenCode:**
 ```
 ~/.config/opencode/  (or .opencode/)
-  commands/
-    gsd-new-project.md
-    gsd-plan-phase.md
-    gsd-execute-phase.md
+  command/
+    gsd/
+      new-project.md
+      plan-phase.md
+      execute-phase.md
 ```
 
 ---
@@ -250,8 +251,8 @@ OpenCode:    @~/.config/opencode/get-shit-done/workflows/execute-plan.md
 
 For GSD translation, use:
 ```
-OpenCode: commands/gsd-new-project.md
-         commands/gsd-plan-phase.md
+OpenCode: command/gsd/new-project.md
+         command/gsd/plan-phase.md
 ```
 
 ### File Reference Patterns
@@ -313,7 +314,7 @@ No translation needed - attributes work the same.
 
 **OpenCode Markdown Emphasis:**
 ```markdown
-* /clear first → fresh context window
+*/clear first → fresh context window*
 ```
 
 **Translation Rule:** Replace `<sub>` tags with markdown `*` for emphasis.
@@ -354,6 +355,19 @@ Phase number: $ARGUMENTS (optional - auto-detects next unplanned phase if not pr
 ```markdown
 <context>
 Phase number: $ARGUMENTS (optional - auto-detects next unplanned phase if not provided)
+</context>
+```
+
+**Claude Code:**
+```markdown
+<context>
+  All arguments become the phase description
+</context>
+```
+**OpenCode:**
+```markdown
+<context>
+  `$ARGUMENTS` become the phase description
 </context>
 ```
 
@@ -477,9 +491,10 @@ Provide help information for GSD commands.
 User's query: $ARGUMENTS
 ```
 
-**OpenCode (`commands/gsd-help.md`):**
+**OpenCode (`command/gsd/help.md`):**
 ```yaml
 ---
+name: gsd-help
 description: Show all available GSD commands and usage guide
 tools:
   read: true
@@ -520,9 +535,10 @@ Phase number: $ARGUMENTS
 Spawn gsd-planner agent.
 ```
 
-**OpenCode (`commands/gsd-plan-phase.md`):**
+**OpenCode (`command/gsd/plan-phase.md`):**
 ```yaml
 ---
+name: gsd-plan-phase
 description: Create detailed execution plan for a phase (PLAN.md) with verification loop
 agent: gsd-planner
 subtask: true
@@ -571,6 +587,7 @@ Your job: Produce PLAN.md files that Claude executors can implement without inte
 **OpenCode (`agents/gsd-planner.md`):**
 ```yaml
 ---
+name: gsd-planner
 description: Creates executable phase plans with task breakdown, dependency analysis, and goal-backward verification. Spawned by /gsd-plan-phase orchestrator.
 mode: subagent
 model: anthropic/claude-sonnet-4-5
@@ -892,9 +909,9 @@ Task(
 
 **Claude Code:** Uses nested `commands/gsd/` structure
 
-**OpenCode:** Prefers flat structure with prefixed names
+**OpenCode:**  Uses nested `command/gsd/` structure
 
-**Translation:** Use `gsd-command-name.md` naming pattern in flat `commands/` directory.
+**Translation:** Use `command-name.md` naming pattern in `commands/gsd/` directory.
 
 ---
 
@@ -903,8 +920,7 @@ Task(
 When translating a file from Claude Code to OpenCode:
 
 ### Commands
-- [ ] Update filename: `command.md` → `gsd-command.md`
-- [ ] Remove `name` from frontmatter (filename defines name)
+- [ ] Update filename: `command.md` → `command.md`
 - [ ] Convert `allowed-tools` array to `tools` object
 - [ ] Remove `argument-hint`, move to `description`
 - [ ] Remove `color` attribute
@@ -912,11 +928,13 @@ When translating a file from Claude Code to OpenCode:
 - [ ] Add `subtask: true` if agent invocation needed
 - [ ] Update `@` references to new paths
 - [ ] Replace `<sub>` tags with `*` emphasis
+- [ ] Replace `get-shit-done-cc` with `gsd-opencode`
+- [ ] Replace `AskUserQuestion` with `question tool`
+- [ ] Replace `https://raw.githubusercontent.com/glittercowboy/get-shit-done` with `https://raw.githubusercontent.com/rokicool/gsd-opencode`
 - [ ] Update MCP tool patterns (`mcp__*` → direct names)
 
 ### Agents
 - [ ] Update location: `.claude/agents/` → `.opencode/agents/`
-- [ ] Remove `name` from frontmatter (filename defines name)
 - [ ] Convert `tools` list to `tools` object
 - [ ] Add `mode: subagent` (GSD agents are subagents)
 - [ ] Remove `color` attribute
@@ -950,7 +968,7 @@ When translating a file from Claude Code to OpenCode:
 | `./.claude/` | `./.opencode/` |
 | `~/.claude/get-shit-done/` | `~/.config/opencode/get-shit-done/` |
 | `./.claude/get-shit-done/` | `./.opencode/get-shit-done/` |
-| `commands/gsd/` | `command/gsd/` (with `gsd-` prefix) |
+| `commands/gsd/` | `command/gsd/` |
 
 ### Command Name Replacements
 
@@ -965,7 +983,6 @@ When translating a file from Claude Code to OpenCode:
 
 | Claude Code | OpenCode | Action |
 |-------------|-----------|--------|
-| `name: ...` | **Remove** | Use filename |
 | `allowed-tools: [...]` | `tools: {...}` | Convert array to object |
 | `argument-hint: ...` | Move to description | No separate field |
 | `color: ...` | **Remove** | Not supported |

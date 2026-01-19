@@ -12,7 +12,7 @@ This is prompt 6 of 6 in the translation sequence. Use the mapping document crea
 **Source files:** ./original/agents/*.md
 **Target directory:** ./gsd-opencode/agents/
 
-**Mapping reference:** @./gsd-opencode/TRANSLATION-MAPPING.md
+**Mapping reference:** @./assets/prompts/TRANSLATION-MAPPING.md
 
 **Agent documentation:** https://opencode.ai/docs/agents/
 
@@ -58,7 +58,7 @@ This is prompt 6 of 6 in the translation sequence. Use the mapping document crea
 </requirements>
 
 <implementation>
-Follow the mapping document at ./gsd-opencode/TRANSLATION-MAPPING.md for specific conversion rules, especially the agent specification section.
+Follow the mapping document at ./assets/prompts/TRANSLATION-MAPPING.md for specific conversion rules, especially the agent specification section.
 
 For each file:
 1. Read the source file
@@ -110,9 +110,9 @@ After completing translations:
 
 3. Check that no Claude Code tool names remain:
    ```bash
-   grep -r "Read\|Write\|Bash\|Glob\|Grep\|Task\|WebFetch" ./gsd-opencode/agents/
+   grep -r "Read\|Write\|Bash\|Glob\|Grep\|Task\|WebFetch\|AskUserQuestion" ./gsd-opencode/agents/
    ```
-   Only OpenCode equivalents should be present.
+   Should return nothing.
 
 4. Verify no `<sub>` tags remain:
    ```bash

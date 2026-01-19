@@ -12,7 +12,7 @@ This is prompt 2 of 6 in the translation sequence. Use the mapping document crea
 **Source files:** ./original/get-shit-done/commands/gsd/*.md
 **Target directory:** ./gsd-opencode/command/gsd/
 
-**Mapping reference:** @./gsd-opencode/TRANSLATION-MAPPING.md
+**Mapping reference:** @./assets/prompts/TRANSLATION-MAPPING.md
 
 **Project context:**
 - Project name: "gsd-opencode"
@@ -101,9 +101,21 @@ After completing translations:
    - No `<sub>` tags remain
    - $ARGUMENTS is used where appropriate
 
-3. Verify no files in the original directory structure were missed
+3. Check that no Claude Code tool names remain:
+   ```bash
+   grep -r "Read\|Write\|Bash\|Glob\|Grep\|Task\|WebFetch\|AskUserQuestion" ./gsd-opencode/command/gsd/*.md
+   ```
+   Should return nothing.
 
-4. Test that the translated commands follow OpenCode command syntax
+4. Verify no `<sub>` tags remain:
+   ```bash
+   grep -r "<sub>" ./gsd-opencode/command/gsd/*.md
+   ```
+   Should return nothing.
+
+5. Verify no files in the original directory structure were missed
+
+6. Test that the translated commands follow OpenCode command syntax
 </verification>
 
 <success_criteria>
