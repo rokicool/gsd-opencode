@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.6.0] - 2026-01-19
 
+Catch up with original [Get-Shit-Done v1.6.4](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md#164---2026-01-17).
 Complete restructuring with agent system, unified workflows, and enhanced project lifecycle management.
 
 ### Added
@@ -65,4 +66,3 @@ Complete restructuring with agent system, unified workflows, and enhanced projec
 - Test output files: animal-facts.md, dad-jokes.md, random-numbers.md
 
 ## [1.5.2] - 2026-01-19
-

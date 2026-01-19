@@ -128,6 +128,22 @@ npx gsd-opencode
 
 That's it. Verify with `/gsd-help`.
 
+That's it. Verify with `/gsd:help` inside your Claude Code interface.
+
+### Staying Updated
+
+GSD evolves fast. Check for updates periodically:
+
+```
+/gsd:whats-new
+```
+
+Update with:
+
+```bash
+npx gsd-opencode@latest
+```
+
 <details>
 <summary><strong>Non-interactive Install (Docker, CI, Scripts)</strong></summary>
 
@@ -163,26 +179,14 @@ If you prefer not to use that flag, add this to your project's `.opencode/settin
 
 ```json
 {
-  "permissions": {
-    "allow": [
-      "Bash(date:*)",
-      "Bash(echo:*)",
-      "Bash(cat:*)",
-      "Bash(ls:*)",
-      "Bash(mkdir:*)",
-      "Bash(wc:*)",
-      "Bash(head:*)",
-      "Bash(tail:*)",
-      "Bash(sort:*)",
-      "Bash(grep:*)",
-      "Bash(tr:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git status:*)",
-      "Bash(git log:*)",
-      "Bash(git diff:*)",
-      "Bash(git tag:*)"
-    ]
+  $schema: https://opencode.ai/config.json,
+  permission: {
+    bash: allow,
+    read: allow,
+    edit: allow,
+    grep: allow,
+    glob: allow,
+    list: allow
   }
 }
 ```
@@ -272,6 +276,141 @@ The codebase docs load automatically during planning. OpenCode knows your patter
 
 ## Why It Works
 
+## How It Works
+
+> **Already have code?** Run `/gsd-map-codebase` first. It spawns parallel agents to analyze your stack, architecture, conventions, and concerns. Then `/gsd-new-project` knows your codebase — questions focus on what you're adding, and planning automatically loads your patterns.
+
+### 1. Initialize Project
+
+```
+/gsd-new-project
+```
+
+One command, one flow. The system:
+
+1. **Questions** — Asks until it understands your idea completely (goals, constraints, tech preferences, edge cases)
+2. **Research** — Spawns parallel agents to investigate the domain (optional but recommended)
+3. **Requirements** — Extracts what's v1, v2, and out of scope
+4. **Roadmap** — Creates phases mapped to requirements
+
+You approve the roadmap. Now you're ready to build.
+
+**Creates:** `PROJECT.md`, `REQUIREMENTS.md`, `ROADMAP.md`, `STATE.md`, `.planning/research/`
+
+---
+
+### 2. Discuss Phase
+
+```
+/gsd-discuss-phase 1
+```
+
+**This is where you shape the implementation.**
+
+Your roadmap has a sentence or two per phase. That's not enough context to build something the way *you* imagine it. This step captures your preferences before anything gets researched or planned.
+
+The system analyzes the phase and identifies gray areas based on what's being built:
+
+- **Visual features** → Layout, density, interactions, empty states
+- **APIs/CLIs** → Response format, flags, error handling, verbosity
+- **Content systems** → Structure, tone, depth, flow
+- **Organization tasks** → Grouping criteria, naming, duplicates, exceptions
+
+For each area you select, it asks until you're satisfied. The output — `CONTEXT.md` — feeds directly into the next two steps:
+
+1. **Researcher reads it** — Knows what patterns to investigate ("user wants card layout" → research card component libraries)
+2. **Planner reads it** — Knows what decisions are locked ("infinite scroll decided" → plan includes scroll handling)
+
+The deeper you go here, the more the system builds what you actually want. Skip it and you get reasonable defaults. Use it and you get *your* vision.
+
+**Creates:** `{phase}-CONTEXT.md`
+
+---
+
+### 3. Plan Phase
+
+```
+/gsd-plan-phase 1
+```
+
+The system:
+
+1. **Researches** — Investigates how to implement this phase, guided by your CONTEXT.md decisions
+2. **Plans** — Creates 2-3 atomic task plans with XML structure
+3. **Verifies** — Checks plans against requirements, loops until they pass
+
+Each plan is small enough to execute in a fresh context window. No degradation, no "I'll be more concise now."
+
+**Creates:** `{phase}-RESEARCH.md`, `{phase}-{N}-PLAN.md`
+
+---
+
+### 4. Execute Phase
+
+```
+/gsd-execute-phase 1
+```
+
+The system:
+
+1. **Runs plans in waves** — Parallel where possible, sequential when dependent
+2. **Fresh context per plan** — 200k tokens purely for implementation, zero accumulated garbage
+3. **Commits per task** — Every task gets its own atomic commit
+4. **Verifies against goals** — Checks the codebase delivers what the phase promised
+
+Walk away, come back to completed work with clean git history.
+
+**Creates:** `{phase}-{N}-SUMMARY.md`, `{phase}-VERIFICATION.md`
+
+---
+
+### 5. Verify Work
+
+```
+/gsd-verify-work 1
+```
+
+**This is where you confirm it actually works.**
+
+Automated verification checks that code exists and tests pass. But does the feature *work* the way you expected? This is your chance to use it.
+
+The system:
+
+1. **Extracts testable deliverables** — What you should be able to do now
+2. **Walks you through one at a time** — "Can you log in with email?" Yes/no, or describe what's wrong
+3. **Diagnoses failures automatically** — Spawns debug agents to find root causes
+4. **Creates verified fix plans** — Ready for immediate re-execution
+
+If everything passes, you move on. If something's broken, you don't manually debug — you just run `/gsd-execute-phase` again with the fix plans it created.
+
+**Creates:** `{phase}-UAT.md`, fix plans if issues found
+
+---
+
+### 6. Repeat → Complete → Next Milestone
+
+```
+/gsd-discuss-phase 2
+/gsd-plan-phase 2
+/gsd-execute-phase 2
+/gsd-verify-work 2
+...
+/gsd-complete-milestone
+/gsd-new-milestone
+```
+
+Loop **discuss → plan → execute → verify** until milestone complete.
+
+Each phase gets your input (discuss), proper research (plan), clean execution (execute), and human verification (verify). Context stays fresh. Quality stays high.
+
+When all phases are done, `/gsd-complete-milestone` archives the milestone and tags the release.
+
+Then `/gsd-new-milestone` starts the next version — same flow as `new-project` but for your existing codebase. You describe what you want to build next, the system researches the domain, you scope requirements, and it creates a fresh roadmap. Each milestone is a clean cycle: define → build → ship.
+
+---
+
+## Why It Works
+
 ### Context Engineering
 
 OpenCode is incredibly powerful *if* you give it the context it needs. Most people don't.
@@ -281,11 +420,12 @@ GSD handles it for you:
 | File | What it does |
 |------|--------------|
 | `PROJECT.md` | Project vision, always loaded |
+| `research/` | Ecosystem knowledge (stack, features, architecture, pitfalls) |
+| `REQUIREMENTS.md` | Scoped v1/v2 requirements with phase traceability |
 | `ROADMAP.md` | Where you're going, what's done |
 | `STATE.md` | Decisions, blockers, position — memory across sessions |
 | `PLAN.md` | Atomic task with XML structure, verification steps |
 | `SUMMARY.md` | What happened, what changed, committed to history |
-| `ISSUES.md` | Deferred enhancements tracked across sessions |
 | `todos/` | Captured ideas and tasks for later work |
 
 Size limits based on where OpenCode's quality degrades. Stay under, get consistent excellence.
@@ -310,19 +450,20 @@ Every plan is structured XML optimized for OpenCode:
 
 Precise instructions. No guessing. Verification built in.
 
-### Subagent Execution
+### Multi-Agent Orchestration
 
-As OpenCode fills its context window, quality degrades. You've seen it: *"Due to context limits, I'll be more concise now."* That "concision" is code for cutting corners.
+Every stage uses the same pattern: a thin orchestrator spawns specialized agents, collects results, and routes to the next step.
 
-GSD prevents this. Each plan is maximum 3 tasks. Each plan runs in a fresh subagent — 200k tokens purely for implementation, zero accumulated garbage.
+| Stage | Orchestrator does | Agents do |
+|-------|------------------|-----------|
+| Research | Coordinates, presents findings | 4 parallel researchers investigate stack, features, architecture, pitfalls |
+| Planning | Validates, manages iteration | Planner creates plans, checker verifies, loop until pass |
+| Execution | Groups into waves, tracks progress | Executors implement in parallel, each with fresh 200k context |
+| Verification | Presents results, routes next | Verifier checks codebase against goals, debuggers diagnose failures |
 
-| Task | Context | Quality |
-|------|---------|---------|
-| Task 1 | Fresh | ✅ Full |
-| Task 2 | Fresh | ✅ Full |
-| Task 3 | Fresh | ✅ Full |
+The orchestrator never does heavy lifting. It spawns agents, waits, integrates results.
 
-No degradation. Walk away, come back to completed work.
+**The result:** You can run an entire phase — deep research, multiple plans created and verified, thousands of lines of code written across parallel executors, automated verification against goals — and your main context window stays at 30-40%. The work happens in fresh subagent contexts. Your session stays fast and responsive.
 
 ### Atomic Git Commits
 
@@ -353,34 +494,53 @@ You're never locked in. The system adapts.
 
 ## Commands
 
+### Core Workflow
+
 | Command | What it does |
 |---------|--------------|
-| `/gsd-new-project` | Extract your idea through questions, create PROJECT.md |
-| `/gsd-create-roadmap` | Create roadmap and state tracking |
-| `/gsd-map-codebase` | Map existing codebase for brownfield projects |
-| `/gsd-plan-phase [N]` | Generate task plans for phase |
-| `/gsd-execute-plan` | Run single plan via subagent |
-| `/gsd-execute-phase <N>` | Execute all plans in phase N with parallel agents |
-| `/gsd-status [--wait]` | Check background agent status from parallel execution |
+| `/gsd-new-project` | Full initialization: questions → research → requirements → roadmap |
+| `/gsd-discuss-phase [N]` | Capture implementation decisions before planning |
+| `/gsd-plan-phase [N]` | Research + plan + verify for a phase |
+| `/gsd-execute-phase <N>` | Execute all plans in parallel waves, verify when complete |
+| `/gsd-verify-work [N]` | Manual user acceptance testing ¹ |
+| `/gsd-complete-milestone` | Archive milestone, tag release |
+| `/gsd-new-milestone [name]` | Start next version: questions → research → requirements → roadmap |
+
+### Navigation
+
+| Command | What it does |
+|---------|--------------|
 | `/gsd-progress` | Where am I? What's next? |
-| `/gsd-verify-work [N]` | User acceptance test of phase or plan ¹ |
-| `/gsd-plan-fix [plan]` | Plan fixes for UAT issues from verify-work |
-| `/gsd-complete-milestone` | Ship it, prep next version |
-| `/gsd-discuss-milestone` | Gather context for next milestone |
-| `/gsd-new-milestone [name]` | Create new milestone with phases |
-| `/gsd-add-phase` | Append phase to roadmap |
-| `/gsd-insert-phase [N]` | Insert urgent work |
-| `/gsd-remove-phase [N]` | Remove future phase, renumber subsequent |
-| `/gsd-discuss-phase [N]` | Gather context before planning |
-| `/gsd-research-phase [N]` | Deep ecosystem research for niche domains |
-| `/gsd-list-phase-assumptions [N]` | See what OpenCode thinks before you correct it |
-| `/gsd-pause-work` | Create handoff file when stopping mid-phase |
-| `/gsd-resume-work` | Restore from last session |
-| `/gsd-consider-issues` | Review deferred issues, close resolved, identify urgent |
-| `/gsd-add-todo [desc]` | Capture idea or task from conversation for later |
-| `/gsd-check-todos [area]` | List pending todos, select one to work on |
-| `/gsd-debug [desc]` | Systematic debugging with persistent state across `/clear` |
 | `/gsd-help` | Show all commands and usage guide |
+
+### Brownfield
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd-map-codebase` | Analyze existing codebase before new-project |
+
+### Phase Management
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd-add-phase` | Append phase to roadmap |
+| `/gsd-insert-phase [N]` | Insert urgent work between phases |
+| `/gsd-remove-phase [N]` | Remove future phase, renumber |
+
+### Session
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd-pause-work` | Create handoff when stopping mid-phase |
+| `/gsd-resume-work` | Restore from last session |
+
+### Utilities
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd-add-todo [desc]` | Capture idea for later |
+| `/gsd-check-todos` | List pending todos |
+| `/gsd-debug [desc]` | Systematic debugging with persistent state |
 
 <sup>¹ Contributed by reddit user OracleGreyBeard</sup>
 
@@ -390,7 +550,7 @@ You're never locked in. The system adapts.
 
 **Commands not found after install?**
 - Restart OpenCode to reload slash commands
-- Verify files exist in `~/.config/opencode/command/gsd/` (global) or `.opencode/command/gsd/` (local)
+- Verify files exist in `~/.config/opencode/commands/gsd/` (global) or `./.opencode/commands/gsd/` (local)
 
 **Commands not working as expected?**
 - Run `/gsd-help` to verify installation
@@ -401,8 +561,20 @@ You're never locked in. The system adapts.
 npx gsd-opencode@latest
 ```
 
+**Using Docker or containerized environments?**
+
+If file reads fail with tilde paths (`~/.opencode/...`), set `OPENCODE_CONFIG_DIR` before installing:
+```bash
+OPENCODE_CONFIG_DIR=/home/youruser/.opencode npm install -g gsd-opencode
+```
+This ensures absolute paths are used instead of `~` which may not expand correctly in containers.
+
 ---
 
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=rokicool/gsd-opencode&type=date&legend=top-left)](https://www.star-history.com/#rokicool/gsd-opencode&type=date&legend=top-left)
 
 ## License
 

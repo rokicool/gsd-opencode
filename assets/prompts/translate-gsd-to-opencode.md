@@ -33,3 +33,9 @@ There are several complications.
 - ./gsd-opencode/bin/*
 - ./gsd-opencode/package.json
 - ./original/*
+
+====
+
+./original/get-shit-done/README.md file and create /out-README.md file with content updated from Claude Code infrastructure to OpenCode. You can use assets/prompts/TRANSLATION-MAPPING.md file as guidance.
+
+If there is unsertainty use web documentation https://opencode.ai/docs and https://code.claude.com/docs/en/
