@@ -442,7 +442,7 @@ Exit skill and invoke SlashCommand("/gsd-plan-phase [X+1]")
 
 `/gsd-plan-phase [X+1]`
 
-*/clear first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 
@@ -489,7 +489,7 @@ Exit skill and invoke SlashCommand("/gsd-complete-milestone {version}")
 
 `/gsd-complete-milestone {version}`
 
-*/clear first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

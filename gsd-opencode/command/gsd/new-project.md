@@ -64,7 +64,7 @@ This is the most leveraged moment in any project. Deep questioning here means be
    HAS_CODEBASE_MAP=$([ -d .planning/codebase ] && echo "yes")
    ```
 
-   **You MUST run all bash commands above using the Bash tool before proceeding.**
+   **You MUST run all bash commands above using the bash tool before proceeding.**
 
 ## Phase 2: Brownfield Offer
 
@@ -843,7 +843,7 @@ Present completion with next steps:
 
 /gsd-discuss-phase 1 — gather context and clarify approach
 
-*/clear first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

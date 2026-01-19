@@ -17,7 +17,7 @@ Output: .planning/codebase/ folder with 7 structured documents about codebase st
 Include enough detail to be useful as reference. Prioritize practical examples (especially code patterns) over arbitrary brevity.
 
 **Always include file paths:**
-Documents are reference material for Claude when planning/executing. Always include actual file paths formatted with backticks: `src/services/user.ts`.
+Documents are reference material for OpenCode when planning/executing. Vague descriptions like "UserService handles users" are not actionable. Always include actual file paths formatted with backticks: `src/services/user.ts`. This allows OpenCode to navigate directly to relevant code without re-searching. Do NOT include line numbers (they go stale), just file paths.
 </philosophy>
 
 <process>
@@ -258,7 +258,7 @@ Created .planning/codebase/:
 
 `/gsd-new-project`
 
-*/clear first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

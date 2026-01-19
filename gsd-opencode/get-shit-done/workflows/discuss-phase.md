@@ -21,7 +21,7 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 </downstream_awareness>
 
 <philosophy>
-**User = founder/visionary. Claude = builder.**
+**User = founder/visionary. OpenCode = builder.**
 
 The user knows:
 - How they imagine it working
@@ -379,7 +379,7 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 `/gsd-plan-phase ${PHASE}`
 
-*/clear first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

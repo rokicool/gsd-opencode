@@ -190,7 +190,7 @@ Project state updated: .planning/STATE.md
 
 `/gsd-plan-phase {decimal_phase}`
 
-*/clear first → fresh context window*
+*`/new` first → fresh context window*
 
 ---
 

@@ -480,7 +480,7 @@ Task 3 complete. Continuing to task 4...
 | Xcode | `xcodebuild` | `-project`, `-scheme`, `build`, `test` | N/A |
 | Convex | `npx convex` | `dev`, `deploy`, `import` | `npx convex login` |
 
-**Env files:** Use Write/Edit tools. Never ask human to create .env manually.
+**Env files:** Use write/edit tools. Never ask human to create .env manually.
 
 **Quick reference:**
 
@@ -488,7 +488,7 @@ Task 3 complete. Continuing to task 4...
 |--------|--------------|-----------------|
 | Deploy to Vercel | Yes (`vercel`) | YES |
 | Create Stripe webhook | Yes (API) | YES |
-| Write .env file | Yes (Write tool) | YES |
+| Write .env file | Yes (write/edit tools) | YES |
 | Create Upstash DB | Yes (`upstash`) | YES |
 | Run tests | Yes (`npm test`) | YES |
 | Click email verification link | No | NO |

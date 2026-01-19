@@ -227,7 +227,7 @@ Systematic debugging with persistent state across context resets.
 - Gathers symptoms through adaptive questioning
 - Creates `.planning/debug/[slug].md` to track investigation
 - Investigates using scientific method (evidence → hypothesis → test)
-- Survives `/clear` — run `/gsd-debug` with no args to resume
+- Survives `/new` — run `/gsd-debug` with no args to resume
 - Archives resolved issues to `.planning/debug/resolved/`
 
 Usage: `/gsd-debug "login button doesn't work"`
@@ -370,7 +370,7 @@ Change anytime by editing `.planning/config.json`
 ```
 /gsd-debug "form submission fails silently"  # Start debug session
 # ... investigation happens, context fills up ...
-/clear
+/new
 /gsd-debug                                    # Resume from where you left off
 ```
 
