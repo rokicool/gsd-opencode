@@ -23,7 +23,7 @@ GSD is a **meta-prompting system** where every file is both implementation and s
 name: gsd-command-name
 description: One-line description
 argument-hint: "<required>" or "[optional]"
-allowed-tools: [read, write, edit, bash, glob, grep, xquestion]
+allowed-tools: [read, write, edit, bash, glob, grep, question]
 ---
 ```
 
