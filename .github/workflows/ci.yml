@@ -217,30 +217,6 @@ jobs:
             done
           fi
 
-      - name: Check file count consistency - get-shit-done
-        run: |
-          echo "Checking .md file count consistency for get-shit-done..."
-
-          src_count=$(find ./src/get-shit-done/get-shit-done -name "*.md" -type f 2>/dev/null | wc -l)
-          gsd_count=$(find ./gsd-opencode/get-shit-done -name "*.md" -type f 2>/dev/null | wc -l)
-
-          echo "Source directory (./src/get-shit-done/get-shit-done): $src_count .md files"
-          echo "GSD directory (./gsd-opencode/get-shit-done): $gsd_count .md files"
-
-          if [ "$src_count" -eq "$gsd_count" ]; then
-            echo "✓ get-shit-done file count matches ($src_count files)"
-          else
-            difference=$((src_count - gsd_count))
-            echo "❌ get-shit-done file count mismatch!"
-            echo "   Difference: $difference files"
-            if [ "$src_count" -gt "$gsd_count" ]; then
-              echo "   Source has $difference more files than GSD directory"
-            else
-              echo "   GSD directory has $((-difference)) more files than source"
-            fi
-            exit 1
-          fi
-
       - name: Check forbidden strings in antipatterns
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."

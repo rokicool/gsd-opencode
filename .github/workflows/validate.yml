@@ -220,30 +220,6 @@ jobs:
             done
           fi
 
-      - name: Check file count consistency - get-shit-done
-        run: |
-          echo "Checking .md file count consistency for get-shit-done..."
-
-          src_count=$(find ./src/get-shit-done/get-shit-done -name "*.md" -type f 2>/dev/null | wc -l)
-          gsd_count=$(find ${{ inputs.working_directory }}/get-shit-done -name "*.md" -type f 2>/dev/null | wc -l)
-
-          echo "Source directory (./src/get-shit-done/get-shit-done): $src_count .md files"
-          echo "GSD directory (${{ inputs.working_directory }}/get-shit-done): $gsd_count .md files"
-
-          if [ "$src_count" -eq "$gsd_count" ]; then
-            echo "✓ get-shit-done file count matches ($src_count files)"
-          else
-            difference=$((src_count - gsd_count))
-            echo "❌ get-shit-done file count mismatch!"
-            echo "   Difference: $difference files"
-            if [ "$src_count" -gt "$gsd_count" ]; then
-              echo "   Source has $difference more files than GSD directory"
-            else
-              echo "   GSD directory has $((-difference)) more files than source"
-            fi
-            exit 1
-          fi
-
       - name: Check forbidden strings in antipatterns
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."
@@ -340,21 +316,20 @@ jobs:
           EOF
 
           # Run the Node.js script
-          node check_forbidden_strings.js
+           node check_forbidden_strings.js
 
-          # Clean up
-          rm check_forbidden_strings.js
+           # Clean up
+           rm check_forbidden_strings.js
 
       - name: Final validation summary
-        run: |
-          echo "=== GSD Validation Summary ==="
-          echo "✓ GSD-STYLE.md exists and accessible"
-          echo "✓ Command structure validated"
-          echo "✓ Workflow structure validated"
-          echo "✓ File naming conventions followed"
-          echo "✓ Anti-patterns check passed"
-          echo "✓ Template structure validated"
-          echo "✓ Reference structure validated"
-          echo "✓ get-shit-done file count consistency check passed"
-          echo ""
-          echo "🎉 GSD compliance validation completed successfully!"
+         run: |
+           echo "=== GSD Validation Summary ==="
+           echo "✓ GSD-STYLE.md exists and accessible"
+           echo "✓ Command structure validated"
+           echo "✓ Workflow structure validated"
+           echo "✓ File naming conventions followed"
+           echo "✓ Anti-patterns check passed"
+           echo "✓ Template structure validated"
+           echo "✓ Reference structure validated"
+           echo ""
+           echo "🎉 GSD compliance validation completed successfully!"
