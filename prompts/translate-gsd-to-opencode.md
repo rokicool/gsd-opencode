@@ -20,14 +20,16 @@ There are several complications.
 10. Replace Claude Code agent names with similar OpenCode agents names.
 11. The author of the prompts is TACHES (https://github.com/glittercowboy/get-shit-done).
 12. The name of the current project is "gds-opencode".
-13. When original prompt uses "<sub>something</sub>" tags - replace the tags with one star '*': *something\* in the OpenCode adopted version
-14. When orignial prompt uses "/clear" command - replace it with "/new" command
-15. Forbidden strings in the target (./gsd-opencode) folder:
+13. All references in target folder (./gsd-opencode) to `get-shit-done-cc` should be replaced with `gsd-opencode`
+14. All references in target folder (./gsd-opencode) to `https://raw.githubusercontent.com/glittercowboy/get-shit-done` should be replaced with `https://raw.githubusercontent.com/rokicool/gsd-opencode`
+15. When original prompt uses "<sub>something</sub>" tags - replace the tags with one star '*': *something\* in the OpenCode adopted version
+16. When orignial prompt uses "/clear" command - replace it with "/new" command
+17. Forbidden strings in the target (./gsd-opencode) folder:
     There is a utility "assets/bin/check-forbidden-strings.js" that can check the "gsd-opencode/" for forbidden strings. You can utilize the utility to final check the translation.
-16. You can define TRANSLATION-MAPPING.md document to reference for every translation prompt.
-17. DO NOT modify:
+18. You can define /TRANSLATION-MAPPING.md document to reference for every translation prompt.
+19. DO NOT modify:
 - ./README.md
-- ./assets/\*
-- ./gsd-opencode/bin/\*
+- ./assets/*
+- ./gsd-opencode/bin/*
 - ./gsd-opencode/package.json
-- ./original/\*
+- ./original/*
