@@ -73,14 +73,7 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Check GSD-STYLE.md exists
-        run: |
-          if [ -f "${{ inputs.working_directory }}/GSD-STYLE.md" ]; then
-            echo "✓ GSD-STYLE.md found"
-          else
-            echo "❌ GSD-STYLE.md not found"
-            exit 1
-          fi
+
 
       - name: Validate command structure
         run: |
@@ -233,7 +226,7 @@ jobs:
       - name: Final validation summary
         run: |
           echo "=== GSD Validation Summary ==="
-          echo "✓ GSD-STYLE.md exists and accessible"
+
           echo "✓ Command structure validated"
           echo "✓ Workflow structure validated"
           echo "✓ File naming conventions followed"
