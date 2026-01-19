@@ -10,5 +10,7 @@ forbidden_strings = [
         'general-purpose',
         'subagent_type="Explore"',
         "~/.claude",
-        "/gsd:"
+        "/gsd:",
+        "get-shit-done-cc",
+        "glittercowboy"
         ]

@@ -17,7 +17,7 @@ This is prompt 2 of 6 in the translation sequence. Use the mapping document crea
 **Project context:**
 - Project name: "gsd-opencode"
 - Config folder: ~/.config/opencode OR .opencode/ (not ~/.claude)
-- Command naming: gsd-<name> instead of gsd:<name>
+- Command naming: gsd-<name> instead of gsd:<name> (not file naming)
 - Source directory: commands/gsd → command/gsd (singular)
 
 **Translation rules:**

@@ -188,6 +188,10 @@ function install(isGlobal) {
   copyWithPathReplacement(skillSrc, skillDest, pathPrefix);
   console.log(`  ${green}✓${reset} Installed get-shit-done`);
 
+  // Create VERSION file
+  fs.writeFileSync(path.join(skillDest, "VERSION"), `v${pkg.version}`);
+  console.log(`  ${green}✓${reset} Created VERSION file`);
+
   console.log(`
   ${green}Done!${reset} Run ${cyan}/gsd-help${reset} to get started.
   `);

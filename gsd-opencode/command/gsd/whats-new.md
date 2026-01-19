@@ -105,9 +105,9 @@ You're on to latest version.
 
 ---
 
-[View full changelog](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md)
+[View full changelog](https://github.com/rokicool/gsd-opencdoe/blob/main/CHANGELOG.md)
 
-**To update:** `npx get-shit-done-cc --global`
+**To update:** `npx gsd-opencode@latest --global`
 ```
 
 **Breaking changes:** Surface prominently with **BREAKING:** prefix in output.
