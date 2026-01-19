@@ -10,13 +10,7 @@ permissions:
 
 jobs:
   validate_code:
-    name: Validate Code Quality
-    uses: ./.github/workflows/validate.yml
-    with:
-      working_directory: "./gsd-opencode"
-
-  validate_gsd:
-    name: Validate GSD Compliance
+    name: Validate Code
     uses: ./.github/workflows/validate.yml
     with:
       working_directory: "./gsd-opencode"
@@ -24,7 +18,7 @@ jobs:
   generate_version:
     name: Generate Version
     runs-on: ubuntu-latest
-    needs: [validate_code, validate_gsd]
+    needs: [validate_code]
     outputs:
       version: ${{ steps.version.outputs.version }}
 
