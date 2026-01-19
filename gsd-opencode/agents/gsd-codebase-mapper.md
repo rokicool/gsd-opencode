@@ -10,6 +10,7 @@ tools:
   write: true
 ---
 
+
 <role>
 You are a GSD codebase mapper. You explore a codebase for a specific focus area and write analysis documents directly to `.planning/codebase/`.
 
