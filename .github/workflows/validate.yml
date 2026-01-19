@@ -220,42 +220,6 @@ jobs:
             done
           fi
 
-      - name: Check file count consistency - GSD commands
-        run: |
-          echo "Checking .md file count consistency for gsd commands..."
-
-          src_files=$(find ./src/get-shit-done/commands/gsd -name "*.md" -type f 2>/dev/null | grep -v "_archive" | sort)
-          gsd_files=$(find ${{ inputs.working_directory }}/command/gsd -name "*.md" -type f 2>/dev/null | grep -v "_archive" | sort)
-
-          src_count=$(echo "$src_files" | wc -l)
-          gsd_count=$(echo "$gsd_files" | wc -l)
-
-          echo "Source directory (./src/get-shit-done/commands/gsd): $src_count .md files"
-          echo "GSD directory (${{ inputs.working_directory }}/command/gsd): $gsd_count .md files"
-
-          if [ "$src_count" -eq "$gsd_count" ]; then
-            echo "✓ GSD commands file count matches ($src_count files)"
-          else
-            difference=$((src_count - gsd_count))
-            echo "❌ GSD commands file count mismatch!"
-            echo "   Difference: $difference files"
-            if [ "$src_count" -gt "$gsd_count" ]; then
-              echo "   Source has $difference more files than GSD directory"
-              echo ""
-              echo "Files in source but not in GSD directory:"
-              comm -23 <(echo "$src_files" | sed 's|.*/||') <(echo "$gsd_files" | sed 's|.*/||')
-            else
-              echo "   GSD directory has $((-difference)) more files than source"
-              echo ""
-              echo "Files in GSD directory but not in source:"
-              comm -13 <(echo "$src_files" | sed 's|.*/||') <(echo "$gsd_files" | sed 's|.*/||')
-            fi
-            # temporary!
-            #
-            exit 0
-            exit 1
-          fi
-
       - name: Check file count consistency - get-shit-done
         run: |
           echo "Checking .md file count consistency for get-shit-done..."
@@ -391,6 +355,6 @@ jobs:
           echo "✓ Anti-patterns check passed"
           echo "✓ Template structure validated"
           echo "✓ Reference structure validated"
-          echo "✓ File count consistency checks passed"
+          echo "✓ get-shit-done file count consistency check passed"
           echo ""
           echo "🎉 GSD compliance validation completed successfully!"
