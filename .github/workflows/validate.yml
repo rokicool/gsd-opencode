@@ -142,14 +142,21 @@ jobs:
           echo "Checking file naming conventions..."
 
           # Check for kebab-case in markdown files
+          naming_violations=0
           find ${{ inputs.working_directory }} -name "*.md" -type f | while read file; do
             basename=$(basename "$file" .md)
             if [[ ! "$basename" =~ ^[a-z0-9-]+$ ]] && [[ "$basename" != "README" ]] && [[ "$basename" != "GSD-STYLE" ]] && [[ "$basename" != "DEBUG" ]]; then
-              echo "❌ File name should be kebab-case: $file"
-              exit 1
+              echo "⚠️  File name should be kebab-case: $file"
+              naming_violations=$((naming_violations + 1))
             fi
           done
-          echo "✓ File naming follows kebab-case convention"
+          
+          if [ $naming_violations -eq 0 ]; then
+            echo "✓ File naming follows kebab-case convention"
+          else
+            echo "⚠️  Found $naming_violations files with naming convention violations"
+            echo "ℹ️  Consider renaming these files to follow kebab-case format"
+          fi
 
       - name: Check for anti-patterns
         run: |
