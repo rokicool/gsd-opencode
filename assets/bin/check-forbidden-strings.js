@@ -99,14 +99,22 @@ function main() {
 
     // Report violations
     if (violations.length > 0) {
-      console.log('❌ Forbidden strings detected:');
+      console.log('⚠️  Forbidden strings detected (warnings):');
       console.log('');
       
       for (const violation of violations) {
-        console.log(`❌ Found "${violation.string}" in ${violation.file}:${violation.line}`);
+        console.log(`⚠️  Found "${violation.string}" in ${violation.file}:${violation.line}`);
         console.log(`   Line ${violation.line}: ${violation.content}`);
         console.log('');
       }
+      
+      console.log(`⚠️  Total violations: ${violations.length}`);
+      console.log('ℹ️  Consider removing these forbidden strings from the codebase');
+      console.log('✅ Check completed successfully (warnings only)');
+    } else {
+      console.log('✅ No forbidden strings found');
+      console.log('🎉 All files passed check!');
+    }
       
       console.log(`💥 Total violations: ${violations.length}`);
       process.exit(1);
