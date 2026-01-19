@@ -115,13 +115,6 @@ function main() {
       console.log('✅ No forbidden strings found');
       console.log('🎉 All files passed check!');
     }
-      
-      console.log(`💥 Total violations: ${violations.length}`);
-      process.exit(1);
-    } else {
-      console.log('✅ No forbidden strings found');
-      console.log('🎉 All files passed the check!');
-    }
 
   } catch (error) {
     console.error('❌ Error during check:', error.message);
