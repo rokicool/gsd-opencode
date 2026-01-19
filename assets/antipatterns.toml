@@ -17,4 +17,9 @@ forbidden_strings = [
         "AskUserQuestion",
         "All arguments become",
         "/clear",
+        "SlashCommand",
+        "TodoWrite",
+        "WebSearch",
+        "WebFetch",
+        "BashOutput"
         ]

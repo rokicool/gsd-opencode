@@ -6,7 +6,7 @@ Take ./original/get-shit-done system of metaprompts for Claude Code and build si
 There are several complications.
 
 1. The main goal is ability to run the get-shit-done propmpts as commands in OpenCode (https://opencode.ai). All the tools, agents, names related to Claude Code should be translated to similar tools, agents, names for OpenCode.
-2. Examine OpenCode documentation https://opencode.ai/docs.
+2. Examine OpenCode documentation https://opencode.ai/docs and Claude Code documentation https://code.claude.com/docs/en/settings#tools-available-to-claude
 3. The config folder for opencode is ~/.config/opencode OR .opencode/ (not ~/.claude).
 4. Claude Code supports "/gsd:subcommand" syntax for the command. Opencode doesn't support ":" in command names. Add "name: gsd-<name-of-command>" to the header of every command
 5. In ./original/get-shit-done the custom commands are located in the ./orginial/get-shit-done/commands/gsd. It is a Cloud Code notation. In OpenCode the same commands must be put into ./gsd-opencode/command/gsd folder. Important: "command" instead of "commands"
