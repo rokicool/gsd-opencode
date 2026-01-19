@@ -230,7 +230,8 @@ jobs:
           npm install
           
           # Run the checker from the repository root
-          node ../../assets/bin/check-forbidden-strings.js
+          cd ..
+          node assets/bin/check-forbidden-strings.js
 
       - name: Final validation summary
         run: |
