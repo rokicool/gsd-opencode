@@ -220,6 +220,7 @@ jobs:
             done
           fi
 
+
       - name: Check forbidden strings in antipatterns
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."
@@ -316,20 +317,20 @@ jobs:
           EOF
 
           # Run the Node.js script
-           node check_forbidden_strings.js
+          node check_forbidden_strings.js
 
-           # Clean up
-           rm check_forbidden_strings.js
+          # Clean up
+          rm check_forbidden_strings.js
 
       - name: Final validation summary
-         run: |
-           echo "=== GSD Validation Summary ==="
-           echo "✓ GSD-STYLE.md exists and accessible"
-           echo "✓ Command structure validated"
-           echo "✓ Workflow structure validated"
-           echo "✓ File naming conventions followed"
-           echo "✓ Anti-patterns check passed"
-           echo "✓ Template structure validated"
-           echo "✓ Reference structure validated"
-           echo ""
-           echo "🎉 GSD compliance validation completed successfully!"
+        run: |
+          echo "=== GSD Validation Summary ==="
+          echo "✓ GSD-STYLE.md exists and accessible"
+          echo "✓ Command structure validated"
+          echo "✓ Workflow structure validated"
+          echo "✓ File naming conventions followed"
+          echo "✓ Anti-patterns check passed"
+          echo "✓ Template structure validated"
+          echo "✓ Reference structure validated"
+          echo ""
+          echo "🎉 GSD compliance validation completed successfully!"
