@@ -1,11 +1,11 @@
 ---
 paths:
-  - "commands/gsd/**/*.md"
+  - "command/gsd/**/*.md"
 ---
 
 # Slash Command Rules
 
-Rules for editing files in `commands/gsd/`.
+Rules for editing files in `command/gsd/`.
 
 ## File Structure
 
