@@ -15,7 +15,7 @@ Shows version comparison, changelog entries for missed versions, and update inst
 Read installed version from VERSION file:
 
 ```bash
-cat ~/.claude/get-shit-done/VERSION 2>/dev/null
+cat ~/.config/opencode/get-shit-done/VERSION 2>/dev/null
 ```
 
 **If VERSION file missing:**
@@ -26,7 +26,7 @@ cat ~/.claude/get-shit-done/VERSION 2>/dev/null
 
 Your installation doesn't include version tracking.
 
-**To fix:** `npx get-shit-done-cc --global`
+**To fix:** `npx gsd-opencode --global`
 
 This will reinstall with version tracking enabled.
 ```
@@ -38,13 +38,13 @@ STOP here if no VERSION file.
 Fetch latest CHANGELOG.md from GitHub:
 
 Use WebFetch tool with:
-- URL: `https://raw.githubusercontent.com/glittercowboy/get-shit-done/main/CHANGELOG.md`
+- URL: `https://raw.githubusercontent.com/rokicool/gsd-opencode/main/CHANGELOG.md`
 - Prompt: "Extract all version entries with their dates and changes. Return in Keep-a-Changelog format."
 
 **If fetch fails:**
 Fall back to local changelog:
 ```bash
-cat ~/.claude/get-shit-done/CHANGELOG.md 2>/dev/null
+cat ~/.config/opencode/get-shit-done/CHANGELOG.md 2>/dev/null
 ```
 
 Note to user: "Couldn't check for updates (offline or GitHub unavailable). Showing local changelog."
@@ -75,7 +75,7 @@ Format output clearly:
 
 You're on to latest version.
 
-[View full changelog](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md)
+[View full changelog](https://github.com/rokicool/gsd-opencdoe/blob/main/CHANGELOG.md)
 ```
 
 **If updates available:**
