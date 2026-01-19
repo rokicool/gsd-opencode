@@ -68,6 +68,37 @@ This document maps all transformations from the original Claude Code get-shit-do
 | gsd-codebase-mapper | gsd-codebase-mapper (custom) |
 | gsd-research-synthesizer | gsd-research-synthesizer (custom) |
 
+Example of the Custom Agent header:
+
+** Claude Code **
+
+``` yaml
+---
+name: gsd-project-researcher
+description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd-new-project or /gsd-new-milestone orchestrators.
+tools: read, write, bash, grep, glob, webfetch, (optional MCP tool)
+color: cyan
+---
+```
+
+** OpenCode ** 
+
+```yaml
+---
+name: gsd-project-researcher
+description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd-new-project or /gsd-new-milestone orchestrators.
+tools:
+  read: true
+  write: true
+  bash: true
+  grep: true
+  glob: true
+  webfetch: true
+  (optional MCP tool): true
+color: "#00FFFF"
+---
+```
+
 Note: These are custom OpenCode agents that need to be created in the agents/ directory. OpenCode's built-in agents (Build, Plan, General, Explore) can be referenced where appropriate.
 
 ## Path Transformations

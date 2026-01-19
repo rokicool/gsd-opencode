@@ -39,3 +39,8 @@ There are several complications.
 ./original/get-shit-done/README.md file and create /out-README.md file with content updated from Claude Code infrastructure to OpenCode. You can use assets/prompts/TRANSLATION-MAPPING.md file as guidance.
 
 If there is unsertainty use web documentation https://opencode.ai/docs and https://code.claude.com/docs/en/
+
+====
+
+Use assets/prompts/TRANSLATION-MAPPING.md document to update all Agent definiion files in gsd-opencode/agents folder from Claude Code to OpenCode notation.
+Translate color to it's HEX definiton.
