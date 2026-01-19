@@ -132,7 +132,7 @@ Use question:
 Run the update:
 
 ```bash
-npx gsd-opencode --global
+npx gsd-opencode@latest --global
 ```
 
 Capture output. If install fails, show error and STOP.
