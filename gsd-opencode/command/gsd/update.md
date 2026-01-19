@@ -154,7 +154,7 @@ Format completion message (changelog was already shown in confirmation step):
 
 ⚠️  Restart OpenCode to pick up the new commands.
 
-[View full changelog](https://github.com/rokicool/get-shit-done/blob/main/CHANGELOG.md)
+[View full changelog](https://github.com/rokicool/gsd-opencode/blob/main/CHANGELOG.md)
 ```
 </step>
 

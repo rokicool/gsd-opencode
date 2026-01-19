@@ -21,5 +21,6 @@ forbidden_strings = [
         "TodoWrite",
         "WebSearch",
         "WebFetch",
-        "BashOutput"
+        "BashOutput",
+        "rokicool/get-shit-done"
         ]

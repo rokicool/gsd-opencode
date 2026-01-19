@@ -38,7 +38,7 @@ STOP here if no VERSION file.
 Fetch latest CHANGELOG.md from GitHub:
 
 Use webfetch tool with:
-- URL: `https://raw.githubusercontent.com/rokicool/get-shit-done/main/CHANGELOG.md`
+- URL: `https://raw.githubusercontent.com/rokicool/gsd-opencode/main/CHANGELOG.md`
 - Prompt: "Extract all version entries with their dates and changes. Return in Keep-a-Changelog format."
 
 **If fetch fails:**
@@ -75,7 +75,7 @@ Format output clearly:
 
 You're on the latest version.
 
-[View full changelog](https://github.com/rokicool/get-shit-done/blob/main/CHANGELOG.md)
+[View full changelog](https://github.com/rokicool/gsd-opencode/blob/main/CHANGELOG.md)
 ```
 
 **If updates available:**
@@ -105,7 +105,7 @@ You're on the latest version.
 
 ---
 
-[View full changelog](https://github.com/rokicool/get-shit-done/blob/main/CHANGELOG.md)
+[View full changelog](https://github.com/rokicool/gsd-opencode/blob/main/CHANGELOG.md)
 
 **To update:** `npx gsd-opencode --global`
 ```
