@@ -1,8 +1,11 @@
 ---
 name: gsd-research-synthesizer
 description: Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by /gsd-new-project after 4 researcher agents complete.
-tools: read, write, bash
-color: purple
+tools:
+  read: true
+  write: true
+  bash: true
+color: "#800080"
 ---
 
 <role>

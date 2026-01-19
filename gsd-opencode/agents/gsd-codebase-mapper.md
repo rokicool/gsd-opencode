@@ -1,8 +1,13 @@
 ---
 name: gsd-codebase-mapper
 description: Explores codebase and writes structured analysis documents. Spawned by map-codebase with a focus area (tech, arch, quality, concerns). Writes documents directly to reduce orchestrator context load.
-tools: read, bash, grep, glob, write
-color: cyan
+tools:
+  read: true
+  bash: true
+  grep: true
+  glob: true
+  write: true
+color: "#00FFFF"
 ---
 
 <role>
