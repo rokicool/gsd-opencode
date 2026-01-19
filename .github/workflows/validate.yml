@@ -228,7 +228,9 @@ jobs:
           # Install dependencies and run standalone checker
           cd "${{ inputs.working_directory }}"
           npm install
-          node assets/bin/check-forbidden-strings.js
+          
+          # Run the checker from the repository root (not inside working_directory)
+          node ../../assets/bin/check-forbidden-strings.js
 
       - name: Final validation summary
         run: |
