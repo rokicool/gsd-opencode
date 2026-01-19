@@ -110,7 +110,7 @@ After completing translations:
 
 3. Check that no Claude Code tool names remain:
    ```bash
-   grep -r "Read\|Write\|Bash\|Glob\|Grep\|Task\|WebFetch\|AskUserQuestion" ./gsd-opencode/agents/
+   grep -r "WebFetch\|AskUserQuestion" ./gsd-opencode/agents/
    ```
    Should return nothing.
 

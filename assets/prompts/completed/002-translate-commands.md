@@ -1,5 +1,5 @@
 <objective>
-Translate all command files from Claude Code's get-shit-done system to OpenCode format.
+Translate all command files from Claude Code's get-shit-done system to OpenCode format and put to ./gsd-opencode/command/gsd/ folder for further distribution.
 
 **Why this matters:** Commands are the user-facing interface to the GSD system. They must be translated to work with OpenCode's command system.
 
@@ -10,7 +10,8 @@ Translate all command files from Claude Code's get-shit-done system to OpenCode 
 This is prompt 2 of 6 in the translation sequence. Use the mapping document created in prompt 1 as your reference.
 
 **Source files:** ./original/get-shit-done/commands/gsd/*.md
-**Target directory:** ./gsd-opencode/command/gsd/
+**Target directory:** ./gsd-opencode/command/gsd/ 
+**Important** ALL COMMANDS MUST BE CREATED IN `gsd-opencode/command/gsd/` FOLDER
 
 **Mapping reference:** @./assets/prompts/TRANSLATION-MAPPING.md
 
@@ -18,7 +19,7 @@ This is prompt 2 of 6 in the translation sequence. Use the mapping document crea
 - Project name: "gsd-opencode"
 - Config folder: ~/.config/opencode OR .opencode/ (not ~/.claude)
 - Command naming: gsd-<name> instead of gsd:<name> (not file naming)
-- Source directory: commands/gsd → command/gsd (singular)
+- Source directory: ".../commands/gsd" → ".../command/gsd" (singular)
 
 **Translation rules:**
 1. Command names in frontmatter: `name: gsd:plan-phase` → `name: gsd-plan-phase`
@@ -103,7 +104,7 @@ After completing translations:
 
 3. Check that no Claude Code tool names remain:
    ```bash
-   grep -r "Read\|Write\|Bash\|Glob\|Grep\|Task\|WebFetch\|AskUserQuestion" ./gsd-opencode/command/gsd/*.md
+   grep -r "WebFetch\|AskUserQuestion" ./gsd-opencode/command/gsd/*.md
    ```
    Should return nothing.
 

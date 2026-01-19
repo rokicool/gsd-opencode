@@ -81,7 +81,6 @@ color: green
 name: gsd-planner
 description: Creates executable phase plans with task breakdown...
 mode: subagent
-model: anthropic/claude-sonnet-4-5
 tools:
   read: true
   write: true
@@ -151,7 +150,6 @@ allowed-tools:
 name: gsd-plan-phase
 description: Create detailed execution plan for a phase with verification loop
 agent: gsd-planner
-model: anthropic/claude-sonnet-4-5
 tools:
   read: true
   write: true
@@ -247,12 +245,12 @@ OpenCode:    @~/.config/opencode/get-shit-done/workflows/execute-plan.md
 
 **Claude Code uses:** `commands/gsd/` (nested structure)
 
-**OpenCode expects:** `command/gsd/` (nested structure)
+**OpenCode expects:** `gsd-opencode/command/gsd/` (nested structure)
 
 For GSD translation, use:
 ```
-OpenCode: command/gsd/new-project.md
-         command/gsd/plan-phase.md
+OpenCode: gsd-opencode/command/gsd/new-project.md
+         gsd-opencode/command/gsd/plan-phase.md
 ```
 
 ### File Reference Patterns
@@ -491,7 +489,7 @@ Provide help information for GSD commands.
 User's query: $ARGUMENTS
 ```
 
-**OpenCode (`command/gsd/help.md`):**
+**OpenCode (`gsd-opencode/command/gsd/help.md`):**
 ```yaml
 ---
 name: gsd-help
@@ -535,7 +533,7 @@ Phase number: $ARGUMENTS
 Spawn gsd-planner agent.
 ```
 
-**OpenCode (`command/gsd/plan-phase.md`):**
+**OpenCode (`gsd-opencode/command/gsd/plan-phase.md`):**
 ```yaml
 ---
 name: gsd-plan-phase
@@ -590,7 +588,6 @@ Your job: Produce PLAN.md files that Claude executors can implement without inte
 name: gsd-planner
 description: Creates executable phase plans with task breakdown, dependency analysis, and goal-backward verification. Spawned by /gsd-plan-phase orchestrator.
 mode: subagent
-model: anthropic/claude-sonnet-4-5
 tools:
   read: true
   write: true
@@ -920,7 +917,7 @@ Task(
 When translating a file from Claude Code to OpenCode:
 
 ### Commands
-- [ ] Update filename: `command.md` → `command.md`
+- [ ] Create filename: `./gsd-opencode/command/gsd/command.md`
 - [ ] Convert `allowed-tools` array to `tools` object
 - [ ] Remove `argument-hint`, move to `description`
 - [ ] Remove `color` attribute
@@ -938,7 +935,6 @@ When translating a file from Claude Code to OpenCode:
 - [ ] Convert `tools` list to `tools` object
 - [ ] Add `mode: subagent` (GSD agents are subagents)
 - [ ] Remove `color` attribute
-- [ ] Add `model` if specific model needed
 - [ ] Update `@` references to new paths
 - [ ] Replace `subagent_type="..."` with `@agent-name` in content
 
