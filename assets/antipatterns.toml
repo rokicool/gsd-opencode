@@ -5,6 +5,7 @@ folder = "./gsd-opencode/"
 file = "*.md"
 exclude_dir = ""
 forbidden_strings = [
+        "Claude",
         "Claude Code",
         "<sub>",
         'general-purpose',
@@ -14,7 +15,6 @@ forbidden_strings = [
         "get-shit-done-cc",
         "glittercowboy",
         "AskUserQuestion",
-        "All arguments become"
-        ]
+        "All arguments become",
         "/clear",
-]
+        ]
