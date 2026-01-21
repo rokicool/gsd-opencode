@@ -188,6 +188,120 @@ Interpret input case-insensitively:
 
 If the user enters anything else, re-prompt.
 
+## Step 4: Inline edit flow (triggered by [E]dit)
+
+When the user selects **Edit**, allow them to adjust the per-stage model IDs for the **next configuration** before confirming.
+
+Important rules:
+
+- Editing does **not** modify `profiles.presets`.
+- Editing stores overrides in config at: `profiles.custom_overrides.{stage}`.
+- These overrides apply to the **currently active profile's runtime configuration** (additive behavior).
+
+### Edit flow
+
+1. Show the proposed profile mapping (starting from `newPreset`):
+
+```
+Editing proposed profile: {newProfile}
+Press Enter to keep the current value.
+```
+
+2. Prompt in order for each stage (use full model IDs in the bracketed defaults):
+
+```
+planning [{newPreset.planning}]:
+execution [{newPreset.execution}]:
+verification [{newPreset.verification}]:
+```
+
+For each prompt:
+
+- If user presses Enter → keep the existing value
+- If user types a value → treat as the new model ID for that stage
+
+3. After collecting all three, build `editedNextConfig`:
+
+- Start with `newPreset` mapping
+- Overlay any user-entered values
+
+4. Show an updated preview table:
+
+```
+Profile change (edited): {currentProfile} → {newProfile}
+
+| Stage        | Current Model               | New Model                   |
+|--------------|-----------------------------|-----------------------------|
+| planning     | {currentPreset.planning}    | {editedNextConfig.planning} |
+| execution    | {currentPreset.execution}   | {editedNextConfig.execution}|
+| verification | {currentPreset.verification}| {editedNextConfig.verification}|
+```
+
+5. Loop back to the same prompt:
+
+```
+[C]onfirm | [E]dit | [X] Cancel:
+```
+
+### Confirming an edited change
+
+On Confirm after Edit:
+
+1. Call `setActiveProfile(newProfile)`
+2. Persist the overrides with `writeConfig()` by deep-merging (per library guarantee):
+
+```jsonc
+{
+  "profiles": {
+    "custom_overrides": {
+      "planning": "...",
+      "execution": "...",
+      "verification": "..."
+    }
+  }
+}
+```
+
+Notes:
+
+- Only write keys for stages the user actually changed (keep the override object minimal).
+- If the user changed none of the stages, do not write overrides.
+
+### Edge cases to handle (do not crash)
+
+#### Already-active profile
+
+If the chosen profile is already active, do **not** show confirmation or edit prompts. Output:
+
+```
+Profile '{currentProfile}' is already active.
+```
+
+Then show the current configuration table and stop.
+
+#### Invalid profile flag
+
+If the user provides an invalid flag:
+
+- Use `validateProfile()` (fuzzy suggestion if available)
+- Show valid options: `--quality/-q`, `--balanced/-b`, `--budget/-u`
+- Allow the user to retry (either type a valid profile name or use the picker)
+
+#### Missing/empty config.json
+
+If `.planning/config.json` is missing or empty:
+
+- `readConfig()` should return defaults
+- Proceed normally
+- On first write (profile set or overrides), `writeConfig()` will create the file
+
+#### Corrupted JSON
+
+If config.json is corrupted:
+
+- `readConfig()` should warn and fall back to defaults (and back up to `.planning/config.json.bak`)
+- Proceed normally, but surface the warning once so the user knows defaults were used
+
 ### Confirm path
 
 On confirm:
