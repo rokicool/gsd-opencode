@@ -25,12 +25,13 @@ It manages the project's config file at:
 
 ### Defaults (built-in)
 
-Built-in defaults live in code (this library), not in config.json. The file stores **only overrides** and the user's active profile.
+Built-in defaults live in code (this library). The file stores the user's active profile and any editable mappings (like preset definitions).
 
 Default values:
 
 - `profiles.active_profile`: `"balanced"`
 - `profiles.custom_overrides`: `{}`
+- `profiles.presets`: built-in defaults for `quality`, `balanced`, and `budget` (can be overridden by config.json)
 
 ## Procedures
 
@@ -68,6 +69,23 @@ function readConfig() {
   const DEFAULTS = {
     profiles: {
       active_profile: "balanced",
+      presets: {
+        quality: {
+          planning: "opencode/glm-4.7-free",
+          execution: "opencode/glm-4.7-free",
+          verification: "opencode/glm-4.7-free",
+        },
+        balanced: {
+          planning: "opencode/glm-4.7-free",
+          execution: "opencode/minimax-m2.1-free",
+          verification: "opencode/glm-4.7-free",
+        },
+        budget: {
+          planning: "opencode/minimax-m2.1-free",
+          execution: "opencode/grok-code",
+          verification: "opencode/minimax-m2.1-free",
+        },
+      },
       custom_overrides: {},
     },
   };
@@ -265,6 +283,131 @@ function setActiveProfile(profileName) {
 - Set to invalid profile: `setActiveProfile("cheap")` → returns `{ ok: false, error: "Invalid profile 'cheap'. Valid options: ..." }`
 
 ---
+
+## Preset Definitions
+
+Presets are semantic, user-editable stage-to-model mappings stored under `profiles.presets`.
+
+### Preset schema (profiles.presets)
+
+```jsonc
+{
+  "profiles": {
+    "active_profile": "balanced",
+    "presets": {
+      "quality": {
+        "planning": "opencode/glm-4.7-free",
+        "execution": "opencode/glm-4.7-free",
+        "verification": "opencode/glm-4.7-free"
+      },
+      "balanced": {
+        "planning": "opencode/glm-4.7-free",
+        "execution": "opencode/minimax-m2.1-free",
+        "verification": "opencode/glm-4.7-free"
+      },
+      "budget": {
+        "planning": "opencode/minimax-m2.1-free",
+        "execution": "opencode/grok-code",
+        "verification": "opencode/minimax-m2.1-free"
+      }
+    },
+    "custom_overrides": {}
+  }
+}
+```
+
+### Agent-to-stage mapping
+
+| Stage | Agents |
+|-------|--------|
+| planning | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
+| execution | gsd-executor, gsd-debugger |
+| verification | gsd-verifier, gsd-integration-checker |
+
+---
+
+### getPresetConfig(presetName)
+
+**Purpose:** Get the stage-to-model mappings for a preset.
+
+**Behavior:**
+
+1. Validate `presetName` via `validateProfile()`
+2. Read config via `readConfig()`
+3. Return the preset's stage mappings from `config.profiles.presets[presetName]`
+4. If preset not found in config (should not happen with proper seeding), use built-in defaults
+
+**Returns:** Object with `{ planning: string, execution: string, verification: string }`
+
+**Pseudocode:**
+
+```ts
+function getPresetConfig(presetName) {
+  const validation = validateProfile(presetName);
+  if (!validation.valid) {
+    return { ok: false, error: validation.error };
+  }
+
+  const BUILTIN_DEFAULTS = {
+    quality: {
+      planning: "opencode/glm-4.7-free",
+      execution: "opencode/glm-4.7-free",
+      verification: "opencode/glm-4.7-free",
+    },
+    balanced: {
+      planning: "opencode/glm-4.7-free",
+      execution: "opencode/minimax-m2.1-free",
+      verification: "opencode/glm-4.7-free",
+    },
+    budget: {
+      planning: "opencode/minimax-m2.1-free",
+      execution: "opencode/grok-code",
+      verification: "opencode/minimax-m2.1-free",
+    },
+  };
+
+  const config = readConfig();
+  const presets = config?.profiles?.presets ?? BUILTIN_DEFAULTS;
+  const preset = presets[presetName] ?? BUILTIN_DEFAULTS[presetName];
+
+  return {
+    ok: true,
+    preset: {
+      planning: preset.planning,
+      execution: preset.execution,
+      verification: preset.verification,
+    },
+  };
+}
+```
+
+---
+
+### getAgentsForStage(stage)
+
+**Purpose:** Return the list of agents that belong to a given stage.
+
+**Pseudocode:**
+
+```ts
+function getAgentsForStage(stage) {
+  const STAGE_AGENTS = {
+    planning: [
+      "gsd-planner",
+      "gsd-plan-checker",
+      "gsd-phase-researcher",
+      "gsd-roadmapper",
+      "gsd-project-researcher",
+      "gsd-research-synthesizer",
+      "gsd-codebase-mapper",
+    ],
+    execution: ["gsd-executor", "gsd-debugger"],
+    verification: ["gsd-verifier", "gsd-integration-checker"],
+  };
+
+  return STAGE_AGENTS[stage] ?? [];
+}
+```
 
 ## Usage
 
