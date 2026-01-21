@@ -58,10 +58,10 @@ Plans:
   1. `/gsd-set-profile quality` (or balanced/budget) switches active profile
   2. Profile change shows proposed changes before user confirms
   3. Confirmation displays which models will be assigned to which stages
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Create set-profile command with confirmation workflow and edge cases
 
 ### Phase 4: Agent Discovery
 **Goal**: System knows all 11 agents, their stage mappings, and validates before modification
@@ -127,7 +127,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Config Foundation | 2/2 | Complete | 2026-01-21 |
 | 2. Profile Definitions | 2/2 | Complete | 2026-01-21 |
-| 3. Set-Profile Command | 0/TBD | Not started | - |
+| 3. Set-Profile Command | 0/1 | Not started | - |
 | 4. Agent Discovery | 0/TBD | Not started | - |
 | 5. Frontmatter Rewriting | 0/TBD | Not started | - |
 | 6. Settings Command | 0/TBD | Not started | - |
