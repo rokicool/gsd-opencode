@@ -1,0 +1,25 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "xcodebuildmcp": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "xcodebuildmcp@latest"
+      ],
+      "enabled": false
+    },
+    "swift-mcp": {
+      "type": "local",
+      "command": [
+        "node",
+        "/Users/dpearson/repos/swift-mcp-server/dist/server.js"
+      ],
+      "environment": {
+        "SWIFT_MCP_DATA_DIR": "/Users/dpearson/repos/swift-mcp-server/data"
+      },
+      "enabled": false
+    }
+  }
+}
