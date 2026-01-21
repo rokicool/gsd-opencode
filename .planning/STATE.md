@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-20)
 
 **Core value:** Flexibility — power users want full control over which models run at each stage
-**Current focus:** Phase 4 complete — ready for Phase 5
+**Current focus:** Phase 5 execution done — gap closure needed
 
 ## Current Position
 
-Phase: 5 of 7 (Frontmatter Rewriting) — COMPLETE
+Phase: 5 of 7 (Frontmatter Rewriting) — GAPS FOUND
 Plan: 1 of 1 in current phase
-Status: Phase complete
-Last activity: 2026-01-21 — Completed 05-01-PLAN.md
+Status: Verification gaps found
+Last activity: 2026-01-21 — Verified Phase 5 (gaps found)
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 70%
 
 ## Performance Metrics
 
@@ -74,13 +74,13 @@ None yet.
 
 ### Blockers/Concerns
 
-None currently.
+- [05-VERIFICATION]: Per-stage overrides are stored but not applied during rewriting (`profiles.custom_overrides.*` ignored).
 
 ## Session Continuity
 
 Last session: 2026-01-21T18:32:58Z
-Stopped at: Completed 05-01-PLAN.md
+Stopped at: Verified Phase 5 (gaps found)
 Resume file: None
 
 ---
-*Next: Phase 5 complete — discuss Phase 6 (`/gsd-discuss-phase 6`)*
+*Next: Plan Phase 5 gap closure (`/gsd-plan-phase 5 --gaps`)*
