@@ -748,12 +748,14 @@ function applyProfile(presetName) {
     return { ok: false, error: message, succeeded: [], failed: "(pre-validation)" };
   }
 
-  // 3) Get stage->model mapping for this preset
-  const presetResult = getPresetConfig(presetName); // from config.md
-  if (!presetResult.ok) {
-    return { ok: false, error: presetResult.error, succeeded: [], failed: "(config)" };
+  // 3) Get the stage->model mapping that should actually be applied.
+  //    Note: Per-stage overrides live under config.profiles.custom_overrides.{stage}.
+  //    applyProfile() applies them automatically by using getEffectiveStageModels().
+  const effectiveResult = getEffectiveStageModels(presetName); // from config.md
+  if (!effectiveResult.ok) {
+    return { ok: false, error: effectiveResult.error, succeeded: [], failed: "(config)" };
   }
-  const stageModels = presetResult.preset;
+  const stageModels = effectiveResult.stageModels;
 
   const modified = [];
   const unchanged = [];
