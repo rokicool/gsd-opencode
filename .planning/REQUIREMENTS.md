@@ -76,9 +76,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONF-02 | Phase 1: Config Foundation | Complete |
 | CONF-03 | Phase 1: Config Foundation | Complete |
 | CONF-04 | Phase 1: Config Foundation | Partial* |
-| PROF-01 | Phase 2: Profile Definitions | Pending |
+| PROF-01 | Phase 2: Profile Definitions | Complete |
 | PROF-02 | Phase 5: Frontmatter Rewriting | Pending |
-| PROF-03 | Phase 2: Profile Definitions | Pending |
+| PROF-03 | Phase 2: Profile Definitions | Complete |
 | CMD-01 | Phase 3: Set-Profile Command | Pending |
 | CMD-02 | Phase 6: Settings Command | Pending |
 | CMD-03 | Phase 3: Set-Profile Command | Pending |
