@@ -30,10 +30,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. Config changes persist to `.planning/config.json` and survive session restarts
   2. Config file is human-readable JSON that can be manually edited
   3. Invalid profile names produce clear error messages explaining valid options
-**Plans**: 1 plan
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Create config helper module with persistence, validation, and error handling
+- [x] 01-01: Create config helper module with persistence, validation, and error handling
+- [ ] 01-02: Seed config.json with profiles schema (gap closure)
 
 ### Phase 2: Profile Definitions
 **Goal**: Three semantic presets exist with editable model-to-stage mappings
