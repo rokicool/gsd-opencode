@@ -22,9 +22,9 @@ Requirements for model profile management feature.
 
 ### Commands
 
-- [ ] **CMD-01**: `/gsd-set-profile <profile>` switches active profile
+- [x] **CMD-01**: `/gsd-set-profile <profile>` switches active profile
 - [ ] **CMD-02**: `/gsd-settings` provides interactive configuration menu
-- [ ] **CMD-03**: Profile changes show confirmation with proposed changes before user confirms
+- [x] **CMD-03**: Profile changes show confirmation with proposed changes before user confirms
 
 ### Agent Integration
 
@@ -79,9 +79,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROF-01 | Phase 2: Profile Definitions | Complete |
 | PROF-02 | Phase 5: Frontmatter Rewriting | Pending |
 | PROF-03 | Phase 2: Profile Definitions | Complete |
-| CMD-01 | Phase 3: Set-Profile Command | Pending |
+| CMD-01 | Phase 3: Set-Profile Command | Complete |
 | CMD-02 | Phase 6: Settings Command | Pending |
-| CMD-03 | Phase 3: Set-Profile Command | Pending |
+| CMD-03 | Phase 3: Set-Profile Command | Complete |
 | AGNT-01 | Phase 5: Frontmatter Rewriting | Pending |
 | AGNT-02 | Phase 4: Agent Discovery | Pending |
 | AGNT-03 | Phase 4: Agent Discovery | Pending |
@@ -98,7 +98,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-20*
-*Last updated: 2026-01-21 after Phase 1 completion*
+*Last updated: 2026-01-21 after Phase 3 completion*
 
 **Notes:**
 - *Partial: CONF-04 behavior documented in config.md; runtime exercise deferred to Phase 3 when /gsd-set-profile exists
