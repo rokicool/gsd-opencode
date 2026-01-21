@@ -18,6 +18,10 @@ It manages the project's config file at:
 
   "profiles": {               // new in Phase 1
     "active_profile": "balanced",
+    "presets": { "...": "..." },
+
+    // Phase 06: per-profile per-stage overrides (canonical)
+    // profiles.custom_overrides.{profile}.{stage} = modelId
     "custom_overrides": {}
   }
 }
@@ -52,8 +56,52 @@ When you compare these snapshots/diffs, changes should be additive under `profil
 Default values:
 
 - `profiles.active_profile`: `"balanced"`
-- `profiles.custom_overrides`: `{}`
+- `profiles.custom_overrides`: `{}` (Phase 06 canonical shape is nested by profile)
 - `profiles.presets`: built-in defaults for `quality`, `balanced`, and `budget` (can be overridden by config.json)
+
+---
+
+## Per-profile model overrides (Phase 06)
+
+`profiles.presets` define the baseline stage→model mapping for each profile.
+
+`profiles.custom_overrides` lets users override the model for **specific stages** (`planning | execution | verification`) **scoped to a specific profile**.
+
+### Canonical override shape (Phase 06)
+
+- `profiles.custom_overrides.{profile}.{stage} = modelId`
+
+Example: override `execution` for `balanced` only:
+
+```jsonc
+{
+  "profiles": {
+    "active_profile": "balanced",
+    "presets": { "...": "..." },
+    "custom_overrides": {
+      "balanced": {
+        "execution": "opencode/minimax-m2.1-free"
+      }
+    }
+  }
+}
+```
+
+### Legacy override shape (still supported for compatibility)
+
+Earlier phases stored overrides as a single global map:
+
+- `profiles.custom_overrides.{stage} = modelId`
+
+Phase 06 **does not** treat those legacy keys as global overrides because that would cause cross-profile leakage when switching profiles.
+
+Instead, Phase 06 normalizes legacy overrides into the canonical per-profile shape and scopes them to the **currently active profile at the time of normalization**:
+
+- Migrate:
+  - `profiles.custom_overrides.{stage}` → `profiles.custom_overrides.{active_profile}.{stage}`
+- Remove the top-level stage keys after migration.
+
+This normalization is best-effort and is designed to prevent overrides from unexpectedly affecting other profiles.
 
 ## Procedures
 
@@ -78,6 +126,9 @@ Default values:
 3. Auto-heal:
    - ensure required keys exist (currently: `profiles`, `profiles.active_profile`, `profiles.custom_overrides`)
    - if keys were restored, log: `"Restored missing config keys: profiles.active_profile"` (comma-separated)
+4. Normalize legacy override shapes:
+   - call `normalizeCustomOverrides(config)` (see below)
+   - this prevents cross-profile override leakage from legacy configs
 4. Lenient parsing:
    - preserve unknown keys (do not strip)
    - optionally warn: `"Unknown config key: 'foo' - ignoring"`
@@ -136,6 +187,11 @@ function readConfig() {
 
   const { healedConfig, restoredKeys, unknownKeys } = autoHealConfig(parsed, DEFAULTS);
 
+  // Phase 06: normalize legacy override shapes into per-profile overrides.
+  // This mutates healedConfig in-memory; commands that later call writeConfig()
+  // (e.g., setActiveProfile) will naturally persist the migrated structure.
+  const { normalizedConfig, warnings: overrideWarnings } = normalizeCustomOverrides(healedConfig);
+
   if (restoredKeys.length > 0) {
     warn(`Restored missing config keys: ${restoredKeys.join(", ")}`);
   }
@@ -144,7 +200,91 @@ function readConfig() {
     warn(`Unknown config key: '${key}' - ignoring`);
   }
 
-  return healedConfig;
+  for (const msg of overrideWarnings) {
+    warn(msg);
+  }
+
+  return normalizedConfig;
+}
+```
+
+---
+
+### normalizeCustomOverrides(config) (Phase 06)
+
+**Purpose:** Normalize legacy `profiles.custom_overrides` shapes so per-stage overrides are **scoped per-profile**.
+
+**Goal:** Prevent legacy configs from causing overrides to “move” when switching `profiles.active_profile`.
+
+**Behavior:**
+
+1. If `profiles.custom_overrides` already matches the Phase 06 canonical shape (nested by profile), return as-is.
+2. If it appears to be the legacy shape (direct `planning`/`execution`/`verification` keys):
+   - treat those overrides as belonging to the **current active profile** (default `balanced` if missing)
+   - migrate them to `profiles.custom_overrides.{active_profile}.{stage}`
+   - delete the top-level stage keys
+3. If migration is ambiguous (e.g., conflicting values between legacy and nested shapes), prefer the nested value and warn.
+
+**Returns:** `{ normalizedConfig, warnings: string[] }`
+
+**Pseudocode:**
+
+```ts
+function normalizeCustomOverrides(config) {
+  const warnings = [];
+
+  const active = config?.profiles?.active_profile ?? "balanced";
+  const overrides = config?.profiles?.custom_overrides;
+
+  // Nothing to do
+  if (!overrides || typeof overrides !== "object") {
+    return { normalizedConfig: config, warnings };
+  }
+
+  const STAGES = ["planning", "execution", "verification"];
+  const looksLegacy = STAGES.some(
+    (s) => typeof overrides[s] === "string" || overrides[s] === null
+  );
+
+  if (!looksLegacy) {
+    // Canonical (or at least non-legacy) shape
+    return { normalizedConfig: config, warnings };
+  }
+
+  // Ensure nested container exists
+  config.profiles = config.profiles ?? {};
+  config.profiles.custom_overrides = config.profiles.custom_overrides ?? {};
+  config.profiles.custom_overrides[active] =
+    config.profiles.custom_overrides[active] ?? {};
+
+  for (const stage of STAGES) {
+    const legacyValue = overrides[stage];
+    const nestedValue = config.profiles.custom_overrides[active][stage];
+
+    // Prefer canonical nested value if it already exists
+    if (
+      typeof nestedValue === "string" &&
+      nestedValue.trim() !== "" &&
+      typeof legacyValue === "string" &&
+      legacyValue.trim() !== "" &&
+      nestedValue !== legacyValue
+    ) {
+      warnings.push(
+        `Legacy override '${stage}' ignored because profiles.custom_overrides.${active}.${stage} already exists.`
+      );
+    } else if (typeof legacyValue === "string" && legacyValue.trim() !== "") {
+      config.profiles.custom_overrides[active][stage] = legacyValue;
+    }
+
+    // Remove legacy top-level stage key
+    delete overrides[stage];
+  }
+
+  warnings.push(
+    `Normalized legacy profiles.custom_overrides.{stage} into profiles.custom_overrides.${active}.{stage}`
+  );
+
+  return { normalizedConfig: config, warnings };
 }
 ```
 
@@ -414,17 +554,18 @@ function getPresetConfig(presetName) {
 This is the canonical helper whenever you need the stage models OpenCode will actually use:
 
 - Start from the preset mapping (via `getPresetConfig(presetName)`)
-- Overlay per-stage overrides from `config.profiles.custom_overrides.{stage}`
+- Overlay per-stage overrides from `config.profiles.custom_overrides.{profile}.{stage}` (Phase 06 canonical)
 
 **Behavior requirements:**
 
 1. Validate `presetName` via `validateProfile()`
 2. Read config via `readConfig()`
 3. Read the raw preset mapping via `getPresetConfig(presetName)`
-4. Overlay `config.profiles.custom_overrides` on top of the preset mapping:
+4. Determine `profileOverrides` from `config.profiles.custom_overrides[presetName]` (if present)
+5. Overlay `profileOverrides` on top of the preset mapping:
    - Only apply known stages: `planning | execution | verification`
    - Only apply override values that are **non-empty strings**
-   - Ignore any unknown keys in `custom_overrides`
+   - Ignore any unknown keys in `profileOverrides`
 
 **Returns:**
 
@@ -444,6 +585,11 @@ function getEffectiveStageModels(presetName) {
   // 2) Read config (contains custom overrides)
   const config = readConfig();
 
+  // Phase 06: ensure legacy override shapes are normalized before reading.
+  // (If readConfig() already did this, this is a no-op.)
+  const normalized = normalizeCustomOverrides(config);
+  const safeConfig = normalized.normalizedConfig;
+
   // 3) Start with the raw preset mapping
   const presetResult = getPresetConfig(presetName);
   if (!presetResult.ok) {
@@ -452,12 +598,13 @@ function getEffectiveStageModels(presetName) {
 
   const stageModels = { ...presetResult.preset };
 
-  // 4) Overlay per-stage overrides (only known stages; only non-empty strings)
-  const overrides = config?.profiles?.custom_overrides ?? {};
+  // 4) Overlay per-stage overrides for THIS profile (only known stages; only non-empty strings)
+  const overridesByProfile = safeConfig?.profiles?.custom_overrides ?? {};
+  const profileOverrides = overridesByProfile?.[presetName] ?? {};
   const stages = ["planning", "execution", "verification"];
 
   for (const stage of stages) {
-    const override = overrides?.[stage];
+    const override = profileOverrides?.[stage];
     if (typeof override === "string" && override.trim() !== "") {
       stageModels[stage] = override;
     }
