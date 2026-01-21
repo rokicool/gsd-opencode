@@ -153,4 +153,72 @@ Then re-print the "Current configuration" table and exit.
 
 Otherwise continue into the confirmation workflow (Task 2).
 
+## Step 3: Confirmation workflow (preview + confirm)
+
+When `newProfile !== currentProfile`, you MUST show a before/after preview and ask for explicit confirmation.
+
+1. Get configs:
+
+- `currentPreset = getPresetConfig(currentProfile)`
+- `newPreset = getPresetConfig(newProfile)`
+
+2. Print:
+
+```
+Profile change: {currentProfile} → {newProfile}
+
+| Stage        | Current Model              | New Model                  |
+|--------------|----------------------------|----------------------------|
+| planning     | {currentPreset.planning}   | {newPreset.planning}       |
+| execution    | {currentPreset.execution}  | {newPreset.execution}      |
+| verification | {currentPreset.verification}| {newPreset.verification}  |
+```
+
+3. Prompt:
+
+```
+[C]onfirm | [E]dit | [X] Cancel:
+```
+
+Interpret input case-insensitively:
+
+- `c` / `confirm` → Confirm
+- `e` / `edit` → Enter inline edit flow (Task 3)
+- `x` / `cancel` → Cancel
+
+If the user enters anything else, re-prompt.
+
+### Confirm path
+
+On confirm:
+
+1. Call `setActiveProfile(newProfile)`
+2. If it returns `{ ok: false }`, print the error and stop.
+3. Otherwise print:
+
+```
+✓ Active profile set to: {newProfile}
+```
+
+4. Then print the new active configuration table (Stage | Model) using `getPresetConfig(newProfile)`:
+
+```
+Current configuration:
+| Stage        | Model |
+|--------------|-------|
+| planning     | ...   |
+| execution    | ...   |
+| verification | ...   |
+```
+
+### Cancel path
+
+On cancel:
+
+```
+Profile change cancelled. Current profile: {currentProfile}
+```
+
+Then stop.
+
 </behavior>
