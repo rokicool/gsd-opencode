@@ -705,6 +705,111 @@ function rewriteFrontmatter(agentInfo, newModel) {
 
 - `rewriteFrontmatter(gsd-planner, "opencode/glm-4.7-free")` inserts/updates `model:` while keeping `tools:` and body unchanged.
 
+---
+
+### applyProfile(presetName)
+
+**Purpose:** Apply a model profile preset across all 11 GSD agent files by rewriting each agent’s `model:` frontmatter key.
+
+This is the orchestration layer that makes `/gsd-set-profile` actually take effect in OpenCode. OpenCode reads `model:` from agent frontmatter, so changing profiles must rewrite agents.
+
+**High-level constraints:**
+
+1. **Validate everything before modifying anything** (atomic-by-validation):
+   - Invalid preset name → no modification
+   - Any agent validation errors → no modification
+2. **Fail fast on write errors** (per Phase 05 goal): stop on first failed write and report partial success.
+3. **Idempotent behavior:** if an agent already has the correct model for its stage, skip rewriting and report as `unchanged`.
+
+**Inputs:**
+
+- `presetName`: string (`"quality" | "balanced" | "budget"`)
+
+**Returns:**
+
+- Success: `{ ok: true, modified: string[], unchanged: string[] }`
+- Failure: `{ ok: false, error: string, succeeded: string[], failed: string }`
+
+**Pseudocode:**
+
+```ts
+function applyProfile(presetName) {
+  // 1) Validate preset name
+  const presetValidation = validateProfile(presetName); // from config.md
+  if (!presetValidation.valid) {
+    return { ok: false, error: presetValidation.error, succeeded: [], failed: "(validation)" };
+  }
+
+  // 2) Validate ALL agents before any modification
+  const validation = validateAllAgents();
+  if (!validation.valid) {
+    // Keep error formatting consistent with existing validateAllAgents() usage
+    const message = formatValidationErrors(validation.errors);
+    return { ok: false, error: message, succeeded: [], failed: "(pre-validation)" };
+  }
+
+  // 3) Get stage->model mapping for this preset
+  const presetResult = getPresetConfig(presetName); // from config.md
+  if (!presetResult.ok) {
+    return { ok: false, error: presetResult.error, succeeded: [], failed: "(config)" };
+  }
+  const stageModels = presetResult.preset;
+
+  const modified = [];
+  const unchanged = [];
+  const succeeded = [];
+
+  // 4) Rewrite agents stage-by-stage
+  const stages = ["planning", "execution", "verification"];
+  for (const stage of stages) {
+    const stageModel = stageModels[stage];
+    const agentNames = getAgentsForStage(stage); // from config.md
+
+    for (const agentName of agentNames) {
+      // Find the validated AgentInfo
+      const agentInfo = validation.agents.find((a) => a.name === agentName);
+      if (!agentInfo) {
+        // Should not happen if validateAllAgents() and getAgentsForStage() are consistent
+        return {
+          ok: false,
+          error: `Internal error: validated agent not found for '${agentName}'`,
+          succeeded,
+          failed: agentName,
+        };
+      }
+
+      // Idempotency check: skip rewrite if already correct
+      const currentModel = agentInfo.frontmatter.model;
+      if (typeof currentModel === "string" && currentModel === stageModel) {
+        unchanged.push(agentName);
+        continue;
+      }
+
+      const result = rewriteFrontmatter(agentInfo, stageModel);
+      if (!result.ok) {
+        return {
+          ok: false,
+          error: `Failed to rewrite '${agentName}': ${result.error}`,
+          succeeded,
+          failed: agentName,
+        };
+      }
+
+      modified.push(agentName);
+      succeeded.push(agentName);
+    }
+  }
+
+  return { ok: true, modified, unchanged };
+}
+```
+
+**Example scenarios:**
+
+- **Fresh apply (some agents missing model key):** `modified` includes all agents whose model was inserted.
+- **Repeat apply (idempotent):** `modified` is empty and `unchanged` contains all 11 agents.
+- **Partial failure:** returns `{ ok: false }` with `succeeded` listing agents written before the first failure.
+
 **Example scenarios:**
 
 - **All valid:**
