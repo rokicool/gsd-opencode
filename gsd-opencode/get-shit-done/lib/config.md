@@ -48,10 +48,16 @@ Default values:
    - return a default config object
 2. If file exists:
    - parse as JSON
-   - if JSON is invalid: warn user and return defaults (do not crash)
+   - if JSON is invalid:
+     - log warning: `"Config file corrupted, using defaults"`
+     - attempt to back up the corrupted file to `.planning/config.json.bak` **before** any future overwrite
+     - return defaults (do not crash)
 3. Auto-heal:
-   - ensure required keys exist
+   - ensure required keys exist (currently: `profiles`, `profiles.active_profile`, `profiles.custom_overrides`)
+   - if keys were restored, log: `"Restored missing config keys: profiles.active_profile"` (comma-separated)
+4. Lenient parsing:
    - preserve unknown keys (do not strip)
+   - optionally warn: `"Unknown config key: 'foo' - ignoring"`
 
 **Returns:** A config object.
 
@@ -71,16 +77,43 @@ function readConfig() {
     return DEFAULTS;
   }
 
+  const raw = readFile(".planning/config.json");
+  let parsed;
+
   try {
-    const raw = readFile(".planning/config.json");
-    const parsed = JSON.parse(raw);
-    return autoHealConfig(parsed, DEFAULTS);
+    parsed = JSON.parse(raw);
   } catch (err) {
     warn("Config file corrupted, using defaults");
+
+    // Backup corrupted file for recovery/debugging.
+    // Best-effort: failure to back up should not crash.
+    try {
+      writeFile(".planning/config.json.bak", raw);
+    } catch {}
+
     return DEFAULTS;
   }
+
+  const { healedConfig, restoredKeys, unknownKeys } = autoHealConfig(parsed, DEFAULTS);
+
+  if (restoredKeys.length > 0) {
+    warn(`Restored missing config keys: ${restoredKeys.join(", ")}`);
+  }
+
+  for (const key of unknownKeys) {
+    warn(`Unknown config key: '${key}' - ignoring`);
+  }
+
+  return healedConfig;
 }
 ```
+
+**Example scenarios:**
+
+- **Missing file**: `.planning/config.json` doesn't exist → returns defaults
+- **Corrupted JSON**: file contains `{"mode":` (truncated) → warns and returns defaults, writes `.planning/config.json.bak`
+- **Missing keys**: file exists but missing `profiles.active_profile` → warns keys restored and returns healed config
+- **Unknown keys**: file contains `{ "foo": 1 }` → warns unknown key but keeps it in the returned object
 
 ---
 
@@ -93,10 +126,11 @@ function readConfig() {
 1. Validate `.planning/` directory exists
    - If missing: error: `"No .planning directory found. Run /gsd-new-project first."`
 2. Read existing config (if any)
+   - if existing config is corrupted, follow the same backup/recovery behavior as `readConfig()`
 3. Merge:
-   - preserve all existing keys
+   - preserve all existing keys (including unknown)
    - apply the incoming `config` as an overlay (do not replace the entire file)
-4. Write JSON with **2-space indent**
+4. Write JSON with **2-space indent** and trailing newline
 
 **Pseudocode:**
 
@@ -115,6 +149,11 @@ function writeConfig(config) {
   return { ok: true };
 }
 ```
+
+**Example scenarios:**
+
+- **Missing .planning/**: returns `{ ok: false, error: "No .planning directory found. Run /gsd-new-project first." }`
+- **Safe merge**: existing config has `mode`, `depth`, `parallelization` and new `profiles` is added without clobbering
 
 ---
 
@@ -141,13 +180,24 @@ function validateProfile(profileName) {
   if (validOptions.includes(profileName)) {
     return { valid: true };
   }
+
+  // Optional: suggest closest match if obvious.
+  // (Example heuristic: Levenshtein distance or prefix match.)
+  const suggestion = suggestClosest(profileName, validOptions); // returns string | null
+
+  const suggestionMsg = suggestion ? ` Did you mean '${suggestion}'?` : "";
   return {
     valid: false,
-    error: `Invalid profile '${profileName}'. Valid options: ${validOptions.join(", ")}`,
+    error: `Invalid profile '${profileName}'. Valid options: ${validOptions.join(", ")}.${suggestionMsg}`,
     validOptions,
   };
 }
 ```
+
+**Example scenarios:**
+
+- `validateProfile("quality")` → `{ valid: true }`
+- `validateProfile("balnced")` → `{ valid: false, error: "Invalid profile 'balnced'. Valid options: quality, balanced, budget. Did you mean 'balanced'?", validOptions: [...] }`
 
 ---
 
@@ -208,3 +258,8 @@ function setActiveProfile(profileName) {
   return writeConfig(updated);
 }
 ```
+
+**Example scenarios:**
+
+- Set to valid profile: `setActiveProfile("budget")` → persists `profiles.active_profile = "budget"`
+- Set to invalid profile: `setActiveProfile("cheap")` → returns `{ ok: false, error: "Invalid profile 'cheap'. Valid options: ..." }`
