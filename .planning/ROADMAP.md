@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Config Foundation** - Establish config schema with persistence and validation
 - [x] **Phase 2: Profile Definitions** - Define preset profiles and editable mappings
 - [x] **Phase 3: Set-Profile Command** - Implement `/gsd-set-profile` for quick switching
-- [ ] **Phase 4: Agent Discovery** - Validate agent files and stage mappings
+- [x] **Phase 4: Agent Discovery** - Validate agent files and stage mappings
 - [ ] **Phase 5: Frontmatter Rewriting** - Apply profile changes to agent files
 - [ ] **Phase 6: Settings Command** - Implement `/gsd-settings` for interactive configuration
 - [ ] **Phase 7: Documentation** - Document workaround, usage, and customization
