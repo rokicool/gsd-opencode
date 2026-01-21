@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-20)
 
 **Core value:** Flexibility — power users want full control over which models run at each stage
-**Current focus:** Phase 5 execution done — gap closure needed
+**Current focus:** Phase 6 planning pending
 
 ## Current Position
 
-Phase: 5 of 7 (Frontmatter Rewriting) — GAPS FOUND
-Plan: 1 of 1 in current phase
-Status: Verification gaps found
-Last activity: 2026-01-21 — Verified Phase 5 (gaps found)
+Phase: 5 of 7 (Frontmatter Rewriting)
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-21 — Completed 05-02-PLAN.md
 
-Progress: [███████░░░] 70%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 2.44 min
-- Total execution time: 19.55 min
+- Total plans completed: 9
+- Average duration: 2.51 min
+- Total execution time: 22.55 min
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [███████░░░] 70%
 | 2 | 2 | 2 | 4.50 min |
 | 3 | 2 | 2 | 1.45 min |
 | 4 | 1 | 1 | 3.00 min |
-| 5 | 1 | 1 | 2.33 min |
+| 5 | 2 | 2 | 2.50 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02, 03-01, 03-02, 04-01, 05-01
+- Last 5 plans: 03-01, 03-02, 04-01, 05-01, 05-02
 - Trend: -
 
 *Updated after each plan completion*
@@ -68,19 +68,21 @@ Recent decisions affecting current work:
 - [05-01]: Preserve `tools:` YAML block verbatim when rewriting frontmatter to avoid formatting diffs
 - [05-01]: Apply profiles with validate-first, then fail-fast-on-first-write while reporting partial success
 
+- [05-02]: Use `getEffectiveStageModels()` (preset + `profiles.custom_overrides` overlay) as the canonical stage→model resolver for rewrites and UX tables
+
 ### Pending Todos
 
 None yet.
 
 ### Blockers/Concerns
 
-- [05-VERIFICATION]: Per-stage overrides are stored but not applied during rewriting (`profiles.custom_overrides.*` ignored).
+- None currently.
 
 ## Session Continuity
 
-Last session: 2026-01-21T18:32:58Z
-Stopped at: Verified Phase 5 (gaps found)
+Last session: 2026-01-21T18:52:25Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
 
 ---
-*Next: Plan Phase 5 gap closure (`/gsd-plan-phase 5 --gaps`)*
+*Next: Phase 6 planning (`/gsd-plan-phase 6`)*

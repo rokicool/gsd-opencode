@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Profile Definitions** - Define preset profiles and editable mappings
 - [x] **Phase 3: Set-Profile Command** - Implement `/gsd-set-profile` for quick switching
 - [x] **Phase 4: Agent Discovery** - Validate agent files and stage mappings
-- [ ] **Phase 5: Frontmatter Rewriting** - Apply profile changes to agent files
+- [x] **Phase 5: Frontmatter Rewriting** - Apply profile changes to agent files
 - [ ] **Phase 6: Settings Command** - Implement `/gsd-settings` for interactive configuration
 - [ ] **Phase 7: Documentation** - Document workaround, usage, and customization
 
@@ -87,10 +87,11 @@ Plans:
   2. Per-stage overrides apply correct model to each stage's agents
   3. Frontmatter rewriting preserves all other keys and body content
   4. Rewriting is idempotent (safe to run multiple times)
-**Plans**: 1 plan
+**Plans**: 2 plans
 
 Plans:
 - [x] 05-01-PLAN.md — Implement frontmatter rewriting and integrate with gsd-set-profile
+- [x] 05-02-PLAN.md — Gap closure: apply per-stage overrides (profiles.custom_overrides) during rewrites
 
 ### Phase 6: Settings Command
 **Goal**: Users can view current settings and interactively manage configuration
@@ -130,7 +131,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Profile Definitions | 2/2 | Complete | 2026-01-21 |
 | 3. Set-Profile Command | 2/2 | Complete | 2026-01-21 |
 | 4. Agent Discovery | 1/1 | Complete | 2026-01-21 |
-| 5. Frontmatter Rewriting | 1/1 | Complete | 2026-01-21 |
+| 5. Frontmatter Rewriting | 2/2 | Complete | 2026-01-21 |
 | 6. Settings Command | 0/TBD | Not started | - |
 | 7. Documentation | 0/TBD | Not started | - |
 
