@@ -58,10 +58,11 @@ Plans:
   1. `/gsd-set-profile quality` (or balanced/budget) switches active profile
   2. Profile change shows proposed changes before user confirms
   3. Confirmation displays which models will be assigned to which stages
-**Plans**: 1 plan
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Create set-profile command with confirmation workflow and edge cases
+- [x] 03-01-PLAN.md — Create set-profile command with confirmation workflow and edge cases
+- [ ] 03-02-PLAN.md — Gap closure: add positional argument support
 
 ### Phase 4: Agent Discovery
 **Goal**: System knows all 11 agents, their stage mappings, and validates before modification
