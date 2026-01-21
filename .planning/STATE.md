@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-01-20)
 
 **Core value:** Flexibility — power users want full control over which models run at each stage
-**Current focus:** Phase 1 - Config Foundation
+**Current focus:** Phase 2 - Profile Definitions
 
 ## Current Position
 
-Phase: 1 of 7 (Config Foundation)
-Plan: 2 of 2 in current phase
+Phase: 2 of 7 (Profile Definitions)
+Plan: 1 of 1 in current phase
 Status: Phase complete
-Last activity: 2026-01-21 — Completed 01-02-PLAN.md
+Last activity: 2026-01-21 — Completed 02-01-PLAN.md
 
-Progress: [██░░░░░░░░░] 20%
+Progress: [███░░░░░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 0.75 min
-- Total execution time: 1.5 min
+- Total plans completed: 3
+- Average duration: 0.83 min
+- Total execution time: 2.5 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 2 | 2 | 0.75 min |
+| 2 | 1 | 1 | 1.00 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01, 01-02
+- Last 5 plans: 01-01, 01-02, 02-01
 - Trend: -
 
 *Updated after each plan completion*
@@ -52,6 +53,9 @@ Recent decisions affecting current work:
 - [01-02]: active_profile defaults to 'balanced' per documented behavior
 - [01-02]: Validation error messages and corruption recovery deferred to Phase 3
 
+- [02-01]: Presets stored at `profiles.presets` in config.json and are user-editable
+- [02-01]: Stage-to-agent mapping documented for future frontmatter rewriting (Phase 5)
+
 ### Pending Todos
 
 None yet.
@@ -63,7 +67,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-21
-Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
+Stopped at: Completed 02-01-PLAN.md (Phase 2 complete)
 Resume file: None
 
 ---
