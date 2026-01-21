@@ -44,10 +44,11 @@ Plans:
   1. Three presets available: quality, balanced, budget
   2. Each preset maps to specific models for planning/execution/verification stages
   3. User can edit preset definitions by modifying config file
-**Plans**: 1 plan
+**Plans**: 2 plans
 
 Plans:
 - [x] 02-01-PLAN.md — Define presets in config.md and seed config.json with editable mappings
+- [x] 02-02-PLAN.md — Gap closure: document config key preservation + close Phase 2 UAT mismatch
 
 ### Phase 3: Set-Profile Command
 **Goal**: Users can quickly switch profiles with confirmation workflow
@@ -125,7 +126,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Config Foundation | 2/2 | Complete | 2026-01-21 |
-| 2. Profile Definitions | 1/1 | Complete | 2026-01-21 |
+| 2. Profile Definitions | 2/2 | Complete | 2026-01-21 |
 | 3. Set-Profile Command | 0/TBD | Not started | - |
 | 4. Agent Discovery | 0/TBD | Not started | - |
 | 5. Frontmatter Rewriting | 0/TBD | Not started | - |
