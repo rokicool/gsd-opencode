@@ -73,10 +73,10 @@ Plans:
   2. Missing agent files produce clear error listing what's missing
   3. All agents are validated before any are modified (batch validation)
   4. Validation catches malformed frontmatter before attempted modification
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md — Create agent discovery and validation library (agents.md)
 
 ### Phase 5: Frontmatter Rewriting
 **Goal**: Profile changes update agent file frontmatter with per-stage overrides
