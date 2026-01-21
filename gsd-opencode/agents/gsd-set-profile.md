@@ -95,13 +95,13 @@ Always start by reading config and showing the user's current state.
 
 1. Call `readConfig()`
 2. Determine current profile via `getActiveProfile()`
-3. Get current stage-to-model mapping via `getPresetConfig(currentProfile)`
+3. Get current stage-to-model mapping via `getEffectiveStageModels(currentProfile)`
 4. Print:
 
 ```
 Active profile: {currentProfile}
 
-Current configuration:
+Current configuration (effective — includes per-stage overrides):
 | Stage        | Model |
 |--------------|-------|
 | planning     | ...   |
@@ -198,13 +198,15 @@ When `newProfile !== currentProfile`, you MUST show a before/after preview and a
 
 1. Get configs:
 
-- `currentPreset = getPresetConfig(currentProfile)`
-- `newPreset = getPresetConfig(newProfile)`
+- `currentPreset = getEffectiveStageModels(currentProfile)`
+- `newPreset = getEffectiveStageModels(newProfile)`
 
 2. Print:
 
 ```
 Profile change: {currentProfile} → {newProfile}
+
+Effective stage models (includes `profiles.custom_overrides.{stage}`):
 
 | Stage        | Current Model              | New Model                  |
 |--------------|----------------------------|----------------------------|
@@ -239,7 +241,7 @@ Important rules:
 
 ### Edit flow
 
-1. Show the proposed profile mapping (starting from `newPreset`):
+1. Show the proposed profile mapping (starting from the **effective** mapping for `newProfile` — preset + any existing overrides):
 
 ```
 Editing proposed profile: {newProfile}
@@ -306,6 +308,12 @@ Notes:
 - Only write keys for stages the user actually changed (keep the override object minimal).
 - If the user changed none of the stages, do not write overrides.
 
+3. **Critical ordering:** Call `applyProfile(newProfile)` only **after** both:
+   - `setActiveProfile(newProfile)` succeeded, and
+   - any override `writeConfig()` succeeded (if applicable)
+
+Rationale: `applyProfile()` reads the effective stage models (preset + `profiles.custom_overrides`) from config, so overrides must be persisted before rewriting agent frontmatter.
+
 ### Edge cases to handle (do not crash)
 
 #### Already-active profile
@@ -349,9 +357,9 @@ On confirm:
 2. If it returns `{ ok: false }`, print the error and stop.
 3. If it succeeds, apply the profile to agent files by rewriting `model:` in all 11 stage agents:
 
-   - Call: `applyProfile(newProfile)`
-   - This will rewrite `model:` in the agent frontmatter so OpenCode actually uses the new model
-   - This is the mechanism that makes profile changes take effect
+    - Call: `applyProfile(newProfile)`
+    - This will rewrite `model:` in the agent frontmatter so OpenCode actually uses the new (effective) per-stage models
+    - This is the mechanism that makes profile changes take effect
 
    Error handling:
    - If `applyProfile()` returns `{ ok: false }`:
@@ -378,10 +386,10 @@ Agent updates: {modified.length} modified, {unchanged.length} unchanged
 All agents already have the correct model configured.
 ```
 
-5. Then print the new active configuration table (Stage | Model) using `getPresetConfig(newProfile)`:
+5. Then print the new active configuration table (Stage | Model) using `getEffectiveStageModels(newProfile)`:
 
 ```
-Current configuration:
+Current configuration (effective — includes per-stage overrides):
 | Stage        | Model |
 |--------------|-------|
 | planning     | ...   |
