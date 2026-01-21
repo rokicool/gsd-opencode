@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Set-Profile Command** - Implement `/gsd-set-profile` for quick switching
 - [x] **Phase 4: Agent Discovery** - Validate agent files and stage mappings
 - [x] **Phase 5: Frontmatter Rewriting** - Apply profile changes to agent files
-- [ ] **Phase 6: Settings Command** - Implement `/gsd-settings` for interactive configuration
+- [x] **Phase 6: Settings Command** - Implement `/gsd-settings` for interactive configuration
 - [ ] **Phase 7: Documentation** - Document workaround, usage, and customization
 
 ## Phase Details
@@ -101,10 +101,11 @@ Plans:
   1. `/gsd-settings` displays current profile and effective model assignments
   2. Interactive menu allows profile selection and override configuration
   3. Current state clearly shows which model runs for each stage
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: TBD
+- [x] 06-01-PLAN.md — Scope per-stage overrides per profile (and migrate legacy override shape)
+- [x] 06-02-PLAN.md — Implement `/gsd-settings` interactive settings command
 
 ### Phase 7: Documentation
 **Goal**: Feature is documented with usage examples and testing steps
@@ -132,7 +133,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Set-Profile Command | 2/2 | Complete | 2026-01-21 |
 | 4. Agent Discovery | 1/1 | Complete | 2026-01-21 |
 | 5. Frontmatter Rewriting | 2/2 | Complete | 2026-01-21 |
-| 6. Settings Command | 0/TBD | Not started | - |
+| 6. Settings Command | 2/2 | Complete | 2026-01-21 |
 | 7. Documentation | 0/TBD | Not started | - |
 
 ---

@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-20)
 ## Current Position
 
 Phase: 6 of 7 (Settings Command)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-21 — Completed 06-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-21 — Completed 06-02-PLAN.md
 
-Progress: [█████████░] 90%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -73,6 +73,8 @@ Recent decisions affecting current work:
 
 - [06-01]: Per-stage overrides are scoped per profile at `profiles.custom_overrides.{profile}.{stage}`; legacy `profiles.custom_overrides.{stage}` is migrated into the active profile to prevent cross-profile leakage.
 
+- [06-02]: `/gsd-settings` is a menu-loop command that always prints current state first, and persists each confirmed profile/override change immediately (with applyProfile() to rewrite agent frontmatter).
+
 ### Pending Todos
 
 None yet.
@@ -83,8 +85,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-21T22:23:19Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-01-21T22:28:20Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
 
 ---
