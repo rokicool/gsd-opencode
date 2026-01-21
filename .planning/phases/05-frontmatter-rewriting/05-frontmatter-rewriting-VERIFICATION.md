@@ -1,97 +1,106 @@
 ---
 phase: 05-frontmatter-rewriting
-verified: 2026-01-21T18:40:32Z
-status: gaps_found
-score: 3/4 must-haves verified
-gaps:
-  - truth: "Per-stage overrides apply correct model to each stage's agents"
-    status: failed
-    reason: "Override storage is documented (profiles.custom_overrides.*) but applyProfile() uses getPresetConfig() which does not merge custom_overrides, so agent rewrites will ignore per-stage overrides."
-    artifacts:
-      - path: "gsd-opencode/get-shit-done/lib/config.md"
-        issue: "getPresetConfig() returns preset mapping but never overlays profiles.custom_overrides"
-      - path: "gsd-opencode/get-shit-done/lib/agents.md"
-        issue: "applyProfile() uses getPresetConfig(presetName) stageModels and never applies overrides"
-      - path: "gsd-opencode/agents/gsd-set-profile.md"
-        issue: "Edit flow stores profiles.custom_overrides, but confirm path still calls applyProfile(newProfile) (no edited mapping passed)"
-    missing:
-      - "Config helper that returns effective stage models (preset + custom_overrides)"
-      - "applyProfile() to use effective stage models (including overrides) when rewriting agent frontmatter"
-      - "gsd-set-profile confirm flow to apply edited stage models to rewriting (either via effective config or passing edited mapping)"
+verified: 2026-01-21T19:14:00Z
+status: passed
+score: 4/4 must-haves verified
+re_verification:
+  previous_status: gaps_found
+  previous_score: 3/4
+  gaps_closed:
+    - "Per-stage overrides apply correct model to each stage's agents"
+  gaps_remaining: []
+  regressions: []
 ---
 
 # Phase 5: Frontmatter Rewriting Verification Report
 
 **Phase Goal:** Profile changes update agent file frontmatter with per-stage overrides.
-**Verified:** 2026-01-21T18:40:32Z
-**Status:** gaps_found
-**Re-verification:** No — initial verification
+**Verified:** 2026-01-21T19:14:00Z
+**Status:** passed
+**Re-verification:** Yes — after gap closure
 
 ## Goal Achievement
 
-### Observable Truths
+### Observable Truths (Must-Haves)
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | Changing profile rewrites `model:` frontmatter in all 11 agent files | ✓ VERIFIED | `agents.md` defines `applyProfile()` which iterates `planning/execution/verification` stages via `getAgentsForStage()` and rewrites each agent using `rewriteFrontmatter()` (see `### applyProfile(presetName)` and `### rewriteFrontmatter(agentInfo, newModel)`). |
-| 2 | Per-stage overrides apply correct model to each stage's agents | ✗ FAILED | `gsd-set-profile.md` documents editing and persisting `profiles.custom_overrides.{stage}`, but `config.md:getPresetConfig()` does not apply overrides and `agents.md:applyProfile()` only uses `getPresetConfig(presetName)` stageModels. |
-| 3 | Frontmatter rewriting preserves all other keys and body content | ✓ VERIFIED | `agents.md:serializeFrontmatter()` explicitly preserves key order (except `model` reposition), preserves `tools:` block verbatim, and appends body content from `bodyStart` unchanged.
-| 4 | Rewriting is idempotent (same profile twice = same result) | ✓ VERIFIED | `agents.md:applyProfile()` checks `currentModel === stageModel` and adds agent to `unchanged` without rewriting.
+| 1 | Changing profile rewrites `model:` frontmatter in all 11 stage agent files | ✓ VERIFIED | `gsd-opencode/get-shit-done/lib/agents.md` contains `### applyProfile(presetName)` and loops stages + agents, calling `rewriteFrontmatter()` for each (`rg -n "### applyProfile\\(presetName\\)" ...` and see `rewriteFrontmatter` call at ~line 790). The agent set excludes `gsd-set-profile` (constant `ALL_GSD_AGENTS` explicitly lists 11 agents). |
+| 2 | Per-stage overrides apply correct model to each stage's agents | ✓ VERIFIED | Effective stage models are computed via `getEffectiveStageModels(presetName)` in `gsd-opencode/get-shit-done/lib/config.md`, overlaying `config.profiles.custom_overrides.{stage}` onto preset mapping (see `### getEffectiveStageModels` pseudocode). `applyProfile()` now uses this helper (`agents.md` lines ~751-758: `const effectiveResult = getEffectiveStageModels(presetName)`). `gsd-set-profile` documents persisting overrides before calling `applyProfile(newProfile)` (lines ~291-316). |
+| 3 | Frontmatter rewriting preserves all other keys and body content | ✓ VERIFIED | `agents.md:serializeFrontmatter()` documents preservation guarantees: key order preserved (except `model` reposition), `tools:` block preserved verbatim, and body lines from `bodyStart` copied verbatim (lines ~509-516 and tools-block capture logic around ~540-575). |
+| 4 | Rewriting is idempotent (safe to run multiple times) | ✓ VERIFIED | `agents.md:applyProfile()` checks `currentModel === stageModel` and pushes agent to `unchanged` without rewriting (lines ~783-788). |
 
-**Score:** 3/4 truths verified
+**Score:** 4/4 truths verified
 
-### Required Artifacts
+## Required Artifacts (3-level verification)
 
 | Artifact | Expected | Status | Details |
 |---------|----------|--------|---------|
-| `gsd-opencode/get-shit-done/lib/agents.md` | `serializeFrontmatter()`, `rewriteFrontmatter()`, `applyProfile()` procedures for rewriting agent frontmatter | ✓ VERIFIED | Exists and is substantive (~903 lines). Contains `function serializeFrontmatter`, `function rewriteFrontmatter`, `function applyProfile` pseudocode blocks. |
-| `gsd-opencode/agents/gsd-set-profile.md` | Command flow that applies profile changes after confirmation | ✓ VERIFIED | Exists and is substantive (~411 lines). References `@gsd-opencode/get-shit-done/lib/agents.md` and instructs calling `applyProfile(newProfile)` on confirm. |
+| `gsd-opencode/get-shit-done/lib/agents.md` | Rewriting orchestration (`serializeFrontmatter`, `rewriteFrontmatter`, `applyProfile`) | ✓ VERIFIED | **Exists:** yes. **Substantive:** 904 lines (`wc -l`). **No obvious stubs:** `rg -n "TODO|FIXME|placeholder|not implemented"` found none. **Wired:** referenced by `/gsd-set-profile` via `@gsd-opencode/get-shit-done/lib/agents.md` and `applyProfile(newProfile)` invocation. |
+| `gsd-opencode/get-shit-done/lib/config.md` | Effective stage→model resolver supporting overrides | ✓ VERIFIED | **Exists:** yes. **Substantive:** 561 lines. Contains `### getEffectiveStageModels(presetName)` + pseudocode overlaying `profiles.custom_overrides` (around lines ~410-470). **Wired:** `agents.md` calls `getEffectiveStageModels(presetName)` when applying profile. |
+| `gsd-opencode/agents/gsd-set-profile.md` | Command spec that persists profile/overrides then applies rewrites | ✓ VERIFIED | **Exists:** yes. **Substantive:** 418 lines. References both libs in context (`@.../config.md`, `@.../agents.md`) and documents `applyProfile(newProfile)` after `setActiveProfile` + `writeConfig()` for overrides (around lines ~291-316 and ~352-363). |
 
-### Key Link Verification
+## Key Link Verification (Wiring)
 
 | From | To | Via | Status | Details |
 |------|----|-----|--------|---------|
-| `gsd-opencode/agents/gsd-set-profile.md` | `gsd-opencode/get-shit-done/lib/agents.md` | `@` reference in `<context>` | ✓ WIRED | `@gsd-opencode/get-shit-done/lib/agents.md` present in context. |
-| `applyProfile()` (`agents.md`) | `getPresetConfig()` (`config.md`) | stage model lookup | ✓ WIRED | `agents.md` calls `getPresetConfig(presetName)` to obtain `stageModels`. |
-| `applyProfile()` (`agents.md`) | `validateAllAgents()` (`agents.md`) | pre-validation before write | ✓ WIRED | `agents.md` calls `validateAllAgents()` and aborts before rewriting if invalid. |
-| `applyProfile()` (`agents.md`) | per-stage overrides (`profiles.custom_overrides`) | merge/overlay into stageModels | ✗ NOT WIRED | No helper exists to merge `custom_overrides` into the stage model mapping used for rewriting. |
+| `gsd-opencode/agents/gsd-set-profile.md` | `gsd-opencode/get-shit-done/lib/agents.md` | `@` reference + documented call | ✓ WIRED | `@gsd-opencode/get-shit-done/lib/agents.md` present (line ~25) and confirm path calls `applyProfile(newProfile)` (matches `rg -n "applyProfile\\(newProfile\\)"`). |
+| `agents.md:applyProfile()` | `config.md:getEffectiveStageModels()` | stage model resolver | ✓ WIRED | `agents.md` uses `getEffectiveStageModels(presetName)` (around lines ~751-758). |
+| `config.md:getEffectiveStageModels()` | `profiles.custom_overrides` | overlay logic | ✓ WIRED | Pseudocode explicitly reads `config?.profiles?.custom_overrides ?? {}` and overlays only known stages with non-empty strings (around lines ~455-666 in file view). |
+| `gsd-set-profile.md` (edit-confirm flow) | `profiles.custom_overrides` + rewrite step | ordering + persistence | ✓ WIRED | Docs require persisting overrides via `writeConfig()` before `applyProfile(newProfile)` (lines ~291-316). |
 
-### Requirements Coverage
+## Requirements Coverage (Phase 5)
 
 | Requirement | Status | Blocking Issue |
 |------------|--------|----------------|
 | AGNT-01: Profile changes rewrite `model:` frontmatter in agent files | ✓ SATISFIED | — |
-| PROF-02: User can set per-stage model overrides | ✗ BLOCKED | Overrides are stored/documented but never applied to rewriting (and no “effective mapping” function exists). |
+| PROF-02: User can set per-stage model overrides | ✓ SATISFIED | — |
 
-### Anti-Patterns Found
+Note: `.planning/REQUIREMENTS.md` checkboxes for AGNT-01/PROF-02 are still unchecked in the repo, but the Phase 5 deliverables that satisfy them are now present and wired.
 
-No TODO/FIXME/placeholder patterns found in the key phase artifacts (`agents.md`, `gsd-set-profile.md`).
+## Anti-Patterns Found
 
-### Human Verification (Recommended after gap closure)
+No phase-blocking stub patterns found in:
 
-Even after wiring overrides correctly, this phase should be manually exercised because it mutates files on disk.
+- `gsd-opencode/get-shit-done/lib/agents.md`
+- `gsd-opencode/get-shit-done/lib/config.md`
+- `gsd-opencode/agents/gsd-set-profile.md`
 
-#### 1. Apply profile rewrites agent frontmatter
+Evidence (command used):
 
-**Test:** Run `/gsd-set-profile quality` and confirm.
+```bash
+rg -n "TODO|FIXME|placeholder|not implemented|coming soon|return null" gsd-opencode/get-shit-done/lib/agents.md gsd-opencode/get-shit-done/lib/config.md gsd-opencode/agents/gsd-set-profile.md
+```
 
-**Expected:** The 11 stage agent files (`gsd-opencode/agents/gsd-*.md`, excluding `gsd-set-profile.md`) now contain a `model:` key in frontmatter matching the profile’s per-stage models.
+## Human Verification (Recommended)
 
-**Why human:** Requires running the interactive command flow and observing real file diffs.
+Even with structural wiring verified, this feature mutates files on disk via an interactive command, so it should be manually exercised.
 
-#### 2. Idempotency (second run produces no diffs)
+### 1. Apply preset profile rewrites
 
-**Test:** Re-run `/gsd-set-profile quality` and confirm.
+**Test:** Run `/gsd-set-profile quality` and Confirm.
 
-**Expected:** Command reports `modified: 0`, `unchanged: 11` (or equivalent), and `git diff` shows no changes.
+**Expected:** The 11 stage agent files (`gsd-opencode/agents/gsd-*.md` excluding `gsd-set-profile.md`) have `model:` set per stage according to the active preset (plus overrides if set). `git diff` should show only frontmatter `model:` edits (no body/tool formatting churn).
 
-**Why human:** Requires running the command twice and checking filesystem changes.
+**Why human:** Requires running OpenCode command flow and observing real file diffs.
 
-## Gaps Summary
+### 2. Per-stage override takes effect immediately
 
-The repo contains a detailed frontmatter rewrite design (`serializeFrontmatter`, `rewriteFrontmatter`, `applyProfile`) and the `/gsd-set-profile` command is wired to reference it. However, the phase goal explicitly includes **per-stage overrides**, and the current design stores overrides (`profiles.custom_overrides`) without ever applying them to the stage→model mapping used for rewriting. As a result, agent `model:` frontmatter updates will follow only preset values and ignore overrides.
+**Test:** Run `/gsd-set-profile balanced`, choose **Edit**, change only `execution` model, Confirm.
+
+**Expected:** Only the execution-stage agents (`gsd-executor`, `gsd-debugger`) get the overridden `model:` value; planning/verification agents match preset values.
+
+**Why human:** Confirms the “persist overrides then rewrite” ordering works end-to-end.
+
+### 3. Idempotency
+
+**Test:** Re-run `/gsd-set-profile balanced` (same effective mapping), Confirm.
+
+**Expected:** No agent files are rewritten; output indicates `modified: 0` and `unchanged: 11` (or equivalent), and `git diff` remains clean.
+
+**Why human:** Validates the skip-on-equal-model logic produces no churn.
 
 ---
 
-_Verified: 2026-01-21T18:40:32Z_
+_Verified: 2026-01-21T19:14:00Z_
 _Verifier: OpenCode (gsd-verifier)_

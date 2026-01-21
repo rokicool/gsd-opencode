@@ -17,7 +17,7 @@ Requirements for model profile management feature.
 ### Profiles
 
 - [ ] **PROF-01**: Three semantic presets available: quality, balanced, budget
-- [ ] **PROF-02**: User can set per-stage model overrides (planning/execution/verification)
+- [x] **PROF-02**: User can set per-stage model overrides (planning/execution/verification)
 - [ ] **PROF-03**: User can edit preset mappings via config file
 
 ### Commands
@@ -28,7 +28,7 @@ Requirements for model profile management feature.
 
 ### Agent Integration
 
-- [ ] **AGNT-01**: Profile changes rewrite model: frontmatter in agent files
+- [x] **AGNT-01**: Profile changes rewrite model: frontmatter in agent files
 - [x] **AGNT-02**: Stage-to-agent mapping covers all 11 GSD agents
 - [x] **AGNT-03**: Missing agent files cause clear error listing what's missing
 - [x] **AGNT-04**: All agents validated before any are modified (batch validation)
@@ -77,12 +77,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONF-03 | Phase 1: Config Foundation | Complete |
 | CONF-04 | Phase 1: Config Foundation | Partial* |
 | PROF-01 | Phase 2: Profile Definitions | Complete |
-| PROF-02 | Phase 5: Frontmatter Rewriting | Pending |
+| PROF-02 | Phase 5: Frontmatter Rewriting | Complete |
 | PROF-03 | Phase 2: Profile Definitions | Complete |
 | CMD-01 | Phase 3: Set-Profile Command | Complete |
 | CMD-02 | Phase 6: Settings Command | Pending |
 | CMD-03 | Phase 3: Set-Profile Command | Complete |
-| AGNT-01 | Phase 5: Frontmatter Rewriting | Pending |
+| AGNT-01 | Phase 5: Frontmatter Rewriting | Complete |
 | AGNT-02 | Phase 4: Agent Discovery | Complete |
 | AGNT-03 | Phase 4: Agent Discovery | Complete |
 | AGNT-04 | Phase 4: Agent Discovery | Complete |
@@ -98,7 +98,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-20*
-*Last updated: 2026-01-21 after Phase 4 completion*
+*Last updated: 2026-01-21 after Phase 5 verification*
 
 **Notes:**
 - *Partial: CONF-04 behavior documented in config.md; runtime exercise deferred to Phase 3 when /gsd-set-profile exists
