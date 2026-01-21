@@ -1,5 +1,9 @@
 {
   "mode": "yolo",
   "depth": "comprehensive",
-  "parallelization": true
+  "parallelization": true,
+  "profiles": {
+    "active_profile": "balanced",
+    "custom_overrides": {}
+  }
 }
