@@ -90,7 +90,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 05-01-PLAN.md — Implement frontmatter rewriting and integrate with gsd-set-profile
+- [x] 05-01-PLAN.md — Implement frontmatter rewriting and integrate with gsd-set-profile
 
 ### Phase 6: Settings Command
 **Goal**: Users can view current settings and interactively manage configuration
@@ -130,7 +130,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Profile Definitions | 2/2 | Complete | 2026-01-21 |
 | 3. Set-Profile Command | 2/2 | Complete | 2026-01-21 |
 | 4. Agent Discovery | 1/1 | Complete | 2026-01-21 |
-| 5. Frontmatter Rewriting | 0/1 | Not started | - |
+| 5. Frontmatter Rewriting | 1/1 | Complete | 2026-01-21 |
 | 6. Settings Command | 0/TBD | Not started | - |
 | 7. Documentation | 0/TBD | Not started | - |
 
