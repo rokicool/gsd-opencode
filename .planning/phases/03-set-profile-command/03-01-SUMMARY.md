@@ -66,7 +66,7 @@ Each task was committed atomically:
 2. **Task 2: Implement confirmation workflow with before/after table** - `f85e8d9` (feat)
 3. **Task 3: Add edge cases and inline edit flow** - `ee5a036` (feat)
 
-**Plan metadata:** (added after STATE.md + SUMMARY.md updates)
+**Plan metadata:** `0b3c5e8` (docs)
 
 ## Files Created/Modified
 
