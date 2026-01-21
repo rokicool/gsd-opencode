@@ -27,6 +27,28 @@ It manages the project's config file at:
 
 Built-in defaults live in code (this library). The file stores the user's active profile and any editable mappings (like preset definitions).
 
+### Key preservation note (why different repos may have more config keys)
+
+This repository’s `.planning/config.json` started as a **minimal baseline** (pre-phase keys):
+
+- `mode`
+- `depth`
+- `parallelization`
+
+Other repositories (or older/newer templates) may legitimately include **additional top-level keys** (for example: `gates`, richer `parallelization` objects, etc.). Those differences come from *how the repo was initialized*, not from profile work removing keys.
+
+**Intended guarantee:** `writeConfig()` must **deep-merge overlays** and **preserve all existing/unknown keys**. Profile-related work should only add/update `profiles.*` and must never delete unrelated settings.
+
+**Reproducible verification (git):**
+
+```bash
+git log --oneline -- .planning/config.json
+git show ec90fca:.planning/config.json
+git show 418cff8:.planning/config.json
+```
+
+When you compare these snapshots/diffs, changes should be additive under `profiles.*` (no commits removing other top-level keys).
+
 Default values:
 
 - `profiles.active_profile`: `"balanced"`
