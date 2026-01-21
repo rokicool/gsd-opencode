@@ -12,7 +12,7 @@ This roadmap delivers model profile management for gsd-opencode, enabling per-st
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Config Foundation** - Establish config schema with persistence and validation
+- [x] **Phase 1: Config Foundation** - Establish config schema with persistence and validation
 - [ ] **Phase 2: Profile Definitions** - Define preset profiles and editable mappings
 - [ ] **Phase 3: Set-Profile Command** - Implement `/gsd-set-profile` for quick switching
 - [ ] **Phase 4: Agent Discovery** - Validate agent files and stage mappings
@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01: Create config helper module with persistence, validation, and error handling
-- [ ] 01-02: Seed config.json with profiles schema (gap closure)
+- [x] 01-02: Seed config.json with profiles schema (gap closure)
 
 ### Phase 2: Profile Definitions
 **Goal**: Three semantic presets exist with editable model-to-stage mappings
@@ -124,7 +124,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Config Foundation | 0/1 | Planned | - |
+| 1. Config Foundation | 2/2 | Complete | 2026-01-21 |
 | 2. Profile Definitions | 0/TBD | Not started | - |
 | 3. Set-Profile Command | 0/TBD | Not started | - |
 | 4. Agent Discovery | 0/TBD | Not started | - |
