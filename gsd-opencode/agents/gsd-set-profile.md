@@ -20,6 +20,9 @@ This command updates **project config only**. It does NOT rewrite agent frontmat
 
 # Config library with procedures
 @gsd-opencode/get-shit-done/lib/config.md
+
+# Agent frontmatter rewriting library (Phase 05)
+@gsd-opencode/get-shit-done/lib/agents.md
 </context>
 
 <command>
@@ -344,13 +347,38 @@ On confirm:
 
 1. Call `setActiveProfile(newProfile)`
 2. If it returns `{ ok: false }`, print the error and stop.
-3. Otherwise print:
+3. If it succeeds, apply the profile to agent files by rewriting `model:` in all 11 stage agents:
+
+   - Call: `applyProfile(newProfile)`
+   - This will rewrite `model:` in the agent frontmatter so OpenCode actually uses the new model
+   - This is the mechanism that makes profile changes take effect
+
+   Error handling:
+   - If `applyProfile()` returns `{ ok: false }`:
+     - Print an error
+     - Print which agents succeeded (if any) and which agent failed
+     - Suggest recovery: “You can re-run the command to retry. Git can restore any modified files.”
+     - Stop (do not claim success)
+
+4. Otherwise print:
 
 ```
 ✓ Active profile set to: {newProfile}
 ```
 
-4. Then print the new active configuration table (Stage | Model) using `getPresetConfig(newProfile)`:
+Also print a brief summary of agent changes:
+
+```text
+Agent updates: {modified.length} modified, {unchanged.length} unchanged
+```
+
+- If `modified.length === 0` and `unchanged.length === 11`, print:
+
+```text
+All agents already have the correct model configured.
+```
+
+5. Then print the new active configuration table (Stage | Model) using `getPresetConfig(newProfile)`:
 
 ```
 Current configuration:
@@ -359,6 +387,14 @@ Current configuration:
 | planning     | ...   |
 | execution    | ...   |
 | verification | ...   |
+```
+
+### Update the preview messaging (proposed changes)
+
+In the confirmation preview (before the user confirms), add a note immediately under the table:
+
+```text
+This will update the model: key in all 11 agent files.
 ```
 
 ### Cancel path
