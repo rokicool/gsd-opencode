@@ -73,9 +73,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CONF-01 | Phase 6: Settings Command | Pending |
-| CONF-02 | Phase 1: Config Foundation | Pending |
-| CONF-03 | Phase 1: Config Foundation | Pending |
-| CONF-04 | Phase 1: Config Foundation | Pending |
+| CONF-02 | Phase 1: Config Foundation | Complete |
+| CONF-03 | Phase 1: Config Foundation | Complete |
+| CONF-04 | Phase 1: Config Foundation | Partial* |
 | PROF-01 | Phase 2: Profile Definitions | Pending |
 | PROF-02 | Phase 5: Frontmatter Rewriting | Pending |
 | PROF-03 | Phase 2: Profile Definitions | Pending |
@@ -98,4 +98,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-20*
-*Last updated: 2026-01-20 after initial definition*
+*Last updated: 2026-01-21 after Phase 1 completion*
+
+**Notes:**
+- *Partial: CONF-04 behavior documented in config.md; runtime exercise deferred to Phase 3 when /gsd-set-profile exists
