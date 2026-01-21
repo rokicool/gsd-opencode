@@ -364,3 +364,221 @@ function validateModelKey(modelValue, validModels) {
 **Example scenarios:**
 - **Valid model:** `validateModelKey("opencode/glm-4.7-free", [...])` → `{ valid: true }`
 - **Invalid model:** `validateModelKey("invalid/model", [...])` → `{ valid: false, error: "Invalid model 'invalid/model'. Run 'opencode models' to see valid options." }`
+
+---
+
+### validateAllAgents()
+
+**Purpose:** Batch validate all 11 GSD agents before any modification.
+
+**Guarantee:** All agents are validated before any are modified. Phase 5 calls this once to get either a complete set of pre-validated agent info or a comprehensive list of all errors.
+
+**Behavior:**
+1. Call `validateAgentsExist()` — fail early if any agent files are missing
+2. Get valid models via `getValidModels()`
+3. For each agent in `ALL_GSD_AGENTS`:
+   - `parseFrontmatter(resolveAgentPath(agent))`
+   - `validateFrontmatter(frontmatter, path)`
+   - If model key exists, `validateModelKey(model, validModels)`
+   - Collect all errors (batch, not fail-fast)
+4. Return aggregate result
+
+**Returns:**
+- `{ valid: true, agents: AgentInfo[] }` — all agents validated successfully
+- `{ valid: false, errors: ValidationError[] }` — one or more validation errors
+
+**Type definitions:**
+
+```ts
+type AgentInfo = {
+  name: string;           // Agent name (e.g., "gsd-planner")
+  path: string;           // Full path to agent file
+  frontmatter: object;    // Parsed frontmatter object
+  bodyStart: number;      // Line number where body content begins
+};
+
+type ValidationError = {
+  agent: string;          // Agent name
+  path: string;           // Full path to agent file
+  errors: string[];       // List of error messages for this agent
+};
+```
+
+**Pseudocode:**
+
+```ts
+function validateAllAgents() {
+  // Step 1: Validate all agent files exist
+  const existsResult = validateAgentsExist();
+  if (!existsResult.valid) {
+    return {
+      valid: false,
+      errors: [{
+        agent: "(file existence)",
+        path: "gsd-opencode/agents/",
+        errors: [existsResult.error],
+      }],
+    };
+  }
+
+  // Step 2: Get valid models
+  const modelsResult = getValidModels();
+  const validModels = modelsResult.ok ? modelsResult.models : [];
+  
+  // Note: If models command fails, we can still validate structure
+  // We just skip model value validation
+  const modelsFailed = !modelsResult.ok;
+
+  // Step 3: Validate each agent
+  const agents = [];
+  const errors = [];
+
+  for (const agentName of ALL_GSD_AGENTS) {
+    const path = resolveAgentPath(agentName);
+    const agentErrors = [];
+
+    // Parse frontmatter
+    const parseResult = parseFrontmatter(path);
+    if (!parseResult.ok) {
+      agentErrors.push(parseResult.error);
+    } else {
+      // Validate frontmatter structure
+      const structureResult = validateFrontmatter(parseResult.frontmatter, path);
+      if (!structureResult.valid) {
+        agentErrors.push(...structureResult.errors);
+      }
+
+      // Validate model key (if present and models available)
+      if (
+        parseResult.frontmatter.model &&
+        !modelsFailed
+      ) {
+        const modelResult = validateModelKey(
+          parseResult.frontmatter.model,
+          validModels
+        );
+        if (!modelResult.valid) {
+          agentErrors.push(`${path}: ${modelResult.error}`);
+        }
+      }
+
+      // If no errors, add to successful agents list
+      if (agentErrors.length === 0) {
+        agents.push({
+          name: agentName,
+          path,
+          frontmatter: parseResult.frontmatter,
+          bodyStart: parseResult.bodyStart,
+        });
+      }
+    }
+
+    // Collect errors for this agent
+    if (agentErrors.length > 0) {
+      errors.push({
+        agent: agentName,
+        path,
+        errors: agentErrors,
+      });
+    }
+  }
+
+  // Step 4: Return aggregate result
+  if (errors.length > 0) {
+    return { valid: false, errors };
+  }
+
+  return { valid: true, agents };
+}
+```
+
+**Example scenarios:**
+
+- **All valid:**
+  ```ts
+  {
+    valid: true,
+    agents: [
+      { name: "gsd-planner", path: "gsd-opencode/agents/gsd-planner.md", frontmatter: {...}, bodyStart: 15 },
+      { name: "gsd-plan-checker", path: "gsd-opencode/agents/gsd-plan-checker.md", frontmatter: {...}, bodyStart: 12 },
+      // ... all 11 agents
+    ]
+  }
+  ```
+
+- **Multiple errors:**
+  ```ts
+  {
+    valid: false,
+    errors: [
+      { agent: "gsd-planner", path: "gsd-opencode/agents/gsd-planner.md", errors: ["Invalid YAML in frontmatter: ..."] },
+      { agent: "gsd-verifier", path: "gsd-opencode/agents/gsd-verifier.md", errors: ["Invalid model 'bad/model'. Run 'opencode models' to see valid options."] },
+    ]
+  }
+  ```
+
+---
+
+## Usage
+
+### Phase 5 Consumption Pattern
+
+Phase 5 (Frontmatter Rewriting) calls `validateAllAgents()` once before any modification:
+
+```ts
+const result = validateAllAgents();
+
+if (!result.valid) {
+  // Display all errors, abort before any modification
+  console.error("Agent validation failed:");
+  for (const err of result.errors) {
+    console.error(`\n${err.agent}:`);
+    for (const msg of err.errors) {
+      console.error(`  - ${msg}`);
+    }
+  }
+  return; // Do NOT proceed with frontmatter rewriting
+}
+
+// Safe to proceed with frontmatter rewriting
+// All agents have been validated
+for (const agent of result.agents) {
+  // agent.name       - Agent name
+  // agent.path       - Full path to file
+  // agent.frontmatter - Parsed frontmatter object
+  // agent.bodyStart  - Line number where body begins
+  
+  // Modify frontmatter as needed, then rewrite file
+}
+```
+
+### Batch Validation Guarantee
+
+**All agents are validated before any are modified.**
+
+This ensures:
+1. No partial modifications if some agents have errors
+2. User sees complete error list (not just first error)
+3. Atomic operation: all succeed or none are modified
+
+### Reference from Other Commands
+
+Include this library via @-reference:
+
+```markdown
+@gsd-opencode/get-shit-done/lib/agents.md
+```
+
+### Exports
+
+This library provides:
+
+| Procedure | Purpose |
+|-----------|---------|
+| `resolveAgentPath(agentName)` | Get full path to agent file |
+| `validateAgentsExist()` | Check all 11 agent files exist |
+| `parseFrontmatter(agentPath)` | Extract and parse YAML frontmatter |
+| `validateFrontmatter(frontmatter, agentPath)` | Validate frontmatter structure |
+| `getValidModels()` | Get valid model list from opencode |
+| `validateModelKey(modelValue, validModels)` | Check model against valid list |
+| `validateAllAgents()` | Main orchestration — batch validate all agents |
