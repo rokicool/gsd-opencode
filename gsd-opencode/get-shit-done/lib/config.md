@@ -352,6 +352,8 @@ Presets are semantic, user-editable stage-to-model mappings stored under `profil
 
 **Purpose:** Get the stage-to-model mappings for a preset.
 
+**Important:** `getPresetConfig()` returns the **raw preset mapping** only. It does **not** apply any per-stage overrides from `profiles.custom_overrides`. If you need the models that will actually be applied at runtime (including overrides), use `getEffectiveStageModels()`.
+
 **Behavior:**
 
 1. Validate `presetName` via `validateProfile()`
@@ -404,6 +406,68 @@ function getPresetConfig(presetName) {
 ```
 
 ---
+
+### getEffectiveStageModels(presetName)
+
+**Purpose:** Get the **effective** stage-to-model mapping that should be used at runtime when rewriting agent frontmatter.
+
+This is the canonical helper whenever you need the stage models OpenCode will actually use:
+
+- Start from the preset mapping (via `getPresetConfig(presetName)`)
+- Overlay per-stage overrides from `config.profiles.custom_overrides.{stage}`
+
+**Behavior requirements:**
+
+1. Validate `presetName` via `validateProfile()`
+2. Read config via `readConfig()`
+3. Read the raw preset mapping via `getPresetConfig(presetName)`
+4. Overlay `config.profiles.custom_overrides` on top of the preset mapping:
+   - Only apply known stages: `planning | execution | verification`
+   - Only apply override values that are **non-empty strings**
+   - Ignore any unknown keys in `custom_overrides`
+
+**Returns:**
+
+- Success: `{ ok: true, stageModels: { planning, execution, verification } }`
+- Failure: `{ ok: false, error: string }`
+
+**Pseudocode:**
+
+```ts
+function getEffectiveStageModels(presetName) {
+  // 1) Validate preset name
+  const validation = validateProfile(presetName);
+  if (!validation.valid) {
+    return { ok: false, error: validation.error };
+  }
+
+  // 2) Read config (contains custom overrides)
+  const config = readConfig();
+
+  // 3) Start with the raw preset mapping
+  const presetResult = getPresetConfig(presetName);
+  if (!presetResult.ok) {
+    return { ok: false, error: presetResult.error };
+  }
+
+  const stageModels = { ...presetResult.preset };
+
+  // 4) Overlay per-stage overrides (only known stages; only non-empty strings)
+  const overrides = config?.profiles?.custom_overrides ?? {};
+  const stages = ["planning", "execution", "verification"];
+
+  for (const stage of stages) {
+    const override = overrides?.[stage];
+    if (typeof override === "string" && override.trim() !== "") {
+      stageModels[stage] = override;
+    }
+  }
+
+  return { ok: true, stageModels };
+}
+```
+
+**Usage note:** Use `getEffectiveStageModels()` anywhere you need the models that will actually be applied (for example: `applyProfile()` when rewriting agent frontmatter).
 
 ### getAgentsForStage(stage)
 
