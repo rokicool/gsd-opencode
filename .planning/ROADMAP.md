@@ -76,7 +76,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 04-01-PLAN.md — Create agent discovery and validation library (agents.md)
+- [x] 04-01-PLAN.md — Create agent discovery and validation library (agents.md)
 
 ### Phase 5: Frontmatter Rewriting
 **Goal**: Profile changes update agent file frontmatter with per-stage overrides
@@ -129,7 +129,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Config Foundation | 2/2 | Complete | 2026-01-21 |
 | 2. Profile Definitions | 2/2 | Complete | 2026-01-21 |
 | 3. Set-Profile Command | 2/2 | Complete | 2026-01-21 |
-| 4. Agent Discovery | 0/TBD | Not started | - |
+| 4. Agent Discovery | 1/1 | Complete | 2026-01-21 |
 | 5. Frontmatter Rewriting | 0/TBD | Not started | - |
 | 6. Settings Command | 0/TBD | Not started | - |
 | 7. Documentation | 0/TBD | Not started | - |
