@@ -206,7 +206,7 @@ When `newProfile !== currentProfile`, you MUST show a before/after preview and a
 ```
 Profile change: {currentProfile} → {newProfile}
 
-Effective stage models (includes `profiles.custom_overrides.{stage}`):
+Effective stage models (includes per-profile overrides at `profiles.custom_overrides.{profile}.{stage}`):
 
 | Stage        | Current Model              | New Model                  |
 |--------------|----------------------------|----------------------------|
@@ -236,8 +236,8 @@ When the user selects **Edit**, allow them to adjust the per-stage model IDs for
 Important rules:
 
 - Editing does **not** modify `profiles.presets`.
-- Editing stores overrides in config at: `profiles.custom_overrides.{stage}`.
-- These overrides apply to the **currently active profile's runtime configuration** (additive behavior).
+- Editing stores overrides in config at: `profiles.custom_overrides.{newProfile}.{stage}`.
+- These overrides apply only to the **selected profile's runtime configuration** (preset + per-profile overrides).
 
 ### Edit flow
 
@@ -295,9 +295,11 @@ On Confirm after Edit:
 {
   "profiles": {
     "custom_overrides": {
-      "planning": "...",
-      "execution": "...",
-      "verification": "..."
+      "{newProfile}": {
+        "planning": "...",
+        "execution": "...",
+        "verification": "..."
+      }
     }
   }
 }
@@ -306,13 +308,14 @@ On Confirm after Edit:
 Notes:
 
 - Only write keys for stages the user actually changed (keep the override object minimal).
+- Scope the written keys under `{newProfile}`.
 - If the user changed none of the stages, do not write overrides.
 
 3. **Critical ordering:** Call `applyProfile(newProfile)` only **after** both:
-   - `setActiveProfile(newProfile)` succeeded, and
-   - any override `writeConfig()` succeeded (if applicable)
+    - `setActiveProfile(newProfile)` succeeded, and
+    - any override `writeConfig()` succeeded (if applicable)
 
-Rationale: `applyProfile()` reads the effective stage models (preset + `profiles.custom_overrides`) from config, so overrides must be persisted before rewriting agent frontmatter.
+Rationale: `applyProfile()` reads the effective stage models (preset + `profiles.custom_overrides.{newProfile}.*`) from config, so overrides must be persisted before rewriting agent frontmatter.
 
 ### Edge cases to handle (do not crash)
 

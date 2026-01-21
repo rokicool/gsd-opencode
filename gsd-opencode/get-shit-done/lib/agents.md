@@ -749,8 +749,9 @@ function applyProfile(presetName) {
   }
 
   // 3) Get the stage->model mapping that should actually be applied.
-  //    Note: Per-stage overrides live under config.profiles.custom_overrides.{stage}.
-  //    applyProfile() applies them automatically by using getEffectiveStageModels().
+  //    Note (Phase 06): Per-stage overrides are scoped per profile:
+  //      config.profiles.custom_overrides.{presetName}.{stage}
+  //    applyProfile() applies them automatically by using getEffectiveStageModels(presetName).
   const effectiveResult = getEffectiveStageModels(presetName); // from config.md
   if (!effectiveResult.ok) {
     return { ok: false, error: effectiveResult.error, succeeded: [], failed: "(config)" };
