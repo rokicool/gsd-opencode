@@ -492,6 +492,219 @@ function validateAllAgents() {
 }
 ```
 
+---
+
+### serializeFrontmatter(frontmatter, originalLines, bodyStart)
+
+**Purpose:** Rebuild an agent markdown file after updating its parsed frontmatter, while preserving the original file’s structure and style.
+
+This procedure is the core of Phase 05 frontmatter rewriting. It is intentionally **not** a full YAML serializer — it assumes the agent frontmatter is **flat** (top-level scalar keys) except for the `tools:` block, which must be preserved verbatim.
+
+**Inputs:**
+
+- `frontmatter`: The updated frontmatter object (from `parseFrontmatter()`, with any modifications applied).
+- `originalLines`: The full original file split by `\n`.
+- `bodyStart`: The line number where body content begins (from `parseFrontmatter()` / `AgentInfo.bodyStart`).
+
+**Preservation guarantees:**
+
+1. **Key order preserved** based on the original file’s frontmatter, except:
+   - `model:` is forced to appear **immediately after** `name:` (inserted if missing)
+2. **Non-model values preserved** (the caller only changes `frontmatter.model`)
+3. **`tools:` block preserved exactly** (copied verbatim from the original lines)
+4. **Body content preserved exactly** (all lines from `bodyStart` onward are copied verbatim)
+
+**Behavior notes (serialization rules):**
+
+- Scalar serialization uses `key: value`.
+- `description` may be multi-line:
+  - If `description.length > 80` OR contains newlines, serialize as YAML block scalar with `|`.
+  - Otherwise, serialize as a quoted string if it contains `:` or leading/trailing whitespace.
+- Preserve `color:` if present (treat as a scalar string).
+
+**Returns:** Full file content as a single string.
+
+**Pseudocode:**
+
+```ts
+function serializeFrontmatter(frontmatter, originalLines, bodyStart) {
+  // 1) Identify frontmatter bounds from original file
+  //    NOTE: For GSD agent files, frontmatter is expected at the top.
+  //    Still, we locate delimiters defensively.
+  const { frontmatterStart, frontmatterEnd } = findFrontmatterDelimiters(originalLines);
+
+  // 2) Extract original frontmatter lines (between --- delimiters)
+  const originalFmLines = originalLines.slice(frontmatterStart + 1, frontmatterEnd);
+
+  // 3) Derive original key ordering and capture tools block verbatim
+  //    We treat `tools:` as a special multi-line YAML block:
+  //      tools:
+  //        read: true
+  //        write: true
+  //    and we copy it as-is.
+  const orderedKeys = [];           // e.g. ["name", "description", "tools", "color"]
+  const toolsBlockLines = [];       // verbatim lines from "tools:" through before next top-level key
+
+  let i = 0;
+  while (i < originalFmLines.length) {
+    const line = originalFmLines[i];
+
+    // Top-level key lines are not indented and look like "key:"
+    const match = line.match(/^([A-Za-z0-9_-]+):/);
+    if (!match) {
+      i++;
+      continue;
+    }
+
+    const key = match[1];
+
+    if (key === "tools") {
+      // Capture tools block verbatim, including the "tools:" line
+      const start = i;
+      i++;
+      while (i < originalFmLines.length) {
+        const next = originalFmLines[i];
+        const nextKey = next.match(/^([A-Za-z0-9_-]+):/);
+        const isIndented = /^\s+/.test(next);
+
+        // Stop when we reach the next top-level key line
+        if (nextKey && !isIndented) break;
+        i++;
+      }
+      toolsBlockLines.push(...originalFmLines.slice(start, i));
+      orderedKeys.push("tools");
+      continue;
+    }
+
+    // Record the key order (even if we later reposition model)
+    orderedKeys.push(key);
+    i++;
+  }
+
+  // 4) Build new frontmatter lines
+  const out = [];
+  out.push("---");
+
+  // Always emit name first
+  out.push(`name: ${formatScalar(frontmatter.name)}`);
+
+  // Force model second (insert if missing)
+  // If caller intends to remove model, they should delete the key before calling.
+  if (frontmatter.model) {
+    out.push(`model: ${formatScalar(frontmatter.model)}`);
+  } else {
+    // If model was missing, callers in Phase 05 will set it before calling.
+    // This branch is here for completeness.
+    out.push(`model: ${formatScalar(frontmatter.model ?? "")}`);
+  }
+
+  // Emit remaining keys in original order, excluding name/model (already handled)
+  for (const key of orderedKeys) {
+    if (key === "name" || key === "model") continue;
+
+    if (key === "tools") {
+      // Preserve tools block exactly as-is
+      if (toolsBlockLines.length > 0) {
+        out.push(...toolsBlockLines);
+      } else {
+        // Fallback: serialize tools from object (should be rare)
+        out.push("tools:");
+        out.push(...serializeToolsObject(frontmatter.tools));
+      }
+      continue;
+    }
+
+    if (key === "description") {
+      out.push(...serializeDescription(frontmatter.description));
+      continue;
+    }
+
+    // Default scalar key
+    if (key in frontmatter) {
+      out.push(`${key}: ${formatScalar(frontmatter[key])}`);
+    }
+  }
+
+  // 5) Append any new keys that didn't exist in original frontmatter
+  //    (Not expected for Phase 05, but keeps the serializer stable.)
+  const known = new Set(["name", "model", ...orderedKeys]);
+  const extraKeys = Object.keys(frontmatter).filter((k) => !known.has(k));
+  for (const key of extraKeys) {
+    out.push(`${key}: ${formatScalar(frontmatter[key])}`);
+  }
+
+  out.push("---");
+
+  // 6) Preserve body content exactly as-is
+  const bodyLines = originalLines.slice(bodyStart);
+  out.push(...bodyLines);
+
+  return out.join("\n");
+}
+```
+
+**Example scenarios:**
+
+- **Insert model key when missing:** original frontmatter has `name`, `description`, `tools`; output adds `model:` after `name:`.
+- **Update model key when present:** output rewrites only the `model:` line value, leaving other keys and body untouched.
+- **Preserve tools block:** `tools:` YAML stays identical (ordering/spacing preserved) because lines are copied verbatim.
+
+---
+
+### rewriteFrontmatter(agentInfo, newModel)
+
+**Purpose:** Update a single agent file’s `model:` frontmatter key to a new value, preserving all other frontmatter keys and body content.
+
+This procedure is designed to be called by `applyProfile()` (Phase 05) after a **full pre-validation** via `validateAllAgents()`.
+
+**Inputs:**
+
+- `agentInfo`: An `AgentInfo` from `validateAllAgents()`
+- `newModel`: The model string to insert/update (e.g., `"opencode/glm-4.7-free"`)
+
+**Returns:**
+
+- `{ ok: true }`, or
+- `{ ok: false, error: string }`
+
+**Fail-fast note:** If writing fails, return immediately with an error. `applyProfile()` will stop on first write failure and report partial success.
+
+**Pseudocode:**
+
+```ts
+function rewriteFrontmatter(agentInfo, newModel) {
+  let original;
+  try {
+    original = readFile(agentInfo.path);
+  } catch (err) {
+    return { ok: false, error: `Failed to read agent file: ${agentInfo.path} - ${err.message}` };
+  }
+
+  const originalLines = original.split("\n");
+
+  // Clone frontmatter and update/insert model
+  const updatedFrontmatter = { ...agentInfo.frontmatter, model: newModel };
+
+  const rebuilt = serializeFrontmatter(
+    updatedFrontmatter,
+    originalLines,
+    agentInfo.bodyStart
+  );
+
+  try {
+    writeFile(agentInfo.path, rebuilt);
+  } catch (err) {
+    return { ok: false, error: `Failed to write agent file: ${agentInfo.path} - ${err.message}` };
+  }
+
+  return { ok: true };
+}
+```
+
+**Example scenarios:**
+
+- `rewriteFrontmatter(gsd-planner, "opencode/glm-4.7-free")` inserts/updates `model:` while keeping `tools:` and body unchanged.
+
 **Example scenarios:**
 
 - **All valid:**
