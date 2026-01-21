@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-20)
 
 ## Current Position
 
-Phase: 5 of 7 (Frontmatter Rewriting)
-Plan: 2 of 2 in current phase
-Status: Phase verified
-Last activity: 2026-01-21 — Verified Phase 5 (passed)
+Phase: 6 of 7 (Settings Command)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-01-21 — Completed 06-01-PLAN.md
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 2.51 min
-- Total execution time: 22.55 min
+- Total plans completed: 10
+- Average duration: 2.50 min
+- Total execution time: 24.55 min
 
 **By Phase:**
 
@@ -32,6 +32,7 @@ Progress: [████████░░] 80%
 | 3 | 2 | 2 | 1.45 min |
 | 4 | 1 | 1 | 3.00 min |
 | 5 | 2 | 2 | 2.50 min |
+| 6 | 1 | 2 | 2.00 min |
 
 **Recent Trend:**
 - Last 5 plans: 03-01, 03-02, 04-01, 05-01, 05-02
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 
 - [05-02]: Use `getEffectiveStageModels()` (preset + `profiles.custom_overrides` overlay) as the canonical stage→model resolver for rewrites and UX tables
 
+- [06-01]: Per-stage overrides are scoped per profile at `profiles.custom_overrides.{profile}.{stage}`; legacy `profiles.custom_overrides.{stage}` is migrated into the active profile to prevent cross-profile leakage.
+
 ### Pending Todos
 
 None yet.
@@ -80,9 +83,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-21T18:52:25Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-01-21T22:23:19Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
 
 ---
-*Next: Phase 6 planning (`/gsd-plan-phase 6`)*
+*Next: Execute 06-02-PLAN.md*
