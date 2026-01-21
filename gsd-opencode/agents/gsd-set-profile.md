@@ -47,6 +47,14 @@ Support **two invocation styles**:
 /gsd-set-profile -u
 ```
 
+3) **Positional argument (direct selection)**
+
+```
+/gsd-set-profile quality
+/gsd-set-profile balanced
+/gsd-set-profile budget
+```
+
 ### Valid profiles
 
 - `quality`
@@ -60,6 +68,20 @@ Support **two invocation styles**:
 - If multiple profile flags are provided:
   - Prefer the **last** profile flag seen (simplest predictable rule)
   - Warn the user: "Multiple profile flags provided; using '{chosen}'."
+
+### Argument parsing precedence
+
+When multiple selection methods are provided:
+
+1. **Positional argument** (first non-flag token) — highest priority
+2. **Flags** (`--quality`, `-q`, etc.) — checked if no positional
+3. **Interactive picker** — used if neither positional nor flags
+
+Examples:
+
+- `/gsd-set-profile quality --budget` → uses `quality` (positional wins)
+- `/gsd-set-profile --budget` → uses `budget` (flag, no positional)
+- `/gsd-set-profile` → interactive picker
 </command>
 
 <behavior>
@@ -107,15 +129,29 @@ Type a number (1-3) or 'cancel':
 
 Map selection → `newProfile`.
 
-### B) Flag-based selection
+### B) Positional argument selection
+
+If invoked with a positional argument (first non-flag token):
+
+1. Extract the first positional token
+2. Check if it matches a valid profile name (quality/balanced/budget)
+3. If valid, set `newProfile` to that value
+4. If invalid, use `validateProfile(token)` for fuzzy suggestion (same as unknown flag handling in section D)
+
+### C) Flag-based selection
 
 If invoked with a supported profile flag, set `newProfile` accordingly.
 
-### C) Unknown flag handling (do NOT crash)
+### D) Invalid profile handling (positional or flag)
 
-If the user provided flags but none match the known set:
+If the user provided an invalid selection via:
 
-1. Attempt to extract the unknown token (e.g., `--fast` or `-x`) for messaging.
+- Unknown flags (e.g., `--fast`)
+- Invalid positional arguments (e.g., `/gsd-set-profile turbo`)
+
+Do NOT crash. Instead:
+
+1. Attempt to extract the invalid token (e.g., `turbo`, `--fast` or `-x`) for messaging.
 2. Use `validateProfile(tokenWithoutDashes)` for fuzzy suggestion (per config library).
 3. Print a helpful error, including a suggestion if available, and re-prompt the user to retry.
 
