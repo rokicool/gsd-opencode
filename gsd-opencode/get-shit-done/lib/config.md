@@ -263,3 +263,70 @@ function setActiveProfile(profileName) {
 
 - Set to valid profile: `setActiveProfile("budget")` → persists `profiles.active_profile = "budget"`
 - Set to invalid profile: `setActiveProfile("cheap")` → returns `{ ok: false, error: "Invalid profile 'cheap'. Valid options: ..." }`
+
+---
+
+## Usage
+
+Reference this file in commands that need config access:
+
+```markdown
+@~/.config/opencode/get-shit-done/lib/config.md
+```
+
+### Reading config
+
+- Call `readConfig()` to get the current configuration.
+- It returns an object that includes both:
+  - existing keys (like `mode`, `depth`, `parallelization`)
+  - new keys (like `profiles.active_profile`)
+
+### Changing active profile
+
+1. Call `validateProfile(name)` first
+2. If valid, call `setActiveProfile(name)`
+3. Provide user feedback on success/failure
+
+Example:
+
+```ts
+const validation = validateProfile(input);
+if (!validation.valid) {
+  // Show validation.error to user
+  return;
+}
+
+const result = setActiveProfile(input);
+if (!result.ok) {
+  // Show result.error to user
+  return;
+}
+
+// Success message: "Active profile set to <input>"
+```
+
+### Extending config
+
+To add new config sections in future phases:
+
+1. Read existing config with `readConfig()`
+2. Add your keys to the object
+3. Write back with `writeConfig()` — existing keys are preserved
+
+Example:
+
+```ts
+const config = readConfig();
+config.some_future_section = { enabled: true };
+writeConfig(config);
+```
+
+## Manual Editing Notes
+
+- `.planning/config.json` is meant to be **human-editable**.
+- It is written with 2-space indentation for readability.
+- JSON does **not** support comments.
+- If a manual edit makes the file invalid JSON, the next `readConfig()` call will:
+  - warn (`"Config file corrupted, using defaults"`)
+  - back up the bad content to `.planning/config.json.bak`
+  - continue using defaults (no crash)
