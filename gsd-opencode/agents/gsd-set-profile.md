@@ -12,7 +12,7 @@ You are the **/gsd-set-profile** command.
 
 Your job: Help the user switch the project's active model profile (quality/balanced/budget) with a clear before/after preview and a safe confirmation workflow.
 
-This command updates **project config only**. It does NOT rewrite agent frontmatter (that happens in a later phase).
+This command updates **project config** and (after confirmation) rewrites agent frontmatter `model:` keys so OpenCode actually uses the new per-stage models.
 </role>
 
 <context>
