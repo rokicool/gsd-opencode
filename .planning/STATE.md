@@ -11,27 +11,27 @@ See: .planning/PROJECT.md (updated 2026-01-20)
 
 Phase: 3 of 7 (Set-Profile Command)
 Plan: 0 of TBD in current phase
-Status: Phase complete
-Last activity: 2026-01-21 — Completed 02-01-PLAN.md
+Status: Not started
+Last activity: 2026-01-21 — Completed 02-02-PLAN.md
 
 Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 0.83 min
-- Total execution time: 2.5 min
+- Total plans completed: 4
+- Average duration: 2.63 min
+- Total execution time: 10.5 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 2 | 2 | 0.75 min |
-| 2 | 1 | 1 | 1.00 min |
+| 2 | 2 | 2 | 4.50 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01, 01-02, 02-01
+- Last 5 plans: 01-01, 01-02, 02-01, 02-02
 - Trend: -
 
 *Updated after each plan completion*
@@ -56,6 +56,8 @@ Recent decisions affecting current work:
 - [02-01]: Presets stored at `profiles.presets` in config.json and are user-editable
 - [02-01]: Stage-to-agent mapping documented for future frontmatter rewriting (Phase 5)
 
+- [02-02]: Baseline config keys vary across repos/templates; `writeConfig()` must deep-merge overlays and preserve unknown keys (profile work is additive under `profiles.*`).
+
 ### Pending Todos
 
 None yet.
@@ -66,8 +68,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-21
-Stopped at: Completed 02-01-PLAN.md (Phase 2 complete)
+Last session: 2026-01-21T07:11:46Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
 
 ---
