@@ -271,7 +271,38 @@ questions: [
 ]
 ```
 
-Create `.planning/config.json` with chosen mode, depth, and parallelization.
+Create `.planning/config.json` with chosen mode, depth, parallelization, and the profiles schema:
+
+```json
+{
+  "mode": "[chosen mode]",
+  "depth": "[chosen depth]",
+  "parallelization": [true/false],
+  "profiles": {
+    "active_profile": "balanced",
+    "presets": {
+      "quality": {
+        "planning": "opencode/glm-4.7-free",
+        "execution": "opencode/glm-4.7-free",
+        "verification": "opencode/glm-4.7-free"
+      },
+      "balanced": {
+        "planning": "opencode/glm-4.7-free",
+        "execution": "opencode/minimax-m2.1-free",
+        "verification": "opencode/glm-4.7-free"
+      },
+      "budget": {
+        "planning": "opencode/minimax-m2.1-free",
+        "execution": "opencode/grok-code",
+        "verification": "opencode/minimax-m2.1-free"
+      }
+    },
+    "custom_overrides": {}
+  }
+}
+```
+
+This profiles schema enables `/gsd-settings` and `/gsd-set-profile` commands to manage model profiles immediately after project initialization.
 
 **Commit config.json:**
 
