@@ -44,9 +44,30 @@ Precedence: Positional > Flags > Interactive picker
 
 <behavior>
 
-## Step 1: Read config file
+## Step 1: Read config file and migrate if needed
 
-Read `.planning/config.json`. If missing or invalid, use defaults:
+Read `.planning/config.json`. Handle these cases:
+
+**Case A: File missing or invalid**
+- Use defaults (see below)
+- Write the defaults to `.planning/config.json`
+- Print: `Created .planning/config.json with default profile settings`
+
+**Case B: File exists but missing `profiles` key (legacy config)**
+- This is an older GSD project that needs migration
+- Preserve all existing keys (`mode`, `depth`, `parallelization`, etc.)
+- Add the `profiles` structure with defaults
+- Write the merged config to `.planning/config.json`
+- Print: `Migrated config.json to support model profiles (GSD update)`
+
+**Case C: File exists with `profiles` key**
+- Use as-is, no migration needed
+
+**Also check `opencode.json`:**
+- If missing, it will be created when changes are saved
+- If exists, it will be merged (preserve non-agent keys)
+
+**Default profiles structure:**
 
 ```json
 {
