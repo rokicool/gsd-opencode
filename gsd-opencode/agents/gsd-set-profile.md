@@ -120,15 +120,24 @@ Notes:
 
 ### A) No-args interactive picker
 
-If invoked with **no profile flag**, prompt:
+If invoked with **no profile flag**, prompt using the OpenCode **question tool** (interactive picker):
 
-```
-Select a profile:
-[1] quality
-[2] balanced
-[3] budget
+Use question:
 
-Type a number (1-3) or 'cancel':
+```js
+questions: [
+  {
+    header: "Model profile",
+    question: "Select a profile",
+    multiSelect: false,
+    options: [
+      { label: "quality" },
+      { label: "balanced" },
+      { label: "budget" },
+      { label: "Cancel" },
+    ],
+  },
+]
 ```
 
 Map selection → `newProfile`.
@@ -216,19 +225,24 @@ Effective stage models (includes per-profile overrides at `profiles.custom_overr
 | verification | {currentPreset.verification}| {newPreset.verification}  |
 ```
 
-3. Prompt:
+3. Prompt using the OpenCode **question tool** (no freeform parsing, no single-letter triggers):
 
+Use question:
+
+```js
+questions: [
+  {
+    header: "Confirm profile change",
+    question: "What would you like to do?",
+    multiSelect: false,
+    options: [
+      { label: "Confirm change", description: "Persist config and rewrite agent frontmatter" },
+      { label: "Edit proposed stage models", description: "Adjust the per-stage model IDs before confirming" },
+      { label: "Cancel", description: "Exit without making changes" },
+    ],
+  },
+]
 ```
-[C]onfirm | [E]dit | [X] Cancel:
-```
-
-Interpret input case-insensitively:
-
-- `c` / `confirm` → Confirm
-- `e` / `edit` → Enter inline edit flow (Task 3)
-- `x` / `cancel` → Cancel
-
-If the user enters anything else, re-prompt.
 
 ## Step 4: Inline edit flow (triggered by [E]dit)
 
@@ -279,11 +293,8 @@ Profile change (edited): {currentProfile} → {newProfile}
 | verification | {currentPreset.verification}| {editedNextConfig.verification}|
 ```
 
-5. Loop back to the same prompt:
-
-```
-[C]onfirm | [E]dit | [X] Cancel:
-```
+5. After showing the edited preview, ask again using the same question-tool options:
+   **Confirm change** / **Edit proposed stage models** / **Cancel**.
 
 ### Confirming an edited change
 

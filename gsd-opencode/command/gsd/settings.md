@@ -93,17 +93,30 @@ If no legacy shape is detected, do nothing.
 
 ## Interactive menu loop (must loop until Exit)
 
-After printing current state, enter a loop:
+After printing current state, enter a loop.
 
-```
-Choose an action:
-[1] Change active profile
-[2] Edit stage override (active profile)
-[3] Clear stage override (active profile)
-[4] Exit
+**The action menu MUST be interactive.** Use the OpenCode **question tool** (do not ask the user to type numbers).
 
-Selection:
+Use question:
+
+```js
+questions: [
+  {
+    header: "GSD Settings",
+    question: "Choose an action",
+    multiSelect: false,
+    options: [
+      { label: "Change active profile", description: "Switch between quality/balanced/budget" },
+      { label: "Edit stage override (active profile)", description: "Override a single stage model for the active profile" },
+      { label: "Clear stage override (active profile)", description: "Remove an override and return that stage to the preset model" },
+      { label: "Exit", description: "Quit /gsd-settings" },
+    ],
+  },
+]
 ```
+
+- Map the chosen label → action.
+- The loop continues until the user selects **Exit**.
 
 - Invalid input must re-prompt (do not crash).
 - The loop continues until the user selects Exit.
@@ -112,7 +125,7 @@ Selection:
 
 ## Action 1: Change active profile
 
-1) Let the user select one of: `quality | balanced | budget`.
+1) Let the user select one of: `quality | balanced | budget` using the **question tool**.
 2) Build a preview using **effective** stage models for both profiles:
 
 - `current = getEffectiveStageModels(activeProfile)`
@@ -131,7 +144,23 @@ Profile change: {activeProfile} → {newProfile}
 
 This will update the model: key in all 11 agent files.
 
-Confirm? [y/N]:
+Confirm using the **question tool** (interactive Confirm/Cancel).
+
+Use question:
+
+```js
+questions: [
+  {
+    header: "Confirm profile change",
+    question: "Apply this profile change?",
+    multiSelect: false,
+    options: [
+      { label: "Confirm", description: "Persist config and rewrite agent frontmatter" },
+      { label: "Cancel", description: "Return to the main menu without changing anything" },
+    ],
+  },
+]
+```
 ```
 
 3) If not confirmed, return to menu.
@@ -153,15 +182,24 @@ Then return to menu (do not claim full success).
 
 ## Action 2: Edit stage override (active profile)
 
-1) Prompt for stage selection:
+1) Prompt for stage selection using the **question tool**.
 
-```
-Select a stage to override:
-[1] planning
-[2] execution
-[3] verification
+Use question:
 
-Selection (or 'cancel'):
+```js
+questions: [
+  {
+    header: "Stage override",
+    question: "Select a stage to override",
+    multiSelect: false,
+    options: [
+      { label: "planning" },
+      { label: "execution" },
+      { label: "verification" },
+      { label: "Cancel", description: "Return to the main menu" },
+    ],
+  },
+]
 ```
 
 2) Determine the current values:
@@ -181,14 +219,30 @@ Selection (or 'cancel'):
 
 No external model availability checking in this phase — accept custom entries as strings.
 
-4) Confirmation must show old vs new for that stage:
+4) Confirmation must show old vs new for that stage, using an interactive Confirm/Cancel question.
 
 ```
 Change override for '{activeProfile}' / {stage}
 Old: {oldEffective}
 New: {newModelOrClearedEffective}
 
-Confirm? [y/N]:
+Confirm using the **question tool**.
+
+Use question:
+
+```js
+questions: [
+  {
+    header: "Confirm override change",
+    question: `Change override for '${activeProfile}' / ${stage}?`,
+    multiSelect: false,
+    options: [
+      { label: "Confirm", description: "Persist config and rewrite agent frontmatter" },
+      { label: "Cancel", description: "Return to the main menu without changing anything" },
+    ],
+  },
+]
+```
 ```
 
 5) On confirm:
@@ -212,7 +266,7 @@ If `applyProfile()` fails after saving config, report partial success (same patt
 
 This is a dedicated clear flow (even if Action 2 also offers clear as an option).
 
-1) Prompt to select stage.
+1) Prompt to select stage using the **question tool** (same stage selection pattern as Action 2).
 2) Compute:
 
 - `preset = getPresetConfig(activeProfile)`
@@ -220,14 +274,28 @@ This is a dedicated clear flow (even if Action 2 also offers clear as an option)
 - `old = effective[stage]`
 - `new = preset[stage]` (because clearing returns to preset)
 
-3) Confirm:
+3) Confirm using the **question tool**:
 
 ```
 Clear override for '{activeProfile}' / {stage}
 Old: {old}
 New: {new}
 
-Confirm? [y/N]:
+Use question:
+
+```js
+questions: [
+  {
+    header: "Confirm override clear",
+    question: `Clear override for '${activeProfile}' / ${stage}?`,
+    multiSelect: false,
+    options: [
+      { label: "Confirm", description: "Persist config and rewrite agent frontmatter" },
+      { label: "Cancel", description: "Return to the main menu without changing anything" },
+    ],
+  },
+]
+```
 ```
 
 4) On confirm, remove the stage key as described above, `writeConfig()`, then `applyProfile(activeProfile)`, then print `Saved` and reprint current state.
