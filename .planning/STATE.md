@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-20)
 ## Current Position
 
 Phase: 6 of 7 (Settings Command)
-Plan: 3 of 4 in current phase
+Plan: 4 of 4 in current phase
 Status: In progress
-Last activity: 2026-01-22 — Completed 06-03-PLAN.md
+Last activity: 2026-01-22 — Completed 06-04-PLAN.md
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 2.28 min
-- Total execution time: 27.42 min
+- Total plans completed: 13
+- Average duration: 2.42 min
+- Total execution time: 31.42 min
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [██████████] 100%
 | 3 | 2 | 2 | 1.45 min |
 | 4 | 1 | 1 | 3.00 min |
 | 5 | 2 | 2 | 2.50 min |
-| 6 | 2 | 4 | 2.00 min |
+| 6 | 4 | 4 | 2.50 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01, 03-02, 04-01, 05-01, 05-02
+- Last 5 plans: 06-04, 06-03, 06-02, 06-01, 05-02
 - Trend: -
 
 *Updated after each plan completion*
@@ -77,6 +77,9 @@ Recent decisions affecting current work:
 
 - [06-03]: Install-time markdown prompts rewrite `@gsd-opencode/*` and `gsd-opencode/*` into install-relative paths (only within `.md`), plus a non-fatal post-install scan warns if tokens remain.
 
+- [06-04]: Use question-tool pickers for menus/confirmations (avoid freeform number/letter parsing)
+- [06-04]: `/gsd-settings` MUST always print the legend line: `* = overridden` (even when there are no overrides)
+
 ### Pending Todos
 
 None yet.
@@ -87,9 +90,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-22T02:30:34Z
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-01-22T02:41:02Z
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None
 
 ---
-*Next: Execute 06-04-PLAN.md*
+*Next: Phase 07 documentation planning/execution*
