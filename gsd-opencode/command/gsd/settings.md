@@ -48,6 +48,8 @@ On every invocation (and after each confirmed action), print:
 - A stage is overridden if `effective[stage] !== preset[stage]`
 - When overridden, add an inline `*` marker to the **model value**.
 
+After printing the table, ALWAYS print a legend line: `* = overridden` (even if no stages are overridden).
+
 Output format (example):
 
 ```
@@ -64,6 +66,11 @@ Effective stage models (preset + per-profile overrides):
 
 Config: .planning/config.json (editable)
 ```
+
+Legend placement:
+
+- The legend line MUST print on its own line immediately after the table.
+- Override markers are indicated by appending `*` to the model value in the table.
 
 Then immediately show the action menu.
 
