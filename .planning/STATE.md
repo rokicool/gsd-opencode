@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-20)
 
 **Core value:** Flexibility — power users want full control over which models run at each stage
-**Current focus:** Phase 6 planning pending
+**Current focus:** Phase 6 execution + UAT stabilization
 
 ## Current Position
 
 Phase: 6 of 7 (Settings Command)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-01-21 — Completed 06-02-PLAN.md
+Plan: 3 of 4 in current phase
+Status: In progress
+Last activity: 2026-01-22 — Completed 06-03-PLAN.md
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 2.50 min
-- Total execution time: 24.55 min
+- Total plans completed: 11
+- Average duration: 2.28 min
+- Total execution time: 27.42 min
 
 **By Phase:**
 
@@ -32,7 +32,7 @@ Progress: [██████████] 100%
 | 3 | 2 | 2 | 1.45 min |
 | 4 | 1 | 1 | 3.00 min |
 | 5 | 2 | 2 | 2.50 min |
-| 6 | 1 | 2 | 2.00 min |
+| 6 | 2 | 4 | 2.00 min |
 
 **Recent Trend:**
 - Last 5 plans: 03-01, 03-02, 04-01, 05-01, 05-02
@@ -75,6 +75,8 @@ Recent decisions affecting current work:
 
 - [06-02]: `/gsd-settings` is a menu-loop command that always prints current state first, and persists each confirmed profile/override change immediately (with applyProfile() to rewrite agent frontmatter).
 
+- [06-03]: Install-time markdown prompts rewrite `@gsd-opencode/*` and `gsd-opencode/*` into install-relative paths (only within `.md`), plus a non-fatal post-install scan warns if tokens remain.
+
 ### Pending Todos
 
 None yet.
@@ -85,9 +87,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-21T22:28:20Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-01-22T02:30:34Z
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None
 
 ---
-*Next: Execute 06-02-PLAN.md*
+*Next: Execute 06-04-PLAN.md*
