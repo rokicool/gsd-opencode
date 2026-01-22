@@ -132,28 +132,23 @@ Current configuration:
 
 **C) Interactive picker (no args/flags):**
 
-Use a single Question tool call with multiple questions (wizard UI) so the user stays in one selector flow ("scrolls to the right").
-
-Do NOT add a separate "Confirm" question inside the wizard: OpenCode shows a final review/confirm screen for wizard flows.
+Use Question tool:
 
 ```
-questions:
-  - header: "Model profile"
-    question: "Select a profile"
-    options:
-      - label: "quality"
-        description: "planning: opencode/glm-4.7-free | execution: opencode/glm-4.7-free | verification: opencode/glm-4.7-free"
-      - label: "balanced"
-        description: "planning: opencode/glm-4.7-free | execution: opencode/minimax-m2.1-free | verification: opencode/glm-4.7-free"
-      - label: "budget"
-        description: "planning: opencode/minimax-m2.1-free | execution: opencode/grok-code | verification: opencode/minimax-m2.1-free"
-      - label: "Cancel"
-        description: "Exit without changes"
+header: "Model profile"
+question: "Select a profile"
+options:
+  - label: "quality"
+    description: "All stages use opencode/glm-4.7-free"
+  - label: "balanced"
+    description: "Planning/verification use glm-4.7-free, execution uses minimax-m2.1-free"
+  - label: "budget"
+    description: "Planning/verification use minimax-m2.1-free, execution uses grok-code"
+  - label: "Cancel"
+    description: "Exit without changes"
 ```
 
-Then:
-1. If Cancel, print the cancellation message (Step 5) and stop.
-2. Otherwise, set `newProfile` from the answer and continue to Step 6.
+If user selects Cancel, print the cancellation message (Step 5) and stop.
 
 **D) Invalid profile handling:**
 
@@ -175,41 +170,7 @@ Profile '{currentProfile}' is already active.
 ```
 Re-print current configuration table and stop.
 
-## Step 6: Show preview and confirm
-
-Get effective models for the new profile (same logic as Step 2 but for `newProfile`).
-
-Print:
-```
-Profile change: {currentProfile} → {newProfile}
-
-| Stage        | Current Model              | New Model                  |
-|--------------|----------------------------|----------------------------|
-| planning     | {current.planning}         | {new.planning}             |
-| execution    | {current.execution}        | {new.execution}            |
-| verification | {current.verification}     | {new.verification}         |
-
-This will update `opencode.json` with new agent model assignments.
-
-Note: OpenCode loads `opencode.json` at startup and does not hot-reload model/agent assignments. Fully quit and relaunch OpenCode to apply this profile change.
-```
-
-Important: Do NOT print any tooling transcript (e.g., `python -m json.tool ...`) or a separate `Updated:` file list. The preview text above is the complete user-facing output for this step.
-
-Interactive flows MUST use the wizard UI in Step 4 (multiple-question Question tool call) rather than separate Question calls.
-
-## Step 7: Handle confirmation
-
-**If "Cancel":**
-```
-Profile change cancelled. Current profile: {currentProfile}
-```
-Stop.
-
-**If "Confirm":**
-Continue to Step 8.
-
-## Step 8: Apply changes
+## Step 6: Apply changes
 
 1. **Update .planning/config.json:**
    - Set `config.profiles.active_profile` to `newProfile`

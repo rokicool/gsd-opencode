@@ -146,17 +146,15 @@ Important:
 
 1. Use Question tool to pick: quality / balanced / budget / Cancel
 2. If Cancel, return to Step 3
-3. Show preview table comparing current vs new effective models
-4. Use Question tool: Confirm / Cancel
-5. If confirmed:
-    - Update `config.profiles.active_profile` to the new profile
-    - Write `.planning/config.json`
-    - Update `opencode.json` (see Agent Config Update section)
-    - Print "Saved"
+3. Apply the change immediately (no preview table, no extra confirm prompt):
+   - Update `config.profiles.active_profile` to the selected profile
+   - Write `.planning/config.json`
+   - Update `opencode.json` (see Agent Config Update section)
+   - Print "Saved"
 4. Return to Step 3 (show updated state and menu)
 
 Important:
-- Use the Question tool for the profile picker and confirm/cancel.
+- Use the Question tool for the profile picker.
 - Do NOT ask the user to type the option text manually.
 - After saving, immediately show the action menu again using the Question tool. Do NOT print "Next: choose an action" text.
 
@@ -169,33 +167,30 @@ Important:
    - opencode/glm-4.7-free
    - opencode/minimax-m2.1-free
    - opencode/grok-code
-5. Show old vs new, use Question tool: Confirm / Cancel
-6. If confirmed:
-   - Set `config.profiles.custom_overrides[activeProfile][stage]` = new model
-   - Write `.planning/config.json`
-   - Update `opencode.json`
-   - Print "Saved"
-7. Return to Step 3
+5. Apply immediately (no extra confirm prompt):
+    - Set `config.profiles.custom_overrides[activeProfile][stage]` = new model
+    - Write `.planning/config.json`
+    - Update `opencode.json`
+    - Print "Saved"
+6. Return to Step 3
 
 Important:
-- Use the Question tool for stage selection, model selection, and confirm/cancel.
+- Use the Question tool for stage selection and model selection.
 - Do NOT print a bullet list and ask the user to type the choice.
 
 ### If "Clear stage override":
 
 1. Use Question tool to pick stage: planning / execution / verification / Cancel
 2. If Cancel, return to Step 3
-3. Show what will change (override removed, reverts to preset)
-4. Use Question tool: Confirm / Cancel
-5. If confirmed:
-   - Delete `config.profiles.custom_overrides[activeProfile][stage]`
-   - Write `.planning/config.json`
-   - Update `opencode.json`
-   - Print "Saved"
-6. Return to Step 3
+3. Apply immediately (no extra confirm prompt):
+    - Delete `config.profiles.custom_overrides[activeProfile][stage]`
+    - Write `.planning/config.json`
+    - Update `opencode.json`
+    - Print "Saved"
+4. Return to Step 3
 
 Important:
-- Use the Question tool for stage selection and confirm/cancel.
+- Use the Question tool for stage selection.
 - Do NOT print a bullet list and ask the user to type the choice.
 
 ### If "Exit":
