@@ -77,5 +77,22 @@ Flexibility — power users want full control over which models run at each stag
 | Store profiles in .planning/config.json | Project-level config, matches existing GSD patterns | — Pending |
 | gsd-codebase-mapper in Planning stage | Mapping happens before execution, is analytical work | — Pending |
 
+## Development Notes: opencode-sandbox Testing
+
+This repo is commonly tested using a dedicated OpenCode sandbox binary wrapper:
+
+- Wrapper: `opencode-sandbox` (sets `XDG_CONFIG_HOME=~/.config/opencode-sandbox`)
+- Sandbox OpenCode config dir: `~/.config/opencode-sandbox/opencode`
+
+Important: OpenCode runs the installed prompt markdown from the sandbox config dir. Edits in this git working tree are not picked up by the sandbox until you reinstall.
+
+Reinstall sandbox from this repo checkout:
+
+1. `SANDBOX_DIR="$HOME/.config/opencode-sandbox/opencode"`
+2. `rm -rf "$SANDBOX_DIR/command/gsd" "$SANDBOX_DIR/agents" "$SANDBOX_DIR/get-shit-done"`
+3. `node gsd-opencode/gsd-opencode/bin/install.js --global --config-dir "$SANDBOX_DIR"`
+4. Sanity check (expect zero matches):
+   - `rg -n "@gsd-opencode/|\\bgsd-opencode/" "$SANDBOX_DIR" --glob "*.md" --hidden --no-ignore -S`
+
 ---
 *Last updated: 2026-01-20 after initialization*
