@@ -181,7 +181,9 @@ Profile change: {currentProfile} → {newProfile}
 | execution    | {current.execution}        | {new.execution}            |
 | verification | {current.verification}     | {new.verification}         |
 
-This will update opencode.json with new agent model assignments.
+This will update `opencode.json` with new agent model assignments.
+
+Note: OpenCode loads `opencode.json` at startup and does not hot-reload model/agent assignments. Fully quit and relaunch OpenCode to apply this profile change.
 ```
 
 Use Question tool:
@@ -248,6 +250,8 @@ Current configuration:
 | planning     | {new.planning} |
 | execution    | {new.execution} |
 | verification | {new.verification} |
+
+Note: OpenCode loads `opencode.json` at startup and does not hot-reload model/agent assignments. Fully quit and relaunch OpenCode to apply this profile change.
 ```
 
 </behavior>
