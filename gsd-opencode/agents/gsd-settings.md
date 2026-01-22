@@ -135,6 +135,11 @@ options:
     description: "Quit settings"
 ```
 
+Important:
+- Do NOT print a plain-text list of options (no "Choose an action..." bullets).
+- The Question tool call IS the menu UI.
+- After the user selects an option, continue execution based on the selected label.
+
 ## Step 5: Handle selected action
 
 ### If "Change active profile":
@@ -149,6 +154,10 @@ options:
    - Update `opencode.json` (see Agent Config Update section)
    - Print "Saved"
 6. Return to Step 3 (show updated state and menu)
+
+Important:
+- Use the Question tool for the profile picker and confirm/cancel.
+- Do NOT ask the user to type the option text manually.
 
 ### If "Edit stage override":
 
@@ -167,6 +176,10 @@ options:
    - Print "Saved"
 7. Return to Step 3
 
+Important:
+- Use the Question tool for stage selection, model selection, and confirm/cancel.
+- Do NOT print a bullet list and ask the user to type the choice.
+
 ### If "Clear stage override":
 
 1. Use Question tool to pick stage: planning / execution / verification / Cancel
@@ -179,6 +192,10 @@ options:
    - Update `opencode.json`
    - Print "Saved"
 6. Return to Step 3
+
+Important:
+- Use the Question tool for stage selection and confirm/cancel.
+- Do NOT print a bullet list and ask the user to type the choice.
 
 ### If "Exit":
 
