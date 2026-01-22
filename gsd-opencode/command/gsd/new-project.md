@@ -304,10 +304,33 @@ Create `.planning/config.json` with chosen mode, depth, parallelization, and the
 
 This profiles schema enables `/gsd-settings` and `/gsd-set-profile` commands to manage model profiles immediately after project initialization.
 
-**Commit config.json:**
+**Seed opencode.json:**
+
+Create `opencode.json` in the project root with agent model overrides for the default "balanced" profile. This enables per-subagent model selection via OpenCode's native config:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "gsd-planner": { "model": "opencode/glm-4.7-free" },
+    "gsd-plan-checker": { "model": "opencode/glm-4.7-free" },
+    "gsd-phase-researcher": { "model": "opencode/glm-4.7-free" },
+    "gsd-roadmapper": { "model": "opencode/glm-4.7-free" },
+    "gsd-project-researcher": { "model": "opencode/glm-4.7-free" },
+    "gsd-research-synthesizer": { "model": "opencode/glm-4.7-free" },
+    "gsd-codebase-mapper": { "model": "opencode/glm-4.7-free" },
+    "gsd-executor": { "model": "opencode/minimax-m2.1-free" },
+    "gsd-debugger": { "model": "opencode/minimax-m2.1-free" },
+    "gsd-verifier": { "model": "opencode/glm-4.7-free" },
+    "gsd-integration-checker": { "model": "opencode/glm-4.7-free" }
+  }
+}
+```
+
+**Commit config.json and opencode.json:**
 
 ```bash
-git add .planning/config.json
+git add .planning/config.json opencode.json
 git commit -m "$(cat <<'EOF'
 chore: add project config
 
