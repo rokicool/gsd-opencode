@@ -163,10 +163,29 @@ Important:
 1. Use Question tool to pick stage: planning / execution / verification / Cancel
 2. If Cancel, return to Step 3
 3. Show current value for that stage
-4. Use Question tool to pick a model from known models (or type custom):
-   - opencode/glm-4.7-free
-   - opencode/minimax-m2.1-free
-   - opencode/grok-code
+4. Use Question tool to select a model.
+
+   Important:
+   - Do NOT restrict the list to only the hardcoded OpenCode free models.
+   - The user may have additional providers enabled (e.g., GitHub Copilot), so they must be able to enter ANY model ID.
+   - Include a few common options for convenience, and allow freeform entry via the Question tool's custom input.
+
+   Example Question tool call:
+
+   ```
+   header: "Stage override"
+   question: "Select a model for {stage} (or type a model id)"
+   options:
+     - label: "opencode/glm-4.7-free"
+       description: "OpenCode free"
+     - label: "opencode/minimax-m2.1-free"
+       description: "OpenCode free"
+     - label: "opencode/grok-code"
+       description: "OpenCode free"
+   ```
+
+   If the user uses custom input, treat the response as the model id string.
+
 5. Apply immediately (no extra confirm prompt):
     - Set `config.profiles.custom_overrides[activeProfile][stage]` = new model
     - Write `.planning/config.json`
