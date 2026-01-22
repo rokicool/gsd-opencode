@@ -126,10 +126,25 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix) {
     if (entry.isDirectory()) {
       copyWithPathReplacement(srcPath, destPath, pathPrefix);
     } else if (entry.name.endsWith(".md")) {
-      // Replace ~/.claude/ and ./.claude/ with OpenCode paths
+      // Replace repo-local prompt references so installed prompts work outside this repo.
+      // IMPORTANT: order matters to avoid double-rewrites.
       let content = fs.readFileSync(srcPath, "utf8");
+
+      // 1) @-references to this repo → install-relative @-references
+      //    @gsd-opencode/... → @~/.config/opencode/... (global)
+      //    @gsd-opencode/... → @./.opencode/... (local)
+      content = content.replace(/@gsd-opencode\//g, `@${pathPrefix}`);
+
+      // 2) Plain (non-@) repo-local paths → install-relative paths
+      //    gsd-opencode/... → ~/.config/opencode/... (global)
+      //    gsd-opencode/... → ./.opencode/... (local)
+      content = content.replace(/\bgsd-opencode\//g, pathPrefix);
+
+      // 3) Back-compat: rewrite legacy Claude paths → OpenCode paths
+      // NOTE: keep these rewrites verbatim for backward compatibility.
       content = content.replace(/~\/\.claude\//g, pathPrefix);
       content = content.replace(/\.\/\.claude\//g, "./.opencode/");
+
       fs.writeFileSync(destPath, content);
     } else {
       fs.copyFileSync(srcPath, destPath);
