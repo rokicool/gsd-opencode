@@ -1,6 +1,6 @@
 ---
-name: set-profile
-description: Switch model profile for GSD agents (quality/balanced/budget
+name: gsd-set-profile
+description: Switch model profile for GSD agents (quality/balanced/budget)
 arguments:
   - name: profile
     description: "Profile name: quality, balanced, or budget"
