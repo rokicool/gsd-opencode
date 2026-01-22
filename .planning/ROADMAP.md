@@ -18,6 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Agent Discovery** - Validate agent files and stage mappings
 - [x] **Phase 5: Frontmatter Rewriting** - Apply profile changes to agent files
 - [x] **Phase 6: Settings Command** - Implement `/gsd-settings` for interactive configuration
+- [ ] **Phase 6.1: Config Reference** - Investigate config.json referencing; document finding (INSERTED)
 - [ ] **Phase 7: Documentation** - Document workaround, usage, and customization
 
 ## Phase Details
@@ -107,6 +108,22 @@ Plans:
 - [x] 06-01-PLAN.md — Scope per-stage overrides per profile (and migrate legacy override shape)
 - [x] 06-02-PLAN.md — Implement `/gsd-settings` interactive settings command
 
+### Phase 6.1: Config Reference (INSERTED)
+**Goal**: Investigate whether opencode.json can directly reference config.json via env variables or file references
+**Depends on**: Phase 6
+**Requirements**: None (investigation phase)
+**Success Criteria** (what must be TRUE):
+  1. Feasibility of env var approach documented
+  2. Feasibility of file reference approach documented
+  3. Decision captured with rationale
+**Plans**: 1 plan
+
+Plans:
+- [ ] 06.1-01-PLAN.md — Document investigation findings and close phase
+
+**Investigation Finding:**
+OpenCode's `{file:...}` reads entire file as string (no JSON path extraction); `{env:...}` requires external launcher. Current regeneration approach is architecturally correct. **No implementation changes needed.**
+
 ### Phase 7: Documentation
 **Goal**: Feature is documented with usage examples and testing steps
 **Depends on**: Phase 6
@@ -124,7 +141,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 6.1 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -134,6 +151,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. Agent Discovery | 1/1 | Complete | 2026-01-21 |
 | 5. Frontmatter Rewriting | 2/2 | Complete | 2026-01-21 |
 | 6. Settings Command | 2/2 | Complete | 2026-01-21 |
+| 6.1 Config Reference | 0/1 | Planned | - |
 | 7. Documentation | 0/TBD | Not started | - |
 
 ---
