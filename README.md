@@ -1,6 +1,6 @@
 <div align="left">
 
-# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.6.4)
+# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.9.4 - 2025-01-21)
 
 **A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (Adapted for OpenCode by rokicool and enthusiasts)**
 
@@ -69,7 +69,22 @@ I just love both GSD and OpenCode. I felt like having GSD available only for Cla
 
 — **Roman**
 
-## Vesrion 1.6.0 - We started using git submodules
+## Version 1.9.0 - We are catching up with original v1.9.4
+
+You can find all the changes that TACHES made in the [original CHANGELOG.md v1.6.4 -> v1.9.4](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md).
+
+Unfortunately, OpenCode does not allow dynamically switch between the models. So, 
+
+```
+/gsd-set-profile 
+```
+or 
+```
+/gsd-settings 
+```
+are not fully supported. Yet... (Mr [dpearson2699](https://github.com/dpearson2699) is working on [workaround](https://github.com/rokicool/gsd-opencode/issues/44).)
+
+## Version 1.6.0 - We started using git submodules
 
 If you clone this repo dont forget to execute the next command after cloning:
 
@@ -194,88 +209,6 @@ If you prefer not to use that flag, add this to your project's `.opencode/settin
 </details>
 
 ---
-
-## How It Works
-
-### 1. Start with an idea
-
-```
-/gsd-new-project
-```
-
-The system asks questions. Keeps asking until it has everything — your goals, constraints, tech preferences, edge cases. You go back and forth until the idea is fully captured. Creates **PROJECT.md**.
-
-### 2. Create roadmap
-
-```
-/gsd-create-roadmap
-```
-
-Produces:
-- **ROADMAP.md** — Phases from start to finish
-- **STATE.md** — Living memory that persists across sessions
-
-### 3. Plan and execute phases
-
-```
-/gsd-plan-phase 1      # System creates atomic task plans
-/gsd-execute-plan      # Subagent implements autonomously
-```
-
-Each phase breaks into 2-3 atomic tasks. Each task runs in a fresh subagent context — 200k tokens purely for implementation, zero degradation.
-
-### 4. Ship and iterate
-
-```
-/gsd-complete-milestone   # Archive v1, prep for v2
-/gsd-add-phase            # Append new work
-/gsd-insert-phase 2       # Slip urgent work between phases
-```
-
-Ship your MVP in a day. Add features. Insert hotfixes. The system stays modular — you're never stuck.
-
----
-
-## Existing Projects (Brownfield)
-
-Already have code? Start here instead.
-
-### 1. Map the codebase
-
-```
-/gsd-map-codebase
-```
-
-Spawns parallel agents to analyze your code. Creates `.planning/codebase/` with 7 documents:
-
-| Document | Purpose |
-|----------|---------|
-| `STACK.md` | Languages, frameworks, dependencies |
-| `ARCHITECTURE.md` | Patterns, layers, data flow |
-| `STRUCTURE.md` | Directory layout, where things live |
-| `CONVENTIONS.md` | Code style, naming patterns |
-| `TESTING.md` | Test framework, patterns |
-| `INTEGRATIONS.md` | External services, APIs |
-| `CONCERNS.md` | Tech debt, known issues, fragile areas |
-
-### 2. Initialize project
-
-```
-/gsd-new-project
-```
-
-Same as greenfield, but the system knows your codebase. Questions focus on what you're adding/changing, not starting from scratch.
-
-### 3. Continue as normal
-
-From here, it's the same: `/gsd-create-roadmap` → `/gsd-plan-phase` → `/gsd-execute-plan`
-
-The codebase docs load automatically during planning. OpenCode knows your patterns, conventions, and where to put things.
-
----
-
-## Why It Works
-
 ## How It Works
 
 > **Already have code?** Run `/gsd-map-codebase` first. It spawns parallel agents to analyze your stack, architecture, conventions, and concerns. Then `/gsd-new-project` knows your codebase — questions focus on what you're adding, and planning automatically loads your patterns.
@@ -409,6 +342,31 @@ Then `/gsd-new-milestone` starts the next version — same flow as `new-project`
 
 ---
 
+### Quick Mode
+
+```
+/gsd-quick
+```
+
+**For ad-hoc tasks that don't need full planning.**
+
+Quick mode gives you GSD guarantees (atomic commits, state tracking) with a faster path:
+
+- **Same agents** — Planner + executor, same quality
+- **Skips optional steps** — No research, no plan checker, no verifier
+- **Separate tracking** — Lives in `.planning/quick/`, not phases
+
+Use for: bug fixes, small features, config changes, one-off tasks.
+
+```
+/gsd-quick
+> What do you want to do? "Add dark mode toggle to settings"
+```
+
+**Creates:** `.planning/quick/001-add-dark-mode-toggle/PLAN.md`, `SUMMARY.md`
+
+---
+
 ## Why It Works
 
 ### Context Engineering
@@ -503,6 +461,7 @@ You're never locked in. The system adapts.
 | `/gsd-plan-phase [N]` | Research + plan + verify for a phase |
 | `/gsd-execute-phase <N>` | Execute all plans in parallel waves, verify when complete |
 | `/gsd-verify-work [N]` | Manual user acceptance testing ¹ |
+| `/gsd-audit-milestone` | Verify milestone achieved its definition of done |
 | `/gsd-complete-milestone` | Archive milestone, tag release |
 | `/gsd-new-milestone [name]` | Start next version: questions → research → requirements → roadmap |
 
@@ -512,6 +471,8 @@ You're never locked in. The system adapts.
 |---------|--------------|
 | `/gsd-progress` | Where am I? What's next? |
 | `/gsd-help` | Show all commands and usage guide |
+| `/gsd-whats-new` | See what changed since your installed version |
+| `/gsd-update` | Update GSD with changelog preview |
 
 ### Brownfield
 
@@ -526,6 +487,8 @@ You're never locked in. The system adapts.
 | `/gsd-add-phase` | Append phase to roadmap |
 | `/gsd-insert-phase [N]` | Insert urgent work between phases |
 | `/gsd-remove-phase [N]` | Remove future phase, renumber |
+| `/gsd-list-phase-assumptions [N]` | See OpenCode's intended approach before planning |
+| `/gsd-plan-milestone-gaps` | Create phases to close gaps from audit |
 
 ### Session
 
@@ -538,11 +501,65 @@ You're never locked in. The system adapts.
 
 | Command | What it does |
 |---------|--------------|
+| `/gsd-settings` | Configure model profile and workflow agents |
+| `/gsd-set-profile <profile>` | Switch model profile (quality/balanced/budget) |
 | `/gsd-add-todo [desc]` | Capture idea for later |
 | `/gsd-check-todos` | List pending todos |
 | `/gsd-debug [desc]` | Systematic debugging with persistent state |
+| `/gsd-quick` | Execute ad-hoc task with GSD guarantees |
 
 <sup>¹ Contributed by reddit user OracleGreyBeard</sup>
+
+---
+
+## Configuration
+
+GSD stores project settings in `.planning/config.json`. Configure during `/gsd-new-project` or update later with `/gsd-settings`.
+
+### Core Settings
+
+| Setting | Options | Default | What it controls |
+|---------|---------|---------|------------------|
+| `mode` | `yolo`, `interactive` | `interactive` | Auto-approve vs confirm at each step |
+| `depth` | `quick`, `standard`, `comprehensive` | `standard` | Planning thoroughness (phases × plans) |
+
+### Model Profiles
+
+Control which OpenCode model each agent uses. Balance quality vs token spend.
+
+| Profile | Planning | Execution | Verification |
+|---------|----------|-----------|--------------|
+| `quality` | Opus | Opus | Sonnet |
+| `balanced` (default) | Opus | Sonnet | Sonnet |
+| `budget` | Sonnet | Sonnet | Haiku |
+
+Switch profiles:
+```
+/gsd-set-profile budget
+```
+
+Or configure via `/gsd-settings`.
+
+### Workflow Agents
+
+These spawn additional agents during planning/execution. They improve quality but add tokens and time.
+
+| Setting | Default | What it does |
+|---------|---------|--------------|
+| `workflow.research` | `true` | Researches domain before planning each phase |
+| `workflow.plan_check` | `true` | Verifies plans achieve phase goals before execution |
+| `workflow.verifier` | `true` | Confirms must-haves were delivered after execution |
+
+Use `/gsd-settings` to toggle these, or override per-invocation:
+- `/gsd-plan-phase --skip-research`
+- `/gsd-plan-phase --skip-verify`
+
+### Execution
+
+| Setting | Default | What it controls |
+|---------|---------|------------------|
+| `parallelization.enabled` | `true` | Run independent plans simultaneously |
+| `planning.commit_docs` | `true` | Track `.planning/` in git |
 
 ---
 
@@ -550,7 +567,7 @@ You're never locked in. The system adapts.
 
 **Commands not found after install?**
 - Restart OpenCode to reload slash commands
-- Verify files exist in `~/.config/opencode/commands/gsd/` (global) or `./.opencode/commands/gsd/` (local)
+- Verify files exist in `~/.config/opencode/command/gsd/` (global) or `./.opencode/command/gsd/` (local)
 
 **Commands not working as expected?**
 - Run `/gsd-help` to verify installation
@@ -563,9 +580,9 @@ npx gsd-opencode@latest
 
 **Using Docker or containerized environments?**
 
-If file reads fail with tilde paths (`~/.opencode/...`), set `OPENCODE_CONFIG_DIR` before installing:
+If file reads fail with tilde paths (`~/.config/opencode/...`), set `OPENCODE_CONFIG_DIR` before installing:
 ```bash
-OPENCODE_CONFIG_DIR=/home/youruser/.opencode npm install -g gsd-opencode
+OPENCODE_CONFIG_DIR=/home/youruser/.config/opencode npx gsd-opencode --global
 ```
 This ensures absolute paths are used instead of `~` which may not expand correctly in containers.
 
