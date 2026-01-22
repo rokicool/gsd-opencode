@@ -186,6 +186,8 @@ This will update `opencode.json` with new agent model assignments.
 Note: OpenCode loads `opencode.json` at startup and does not hot-reload model/agent assignments. Fully quit and relaunch OpenCode to apply this profile change.
 ```
 
+Important: Do NOT print any tooling transcript (e.g., `python -m json.tool ...`) or a separate `Updated:` file list. The preview text above is the complete user-facing output for this step.
+
 Use Question tool:
 ```
 header: "Confirm profile change"
@@ -253,6 +255,8 @@ Current configuration:
 
 Note: OpenCode loads `opencode.json` at startup and does not hot-reload model/agent assignments. Fully quit and relaunch OpenCode to apply this profile change.
 ```
+
+Important: Do NOT print any tooling transcript (e.g., `python -m json.tool ...`) or a separate `Updated:` file list. The success message above is the complete user-facing output.
 
 </behavior>
 
