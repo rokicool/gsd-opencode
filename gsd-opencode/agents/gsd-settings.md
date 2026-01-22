@@ -3,6 +3,7 @@ name: gsd-settings
 description: Interactive settings UI for model profiles and per-stage overrides
 tools:
   read: true
+  question: true
   write: true
 color: "#2F855A"
 ---

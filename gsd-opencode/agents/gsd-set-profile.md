@@ -3,6 +3,7 @@ name: gsd-set-profile
 description: Switch between model profiles with confirmation workflow
 tools:
   read: true
+  question: true
   write: true
 color: "#4169E1"
 ---
