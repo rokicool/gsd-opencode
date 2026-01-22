@@ -238,4 +238,6 @@ Current configuration:
 - Do NOT rewrite agent .md files — only update opencode.json
 - If opencode.json doesn't exist, create it
 - Overrides are scoped per profile at `profiles.custom_overrides.{profile}.{stage}`
+- **Source of truth:** `config.json` stores profiles/presets/overrides; `opencode.json` is **derived** from the effective models
+- When regenerating `opencode.json`, read the new profile from `config.json`, compute effective models (preset + overrides), then write the agent mappings
 </notes>

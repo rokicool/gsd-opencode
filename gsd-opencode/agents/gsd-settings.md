@@ -199,4 +199,6 @@ If `opencode.json` already exists, merge the `agent` key (preserve other top-lev
 - Persist changes immediately after each confirmation (don't batch)
 - Do NOT rewrite agent .md files — only update opencode.json
 - Overrides are scoped per profile at `profiles.custom_overrides.{profile}.{stage}`
+- **Source of truth:** `config.json` stores profiles/presets/overrides; `opencode.json` is **derived** from the effective models
+- When regenerating `opencode.json`, read the active profile from `config.json`, compute effective models (preset + overrides), then write the agent mappings
 </notes>

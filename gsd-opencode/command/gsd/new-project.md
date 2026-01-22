@@ -304,28 +304,44 @@ Create `.planning/config.json` with chosen mode, depth, parallelization, and the
 
 This profiles schema enables `/gsd-settings` and `/gsd-set-profile` commands to manage model profiles immediately after project initialization.
 
-**Seed opencode.json:**
+**Generate opencode.json from active profile:**
 
-Create `opencode.json` in the project root with agent model overrides for the default "balanced" profile. This enables per-subagent model selection via OpenCode's native config:
+Create `opencode.json` in the project root. This file is **derived from** the active profile in `config.json` - it maps each GSD agent to its stage model.
+
+For the default "balanced" profile, read the stage models from `config.json`:
+- `profiles.presets.balanced.planning` → planning agents
+- `profiles.presets.balanced.execution` → execution agents  
+- `profiles.presets.balanced.verification` → verification agents
+
+Generate `opencode.json` with this structure:
 
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
   "agent": {
-    "gsd-planner": { "model": "opencode/glm-4.7-free" },
-    "gsd-plan-checker": { "model": "opencode/glm-4.7-free" },
-    "gsd-phase-researcher": { "model": "opencode/glm-4.7-free" },
-    "gsd-roadmapper": { "model": "opencode/glm-4.7-free" },
-    "gsd-project-researcher": { "model": "opencode/glm-4.7-free" },
-    "gsd-research-synthesizer": { "model": "opencode/glm-4.7-free" },
-    "gsd-codebase-mapper": { "model": "opencode/glm-4.7-free" },
-    "gsd-executor": { "model": "opencode/minimax-m2.1-free" },
-    "gsd-debugger": { "model": "opencode/minimax-m2.1-free" },
-    "gsd-verifier": { "model": "opencode/glm-4.7-free" },
-    "gsd-integration-checker": { "model": "opencode/glm-4.7-free" }
+    "gsd-planner": { "model": "{planning model}" },
+    "gsd-plan-checker": { "model": "{planning model}" },
+    "gsd-phase-researcher": { "model": "{planning model}" },
+    "gsd-roadmapper": { "model": "{planning model}" },
+    "gsd-project-researcher": { "model": "{planning model}" },
+    "gsd-research-synthesizer": { "model": "{planning model}" },
+    "gsd-codebase-mapper": { "model": "{planning model}" },
+    "gsd-executor": { "model": "{execution model}" },
+    "gsd-debugger": { "model": "{execution model}" },
+    "gsd-verifier": { "model": "{verification model}" },
+    "gsd-integration-checker": { "model": "{verification model}" }
   }
 }
 ```
+
+**Stage-to-agent mapping:**
+| Stage | Agents |
+|-------|--------|
+| Planning | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
+| Execution | gsd-executor, gsd-debugger |
+| Verification | gsd-verifier, gsd-integration-checker |
+
+**Important:** `opencode.json` is regenerated whenever the profile changes via `/gsd-settings` or `/gsd-set-profile`. The source of truth is `config.json`; `opencode.json` is the derived OpenCode-native config.
 
 **Commit config.json and opencode.json:**
 
