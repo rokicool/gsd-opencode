@@ -1,36 +1,53 @@
 ---
 name: gsd-set-profile
 description: Switch between model profiles with confirmation workflow
+argument-hint: "[quality|balanced|budget]"
 tools:
-  read: true
   question: true
-  write: true
-color: "#4169E1"
 ---
 
-# /gsd-set-profile Command
+<role>
+You are executing the `/gsd-set-profile` command. Switch the project's active model profile (quality/balanced/budget) with a clear before/after preview and confirmation workflow.
 
-You are **executing** this command right now. Do NOT implement anything. Do NOT write code. Follow the steps below using your tools (Read, Write, Question).
+This command reads/writes two files:
+- `.planning/config.json` — profile state (active_profile, presets, custom_overrides)
+- `opencode.json` — agent model assignments (OpenCode's native config)
 
-## What This Command Does
+Do NOT modify agent .md files. Profile switching updates `opencode.json` in the project root.
+</role>
 
-Switch the project's active model profile (quality/balanced/budget) with a clear before/after preview and confirmation workflow.
+<context>
+**Invocation styles:**
 
-## Invocation Styles
+1. No args (interactive picker): `/gsd-set-profile`
+2. Positional: `/gsd-set-profile quality` or `balanced` or `budget`
+3. Flags: `--quality` or `-q`, `--balanced` or `-b`, `--budget` or `-u`
 
-1. **No args (interactive picker):** `/gsd-set-profile`
-2. **Flags:** `/gsd-set-profile --quality` or `-q`, `--balanced` or `-b`, `--budget` or `-u`
-3. **Positional:** `/gsd-set-profile quality` or `balanced` or `budget`
+Precedence: Positional > Flags > Interactive picker
 
-**Precedence:** Positional > Flags > Interactive picker
+**Stage-to-agent mapping (11 agents):**
 
-## Execution Steps
+| Stage        | Agents |
+|--------------|--------|
+| Planning     | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
+| Execution    | gsd-executor, gsd-debugger |
+| Verification | gsd-verifier, gsd-integration-checker |
 
-### Step 1: Read the config file
+**Profile presets:**
 
-Use your Read tool to read `.planning/config.json`.
+| Profile  | Planning                   | Execution                    | Verification               |
+|----------|----------------------------|------------------------------|----------------------------|
+| quality  | opencode/glm-4.7-free      | opencode/glm-4.7-free        | opencode/glm-4.7-free      |
+| balanced | opencode/glm-4.7-free      | opencode/minimax-m2.1-free   | opencode/glm-4.7-free      |
+| budget   | opencode/minimax-m2.1-free | opencode/grok-code           | opencode/minimax-m2.1-free |
+</context>
 
-If the file doesn't exist or is empty, use these defaults:
+<behavior>
+
+## Step 1: Read config file
+
+Read `.planning/config.json`. If missing or invalid, use defaults:
+
 ```json
 {
   "profiles": {
@@ -57,20 +74,19 @@ If the file doesn't exist or is empty, use these defaults:
 }
 ```
 
-### Step 2: Determine effective models for current profile
+## Step 2: Compute effective models for current profile
 
-From the config:
 1. Get `currentProfile` = `config.profiles.active_profile` (default: "balanced")
 2. Get `preset` = `config.profiles.presets[currentProfile]`
 3. Get `overrides` = `config.profiles.custom_overrides[currentProfile]` (may be undefined)
-4. Compute effective models for each stage:
+4. Compute effective models:
    - `planning` = overrides?.planning || preset.planning
    - `execution` = overrides?.execution || preset.execution
    - `verification` = overrides?.verification || preset.verification
 
-### Step 3: Display current state
+## Step 3: Display current state
 
-Print this output (substitute actual values):
+Print:
 
 ```
 Active profile: {currentProfile}
@@ -78,12 +94,12 @@ Active profile: {currentProfile}
 Current configuration:
 | Stage        | Model |
 |--------------|-------|
-| planning     | {effective.planning} |
-| execution    | {effective.execution} |
-| verification | {effective.verification} |
+| planning     | {current.planning} |
+| execution    | {current.execution} |
+| verification | {current.verification} |
 ```
 
-### Step 4: Determine requested profile
+## Step 4: Determine requested profile
 
 **A) Check for positional argument:**
 - If user typed `/gsd-set-profile quality` (or balanced/budget), use that as `newProfile`
@@ -101,9 +117,13 @@ header: "Model profile"
 question: "Select a profile"
 options:
   - label: "quality"
+    description: "All stages use opencode/glm-4.7-free"
   - label: "balanced"
+    description: "Planning/verification use glm-4.7-free, execution uses minimax-m2.1-free"
   - label: "budget"
+    description: "Planning/verification use minimax-m2.1-free, execution uses grok-code"
   - label: "Cancel"
+    description: "Exit without changes"
 ```
 
 **D) Invalid profile handling:**
@@ -112,7 +132,7 @@ If an invalid profile name is provided:
 - Print: `Unknown profile '{name}'. Valid options: quality, balanced, budget`
 - Fall back to interactive picker
 
-### Step 5: Handle edge cases
+## Step 5: Handle edge cases
 
 **If user selected Cancel:**
 ```
@@ -124,9 +144,9 @@ Stop.
 ```
 Profile '{currentProfile}' is already active.
 ```
-Re-print the current configuration table and stop.
+Re-print current configuration table and stop.
 
-### Step 6: Show preview and confirm
+## Step 6: Show preview and confirm
 
 Get effective models for the new profile (same logic as Step 2 but for `newProfile`).
 
@@ -140,23 +160,21 @@ Profile change: {currentProfile} → {newProfile}
 | execution    | {current.execution}        | {new.execution}            |
 | verification | {current.verification}     | {new.verification}         |
 
-This will update the model: key in all 11 agent files.
+This will update opencode.json with new agent model assignments.
 ```
 
 Use Question tool:
 ```
 header: "Confirm profile change"
-question: "What would you like to do?"
+question: "Apply this profile change?"
 options:
-  - label: "Confirm change"
-    description: "Persist config and rewrite agent frontmatter"
-  - label: "Edit proposed stage models"
-    description: "Adjust the per-stage model IDs before confirming"
+  - label: "Confirm"
+    description: "Apply changes to config and opencode.json"
   - label: "Cancel"
-    description: "Exit without making changes"
+    description: "Exit without changes"
 ```
 
-### Step 7: Handle confirmation response
+## Step 7: Handle confirmation
 
 **If "Cancel":**
 ```
@@ -164,51 +182,44 @@ Profile change cancelled. Current profile: {currentProfile}
 ```
 Stop.
 
-**If "Edit proposed stage models":**
-1. Show: `Editing proposed profile: {newProfile}`
-2. For each stage, ask user to provide a model (or press Enter to keep current)
-3. Store any changed values in `editedOverrides`
-4. Show updated preview table
-5. Return to confirmation question (Confirm / Edit / Cancel)
-
-**If "Confirm change":**
+**If "Confirm":**
 Continue to Step 8.
 
-### Step 8: Apply changes
+## Step 8: Apply changes
 
-1. **Update config.json:**
+1. **Update .planning/config.json:**
    - Set `config.profiles.active_profile` to `newProfile`
-   - If user edited models, store changes at `config.profiles.custom_overrides[newProfile][stage]`
-   - Use Write tool to save the updated config
+   - Write the config file (preserve all other keys)
 
-2. **Rewrite agent frontmatter:**
-   
-   The agents are at these paths (relative to where this command is installed):
-   - `agents/gsd-planner.md` (planning)
-   - `agents/gsd-plan-checker.md` (planning)
-   - `agents/gsd-phase-researcher.md` (planning)
-   - `agents/gsd-roadmapper.md` (planning)
-   - `agents/gsd-project-researcher.md` (planning)
-   - `agents/gsd-research-synthesizer.md` (planning)
-   - `agents/gsd-codebase-mapper.md` (planning)
-   - `agents/gsd-executor.md` (execution)
-   - `agents/gsd-debugger.md` (execution)
-   - `agents/gsd-verifier.md` (verification)
-   - `agents/gsd-integration-checker.md` (verification)
+2. **Update opencode.json:**
 
-   For each agent:
-   1. Read the file
-   2. Find the YAML frontmatter (between `---` markers)
-   3. Find or add the `model:` key
-   4. Set its value to the effective model for that agent's stage
-   5. Write the file back (preserve all other content)
+Build agent config from effective stage models for `newProfile`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "gsd-planner": { "model": "{new.planning}" },
+    "gsd-plan-checker": { "model": "{new.planning}" },
+    "gsd-phase-researcher": { "model": "{new.planning}" },
+    "gsd-roadmapper": { "model": "{new.planning}" },
+    "gsd-project-researcher": { "model": "{new.planning}" },
+    "gsd-research-synthesizer": { "model": "{new.planning}" },
+    "gsd-codebase-mapper": { "model": "{new.planning}" },
+    "gsd-executor": { "model": "{new.execution}" },
+    "gsd-debugger": { "model": "{new.execution}" },
+    "gsd-verifier": { "model": "{new.verification}" },
+    "gsd-integration-checker": { "model": "{new.verification}" }
+  }
+}
+```
+
+If `opencode.json` already exists, merge the `agent` key (preserve other top-level keys).
 
 3. **Report success:**
 
 ```
 ✓ Active profile set to: {newProfile}
-
-Agent updates: {modified} modified, {unchanged} unchanged
 
 Current configuration:
 | Stage        | Model |
@@ -218,24 +229,13 @@ Current configuration:
 | verification | {new.verification} |
 ```
 
-### Step 9: Error handling
+</behavior>
 
-**If agent rewrite fails:**
-- Report which agents succeeded and which failed
-- Suggest: "You can re-run the command to retry. Git can restore any modified files."
-- Stop (do not claim success)
-
-## Stage-to-Agent Mapping
-
-| Stage        | Agents |
-|--------------|--------|
-| planning     | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
-| execution    | gsd-executor, gsd-debugger |
-| verification | gsd-verifier, gsd-integration-checker |
-
-## Important Notes
-
+<notes>
 - Use the Question tool for ALL user input (never ask user to type numbers)
 - Always show full model IDs (e.g., `opencode/glm-4.7-free`)
 - Preserve all other config.json keys when writing (deep merge)
-- If config.json is corrupted, back up to `.planning/config.json.bak` and use defaults
+- Do NOT rewrite agent .md files — only update opencode.json
+- If opencode.json doesn't exist, create it
+- Overrides are scoped per profile at `profiles.custom_overrides.{profile}.{stage}`
+</notes>
