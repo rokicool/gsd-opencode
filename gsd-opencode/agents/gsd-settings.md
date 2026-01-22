@@ -1,28 +1,44 @@
 ---
 name: gsd-settings
-description: Interactive settings UI for model profiles and per-stage overrides
+description: Interactive settings for model profiles and per-stage overrides
 tools:
-  read: true
   question: true
-  write: true
-color: "#2F855A"
 ---
 
-# /gsd-settings Command
+<role>
+You are executing the `/gsd-settings` command. Display current model profile settings and provide an interactive menu to manage them.
 
-You are **executing** this command right now. Do NOT implement anything. Do NOT write code. Follow the steps below using your tools (Read, Write, Question).
+This command reads/writes two files:
+- `.planning/config.json` — profile state (active_profile, presets, custom_overrides)
+- `opencode.json` — agent model assignments (OpenCode's native config)
 
-## What This Command Does
+Do NOT modify agent .md files. Profile switching updates `opencode.json` in the project root.
+</role>
 
-Display the current model profile settings and provide an interactive menu to change them.
+<context>
+**Stage-to-agent mapping (11 agents):**
 
-## Execution Steps
+| Stage        | Agents |
+|--------------|--------|
+| Planning     | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
+| Execution    | gsd-executor, gsd-debugger |
+| Verification | gsd-verifier, gsd-integration-checker |
 
-### Step 1: Read the config file
+**Profile presets (hardcoded):**
 
-Use your Read tool to read `.planning/config.json`.
+| Profile  | Planning                   | Execution                    | Verification               |
+|----------|----------------------------|------------------------------|----------------------------|
+| quality  | opencode/glm-4.7-free      | opencode/glm-4.7-free        | opencode/glm-4.7-free      |
+| balanced | opencode/glm-4.7-free      | opencode/minimax-m2.1-free   | opencode/glm-4.7-free      |
+| budget   | opencode/minimax-m2.1-free | opencode/grok-code           | opencode/minimax-m2.1-free |
+</context>
 
-If the file doesn't exist or is empty, use these defaults:
+<behavior>
+
+## Step 1: Read config files
+
+Read `.planning/config.json`. If missing or invalid, use defaults:
+
 ```json
 {
   "profiles": {
@@ -49,19 +65,18 @@ If the file doesn't exist or is empty, use these defaults:
 }
 ```
 
-### Step 2: Determine effective models
+## Step 2: Compute effective models
 
-From the config:
 1. Get `activeProfile` = `config.profiles.active_profile` (default: "balanced")
 2. Get `preset` = `config.profiles.presets[activeProfile]`
 3. Get `overrides` = `config.profiles.custom_overrides[activeProfile]` (may be undefined)
-4. Compute effective models for each stage:
+4. Compute effective models:
    - `planning` = overrides?.planning || preset.planning
    - `execution` = overrides?.execution || preset.execution
    - `verification` = overrides?.verification || preset.verification
 5. A stage is "overridden" if overrides[stage] exists and differs from preset[stage]
 
-### Step 3: Display current state
+## Step 3: Display current state
 
 Print this output (substitute actual values):
 
@@ -79,11 +94,11 @@ Active profile: {activeProfile}
 Config: .planning/config.json (editable)
 ```
 
-The `* = overridden` legend line MUST always be printed, even if no stages are overridden.
+The `* = overridden` legend MUST always be printed, even if no stages are overridden.
 
-### Step 4: Show the action menu
+## Step 4: Show action menu
 
-Use the Question tool with this structure:
+Use the Question tool:
 
 ```
 header: "GSD Settings"
@@ -99,96 +114,89 @@ options:
     description: "Quit settings"
 ```
 
-### Step 5: Handle the selected action
+## Step 5: Handle selected action
 
-Based on what the user selects:
+### If "Change active profile":
 
-#### If "Change active profile":
-
-1. Use the Question tool to let user pick: quality / balanced / budget / Cancel
-2. If Cancel, go back to Step 3
-3. Show a preview table comparing current vs new effective models
+1. Use Question tool to pick: quality / balanced / budget / Cancel
+2. If Cancel, return to Step 3
+3. Show preview table comparing current vs new effective models
 4. Use Question tool: Confirm / Cancel
 5. If confirmed:
    - Update `config.profiles.active_profile` to the new profile
-   - Use Write tool to save `.planning/config.json`
-   - Rewrite agent frontmatter (see Agent Rewrite section below)
+   - Write `.planning/config.json`
+   - Update `opencode.json` (see Agent Config Update section)
    - Print "Saved"
-6. Go back to Step 3 (show updated state and menu)
+6. Return to Step 3 (show updated state and menu)
 
-#### If "Edit stage override":
+### If "Edit stage override":
 
 1. Use Question tool to pick stage: planning / execution / verification / Cancel
-2. If Cancel, go back to Step 3
+2. If Cancel, return to Step 3
 3. Show current value for that stage
-4. Use Question tool to pick a model from known models, or let user type custom
+4. Use Question tool to pick a model from known models (or type custom):
+   - opencode/glm-4.7-free
+   - opencode/minimax-m2.1-free
+   - opencode/grok-code
 5. Show old vs new, use Question tool: Confirm / Cancel
 6. If confirmed:
    - Set `config.profiles.custom_overrides[activeProfile][stage]` = new model
-   - Write config
-   - Rewrite agent frontmatter
+   - Write `.planning/config.json`
+   - Update `opencode.json`
    - Print "Saved"
-7. Go back to Step 3
+7. Return to Step 3
 
-#### If "Clear stage override":
+### If "Clear stage override":
 
 1. Use Question tool to pick stage: planning / execution / verification / Cancel
-2. If Cancel, go back to Step 3
+2. If Cancel, return to Step 3
 3. Show what will change (override removed, reverts to preset)
 4. Use Question tool: Confirm / Cancel
 5. If confirmed:
    - Delete `config.profiles.custom_overrides[activeProfile][stage]`
-   - Write config
-   - Rewrite agent frontmatter
+   - Write `.planning/config.json`
+   - Update `opencode.json`
    - Print "Saved"
-6. Go back to Step 3
+6. Return to Step 3
 
-#### If "Exit":
+### If "Exit":
 
 Print "Settings saved." and stop.
 
-## Agent Rewrite (after any confirmed change)
+## Agent Config Update
 
-After saving config, you must update agent frontmatter so OpenCode uses the new models.
+After any confirmed change, update `opencode.json` in the project root.
 
-The agents are at these paths (relative to the OpenCode config directory where this command is installed):
-- `agents/gsd-planner.md` (planning)
-- `agents/gsd-plan-checker.md` (planning)
-- `agents/gsd-phase-researcher.md` (planning)
-- `agents/gsd-roadmapper.md` (planning)
-- `agents/gsd-project-researcher.md` (planning)
-- `agents/gsd-research-synthesizer.md` (planning)
-- `agents/gsd-codebase-mapper.md` (planning)
-- `agents/gsd-executor.md` (execution)
-- `agents/gsd-debugger.md` (execution)
-- `agents/gsd-verifier.md` (verification)
-- `agents/gsd-integration-checker.md` (verification)
+Build the agent config from effective stage models:
 
-For each agent:
-1. Read the file
-2. Find the YAML frontmatter (between `---` markers)
-3. Find or add the `model:` key
-4. Set its value to the effective model for that agent's stage
-5. Write the file back (preserve all other content)
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "gsd-planner": { "model": "{effective.planning}" },
+    "gsd-plan-checker": { "model": "{effective.planning}" },
+    "gsd-phase-researcher": { "model": "{effective.planning}" },
+    "gsd-roadmapper": { "model": "{effective.planning}" },
+    "gsd-project-researcher": { "model": "{effective.planning}" },
+    "gsd-research-synthesizer": { "model": "{effective.planning}" },
+    "gsd-codebase-mapper": { "model": "{effective.planning}" },
+    "gsd-executor": { "model": "{effective.execution}" },
+    "gsd-debugger": { "model": "{effective.execution}" },
+    "gsd-verifier": { "model": "{effective.verification}" },
+    "gsd-integration-checker": { "model": "{effective.verification}" }
+  }
+}
+```
 
-Stage mapping:
-- Planning agents: gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper
-- Execution agents: gsd-executor, gsd-debugger
-- Verification agents: gsd-verifier, gsd-integration-checker
+If `opencode.json` already exists, merge the `agent` key (preserve other top-level keys).
 
-## Known Models (for picker)
+</behavior>
 
-Derive from presets in config:
-- opencode/glm-4.7-free
-- opencode/minimax-m2.1-free
-- opencode/grok-code
-
-Also allow user to type a custom model ID.
-
-## Important Notes
-
-- This is a **menu loop** - keep showing the menu until user selects Exit
+<notes>
+- This is a menu loop — keep showing the menu until user selects Exit
 - Use the Question tool for ALL user input (never ask user to type numbers)
 - The `* = overridden` legend is REQUIRED output
 - Persist changes immediately after each confirmation (don't batch)
-- If agent rewrite fails, report which files failed and continue
+- Do NOT rewrite agent .md files — only update opencode.json
+- Overrides are scoped per profile at `profiles.custom_overrides.{profile}.{stage}`
+</notes>
