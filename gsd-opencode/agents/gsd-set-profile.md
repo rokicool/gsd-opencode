@@ -132,7 +132,9 @@ Current configuration:
 
 **C) Interactive picker (no args/flags):**
 
-Use a single Question tool call with multiple questions (wizard UI) so the user stays in one selector flow ("scrolls to the right"):
+Use a single Question tool call with multiple questions (wizard UI) so the user stays in one selector flow ("scrolls to the right").
+
+Do NOT add a separate "Confirm" question inside the wizard: OpenCode shows a final review/confirm screen for wizard flows.
 
 ```
 questions:
@@ -147,18 +149,11 @@ questions:
         description: "planning: opencode/minimax-m2.1-free | execution: opencode/grok-code | verification: opencode/minimax-m2.1-free"
       - label: "Cancel"
         description: "Exit without changes"
-  - header: "Confirm profile change"
-    question: "Apply this profile change?"
-    options:
-      - label: "Confirm"
-        description: "Apply changes to config and opencode.json"
-      - label: "Cancel"
-        description: "Exit without changes"
 ```
 
 Then:
-1. If Cancel at either step, print the cancellation message (Step 5) and stop.
-2. Otherwise, set `newProfile` from the first answer and continue to Step 6.
+1. If Cancel, print the cancellation message (Step 5) and stop.
+2. Otherwise, set `newProfile` from the answer and continue to Step 6.
 
 **D) Invalid profile handling:**
 

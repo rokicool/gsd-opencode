@@ -144,7 +144,9 @@ Important:
 
 ### If "Change active profile":
 
-Use a single Question tool call with multiple questions (wizard UI) so the user stays in one selector flow:
+Use a single Question tool call with multiple questions (wizard UI) so the user stays in one selector flow.
+
+Do NOT add a separate "Confirm" question inside the wizard: OpenCode shows a final review/confirm screen for wizard flows.
 
 ```
 questions:
@@ -159,17 +161,10 @@ questions:
         description: "planning: opencode/minimax-m2.1-free | execution: opencode/grok-code | verification: opencode/minimax-m2.1-free"
       - label: "Cancel"
         description: "Return to settings"
-  - header: "GSD Settings"
-    question: "Apply this profile change?"
-    options:
-      - label: "Confirm"
-        description: "Write config + regenerate opencode.json"
-      - label: "Cancel"
-        description: "Return to settings"
 ```
 
 Then:
-1. If user selected Cancel at either step, return to Step 3
+1. If user selected Cancel, return to Step 3
 2. Compute the effective models for the selected profile (preset + per-profile overrides)
 3. Apply the change and save:
     - Update `config.profiles.active_profile` to the new profile
