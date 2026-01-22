@@ -7,17 +7,17 @@ The orchestrator's job is coordination, not execution. Each subagent loads the f
 </core_principle>
 
 <required_reading>
-Read STATE.md before any operation to load project context.
-Read config.json for planning behavior settings.
+read STATE.md before any operation to load project context.
+read config.json for planning behavior settings.
 </required_reading>
 
 <process>
 
 <step name="resolve_model_profile" priority="first">
-Read model profile for agent spawning:
+read model profile for agent spawning:
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced"
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -41,16 +41,16 @@ cat .planning/STATE.md 2>/dev/null
 ```
 
 **If file exists:** Parse and internalize:
-- Current position (phase, plan, status
-- Accumulated decisions (constraints on this execution
-- Blockers/concerns (things to watch for
+- Current position (phase, plan, status)
+- Accumulated decisions (constraints on this execution)
+- Blockers/concerns (things to watch for)
 
 **If file missing but .planning/ exists:**
 ```
 STATE.md missing but planning artifacts exist.
 Options:
 1. Reconstruct from existing artifacts
-2. Continue without project state (may lose accumulated context
+2. Continue without project state (may lose accumulated context)
 ```
 
 **If .planning/ doesn't exist:** Error - project not initialized.
@@ -58,9 +58,9 @@ Options:
 **Load planning config:**
 
 ```bash
-# Check if planning docs should be committed (default: true
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true"
-# Auto-detect gitignored (overrides config
+# Check if planning docs should be committed (default: true)
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+# Auto-detect gitignored (overrides config)
 git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
@@ -71,15 +71,15 @@ Store `COMMIT_PLANNING_DOCS` for use in git operations.
 Confirm phase exists and has plans:
 
 ```bash
-# Match both zero-padded (05-* and unpadded (5-* folders
-PADDED_PHASE=$(printf "%02d" ${PHASE_ARG} 2>/dev/null || echo "${PHASE_ARG}"
-PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE_ARG}-* 2>/dev/null | head -1
+# Match both zero-padded (05-*) and unpadded (5-*) folders
+PADDED_PHASE=$(printf "%02d" ${PHASE_ARG} 2>/dev/null || echo "${PHASE_ARG}")
+PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE_ARG}-* 2>/dev/null | head -1)
 if [ -z "$PHASE_DIR" ]; then
   echo "ERROR: No phase directory matching '${PHASE_ARG}'"
   exit 1
 fi
 
-PLAN_COUNT=$(ls -1 "$PHASE_DIR"/*-PLAN.md 2>/dev/null | wc -l | tr -d ' '
+PLAN_COUNT=$(ls -1 "$PHASE_DIR"/*-PLAN.md 2>/dev/null | wc -l | tr -d ' ')
 if [ "$PLAN_COUNT" -eq 0 ]; then
   echo "ERROR: No plans found in $PHASE_DIR"
   exit 1
@@ -96,38 +96,38 @@ List all plans and extract metadata:
 # Get all plans
 ls -1 "$PHASE_DIR"/*-PLAN.md 2>/dev/null | sort
 
-# Get completed plans (have SUMMARY.md
+# Get completed plans (have SUMMARY.md)
 ls -1 "$PHASE_DIR"/*-SUMMARY.md 2>/dev/null | sort
 ```
 
 For each plan, read frontmatter to extract:
-- `wave: N` - Execution wave (pre-computed
+- `wave: N` - Execution wave (pre-computed)
 - `autonomous: true/false` - Whether plan has checkpoints
 - `gap_closure: true/false` - Whether plan closes gaps from verification/UAT
 
 Build plan inventory:
 - Plan path
-- Plan ID (e.g., "03-01"
+- Plan ID (e.g., "03-01")
 - Wave number
 - Autonomous flag
 - Gap closure flag
-- Completion status (SUMMARY exists = complete
+- Completion status (SUMMARY exists = complete)
 
 **Filtering:**
-- Skip completed plans (have SUMMARY.md
+- Skip completed plans (have SUMMARY.md)
 - If `--gaps-only` flag: also skip plans where `gap_closure` is not `true`
 
 If all plans filtered out, report "No matching incomplete plans" and exit.
 </step>
 
 <step name="group_by_wave">
-Read `wave` from each plan's frontmatter and group by wave number:
+read `wave` from each plan's frontmatter and group by wave number:
 
 ```bash
 # For each plan, extract wave from frontmatter
 for plan in $PHASE_DIR/*-PLAN.md; do
-  wave=$(grep "^wave:" "$plan" | cut -d: -f2 | tr -d ' '
-  autonomous=$(grep "^autonomous:" "$plan" | cut -d: -f2 | tr -d ' '
+  wave=$(grep "^wave:" "$plan" | cut -d: -f2 | tr -d ' ')
+  autonomous=$(grep "^autonomous:" "$plan" | cut -d: -f2 | tr -d ' ')
   echo "$plan:$wave:$autonomous"
 done
 ```
@@ -157,7 +157,7 @@ Report wave structure with context:
 
 ```
 
-The "What it builds" column comes from skimming plan names/objectives. Keep it brief (3-8 words.
+The "What it builds" column comes from skimming plan names/objectives. Keep it brief (3-8 words).
 </step>
 
 <step name="execute_waves">
@@ -165,9 +165,9 @@ Execute each wave in sequence. Autonomous plans within a wave run in parallel.
 
 **For each wave:**
 
-1. **Describe what's being built (BEFORE spawning:**
+1. **Describe what's being built (BEFORE spawning):**
 
-   Read each plan's `<objective>` section. Extract what's being built and why it matters.
+   read each plan's `<objective>` section. Extract what's being built and why it matters.
 
    **Output:**
    ```
@@ -178,10 +178,10 @@ Execute each wave in sequence. Autonomous plans within a wave run in parallel.
    **{Plan ID}: {Plan Name}**
    {2-3 sentences: what this builds, key technical approach, why it matters in context}
 
-   **{Plan ID}: {Plan Name}** (if parallel
+   **{Plan ID}: {Plan Name}** (if parallel)
    {same format}
 
-   Spawning {count} agent(s...
+   Spawning {count} agent(s)...
 
    ---
    ```
@@ -190,15 +190,15 @@ Execute each wave in sequence. Autonomous plans within a wave run in parallel.
    - Bad: "Executing terrain generation plan"
    - Good: "Procedural terrain generator using Perlin noise — creates height maps, biome zones, and collision meshes. Required before vehicle physics can interact with ground."
 
-2. **Read files and spawn all autonomous agents in wave simultaneously:**
+2. **read files and spawn all autonomous agents in wave simultaneously:**
 
-   Before spawning, read file contents. The `@` syntax does not work across Task( boundaries - content must be inlined.
+   Before spawning, read file contents. The `@` syntax does not work across Task() boundaries - content must be inlined.
 
    ```bash
-   # Read each plan in the wave
-   PLAN_CONTENT=$(cat "{plan_path}"
-   STATE_CONTENT=$(cat .planning/STATE.md
-   CONFIG_CONTENT=$(cat .planning/config.json 2>/dev/null
+   # read each plan in the wave
+   PLAN_CONTENT=$(cat "{plan_path}")
+   STATE_CONTENT=$(cat .planning/STATE.md)
+   CONFIG_CONTENT=$(cat .planning/config.json 2>/dev/null)
    ```
 
    Use Task tool with multiple parallel calls. Each agent gets prompt with inlined content:
@@ -224,7 +224,7 @@ Execute each wave in sequence. Autonomous plans within a wave run in parallel.
    Project state:
    {state_content}
 
-   Config (if exists:
+   Config (if exists):
    {config_content}
    </context>
 
@@ -244,7 +244,7 @@ Execute each wave in sequence. Autonomous plans within a wave run in parallel.
 
    For each completed agent:
    - Verify SUMMARY.md exists at expected path
-   - Read SUMMARY.md to extract what was built
+   - read SUMMARY.md to extract what was built
    - Note any issues or deviations
 
    **Output:**
@@ -257,7 +257,7 @@ Execute each wave in sequence. Autonomous plans within a wave run in parallel.
    {What was built — from SUMMARY.md deliverables}
    {Notable deviations or discoveries, if any}
 
-   **{Plan ID}: {Plan Name}** (if parallel
+   **{Plan ID}: {Plan Name}** (if parallel)
    {same format}
 
    {If more waves: brief note on what this enables for next wave}
@@ -267,14 +267,14 @@ Execute each wave in sequence. Autonomous plans within a wave run in parallel.
 
    **Examples:**
    - Bad: "Wave 2 complete. Proceeding to Wave 3."
-   - Good: "Terrain system complete — 3 biome types, height-based texturing, physics collision meshes. Vehicle physics (Wave 3 can now reference ground surfaces."
+   - Good: "Terrain system complete — 3 biome types, height-based texturing, physics collision meshes. Vehicle physics (Wave 3) can now reference ground surfaces."
 
 4. **Handle failures:**
 
    If any agent in wave fails:
    - Report which plan failed and why
    - Ask user: "Continue with remaining waves?" or "Stop execution?"
-   - If continue: proceed to next wave (dependent plans may also fail
+   - If continue: proceed to next wave (dependent plans may also fail)
    - If stop: exit with partial completion report
 
 5. **Execute checkpoint plans between waves:**
@@ -294,15 +294,15 @@ Plans with `autonomous: false` require user interaction.
 
 1. **Spawn agent for checkpoint plan:**
    ```
-   Task(prompt="{subagent-task-prompt}", subagent_type="gsd-executor", model="{executor_model}"
+   Task(prompt="{subagent-task-prompt}", subagent_type="gsd-executor", model="{executor_model}")
    ```
 
 2. **Agent runs until checkpoint:**
    - Executes auto tasks normally
-   - Reaches checkpoint task (e.g., `type="checkpoint:human-verify"` or auth gate
-   - Agent returns with structured checkpoint (see checkpoint-return.md template
+   - Reaches checkpoint task (e.g., `type="checkpoint:human-verify"`) or auth gate
+   - Agent returns with structured checkpoint (see checkpoint-return.md template)
 
-3. **Agent return includes (structured format:**
+3. **Agent return includes (structured format):**
    - Completed Tasks table with commit hashes and files
    - Current task name and blocker
    - Checkpoint type and details for user
@@ -327,7 +327,7 @@ Plans with `autonomous: false` require user interaction.
    - Description of issues → spawn continuation agent with feedback
    - Decision selection → spawn continuation agent with choice
 
-6. **Spawn continuation agent (NOT resume:**
+6. **Spawn continuation agent (NOT resume):**
 
    Use the continuation-prompt.md template:
    ```
@@ -335,7 +335,7 @@ Plans with `autonomous: false` require user interaction.
      prompt=filled_continuation_template,
      subagent_type="gsd-executor",
      model="{executor_model}"
-   
+   )
    ```
 
    Fill template with:
@@ -343,12 +343,12 @@ Plans with `autonomous: false` require user interaction.
    - `{resume_task_number}`: Current task from checkpoint
    - `{resume_task_name}`: Current task name from checkpoint
    - `{user_response}`: What user provided
-   - `{resume_instructions}`: Based on checkpoint type (see continuation-prompt.md
+   - `{resume_instructions}`: Based on checkpoint type (see continuation-prompt.md)
 
 7. **Continuation agent executes:**
    - Verifies previous commits exist
    - Continues from resume point
-   - May hit another checkpoint (repeat from step 4
+   - May hit another checkpoint (repeat from step 4)
    - Or completes plan
 
 8. **Repeat until plan completes or user stops**
@@ -412,10 +412,10 @@ Check must_haves against actual codebase. Create VERIFICATION.md.
 Verify what actually exists in the code.",
   subagent_type="gsd-verifier",
   model="{verifier_model}"
-
+)
 ```
 
-**Read verification status:**
+**read verification status:**
 
 ```bash
 grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
@@ -487,9 +487,9 @@ Present gaps and offer next command:
 
 User runs `/gsd-plan-phase {X} --gaps` which:
 1. Reads VERIFICATION.md gaps
-2. Creates additional plans (04, 05, etc. with `gap_closure: true` to close gaps
+2. Creates additional plans (04, 05, etc.) with `gap_closure: true` to close gaps
 3. User then runs `/gsd-execute-phase {X} --gaps-only`
-4. Execute-phase runs only gap closure plans (04-05
+4. Execute-phase runs only gap closure plans (04-05)
 5. Verifier runs again after new plans complete
 
 User stays in control at each decision point.
@@ -506,20 +506,20 @@ Update ROADMAP.md to reflect phase completion:
 
 **Check planning config:**
 
-If `COMMIT_PLANNING_DOCS=false` (set in load_project_state:
+If `COMMIT_PLANNING_DOCS=false` (set in load_project_state):
 - Skip all git operations for .planning/ files
 - Planning docs exist locally but are gitignored
-- Log: "Skipping planning docs commit (commit_docs: false"
+- Log: "Skipping planning docs commit (commit_docs: false)"
 - Proceed to offer_next step
 
-If `COMMIT_PLANNING_DOCS=true` (default:
+If `COMMIT_PLANNING_DOCS=true` (default):
 - Continue with git operations below
 
-Commit phase completion (roadmap, state, verification:
+Commit phase completion (roadmap, state, verification):
 ```bash
 git add .planning/ROADMAP.md .planning/STATE.md .planning/phases/{phase_dir}/*-VERIFICATION.md
 git add .planning/REQUIREMENTS.md  # if updated
-git commit -m "docs(phase-{X}: complete phase execution"
+git commit -m "docs(phase-{X}): complete phase execution"
 ```
 </step>
 
@@ -553,8 +553,8 @@ All {N} phases executed.
 **Why this works:**
 
 Orchestrator context usage: ~10-15%
-- Read plan frontmatter (small
-- Analyze dependencies (logic, no heavy reads
+- read plan frontmatter (small)
+- Analyze dependencies (logic, no heavy reads)
 - Fill template strings
 - Spawn Task calls
 - Collect results
@@ -579,11 +579,11 @@ Each subagent: Fresh 200k context
 **Dependency chain breaks:**
 - Wave 1 plan fails
 - Wave 2 plans depending on it will likely fail
-- Orchestrator can still attempt them (user choice
+- Orchestrator can still attempt them (user choice)
 - Or skip dependent plans entirely
 
 **All agents in wave fail:**
-- Something systemic (git issues, permissions, etc.
+- Something systemic (git issues, permissions, etc.)
 - Stop execution
 - Report for manual investigation
 
@@ -596,7 +596,7 @@ Each subagent: Fresh 200k context
 <resumption>
 **Resuming interrupted execution:**
 
-If phase execution was interrupted (context limit, user exit, error:
+If phase execution was interrupted (context limit, user exit, error):
 
 1. Run `/gsd-execute-phase {phase}` again
 2. discover_plans finds completed SUMMARYs

@@ -35,15 +35,15 @@ Template for `.planning/research/SUMMARY.md` — executive summary of project re
 
 [Summary from FEATURES.md]
 
-**Must have (table stakes:**
+**Must have (table stakes):**
 - [Feature] — users expect this
 - [Feature] — users expect this
 
-**Should have (competitive:**
+**Should have (competitive):**
 - [Feature] — differentiator
 - [Feature] — differentiator
 
-**Defer (v2+:**
+**Defer (v2+):**
 - [Feature] — not essential for launch
 
 ### Architecture Approach
@@ -97,7 +97,7 @@ Phases likely needing deeper research during planning:
 - **Phase [X]:** [reason — e.g., "complex integration, needs API research"]
 - **Phase [Y]:** [reason — e.g., "niche domain, sparse documentation"]
 
-Phases with standard patterns (skip research-phase:
+Phases with standard patterns (skip research-phase):
 - **Phase [X]:** [reason — e.g., "well-documented, established patterns"]
 
 ## Confidence Assessment
@@ -120,14 +120,14 @@ Phases with standard patterns (skip research-phase:
 
 ## Sources
 
-### Primary (HIGH confidence
+### Primary (HIGH confidence)
 - [Context7 library ID] — [topics]
 - [Official docs URL] — [what was checked]
 
-### Secondary (MEDIUM confidence
+### Secondary (MEDIUM confidence)
 - [Source] — [finding]
 
-### Tertiary (LOW confidence
+### Tertiary (LOW confidence)
 - [Source] — [finding, needs validation]
 
 ---
@@ -140,13 +140,13 @@ Phases with standard patterns (skip research-phase:
 <guidelines>
 
 **Executive Summary:**
-- Write for someone who will only read this section
+- write for someone who will only read this section
 - Include the key recommendation and main risk
 - 2-3 paragraphs maximum
 
 **Key Findings:**
 - Summarize, don't duplicate full documents
-- Link to detailed docs (STACK.md, FEATURES.md, etc.
+- Link to detailed docs (STACK.md, FEATURES.md, etc.)
 - Focus on what matters for roadmap decisions
 
 **Implications for Roadmap:**

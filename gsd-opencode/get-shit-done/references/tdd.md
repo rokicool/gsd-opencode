@@ -1,15 +1,15 @@
 <overview>
 TDD is about design quality, not coverage metrics. The red-green-refactor cycle forces you to think about behavior before implementation, producing cleaner interfaces and more testable code.
 
-**Principle:** If you can describe the behavior as `expect(fn(input.toBe(output` before writing `fn`, TDD improves the result.
+**Principle:** If you can describe the behavior as `expect(fn(input)).toBe(output)` before writing `fn`, TDD improves the result.
 
-**Key insight:** TDD work is fundamentally heavier than standard tasks—it requires 2-3 execution cycles (RED → GREEN → REFACTOR, each with file reads, test runs, and potential debugging. TDD features get dedicated plans to ensure full context is available throughout the cycle.
+**Key insight:** TDD work is fundamentally heavier than standard tasks—it requires 2-3 execution cycles (RED → GREEN → REFACTOR), each with file reads, test runs, and potential debugging. TDD features get dedicated plans to ensure full context is available throughout the cycle.
 </overview>
 
 <when_to_use_tdd>
 ## When TDD Improves Quality
 
-**TDD candidates (create a TDD plan:**
+**TDD candidates (create a TDD plan):**
 - Business logic with defined inputs/outputs
 - API endpoints with request/response contracts
 - Data transformations, parsing, formatting
@@ -18,7 +18,7 @@ TDD is about design quality, not coverage metrics. The red-green-refactor cycle 
 - State machines and workflows
 - Utility functions with clear specifications
 
-**Skip TDD (use standard plan with `type="auto"` tasks:**
+**Skip TDD (use standard plan with `type="auto"` tasks):**
 - UI layout, styling, visual components
 - Configuration changes
 - Glue code connecting existing components
@@ -26,7 +26,7 @@ TDD is about design quality, not coverage metrics. The red-green-refactor cycle 
 - Simple CRUD with no business logic
 - Exploratory prototyping
 
-**Heuristic:** Can you write `expect(fn(input.toBe(output` before writing `fn`?
+**Heuristic:** Can you write `expect(fn(input)).toBe(output)` before writing `fn`?
 → Yes: Create a TDD plan
 → No: Use standard plan, add tests after if needed
 </when_to_use_tdd>
@@ -72,7 +72,7 @@ Output: [Working, tested feature]
 <success_criteria>
 - Failing test written and committed
 - Implementation passes test
-- Refactor complete (if needed
+- Refactor complete (if needed)
 - All 2-3 commits present
 </success_criteria>
 
@@ -80,7 +80,7 @@ Output: [Working, tested feature]
 After completion, create SUMMARY.md with:
 - RED: What test was written, why it failed
 - GREEN: What implementation made it pass
-- REFACTOR: What cleanup was done (if any
+- REFACTOR: What cleanup was done (if any)
 - Commits: List of commits produced
 </output>
 ```
@@ -91,23 +91,23 @@ After completion, create SUMMARY.md with:
 <execution_flow>
 ## Red-Green-Refactor Cycle
 
-**RED - Write failing test:**
+**RED - write failing test:**
 1. Create test file following project conventions
-2. Write test describing expected behavior (from `<behavior>` element
+2. write test describing expected behavior (from `<behavior>` element)
 3. Run test - it MUST fail
 4. If test passes: feature exists or test is wrong. Investigate.
-5. Commit: `test({phase}-{plan}: add failing test for [feature]`
+5. Commit: `test({phase}-{plan}): add failing test for [feature]`
 
 **GREEN - Implement to pass:**
-1. Write minimal code to make test pass
+1. write minimal code to make test pass
 2. No cleverness, no optimization - just make it work
 3. Run test - it MUST pass
-4. Commit: `feat({phase}-{plan}: implement [feature]`
+4. Commit: `feat({phase}-{plan}): implement [feature]`
 
-**REFACTOR (if needed:**
+**REFACTOR (if needed):**
 1. Clean up implementation if obvious improvements exist
 2. Run tests - MUST still pass
-3. Only commit if changes made: `refactor({phase}-{plan}: clean up [feature]`
+3. Only commit if changes made: `refactor({phase}-{plan}): clean up [feature]`
 
 **Result:** Each TDD plan produces 2-3 atomic commits.
 </execution_flow>
@@ -134,7 +134,7 @@ After completion, create SUMMARY.md with:
 </test_quality>
 
 <framework_setup>
-## Test Framework Setup (If None Exists
+## Test Framework Setup (If None Exists)
 
 When executing a TDD plan but no test framework is configured, set it up as part of the RED phase:
 
@@ -157,7 +157,7 @@ if [ -f Cargo.toml ]; then echo "rust"; fi
 | Project | Framework | Install |
 |---------|-----------|---------|
 | Node.js | Jest | `npm install -D jest @types/jest ts-jest` |
-| Node.js (Vite | Vitest | `npm install -D vitest` |
+| Node.js (Vite) | Vitest | `npm install -D vitest` |
 | Python | pytest | `pip install pytest` |
 | Go | testing | Built-in |
 | Rust | cargo test | Built-in |
@@ -190,7 +190,7 @@ Framework setup is a one-time cost included in the first TDD plan's RED phase.
 
 **Test doesn't fail in RED phase:**
 - Feature may already exist - investigate
-- Test may be wrong (not testing what you think
+- Test may be wrong (not testing what you think)
 - Fix before proceeding
 
 **Test doesn't pass in GREEN phase:**
@@ -212,22 +212,22 @@ Framework setup is a one-time cost included in the first TDD plan's RED phase.
 <commit_pattern>
 ## Commit Pattern for TDD Plans
 
-TDD plans produce 2-3 atomic commits (one per phase:
+TDD plans produce 2-3 atomic commits (one per phase):
 
 ```
-test(08-02: add failing test for email validation
+test(08-02): add failing test for email validation
 
 - Tests valid email formats accepted
 - Tests invalid formats rejected
 - Tests empty input handling
 
-feat(08-02: implement email validation
+feat(08-02): implement email validation
 
 - Regex pattern matches RFC 5322
 - Returns boolean for validity
-- Handles edge cases (empty, null
+- Handles edge cases (empty, null)
 
-refactor(08-02: extract regex to constant (optional
+refactor(08-02): extract regex to constant (optional)
 
 - Moved pattern to EMAIL_REGEX constant
 - No behavior changes
@@ -238,7 +238,7 @@ refactor(08-02: extract regex to constant (optional
 - Standard plans: 1 commit per task, 2-4 commits per plan
 - TDD plans: 2-3 commits for single feature
 
-Both follow same format: `{type}({phase}-{plan}: {description}`
+Both follow same format: `{type}({phase}-{plan}): {description}`
 
 **Benefits:**
 - Each commit independently revertable
@@ -250,7 +250,7 @@ Both follow same format: `{type}({phase}-{plan}: {description}`
 <context_budget>
 ## Context Budget
 
-TDD plans target **~40% context usage** (lower than standard plans' ~50%.
+TDD plans target **~40% context usage** (lower than standard plans' ~50%).
 
 Why lower:
 - RED phase: write test, run test, potentially debug why it didn't fail

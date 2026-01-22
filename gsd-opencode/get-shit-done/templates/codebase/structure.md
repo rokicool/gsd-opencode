@@ -131,7 +131,7 @@ get-shit-done/
 │   ├── references/    # Principle documents
 │   ├── templates/     # File templates
 │   └── workflows/     # Multi-step procedures
-├── src/               # Source code (if applicable
+├── src/               # Source code (if applicable)
 ├── tests/             # Test files
 ├── package.json       # Project manifest
 └── README.md          # User documentation
@@ -141,15 +141,15 @@ get-shit-done/
 
 **bin/**
 - Purpose: CLI entry points
-- Contains: install.js (installer script
+- Contains: install.js (installer script)
 - Key files: install.js - handles npx installation
 - Subdirectories: None
 
 **commands/gsd/**
 - Purpose: Slash command definitions for OpenCode
-- Contains: *.md files (one per command
+- Contains: *.md files (one per command)
 - Key files: new-project.md, plan-phase.md, execute-plan.md
-- Subdirectories: None (flat structure
+- Subdirectories: None (flat structure)
 
 **get-shit-done/references/**
 - Purpose: Core philosophy and guidance documents
@@ -161,7 +161,7 @@ get-shit-done/
 - Purpose: Document templates for .planning/ files
 - Contains: Template definitions with frontmatter
 - Key files: project.md, roadmap.md, plan.md, summary.md
-- Subdirectories: codebase/ (new - for stack/architecture/structure templates
+- Subdirectories: codebase/ (new - for stack/architecture/structure templates)
 
 **get-shit-done/workflows/**
 - Purpose: Reusable multi-step procedures
@@ -172,17 +172,17 @@ get-shit-done/
 ## Key File Locations
 
 **Entry Points:**
-- `bin/install.js` - Installation script (npx entry
+- `bin/install.js` - Installation script (npx entry)
 
 **Configuration:**
 - `package.json` - Project metadata, dependencies, bin entry
 - `.gitignore` - Excluded files
 
 **Core Logic:**
-- `bin/install.js` - All installation logic (file copying, path replacement
+- `bin/install.js` - All installation logic (file copying, path replacement)
 
 **Testing:**
-- `tests/` - Test files (if present
+- `tests/` - Test files (if present)
 
 **Documentation:**
 - `README.md` - User-facing installation and usage guide
@@ -193,7 +193,7 @@ get-shit-done/
 **Files:**
 - kebab-case.md: Markdown documents
 - kebab-case.js: JavaScript source files
-- UPPERCASE.md: Important project files (README, CLAUDE, CHANGELOG
+- UPPERCASE.md: Important project files (README, CLAUDE, CHANGELOG)
 
 **Directories:**
 - kebab-case: All directories
@@ -207,12 +207,12 @@ get-shit-done/
 
 **New Slash Command:**
 - Primary code: `commands/gsd/{command-name}.md`
-- Tests: `tests/commands/{command-name}.test.js` (if testing implemented
+- Tests: `tests/commands/{command-name}.test.js` (if testing implemented)
 - Documentation: Update `README.md` with new command
 
 **New Template:**
 - Implementation: `get-shit-done/templates/{name}.md`
-- Documentation: Template is self-documenting (includes guidelines
+- Documentation: Template is self-documenting (includes guidelines)
 
 **New Workflow:**
 - Implementation: `get-shit-done/workflows/{name}.md`
@@ -223,7 +223,7 @@ get-shit-done/
 - Usage: Reference from commands/workflows as needed
 
 **Utilities:**
-- No utilities yet (`install.js` is monolithic
+- No utilities yet (`install.js` is monolithic)
 - If extracted: `src/utils/`
 
 ## Special Directories
@@ -231,12 +231,12 @@ get-shit-done/
 **get-shit-done/**
 - Purpose: Resources installed to ~/.config/opencode/
 - Source: Copied by bin/install.js during installation
-- Committed: Yes (source of truth
+- Committed: Yes (source of truth)
 
 **commands/**
 - Purpose: Slash commands installed to ~/.config/opencode/commands/
 - Source: Copied by bin/install.js during installation
-- Committed: Yes (source of truth
+- Committed: Yes (source of truth)
 
 ---
 
@@ -247,25 +247,25 @@ get-shit-done/
 
 <guidelines>
 **What belongs in STRUCTURE.md:**
-- Directory layout (ASCII tree
+- Directory layout (ASCII tree)
 - Purpose of each directory
-- Key file locations (entry points, configs, core logic
+- Key file locations (entry points, configs, core logic)
 - Naming conventions
-- Where to add new code (by type
+- Where to add new code (by type)
 - Special/generated directories
 
 **What does NOT belong here:**
-- Conceptual architecture (that's ARCHITECTURE.md
-- Technology stack (that's STACK.md
-- Code implementation details (defer to code reading
-- Every single file (focus on directories and key files
+- Conceptual architecture (that's ARCHITECTURE.md)
+- Technology stack (that's STACK.md)
+- Code implementation details (defer to code reading)
+- Every single file (focus on directories and key files)
 
 **When filling this template:**
 - Use `tree -L 2` or similar to visualize structure
 - Identify top-level directories and their purposes
 - Note naming patterns by observing existing files
 - Locate entry points, configs, and main logic areas
-- Keep directory tree concise (max 2-3 levels
+- Keep directory tree concise (max 2-3 levels)
 
 **ASCII tree format:**
 ```
@@ -278,7 +278,7 @@ root/
 ```
 
 **Useful for phase planning when:**
-- Adding new features (where should files go?
+- Adding new features (where should files go?)
 - Understanding project organization
 - Finding where specific logic lives
 - Following existing conventions

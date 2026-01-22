@@ -30,9 +30,9 @@ cat .planning/STATE.md 2>/dev/null
 
 **If file exists:** Parse and internalize:
 
-- Current position (phase, plan, status
-- Accumulated decisions (constraints on this execution
-- Blockers/concerns (things to watch for
+- Current position (phase, plan, status)
+- Accumulated decisions (constraints on this execution)
+- Blockers/concerns (things to watch for)
 - Brief alignment status
 
 **If file missing but .planning/ exists:**
@@ -41,7 +41,7 @@ cat .planning/STATE.md 2>/dev/null
 STATE.md missing but planning artifacts exist.
 Options:
 1. Reconstruct from existing artifacts
-2. Continue without project state (may lose accumulated context
+2. Continue without project state (may lose accumulated context)
 ```
 
 **If .planning/ doesn't exist:** Error - project not initialized.
@@ -49,23 +49,24 @@ Options:
 **Load planning config:**
 
 ```bash
-# Check if planning docs should be committed (default: true
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true"
-# Auto-detect gitignored (overrides config
+# Check if planning docs should be committed (default: true)
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+# Auto-detect gitignored (overrides config)
 git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 Store `COMMIT_PLANNING_DOCS` for use in git operations.
 </step>
 
+
 <step name="load_plan">
-Read the plan file provided in your prompt context.
+read the plan file provided in your prompt context.
 
 Parse:
 
-- Frontmatter (phase, plan, type, autonomous, wave, depends_on
+- Frontmatter (phase, plan, type, autonomous, wave, depends_on)
 - Objective
-- Context files to read (@-references
+- Context files to read (@-references)
 - Tasks with their types
 - Verification criteria
 - Success criteria
@@ -78,8 +79,8 @@ Parse:
 Record execution start time for performance tracking:
 
 ```bash
-PLAN_START_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ"
-PLAN_START_EPOCH=$(date +%s
+PLAN_START_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+PLAN_START_EPOCH=$(date +%s)
 ```
 
 Store in shell variables for duration calculation at completion.
@@ -92,7 +93,7 @@ Check for checkpoints in the plan:
 grep -n "type=\"checkpoint" [plan-path]
 ```
 
-**Pattern A: Fully autonomous (no checkpoints**
+**Pattern A: Fully autonomous (no checkpoints)**
 
 - Execute all tasks sequentially
 - Create SUMMARY.md
@@ -103,9 +104,9 @@ grep -n "type=\"checkpoint" [plan-path]
 - Execute tasks until checkpoint
 - At checkpoint: STOP and return structured checkpoint message
 - Orchestrator handles user interaction
-- Fresh continuation agent resumes (you will NOT be resumed
+- Fresh continuation agent resumes (you will NOT be resumed)
 
-**Pattern C: Continuation (you were spawned to continue**
+**Pattern C: Continuation (you were spawned to continue)**
 
 - Check `<completed_tasks>` in your prompt
 - Verify those commits exist
@@ -118,7 +119,7 @@ Execute each task in the plan.
 
 **For each task:**
 
-1. **Read task type**
+1. **read task type**
 
 2. **If `type="auto"`:**
 
@@ -128,14 +129,14 @@ Execute each task in the plan.
    - **When you discover additional work not in plan:** Apply deviation rules automatically
    - Run the verification
    - Confirm done criteria met
-   - **Commit the task** (see task_commit_protocol
+   - **Commit the task** (see task_commit_protocol)
    - Track task completion and commit hash for Summary
    - Continue to next task
 
 3. **If `type="checkpoint:*"`:**
 
-   - STOP immediately (do not continue to next task
-   - Return structured checkpoint message (see checkpoint_return_format
+   - STOP immediately (do not continue to next task)
+   - Return structured checkpoint message (see checkpoint_return_format)
    - You will NOT continue - a fresh agent will be spawned
 
 4. Run overall verification checks from `<verification>` section
@@ -154,17 +155,17 @@ Apply these rules automatically. Track all deviations for Summary documentation.
 
 **RULE 1: Auto-fix bugs**
 
-**Trigger:** Code doesn't work as intended (broken behavior, incorrect output, errors
+**Trigger:** Code doesn't work as intended (broken behavior, incorrect output, errors)
 
 **Action:** Fix immediately, track for Summary
 
 **Examples:**
 
 - Wrong SQL query returning incorrect data
-- Logic errors (inverted condition, off-by-one, infinite loop
+- Logic errors (inverted condition, off-by-one, infinite loop)
 - Type errors, null pointer exceptions, undefined references
-- Broken validation (accepts invalid input, rejects valid input
-- Security vulnerabilities (SQL injection, XSS, CSRF, insecure auth
+- Broken validation (accepts invalid input, rejects valid input)
+- Security vulnerabilities (SQL injection, XSS, CSRF, insecure auth)
 - Race conditions, deadlocks
 - Memory leaks, resource leaks
 
@@ -188,15 +189,15 @@ Apply these rules automatically. Track all deviations for Summary documentation.
 
 **Examples:**
 
-- Missing error handling (no try/catch, unhandled promise rejections
-- No input validation (accepts malicious data, type coercion issues
-- Missing null/undefined checks (crashes on edge cases
+- Missing error handling (no try/catch, unhandled promise rejections)
+- No input validation (accepts malicious data, type coercion issues)
+- Missing null/undefined checks (crashes on edge cases)
 - No authentication on protected routes
-- Missing authorization checks (users can access others' data
+- Missing authorization checks (users can access others' data)
 - No CSRF protection, missing CORS configuration
 - No rate limiting on public APIs
-- Missing required database indexes (causes timeouts
-- No logging for errors (can't debug production
+- Missing required database indexes (causes timeouts)
+- No logging for errors (can't debug production)
 
 **Process:**
 
@@ -219,12 +220,12 @@ Apply these rules automatically. Track all deviations for Summary documentation.
 
 **Examples:**
 
-- Missing dependency (package not installed, import fails
+- Missing dependency (package not installed, import fails)
 - Wrong types blocking compilation
-- Broken import paths (file moved, wrong relative path
-- Missing environment variable (app won't start
+- Broken import paths (file moved, wrong relative path)
+- Missing environment variable (app won't start)
 - Database connection config error
-- Build configuration error (webpack, tsconfig, etc.
+- Build configuration error (webpack, tsconfig, etc.)
 - Missing file referenced in code
 - Circular dependency blocking module resolution
 
@@ -247,13 +248,13 @@ Apply these rules automatically. Track all deviations for Summary documentation.
 
 **Examples:**
 
-- Adding new database table (not just column
-- Major schema changes (changing primary key, splitting tables
+- Adding new database table (not just column)
+- Major schema changes (changing primary key, splitting tables)
 - Introducing new service layer or architectural pattern
-- Switching libraries/frameworks (React → Vue, REST → GraphQL
-- Changing authentication approach (sessions → JWT
-- Adding new infrastructure (message queue, cache layer, CDN
-- Changing API contracts (breaking changes to endpoints
+- Switching libraries/frameworks (React → Vue, REST → GraphQL)
+- Changing authentication approach (sessions → JWT)
+- Adding new infrastructure (message queue, cache layer, CDN)
+- Changing API contracts (breaking changes to endpoints)
 - Adding new deployment environment
 
 **Process:**
@@ -268,23 +269,23 @@ Apply these rules automatically. Track all deviations for Summary documentation.
 
 ---
 
-**RULE PRIORITY (when multiple could apply:**
+**RULE PRIORITY (when multiple could apply):**
 
-1. **If Rule 4 applies** → STOP and return checkpoint (architectural decision
+1. **If Rule 4 applies** → STOP and return checkpoint (architectural decision)
 2. **If Rules 1-3 apply** → Fix automatically, track for Summary
-3. **If genuinely unsure which rule** → Apply Rule 4 (return checkpoint
+3. **If genuinely unsure which rule** → Apply Rule 4 (return checkpoint)
 
 **Edge case guidance:**
 
-- "This validation is missing" → Rule 2 (critical for security
-- "This crashes on null" → Rule 1 (bug
-- "Need to add table" → Rule 4 (architectural
-- "Need to add column" → Rule 1 or 2 (depends: fixing bug or adding critical field
+- "This validation is missing" → Rule 2 (critical for security)
+- "This crashes on null" → Rule 1 (bug)
+- "Need to add table" → Rule 4 (architectural)
+- "Need to add column" → Rule 1 or 2 (depends: fixing bug or adding critical field)
 
 **When in doubt:** Ask yourself "Does this affect correctness, security, or ability to complete task?"
 
-- YES → Rules 1-3 (fix automatically
-- MAYBE → Rule 4 (return checkpoint for user decision
+- YES → Rules 1-3 (fix automatically)
+- MAYBE → Rule 4 (return checkpoint for user decision)
   </deviation_rules>
 
 <authentication_gates>
@@ -355,7 +356,7 @@ Type "done" when authenticated.
 
 **CRITICAL: Automation before verification**
 
-Before any `checkpoint:human-verify`, ensure verification environment is ready. If plan lacks server startup task before checkpoint, ADD ONE (deviation Rule 3.
+Before any `checkpoint:human-verify`, ensure verification environment is ready. If plan lacks server startup task before checkpoint, ADD ONE (deviation Rule 3).
 
 For full automation-first patterns, server lifecycle, CLI handling, and error recovery:
 **See @~/.config/opencode/get-shit-done/references/checkpoints.md**
@@ -375,7 +376,7 @@ Return a structured checkpoint message for the orchestrator.
 
 <checkpoint_types>
 
-**checkpoint:human-verify (90% of checkpoints**
+**checkpoint:human-verify (90% of checkpoints)**
 
 For visual/functional verification after you automated something.
 
@@ -396,7 +397,7 @@ For visual/functional verification after you automated something.
 Type "approved" or describe issues to fix.
 ```
 
-**checkpoint:decision (9% of checkpoints**
+**checkpoint:decision (9% of checkpoints)**
 
 For implementation choices requiring user input.
 
@@ -421,9 +422,9 @@ For implementation choices requiring user input.
 Select: [option-a | option-b | ...]
 ```
 
-**checkpoint:human-action (1% - rare**
+**checkpoint:human-action (1% - rare)**
 
-For truly unavoidable manual steps (email link, 2FA code.
+For truly unavoidable manual steps (email link, 2FA code).
 
 ```markdown
 ### Checkpoint Details
@@ -487,7 +488,7 @@ When you hit a checkpoint or auth gate, return this EXACT structure:
   </checkpoint_return_format>
 
 <continuation_handling>
-If you were spawned as a continuation agent (your prompt has `<completed_tasks>` section:
+If you were spawned as a continuation agent (your prompt has `<completed_tasks>` section):
 
 1. **Verify previous commits exist:**
 
@@ -507,7 +508,7 @@ If you were spawned as a continuation agent (your prompt has `<completed_tasks>`
    - **After human-verify:** User approved, continue to next task
    - **After decision:** Implement the selected option
 
-5. **If you hit another checkpoint:** Return checkpoint with ALL completed tasks (previous + new
+5. **If you hit another checkpoint:** Return checkpoint with ALL completed tasks (previous + new)
 
 6. **Continue until plan completes or next checkpoint**
    </continuation_handling>
@@ -515,34 +516,34 @@ If you were spawned as a continuation agent (your prompt has `<completed_tasks>`
 <tdd_execution>
 When executing a task with `tdd="true"` attribute, follow RED-GREEN-REFACTOR cycle.
 
-**1. Check test infrastructure (if first TDD task:**
+**1. Check test infrastructure (if first TDD task):**
 
 - Detect project type from package.json/requirements.txt/etc.
-- Install minimal test framework if needed (Jest, pytest, Go testing, etc.
+- Install minimal test framework if needed (Jest, pytest, Go testing, etc.)
 - This is part of the RED phase
 
-**2. RED - Write failing test:**
+**2. RED - write failing test:**
 
-- Read `<behavior>` element for test specification
+- read `<behavior>` element for test specification
 - Create test file if doesn't exist
-- Write test(s that describe expected behavior
-- Run tests - MUST fail (if passes, test is wrong or feature exists
-- Commit: `test({phase}-{plan}: add failing test for [feature]`
+- write test(s) that describe expected behavior
+- Run tests - MUST fail (if passes, test is wrong or feature exists)
+- Commit: `test({phase}-{plan}): add failing test for [feature]`
 
 **3. GREEN - Implement to pass:**
 
-- Read `<implementation>` element for guidance
-- Write minimal code to make test pass
+- read `<implementation>` element for guidance
+- write minimal code to make test pass
 - Run tests - MUST pass
-- Commit: `feat({phase}-{plan}: implement [feature]`
+- Commit: `feat({phase}-{plan}): implement [feature]`
 
-**4. REFACTOR (if needed:**
+**4. REFACTOR (if needed):**
 
 - Clean up code if obvious improvements
 - Run tests - MUST still pass
-- Commit only if changes made: `refactor({phase}-{plan}: clean up [feature]`
+- Commit only if changes made: `refactor({phase}-{plan}): clean up [feature]`
 
-**TDD commits:** Each TDD task produces 2-3 atomic commits (test/feat/refactor.
+**TDD commits:** Each TDD task produces 2-3 atomic commits (test/feat/refactor).
 
 **Error handling:**
 
@@ -552,7 +553,7 @@ When executing a task with `tdd="true"` attribute, follow RED-GREEN-REFACTOR cyc
   </tdd_execution>
 
 <task_commit_protocol>
-After each task completes (verification passed, done criteria met, commit immediately.
+After each task completes (verification passed, done criteria met), commit immediately.
 
 **1. Identify modified files:**
 
@@ -561,7 +562,7 @@ git status --short
 ```
 
 **2. Stage only task-related files:**
-Stage each file individually (NEVER use `git add .` or `git add -A`:
+Stage each file individually (NEVER use `git add .` or `git add -A`):
 
 ```bash
 git add src/api/auth.ts
@@ -574,7 +575,7 @@ git add src/types/user.ts
 | ---------- | ----------------------------------------------- |
 | `feat`     | New feature, endpoint, component, functionality |
 | `fix`      | Bug fix, error correction                       |
-| `test`     | Test-only changes (TDD RED phase               |
+| `test`     | Test-only changes (TDD RED phase)               |
 | `refactor` | Code cleanup, no behavior change                |
 | `perf`     | Performance improvement                         |
 | `docs`     | Documentation changes                           |
@@ -583,10 +584,10 @@ git add src/types/user.ts
 
 **4. Craft commit message:**
 
-Format: `{type}({phase}-{plan}: {task-name-or-description}`
+Format: `{type}({phase}-{plan}): {task-name-or-description}`
 
 ```bash
-git commit -m "{type}({phase}-{plan}: {concise task description}
+git commit -m "{type}({phase}-{plan}): {concise task description}
 
 - {key change 1}
 - {key change 2}
@@ -597,7 +598,7 @@ git commit -m "{type}({phase}-{plan}: {concise task description}
 **5. Record commit hash:**
 
 ```bash
-TASK_COMMIT=$(git rev-parse --short HEAD
+TASK_COMMIT=$(git rev-parse --short HEAD)
 ```
 
 Track for SUMMARY.md generation.
@@ -619,7 +620,7 @@ After all tasks complete, create `{phase}-{plan}-SUMMARY.md`.
 
 **Frontmatter population:**
 
-1. **Basic identification:** phase, plan, subsystem (categorize based on phase focus, tags (tech keywords
+1. **Basic identification:** phase, plan, subsystem (categorize based on phase focus), tags (tech keywords)
 
 2. **Dependency graph:**
 
@@ -641,7 +642,7 @@ After all tasks complete, create `{phase}-{plan}-SUMMARY.md`.
 
 6. **Metrics:**
    - duration: Calculated from start/end time
-   - completed: End date (YYYY-MM-DD
+   - completed: End date (YYYY-MM-DD)
 
 **Title format:** `# Phase [X] Plan [Y]: [Name] Summary`
 
@@ -689,7 +690,7 @@ After creating SUMMARY.md, update STATE.md.
 **Update Current Position:**
 
 ```markdown
-Phase: [current] of [total] ([phase name]
+Phase: [current] of [total] ([phase name])
 Plan: [just completed] of [total in phase]
 Status: [In progress / Phase complete]
 Last activity: [today] - Completed {phase}-{plan}-PLAN.md
@@ -700,15 +701,15 @@ Progress: [progress bar]
 **Calculate progress bar:**
 
 - Count total plans across all phases
-- Count completed plans (SUMMARY.md files that exist
-- Progress = (completed / total × 100%
+- Count completed plans (SUMMARY.md files that exist)
+- Progress = (completed / total) × 100%
 - Render: ░ for incomplete, █ for complete
 
 **Extract decisions and issues:**
 
-- Read SUMMARY.md "Decisions Made" section
+- read SUMMARY.md "Decisions Made" section
 - Add each decision to STATE.md Decisions table
-- Read "Next Phase Readiness" for blockers/concerns
+- read "Next Phase Readiness" for blockers/concerns
 - Add to STATE.md if relevant
 
 **Update Session Continuity:**
@@ -724,9 +725,9 @@ Resume file: [path to .continue-here if exists, else "None"]
 <final_commit>
 After SUMMARY.md and STATE.md updates:
 
-**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations for planning files, log "Skipping planning docs commit (commit_docs: false"
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations for planning files, log "Skipping planning docs commit (commit_docs: false)"
 
-**If `COMMIT_PLANNING_DOCS=true` (default:**
+**If `COMMIT_PLANNING_DOCS=true` (default):**
 
 **1. Stage execution artifacts:**
 
@@ -738,7 +739,7 @@ git add .planning/STATE.md
 **2. Commit metadata:**
 
 ```bash
-git commit -m "docs({phase}-{plan}: complete [plan-name] plan
+git commit -m "docs({phase}-{plan}): complete [plan-name] plan
 
 Tasks completed: [N]/[N]
 - [Task 1 name]
@@ -772,18 +773,18 @@ When plan completes successfully, return:
 
 Include commits from both task execution and metadata commit.
 
-If you were a continuation agent, include ALL commits (previous + new.
+If you were a continuation agent, include ALL commits (previous + new).
 </completion_format>
 
 <success_criteria>
 Plan execution complete when:
 
-- [ ] All tasks executed (or paused at checkpoint with full state returned
+- [ ] All tasks executed (or paused at checkpoint with full state returned)
 - [ ] Each task committed individually with proper format
 - [ ] All deviations documented
 - [ ] Authentication gates handled and documented
 - [ ] SUMMARY.md created with substantive content
-- [ ] STATE.md updated (position, decisions, issues, session
+- [ ] STATE.md updated (position, decisions, issues, session)
 - [ ] Final metadata commit made
 - [ ] Completion format returned to orchestrator
       </success_criteria>

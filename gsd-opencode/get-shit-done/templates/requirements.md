@@ -77,9 +77,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 <guidelines>
 
 **Requirement Format:**
-- ID: `[CATEGORY]-[NUMBER]` (AUTH-01, CONTENT-02, SOCIAL-03
+- ID: `[CATEGORY]-[NUMBER]` (AUTH-01, CONTENT-02, SOCIAL-03)
 - Description: User-centric, testable, atomic
-- Checkbox: Only for v1 requirements (v2 are not yet actionable
+- Checkbox: Only for v1 requirements (v2 are not yet actionable)
 
 **Categories:**
 - Derive from research FEATURES.md categories
@@ -124,7 +124,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Requirement completion criteria:**
 - Requirement is "Complete" when:
   - Feature is implemented
-  - Feature is verified (tests pass, manual check done
+  - Feature is verified (tests pass, manual check done)
   - Feature is committed
 
 </evolution>
@@ -150,7 +150,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 - [ ] **PROF-01**: User can create profile with display name
 - [ ] **PROF-02**: User can upload avatar image
-- [ ] **PROF-03**: User can write bio (max 500 chars
+- [ ] **PROF-03**: User can write bio (max 500 chars)
 - [ ] **PROF-04**: User can view other users' profiles
 
 ### Content
@@ -167,7 +167,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 - [ ] **SOCL-02**: User can unfollow users
 - [ ] **SOCL-03**: User can like posts
 - [ ] **SOCL-04**: User can comment on posts
-- [ ] **SOCL-05**: User can view activity feed (followed users' posts
+- [ ] **SOCL-05**: User can view activity feed (followed users' posts)
 
 ## v2 Requirements
 

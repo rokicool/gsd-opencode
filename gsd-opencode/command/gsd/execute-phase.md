@@ -2,14 +2,16 @@
 name: gsd-execute-phase
 description: Execute all plans in a phase with wave-based parallelization
 argument-hint: "<phase-number> [--gaps-only]"
-allowed-tools:
+tools:
   - read
   - write
   - edit
   - glob
   - grep
   - bash
+
   - todowrite
+  - question
 ---
 
 <objective>
@@ -29,7 +31,7 @@ Context budget: ~15% orchestrator, 100% fresh per subagent.
 Phase: $ARGUMENTS
 
 **Flags:**
-- `--gaps-only` — Execute only gap closure plans (plans with `gap_closure: true` in frontmatter. Use after verify-work creates fix plans.
+- `--gaps-only` — Execute only gap closure plans (plans with `gap_closure: true` in frontmatter). Use after verify-work creates fix plans.
 
 @.planning/ROADMAP.md
 @.planning/STATE.md
@@ -38,9 +40,9 @@ Phase: $ARGUMENTS
 <process>
 0. **Resolve Model Profile**
 
-   Read model profile for agent spawning:
+   read model profile for agent spawning:
    ```bash
-   MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced"
+   MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
    ```
 
    Default to "balanced" if not set.
@@ -61,19 +63,19 @@ Phase: $ARGUMENTS
 
 2. **Discover plans**
    - List all *-PLAN.md files in phase directory
-   - Check which have *-SUMMARY.md (already complete
+   - Check which have *-SUMMARY.md (already complete)
    - If `--gaps-only`: filter to only plans with `gap_closure: true`
    - Build list of incomplete plans
 
 3. **Group by wave**
-   - Read `wave` from each plan's frontmatter
+   - read `wave` from each plan's frontmatter
    - Group plans by wave number
    - Report wave structure to user
 
 4. **Execute waves**
    For each wave in order:
-   - Spawn `gsd-executor` for each plan in wave (parallel Task calls
-   - Wait for completion (Task blocks
+   - Spawn `gsd-executor` for each plan in wave (parallel Task calls)
+   - Wait for completion (Task blocks)
    - Verify SUMMARYs created
    - Proceed to next wave
 
@@ -89,19 +91,19 @@ Phase: $ARGUMENTS
 
    **If changes exist:** Orchestrator made corrections between executor completions. Commit them:
    ```bash
-   git add -u && git commit -m "fix({phase}: orchestrator corrections"
+   git add -u && git commit -m "fix({phase}): orchestrator corrections"
    ```
 
    **If clean:** Continue to verification.
 
 7. **Verify phase goal**
-   Check config: `WORKFLOW_VERIFIER=$(cat .planning/config.json 2>/dev/null | grep -o '"verifier"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true"`
+   Check config: `WORKFLOW_VERIFIER=$(cat .planning/config.json 2>/dev/null | grep -o '"verifier"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")`
 
-   **If `workflow.verifier` is `false`:** Skip to step 8 (treat as passed.
+   **If `workflow.verifier` is `false`:** Skip to step 8 (treat as passed).
 
    **Otherwise:**
    - Spawn `gsd-verifier` subagent with phase directory and goal
-   - Verifier checks must_haves against actual codebase (not SUMMARY claims
+   - Verifier checks must_haves against actual codebase (not SUMMARY claims)
    - Creates VERIFICATION.md with detailed report
    - Route by status:
      - `passed` → continue to step 8
@@ -113,33 +115,33 @@ Phase: $ARGUMENTS
 
 9. **Update requirements**
    Mark phase requirements as Complete:
-   - Read ROADMAP.md, find this phase's `Requirements:` line (e.g., "AUTH-01, AUTH-02"
-   - Read REQUIREMENTS.md traceability table
+   - read ROADMAP.md, find this phase's `Requirements:` line (e.g., "AUTH-01, AUTH-02")
+   - read REQUIREMENTS.md traceability table
    - For each REQ-ID in this phase: change Status from "Pending" to "Complete"
-   - Write updated REQUIREMENTS.md
+   - write updated REQUIREMENTS.md
    - Skip if: REQUIREMENTS.md doesn't exist, or phase has no Requirements line
 
 10. **Commit phase completion**
-    Check `COMMIT_PLANNING_DOCS` from config.json (default: true.
+    Check `COMMIT_PLANNING_DOCS` from config.json (default: true).
     If false: Skip git operations for .planning/ files.
     If true: Bundle all phase metadata updates in one commit:
     - Stage: `git add .planning/ROADMAP.md .planning/STATE.md`
     - Stage REQUIREMENTS.md if updated: `git add .planning/REQUIREMENTS.md`
-    - Commit: `docs({phase}: complete {phase-name} phase`
+    - Commit: `docs({phase}): complete {phase-name} phase`
 
 11. **Offer next steps**
-    - Route to next action (see `<offer_next>`
+    - Route to next action (see `<offer_next>`)
 </process>
 
 <offer_next>
-Output this markdown directly (not as a code block. Route based on status:
+Output this markdown directly (not as a code block). Route based on status:
 
 | Status | Route |
 |--------|-------|
-| `gaps_found` | Route C (gap closure |
+| `gaps_found` | Route C (gap closure) |
 | `human_needed` | Present checklist, then re-route based on approval |
-| `passed` + more phases | Route A (next phase |
-| `passed` + last phase | Route B (milestone complete |
+| `passed` + more phases | Route A (next phase) |
+| `passed` + last phase | Route B (milestone complete) |
 
 ---
 
@@ -244,29 +246,29 @@ After user runs /gsd-plan-phase {Z} --gaps:
 1. Planner reads VERIFICATION.md gaps
 2. Creates plans 04, 05, etc. to close gaps
 3. User runs /gsd-execute-phase {Z} again
-4. Execute-phase runs incomplete plans (04, 05...
+4. Execute-phase runs incomplete plans (04, 05...)
 5. Verifier runs again → loop until passed
 </offer_next>
 
 <wave_execution>
 **Parallel spawning:**
 
-Before spawning, read file contents. The `@` syntax does not work across Task( boundaries.
+Before spawning, read file contents. The `@` syntax does not work across Task() boundaries.
 
 ```bash
-# Read each plan and STATE.md
-PLAN_01_CONTENT=$(cat "{plan_01_path}"
-PLAN_02_CONTENT=$(cat "{plan_02_path}"
-PLAN_03_CONTENT=$(cat "{plan_03_path}"
-STATE_CONTENT=$(cat .planning/STATE.md
+# read each plan and STATE.md
+PLAN_01_CONTENT=$(cat "{plan_01_path}")
+PLAN_02_CONTENT=$(cat "{plan_02_path}")
+PLAN_03_CONTENT=$(cat "{plan_03_path}")
+STATE_CONTENT=$(cat .planning/STATE.md)
 ```
 
 Spawn all plans in a wave with a single message containing multiple Task calls, with inlined content:
 
 ```
-Task(prompt="Execute plan at {plan_01_path}\n\nPlan:\n{plan_01_content}\n\nProject state:\n{state_content}", subagent_type="gsd-executor", model="{executor_model}"
-Task(prompt="Execute plan at {plan_02_path}\n\nPlan:\n{plan_02_content}\n\nProject state:\n{state_content}", subagent_type="gsd-executor", model="{executor_model}"
-Task(prompt="Execute plan at {plan_03_path}\n\nPlan:\n{plan_03_content}\n\nProject state:\n{state_content}", subagent_type="gsd-executor", model="{executor_model}"
+Task(prompt="Execute plan at {plan_01_path}\n\nPlan:\n{plan_01_content}\n\nProject state:\n{state_content}", subagent_type="gsd-executor", model="{executor_model}")
+Task(prompt="Execute plan at {plan_02_path}\n\nPlan:\n{plan_02_content}\n\nProject state:\n{state_content}", subagent_type="gsd-executor", model="{executor_model}")
+Task(prompt="Execute plan at {plan_03_path}\n\nPlan:\n{plan_03_content}\n\nProject state:\n{state_content}", subagent_type="gsd-executor", model="{executor_model}")
 ```
 
 All three run in parallel. Task tool blocks until all complete.
@@ -278,7 +280,7 @@ All three run in parallel. Task tool blocks until all complete.
 Plans with `autonomous: false` have checkpoints. The execute-phase.md workflow handles the full checkpoint flow:
 - Subagent pauses at checkpoint, returns structured state
 - Orchestrator presents to user, collects response
-- Spawns fresh continuation agent (not resume
+- Spawns fresh continuation agent (not resume)
 
 See `@~/.config/opencode/get-shit-done/workflows/execute-phase.md` step `checkpoint_handling` for complete details.
 </checkpoint_handling>
@@ -299,7 +301,7 @@ Only rule 4 requires user intervention.
 
 After each task completes:
 1. Stage only files modified by that task
-2. Commit with format: `{type}({phase}-{plan}: {task-name}`
+2. Commit with format: `{type}({phase}-{plan}): {task-name}`
 3. Types: feat, fix, test, refactor, perf, chore
 4. Record commit hash for SUMMARY.md
 
@@ -307,14 +309,14 @@ After each task completes:
 
 After all tasks in a plan complete:
 1. Stage plan artifacts only: PLAN.md, SUMMARY.md
-2. Commit with format: `docs({phase}-{plan}: complete [plan-name] plan`
-3. NO code files (already committed per-task
+2. Commit with format: `docs({phase}-{plan}): complete [plan-name] plan`
+3. NO code files (already committed per-task)
 
 **Phase Completion Commit:**
 
-After all plans in phase complete (step 7:
-1. Stage: ROADMAP.md, STATE.md, REQUIREMENTS.md (if updated, VERIFICATION.md
-2. Commit with format: `docs({phase}: complete {phase-name} phase`
+After all plans in phase complete (step 7):
+1. Stage: ROADMAP.md, STATE.md, REQUIREMENTS.md (if updated), VERIFICATION.md
+2. Commit with format: `docs({phase}): complete {phase-name} phase`
 3. Bundles all phase-level state updates in one commit
 
 **NEVER use:**
@@ -328,10 +330,10 @@ After all plans in phase complete (step 7:
 <success_criteria>
 - [ ] All incomplete plans in phase executed
 - [ ] Each plan has SUMMARY.md
-- [ ] Phase goal verified (must_haves checked against codebase
+- [ ] Phase goal verified (must_haves checked against codebase)
 - [ ] VERIFICATION.md created in phase directory
 - [ ] STATE.md reflects phase completion
 - [ ] ROADMAP.md updated
-- [ ] REQUIREMENTS.md updated (phase requirements marked Complete
+- [ ] REQUIREMENTS.md updated (phase requirements marked Complete)
 - [ ] User informed of next steps
 </success_criteria>

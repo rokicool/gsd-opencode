@@ -2,23 +2,24 @@
 name: gsd-new-milestone
 description: Start a new milestone cycle — update PROJECT.md and route to requirements
 argument-hint: "[milestone name, e.g., 'v1.1 Notifications']"
-allowed-tools:
+tools:
   - read
   - write
   - bash
 
+  - question
 ---
 
 <objective>
-Start a new milestone through unified flow: questioning → research (optional → requirements → roadmap.
+Start a new milestone through unified flow: questioning → research (optional) → requirements → roadmap.
 
 This is the brownfield equivalent of new-project. The project exists, PROJECT.md has history. This command gathers "what's next", updates PROJECT.md, then continues through the full requirements → roadmap cycle.
 
 **Creates/Updates:**
 - `.planning/PROJECT.md` — updated with new milestone goals
-- `.planning/research/` — domain research (optional, focuses on NEW features
+- `.planning/research/` — domain research (optional, focuses on NEW features)
 - `.planning/REQUIREMENTS.md` — scoped requirements for this milestone
-- `.planning/ROADMAP.md` — phase structure (continues numbering
+- `.planning/ROADMAP.md` — phase structure (continues numbering)
 - `.planning/STATE.md` — reset for new milestone
 
 **After this command:** Run `/gsd-plan-phase [N]` to start execution.
@@ -32,7 +33,7 @@ This is the brownfield equivalent of new-project. The project exists, PROJECT.md
 </execution_context>
 
 <context>
-Milestone name: $ARGUMENTS (optional - will prompt if not provided
+Milestone name: $ARGUMENTS (optional - will prompt if not provided)
 
 **Load project context:**
 @.planning/PROJECT.md
@@ -40,7 +41,7 @@ Milestone name: $ARGUMENTS (optional - will prompt if not provided
 @.planning/MILESTONES.md
 @.planning/config.json
 
-**Load milestone context (if exists, from /gsd-discuss-milestone:**
+**Load milestone context (if exists, from /gsd-discuss-milestone):**
 @.planning/MILESTONE-CONTEXT.md
 </context>
 
@@ -48,10 +49,10 @@ Milestone name: $ARGUMENTS (optional - will prompt if not provided
 
 ## Phase 1: Load Context
 
-- Read PROJECT.md (existing project, Validated requirements, decisions
-- Read MILESTONES.md (what shipped previously
-- Read STATE.md (pending todos, blockers
-- Check for MILESTONE-CONTEXT.md (from /gsd-discuss-milestone
+- read PROJECT.md (existing project, Validated requirements, decisions)
+- read MILESTONES.md (what shipped previously)
+- read STATE.md (pending todos, blockers)
+- Check for MILESTONE-CONTEXT.md (from /gsd-discuss-milestone)
 
 ## Phase 2: Gather Milestone Goals
 
@@ -62,13 +63,13 @@ Milestone name: $ARGUMENTS (optional - will prompt if not provided
 **If no context file:**
 - Present what shipped in last milestone
 - Ask: "What do you want to build next?"
-- Use  to explore features
+- Use question to explore features
 - Probe for priorities, constraints, scope
 
 ## Phase 3: Determine Milestone Version
 
 - Parse last version from MILESTONES.md
-- Suggest next version (v1.0 → v1.1, or v2.0 for major
+- Suggest next version (v1.0 → v1.1, or v2.0 for major)
 - Confirm with user
 
 ## Phase 4: Update PROJECT.md
@@ -95,27 +96,27 @@ Update "Last updated" footer.
 ```markdown
 ## Current Position
 
-Phase: Not started (defining requirements
+Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
 Last activity: [today] — Milestone v[X.Y] started
 ```
 
-Keep Accumulated Context section (decisions, blockers from previous milestone.
+Keep Accumulated Context section (decisions, blockers) from previous milestone.
 
 ## Phase 6: Cleanup and Commit
 
-Delete MILESTONE-CONTEXT.md if exists (consumed.
+Delete MILESTONE-CONTEXT.md if exists (consumed).
 
 Check planning config:
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true"
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 If `COMMIT_PLANNING_DOCS=false`: Skip git operations
 
-If `COMMIT_PLANNING_DOCS=true` (default:
+If `COMMIT_PLANNING_DOCS=true` (default):
 ```bash
 git add .planning/PROJECT.md .planning/STATE.md
 git commit -m "docs: start milestone v[X.Y] [Name]"
@@ -123,10 +124,10 @@ git commit -m "docs: start milestone v[X.Y] [Name]"
 
 ## Phase 6.5: Resolve Model Profile
 
-Read model profile for agent spawning:
+read model profile for agent spawning:
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced"
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -143,11 +144,11 @@ Store resolved models for use in Task calls below.
 
 ## Phase 7: Research Decision
 
-Use :
+Use question:
 - header: "Research"
 - question: "Research the domain ecosystem for new features before defining requirements?"
 - options:
-  - "Research first (Recommended" — Discover patterns, expected features, architecture for NEW capabilities
+  - "Research first (Recommended)" — Discover patterns, expected features, architecture for NEW capabilities
   - "Skip research" — I know what I need, go straight to requirements
 
 **If "Research first":**
@@ -169,9 +170,9 @@ mkdir -p .planning/research
 Display spawning indicator:
 ```
 ◆ Spawning 4 researchers in parallel...
-  → Stack research (for new features
+  → Stack research (for new features)
   → Features research
-  → Architecture research (integration
+  → Architecture research (integration)
   → Pitfalls research
 ```
 
@@ -186,7 +187,7 @@ Project Research — Stack dimension for [new features].
 <milestone_context>
 SUBSEQUENT MILESTONE — Adding [target features] to existing app.
 
-Existing validated capabilities (DO NOT re-research:
+Existing validated capabilities (DO NOT re-research):
 [List from PROJECT.md Validated requirements]
 
 Focus ONLY on what's needed for the NEW features.
@@ -208,16 +209,16 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 </downstream_consumer>
 
 <quality_gate>
-- [ ] Versions are current (verify with Context7/official docs, not training data
+- [ ] Versions are current (verify with Context7/official docs, not training data)
 - [ ] Rationale explains WHY, not just WHAT
 - [ ] Integration with existing stack considered
 </quality_gate>
 
 <output>
-Write to: .planning/research/STACK.md
+write to: .planning/research/STACK.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/STACK.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Stack research"
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Stack research")
 
 Task(prompt="
 <research_type>
@@ -227,7 +228,7 @@ Project Research — Features dimension for [new features].
 <milestone_context>
 SUBSEQUENT MILESTONE — Adding [target features] to existing app.
 
-Existing features (already built:
+Existing features (already built):
 [List from PROJECT.md Validated requirements]
 
 Focus on how [new features] typically work, expected behavior.
@@ -243,22 +244,22 @@ How do [target features] typically work? What's expected behavior?
 
 <downstream_consumer>
 Your FEATURES.md feeds into requirements definition. Categorize clearly:
-- Table stakes (must have for these features
-- Differentiators (competitive advantage
-- Anti-features (things to deliberately NOT build
+- Table stakes (must have for these features)
+- Differentiators (competitive advantage)
+- Anti-features (things to deliberately NOT build)
 </downstream_consumer>
 
 <quality_gate>
-- [ ] Categories are clear (table stakes vs differentiators vs anti-features
+- [ ] Categories are clear (table stakes vs differentiators vs anti-features)
 - [ ] Complexity noted for each feature
 - [ ] Dependencies on existing features identified
 </quality_gate>
 
 <output>
-Write to: .planning/research/FEATURES.md
+write to: .planning/research/FEATURES.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/FEATURES.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Features research"
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Features research")
 
 Task(prompt="
 <research_type>
@@ -297,10 +298,10 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 </quality_gate>
 
 <output>
-Write to: .planning/research/ARCHITECTURE.md
+write to: .planning/research/ARCHITECTURE.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Architecture research"
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Architecture research")
 
 Task(prompt="
 <research_type>
@@ -323,22 +324,22 @@ What are common mistakes when adding [target features] to [domain]?
 
 <downstream_consumer>
 Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
-- Warning signs (how to detect early
-- Prevention strategy (how to avoid
+- Warning signs (how to detect early)
+- Prevention strategy (how to avoid)
 - Which phase should address it
 </downstream_consumer>
 
 <quality_gate>
-- [ ] Pitfalls are specific to adding these features (not generic
+- [ ] Pitfalls are specific to adding these features (not generic)
 - [ ] Integration pitfalls with existing system covered
 - [ ] Prevention strategies are actionable
 </quality_gate>
 
 <output>
-Write to: .planning/research/PITFALLS.md
+write to: .planning/research/PITFALLS.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/PITFALLS.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Pitfalls research"
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Pitfalls research")
 ```
 
 After all 4 agents complete, spawn synthesizer to create SUMMARY.md:
@@ -350,7 +351,7 @@ Synthesize research outputs into SUMMARY.md.
 </task>
 
 <research_files>
-Read these files:
+read these files:
 - .planning/research/STACK.md
 - .planning/research/FEATURES.md
 - .planning/research/ARCHITECTURE.md
@@ -358,11 +359,11 @@ Read these files:
 </research_files>
 
 <output>
-Write to: .planning/research/SUMMARY.md
+write to: .planning/research/SUMMARY.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 </output>
-", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research"
+", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
 ```
 
 Display research complete banner and key findings:
@@ -393,12 +394,12 @@ Display stage banner:
 
 **Load context:**
 
-Read PROJECT.md and extract:
-- Core value (the ONE thing that must work
+read PROJECT.md and extract:
+- Core value (the ONE thing that must work)
 - Current milestone goals
-- Validated requirements (what already exists
+- Validated requirements (what already exists)
 
-**If research exists:** Read research/FEATURES.md and extract feature categories.
+**If research exists:** read research/FEATURES.md and extract feature categories.
 
 **Present features by category:**
 
@@ -433,7 +434,7 @@ For each capability mentioned:
 
 **Scope each category:**
 
-For each category, use :
+For each category, use question:
 
 - header: "[Category name]"
 - question: "Which [category] features are in this milestone?"
@@ -451,9 +452,9 @@ Track responses:
 
 **Identify gaps:**
 
-Use :
+Use question:
 - header: "Additions"
-- question: "Any requirements research missed? (Features specific to your vision"
+- question: "Any requirements research missed? (Features specific to your vision)"
 - options:
   - "No, research covered it" — Proceed
   - "Yes, let me add some" — Capture additions
@@ -461,26 +462,26 @@ Use :
 **Generate REQUIREMENTS.md:**
 
 Create `.planning/REQUIREMENTS.md` with:
-- v1 Requirements for THIS milestone grouped by category (checkboxes, REQ-IDs
-- Future Requirements (deferred to later milestones
-- Out of Scope (explicit exclusions with reasoning
-- Traceability section (empty, filled by roadmap
+- v1 Requirements for THIS milestone grouped by category (checkboxes, REQ-IDs)
+- Future Requirements (deferred to later milestones)
+- Out of Scope (explicit exclusions with reasoning)
+- Traceability section (empty, filled by roadmap)
 
-**REQ-ID format:** `[CATEGORY]-[NUMBER]` (AUTH-01, NOTIF-02
+**REQ-ID format:** `[CATEGORY]-[NUMBER]` (AUTH-01, NOTIF-02)
 
 Continue numbering from existing requirements if applicable.
 
 **Requirement quality criteria:**
 
 Good requirements are:
-- **Specific and testable:** "User can reset password via email link" (not "Handle password reset"
-- **User-centric:** "User can X" (not "System does Y"
-- **Atomic:** One capability per requirement (not "User can login and manage profile"
+- **Specific and testable:** "User can reset password via email link" (not "Handle password reset")
+- **User-centric:** "User can X" (not "System does Y")
+- **Atomic:** One capability per requirement (not "User can login and manage profile")
 - **Independent:** Minimal dependencies on other requirements
 
 **Present full requirements list:**
 
-Show every requirement (not counts for user confirmation:
+Show every requirement (not counts) for user confirmation:
 
 ```
 ## Milestone v[X.Y] Requirements
@@ -496,14 +497,14 @@ Show every requirement (not counts for user confirmation:
 
 ---
 
-Does this capture what you're building? (yes / adjust
+Does this capture what you're building? (yes / adjust)
 ```
 
 If "adjust": Return to scoping.
 
 **Commit requirements:**
 
-Check planning config (same pattern as Phase 6.
+Check planning config (same pattern as Phase 6).
 
 If committing:
 ```bash
@@ -513,7 +514,7 @@ docs: define milestone v[X.Y] requirements
 
 [X] requirements across [N] categories
 EOF
-"
+)"
 ```
 
 ## Phase 9: Create Roadmap
@@ -529,8 +530,8 @@ Display stage banner:
 
 **Determine starting phase number:**
 
-Read MILESTONES.md to find the last phase number from previous milestone.
-New phases continue from there (e.g., if v1.0 ended at phase 5, v1.1 starts at phase 6.
+read MILESTONES.md to find the last phase number from previous milestone.
+New phases continue from there (e.g., if v1.0 ended at phase 5, v1.1 starts at phase 6).
 
 Spawn gsd-roadmapper agent with context:
 
@@ -544,30 +545,30 @@ Task(prompt="
 **Requirements:**
 @.planning/REQUIREMENTS.md
 
-**Research (if exists:**
+**Research (if exists):**
 @.planning/research/SUMMARY.md
 
 **Config:**
 @.planning/config.json
 
-**Previous milestone (for phase numbering:**
+**Previous milestone (for phase numbering):**
 @.planning/MILESTONES.md
 
 </planning_context>
 
 <instructions>
 Create roadmap for milestone v[X.Y]:
-1. Start phase numbering from [N] (continues from previous milestone
-2. Derive phases from THIS MILESTONE's requirements (don't include validated/existing
+1. Start phase numbering from [N] (continues from previous milestone)
+2. Derive phases from THIS MILESTONE's requirements (don't include validated/existing)
 3. Map every requirement to exactly one phase
-4. Derive 2-5 success criteria per phase (observable user behaviors
+4. Derive 2-5 success criteria per phase (observable user behaviors)
 5. Validate 100% coverage of new requirements
-6. Write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability
+6. write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
 7. Return ROADMAP CREATED with summary
 
-Write files first, then return. This ensures artifacts persist even if context is lost.
+write files first, then return. This ensures artifacts persist even if context is lost.
 </instructions>
-", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap"
+", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
 ```
 
 **Handle roadmapper return:**
@@ -579,7 +580,7 @@ Write files first, then return. This ensures artifacts persist even if context i
 
 **If `## ROADMAP CREATED`:**
 
-Read the created ROADMAP.md and present it nicely inline:
+read the created ROADMAP.md and present it nicely inline:
 
 ```
 ---
@@ -610,7 +611,7 @@ Success criteria:
 
 **CRITICAL: Ask for approval before committing:**
 
-Use :
+Use question:
 - header: "Roadmap"
 - question: "Does this roadmap structure work for you?"
 - options:
@@ -631,25 +632,25 @@ Use :
 
   Current ROADMAP.md: @.planning/ROADMAP.md
 
-  Update the roadmap based on feedback. Edit files in place.
+  Update the roadmap based on feedback. edit files in place.
   Return ROADMAP REVISED with changes made.
   </revision>
-  ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Revise roadmap"
+  ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Revise roadmap")
   ```
 - Present revised roadmap
 - Loop until user approves
 
 **If "Review full file":** Display raw `cat .planning/ROADMAP.md`, then re-ask.
 
-**Commit roadmap (after approval:**
+**Commit roadmap (after approval):**
 
-Check planning config (same pattern as Phase 6.
+Check planning config (same pattern as Phase 6).
 
 If committing:
 ```bash
 git add .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md
 git commit -m "$(cat <<'EOF'
-docs: create milestone v[X.Y] roadmap ([N] phases
+docs: create milestone v[X.Y] roadmap ([N] phases)
 
 Phases:
 [N]. [phase-name]: [requirements covered]
@@ -658,7 +659,7 @@ Phases:
 
 All milestone requirements mapped to phases.
 EOF
-"
+)"
 ```
 
 ## Phase 10: Done
@@ -704,16 +705,16 @@ Present completion with next steps:
 <success_criteria>
 - [ ] PROJECT.md updated with Current Milestone section
 - [ ] STATE.md reset for new milestone
-- [ ] MILESTONE-CONTEXT.md consumed and deleted (if existed
-- [ ] Research completed (if selected — 4 parallel agents spawned, milestone-aware
-- [ ] Requirements gathered (from research or conversation
+- [ ] MILESTONE-CONTEXT.md consumed and deleted (if existed)
+- [ ] Research completed (if selected) — 4 parallel agents spawned, milestone-aware
+- [ ] Requirements gathered (from research or conversation)
 - [ ] User scoped each category
 - [ ] REQUIREMENTS.md created with REQ-IDs
 - [ ] gsd-roadmapper spawned with phase numbering context
-- [ ] Roadmap files written immediately (not draft
-- [ ] User feedback incorporated (if any
+- [ ] Roadmap files written immediately (not draft)
+- [ ] User feedback incorporated (if any)
 - [ ] ROADMAP.md created with phases continuing from previous milestone
-- [ ] All commits made (if planning docs committed
+- [ ] All commits made (if planning docs committed)
 - [ ] User knows next step is `/gsd-discuss-phase [N]`
 
 **Atomic commits:** Each phase commits its artifacts immediately. If context is lost, artifacts persist.

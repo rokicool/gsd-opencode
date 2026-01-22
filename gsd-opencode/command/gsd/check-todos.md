@@ -2,11 +2,12 @@
 name: gsd-check-todos
 description: List pending todos and select one to work on
 argument-hint: [area filter]
-allowed-tools:
+tools:
   - read
   - write
   - bash
   - glob
+  - question
 ---
 
 <objective>
@@ -24,7 +25,7 @@ Enables reviewing captured ideas and deciding what to work on next.
 
 <step name="check_exist">
 ```bash
-TODO_COUNT=$(ls .planning/todos/pending/*.md 2>/dev/null | wc -l | tr -d ' '
+TODO_COUNT=$(ls .planning/todos/pending/*.md 2>/dev/null | wc -l | tr -d ' ')
 echo "Pending todos: $TODO_COUNT"
 ```
 
@@ -38,8 +39,8 @@ Todos are captured during work sessions with /gsd-add-todo.
 
 Would you like to:
 
-1. Continue with current phase (/gsd-progress
-2. Add a todo now (/gsd-add-todo
+1. Continue with current phase (/gsd-progress)
+2. Add a todo now (/gsd-add-todo)
 ```
 
 Exit.
@@ -54,9 +55,9 @@ Check for area filter in arguments:
 <step name="list_todos">
 ```bash
 for file in .planning/todos/pending/*.md; do
-  created=$(grep "^created:" "$file" | cut -d' ' -f2
-  title=$(grep "^title:" "$file" | cut -d':' -f2- | xargs
-  area=$(grep "^area:" "$file" | cut -d' ' -f2
+  created=$(grep "^created:" "$file" | cut -d' ' -f2)
+  title=$(grep "^title:" "$file" | cut -d':' -f2- | xargs)
+  area=$(grep "^area:" "$file" | cut -d' ' -f2)
   echo "$created|$title|$area|$file"
 done | sort
 ```
@@ -66,9 +67,9 @@ Apply area filter if specified. Display as numbered list:
 ```
 Pending Todos:
 
-1. Add auth token refresh (api, 2d ago
-2. Fix modal z-index issue (ui, 1d ago
-3. Refactor database connection pool (database, 5h ago
+1. Add auth token refresh (api, 2d ago)
+2. Fix modal z-index issue (ui, 1d ago)
+3. Refactor database connection pool (database, 5h ago)
 
 ---
 
@@ -84,17 +85,17 @@ Format age as relative time.
 Wait for user to reply with a number.
 
 If valid: load selected todo, proceed.
-If invalid: "Invalid selection. Reply with a number (1-[N] or `q` to exit."
+If invalid: "Invalid selection. Reply with a number (1-[N]) or `q` to exit."
 </step>
 
 <step name="load_context">
-Read the todo file completely. Display:
+read the todo file completely. Display:
 
 ```
 ## [title]
 
 **Area:** [area]
-**Created:** [date] ([relative time] ago
+**Created:** [date] ([relative time] ago)
 **Files:** [list or "None"]
 
 ### Problem
@@ -121,7 +122,7 @@ If roadmap exists:
 <step name="offer_actions">
 **If todo maps to a roadmap phase:**
 
-Use :
+Use question:
 - header: "Action"
 - question: "This todo relates to Phase [N]: [name]. What would you like to do?"
 - options:
@@ -132,7 +133,7 @@ Use :
 
 **If no roadmap match:**
 
-Use :
+Use question:
 - header: "Action"
 - question: "What would you like to do with this todo?"
 - options:
@@ -179,13 +180,13 @@ If todo was moved to done/, commit the change:
 **Check planning config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true"
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
-**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Todo moved (not committed - commit_docs: false"
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Todo moved (not committed - commit_docs: false)"
 
-**If `COMMIT_PLANNING_DOCS=true` (default:**
+**If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
 git add .planning/todos/done/[filename]
@@ -196,7 +197,7 @@ docs: start work on todo - [title]
 
 Moved to done/, beginning implementation.
 EOF
-"
+)"
 ```
 
 Confirm: "Committed: docs: start work on todo - [title]"
@@ -205,8 +206,8 @@ Confirm: "Committed: docs: start work on todo - [title]"
 </process>
 
 <output>
-- Moved todo to `.planning/todos/done/` (if "Work on it now"
-- Updated `.planning/STATE.md` (if todo count changed
+- Moved todo to `.planning/todos/done/` (if "Work on it now")
+- Updated `.planning/STATE.md` (if todo count changed)
 </output>
 
 <anti_patterns>
@@ -223,5 +224,5 @@ Confirm: "Committed: docs: start work on todo - [title]"
 - [ ] Appropriate actions offered
 - [ ] Selected action executed
 - [ ] STATE.md updated if todo count changed
-- [ ] Changes committed to git (if todo moved to done/
+- [ ] Changes committed to git (if todo moved to done/)
 </success_criteria>

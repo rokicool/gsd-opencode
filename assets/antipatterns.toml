@@ -22,5 +22,11 @@ forbidden_strings = [
         "WebSearch",
         "WebFetch",
         "BashOutput",
-        "rokicool/get-shit-done"
+        "rokicool/get-shit-done",
+        "color: cyan",
+        "color: orange",
+        "color: yellow",
+        "color: blue",
+        "color: green",
+        "color: purple",
         ]

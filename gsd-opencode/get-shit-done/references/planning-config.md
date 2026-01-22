@@ -18,7 +18,7 @@ Configuration options for `.planning/` directory behavior.
 
 <commit_docs_behavior>
 
-**When `commit_docs: true` (default:**
+**When `commit_docs: true` (default):**
 - Planning files committed normally
 - SUMMARY.md, STATE.md, ROADMAP.md tracked in git
 - Full history of planning decisions preserved
@@ -32,9 +32,9 @@ Configuration options for `.planning/` directory behavior.
 
 ```bash
 # Check config.json first
-COMMIT_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true"
+COMMIT_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 
-# Auto-detect gitignored (overrides config
+# Auto-detect gitignored (overrides config)
 git check-ignore -q .planning 2>/dev/null && COMMIT_DOCS=false
 ```
 
@@ -53,8 +53,8 @@ fi
 
 <search_behavior>
 
-**When `search_gitignored: false` (default:**
-- Standard rg behavior (respects .gitignore
+**When `search_gitignored: false` (default):**
+- Standard rg behavior (respects .gitignore)
 - Direct path searches work: `rg "pattern" .planning/` finds files
 - Broad searches skip gitignored: `rg "pattern"` skips `.planning/`
 

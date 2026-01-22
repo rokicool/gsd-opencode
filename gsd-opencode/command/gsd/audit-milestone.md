@@ -2,18 +2,19 @@
 name: gsd-audit-milestone
 description: Audit milestone completion against original intent before archiving
 argument-hint: "[version]"
-allowed-tools:
+tools:
   - read
   - glob
   - grep
   - bash
+
   - write
 ---
 
 <objective>
 Verify milestone achieved its definition of done. Check requirements coverage, cross-phase integration, and end-to-end flows.
 
-**This command IS the orchestrator.** Reads existing VERIFICATION.md files (phases already verified during execute-phase, aggregates tech debt and deferred gaps, then spawns integration checker for cross-phase wiring.
+**This command IS the orchestrator.** Reads existing VERIFICATION.md files (phases already verified during execute-phase), aggregates tech debt and deferred gaps, then spawns integration checker for cross-phase wiring.
 </objective>
 
 <execution_context>
@@ -21,7 +22,7 @@ Verify milestone achieved its definition of done. Check requirements coverage, c
 </execution_context>
 
 <context>
-Version: $ARGUMENTS (optional — defaults to current milestone
+Version: $ARGUMENTS (optional — defaults to current milestone)
 
 **Original Intent:**
 @.planning/PROJECT.md
@@ -29,21 +30,21 @@ Version: $ARGUMENTS (optional — defaults to current milestone
 
 **Planned Work:**
 @.planning/ROADMAP.md
-@.planning/config.json (if exists
+@.planning/config.json (if exists)
 
 **Completed Work:**
-Glob: .planning/phases/*/*-SUMMARY.md
-Glob: .planning/phases/*/*-VERIFICATION.md
+glob: .planning/phases/*/*-SUMMARY.md
+glob: .planning/phases/*/*-VERIFICATION.md
 </context>
 
 <process>
 
 ## 0. Resolve Model Profile
 
-Read model profile for agent spawning:
+read model profile for agent spawning:
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced"
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -68,7 +69,7 @@ ls -d .planning/phases/*/ | sort -V
 - Extract milestone definition of done from ROADMAP.md
 - Extract requirements mapped to this milestone from REQUIREMENTS.md
 
-## 2. Read All Phase Verifications
+## 2. read All Phase Verifications
 
 For each phase directory, read the VERIFICATION.md:
 
@@ -80,7 +81,7 @@ cat .planning/phases/02-*/*-VERIFICATION.md
 
 From each VERIFICATION.md, extract:
 - **Status:** passed | gaps_found
-- **Critical gaps:** (if any — these are blockers
+- **Critical gaps:** (if any — these are blockers)
 - **Non-critical gaps:** tech debt, deferred items, warnings
 - **Anti-patterns found:** TODOs, stubs, placeholders
 - **Requirements coverage:** which requirements satisfied/blocked
@@ -102,14 +103,14 @@ API routes: {routes created}
 Verify cross-phase wiring and E2E user flows.",
   subagent_type="gsd-integration-checker",
   model="{integration_checker_model}"
-
+)
 ```
 
 ## 4. Collect Results
 
 Combine:
-- Phase-level gaps and tech debt (from step 2
-- Integration checker's report (wiring gaps, broken flows
+- Phase-level gaps and tech debt (from step 2)
+- Integration checker's report (wiring gaps, broken flows)
 
 ## 5. Check Requirements Coverage
 
@@ -156,12 +157,12 @@ Plus full markdown report with tables for requirements, phases, integration, tec
 
 ## 7. Present Results
 
-Route by status (see `<offer_next>`.
+Route by status (see `<offer_next>`).
 
 </process>
 
 <offer_next>
-Output this markdown directly (not as a code block. Route based on status:
+Output this markdown directly (not as a code block). Route based on status:
 
 ---
 
@@ -198,7 +199,7 @@ All requirements covered. Cross-phase integration verified. E2E flows complete.
 ### Unsatisfied Requirements
 
 {For each unsatisfied requirement:}
-- **{REQ-ID}: {description}** (Phase {X}
+- **{REQ-ID}: {description}** (Phase {X})
   - {reason}
 
 ### Cross-Phase Issues
@@ -225,13 +226,13 @@ All requirements covered. Cross-phase integration verified. E2E flows complete.
 
 **Also available:**
 - cat .planning/v{version}-MILESTONE-AUDIT.md — see full report
-- /gsd-complete-milestone {version} — proceed anyway (accept tech debt
+- /gsd-complete-milestone {version} — proceed anyway (accept tech debt)
 
 ───────────────────────────────────────────────────────────────
 
 ---
 
-**If tech_debt (no blockers but accumulated debt:**
+**If tech_debt (no blockers but accumulated debt):**
 
 ## ⚡ Milestone {version} — Tech Debt Review
 

@@ -63,7 +63,7 @@ Start with: [specific action]
 <yaml_fields>
 Required YAML frontmatter:
 
-- `phase`: Directory name (e.g., `02-authentication`
+- `phase`: Directory name (e.g., `02-authentication`)
 - `task`: Current task number
 - `total_tasks`: How many tasks in phase
 - `status`: `in_progress`, `blocked`, `almost_done`

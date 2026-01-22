@@ -2,7 +2,7 @@
 name: gsd-add-todo
 description: Capture idea or task as todo from current conversation context
 argument-hint: [optional description]
-allowed-tools:
+tools:
   - read
   - write
   - bash
@@ -42,10 +42,10 @@ Note existing areas for consistency in infer_area step.
 **Without arguments:** Analyze recent conversation to extract:
 - The specific problem, idea, or task discussed
 - Relevant file paths mentioned
-- Technical details (error messages, line numbers, constraints
+- Technical details (error messages, line numbers, constraints)
 
 Formulate:
-- `title`: 3-10 word descriptive title (action verb preferred
+- `title`: 3-10 word descriptive title (action verb preferred)
 - `problem`: What's wrong or why this is needed
 - `solution`: Approach hints or "TBD" if just an idea
 - `files`: Relevant paths with line numbers from conversation
@@ -75,10 +75,10 @@ grep -l -i "[key words from title]" .planning/todos/pending/*.md 2>/dev/null
 ```
 
 If potential duplicate found:
-1. Read the existing todo
+1. read the existing todo
 2. Compare scope
 
-If overlapping, use :
+If overlapping, use question:
 - header: "Duplicate?"
 - question: "Similar todo exists: [title]. What would you like to do?"
 - options:
@@ -89,13 +89,13 @@ If overlapping, use :
 
 <step name="create_file">
 ```bash
-timestamp=$(date "+%Y-%m-%dT%H:%M"
-date_prefix=$(date "+%Y-%m-%d"
+timestamp=$(date "+%Y-%m-%dT%H:%M")
+date_prefix=$(date "+%Y-%m-%d")
 ```
 
-Generate slug from title (lowercase, hyphens, no special chars.
+Generate slug from title (lowercase, hyphens, no special chars).
 
-Write to `.planning/todos/pending/${date_prefix}-${slug}.md`:
+write to `.planning/todos/pending/${date_prefix}-${slug}.md`:
 
 ```markdown
 ---
@@ -129,13 +129,13 @@ Commit the todo and any updated state:
 **Check planning config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true"
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
-**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Todo saved (not committed - commit_docs: false"
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Todo saved (not committed - commit_docs: false)"
 
-**If `COMMIT_PLANNING_DOCS=true` (default:**
+**If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
 git add .planning/todos/pending/[filename]
@@ -145,7 +145,7 @@ docs: capture todo - [title]
 
 Area: [area]
 EOF
-"
+)"
 ```
 
 Confirm: "Committed: docs: capture todo - [title]"
@@ -165,7 +165,7 @@ Would you like to:
 
 1. Continue with current work
 2. Add another todo
-3. View all todos (/gsd-check-todos
+3. View all todos (/gsd-check-todos)
 ```
 </step>
 
@@ -173,11 +173,11 @@ Would you like to:
 
 <output>
 - `.planning/todos/pending/[date]-[slug].md`
-- Updated `.planning/STATE.md` (if exists
+- Updated `.planning/STATE.md` (if exists)
 </output>
 
 <anti_patterns>
-- Don't create todos for work in current plan (that's deviation rule territory
+- Don't create todos for work in current plan (that's deviation rule territory)
 - Don't create elaborate solution sections — captures ideas, not plans
 - Don't block on missing information — "TBD" is fine
 </anti_patterns>
@@ -186,7 +186,7 @@ Would you like to:
 - [ ] Directory structure exists
 - [ ] Todo file created with valid frontmatter
 - [ ] Problem section has enough context for future OpenCode
-- [ ] No duplicates (checked and resolved
+- [ ] No duplicates (checked and resolved)
 - [ ] Area consistent with existing todos
 - [ ] STATE.md updated if exists
 - [ ] Todo and state committed to git

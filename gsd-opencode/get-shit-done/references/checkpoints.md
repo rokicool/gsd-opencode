@@ -13,14 +13,14 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
 <checkpoint_types>
 
 <type name="human-verify">
-## checkpoint:human-verify (Most Common - 90%
+## checkpoint:human-verify (Most Common - 90%)
 
 **When:** OpenCode completed automated work, human confirms it works correctly.
 
 **Use for:**
-- Visual UI checks (layout, styling, responsiveness
-- Interactive flows (click through wizard, test user flows
-- Functional verification (feature works as expected
+- Visual UI checks (layout, styling, responsiveness)
+- Interactive flows (click through wizard, test user flows)
+- Functional verification (feature works as expected)
 - Audio/video playback quality
 - Animation smoothness
 - Accessibility testing
@@ -37,8 +37,8 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
 ```
 
 **Key elements:**
-- `<what-built>`: What OpenCode automated (deployed, built, configured
-- `<how-to-verify>`: Exact steps to confirm it works (numbered, specific
+- `<what-built>`: What OpenCode automated (deployed, built, configured)
+- `<how-to-verify>`: Exact steps to confirm it works (numbered, specific)
 - `<resume-signal>`: Clear indication of how to continue
 
 **Example: Vercel Deployment**
@@ -84,9 +84,9 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
   <what-built>Responsive dashboard layout - dev server running at http://localhost:3000</what-built>
   <how-to-verify>
     Visit http://localhost:3000/dashboard and verify:
-    1. Desktop (>1024px: Sidebar left, content right, header top
-    2. Tablet (768px: Sidebar collapses to hamburger menu
-    3. Mobile (375px: Single column layout, bottom nav appears
+    1. Desktop (>1024px): Sidebar left, content right, header top
+    2. Tablet (768px): Sidebar collapses to hamburger menu
+    3. Mobile (375px): Single column layout, bottom nav appears
     4. No layout shift or horizontal scroll at any size
   </how-to-verify>
   <resume-signal>Type "approved" or describe layout issues</resume-signal>
@@ -120,16 +120,16 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
 </type>
 
 <type name="decision">
-## checkpoint:decision (9%
+## checkpoint:decision (9%)
 
 **When:** Human must make choice that affects implementation direction.
 
 **Use for:**
-- Technology selection (which auth provider, which database
-- Architecture decisions (monorepo vs separate repos
-- Design choices (color scheme, layout approach
-- Feature prioritization (which variant to build
-- Data model decisions (schema structure
+- Technology selection (which auth provider, which database)
+- Architecture decisions (monorepo vs separate repos)
+- Design choices (color scheme, layout approach)
+- Feature prioritization (which variant to build)
+- Data model decisions (schema structure)
 
 **Structure:**
 ```xml
@@ -155,7 +155,7 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
 **Key elements:**
 - `<decision>`: What's being decided
 - `<context>`: Why this matters
-- `<options>`: Each option with balanced pros/cons (not prescriptive
+- `<options>`: Each option with balanced pros/cons (not prescriptive)
 - `<resume-signal>`: How to indicate choice
 
 **Example: Auth Provider Selection**
@@ -196,12 +196,12 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
   </context>
   <options>
     <option id="supabase">
-      <name>Supabase (Postgres</name>
+      <name>Supabase (Postgres)</name>
       <pros>Full SQL, generous free tier, built-in auth, real-time subscriptions</pros>
       <cons>Vendor lock-in for real-time features, less flexible than raw Postgres</cons>
     </option>
     <option id="planetscale">
-      <name>PlanetScale (MySQL</name>
+      <name>PlanetScale (MySQL)</name>
       <pros>Serverless scaling, branching workflow, excellent DX</pros>
       <cons>MySQL not Postgres, no foreign keys in free tier</cons>
     </option>
@@ -217,24 +217,24 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
 </type>
 
 <type name="human-action">
-## checkpoint:human-action (1% - Rare
+## checkpoint:human-action (1% - Rare)
 
 **When:** Action has NO CLI/API and requires human-only interaction, OR OpenCode hit an authentication gate during automation.
 
 **Use ONLY for:**
-- **Authentication gates** - OpenCode tried to use CLI/API but needs credentials to continue (this is NOT a failure
-- Email verification links (account creation requires clicking email
-- SMS 2FA codes (phone verification
-- Manual account approvals (platform requires human review before API access
-- Credit card 3D Secure flows (web-based payment authorization
-- OAuth app approvals (some platforms require web-based approval
+- **Authentication gates** - OpenCode tried to use CLI/API but needs credentials to continue (this is NOT a failure)
+- Email verification links (account creation requires clicking email)
+- SMS 2FA codes (phone verification)
+- Manual account approvals (platform requires human review before API access)
+- Credit card 3D Secure flows (web-based payment authorization)
+- OAuth app approvals (some platforms require web-based approval)
 
 **Do NOT use for pre-planned manual work:**
-- Manually deploying to Vercel (use `vercel` CLI - auth gate if needed
-- Manually creating Stripe webhooks (use Stripe API - auth gate if needed
-- Manually creating databases (use provider CLI - auth gate if needed
-- Running builds/tests manually (use Bash tool
-- Creating files manually (use Write tool
+- Manually deploying to Vercel (use `vercel` CLI - auth gate if needed)
+- Manually creating Stripe webhooks (use Stripe API - auth gate if needed)
+- Manually creating databases (use provider CLI - auth gate if needed)
+- Running builds/tests manually (use bash tool)
+- Creating files manually (use write tool)
 
 **Structure:**
 ```xml
@@ -291,7 +291,7 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
 </task>
 ```
 
-**Example: Authentication Gate (Dynamic Checkpoint**
+**Example: Authentication Gate (Dynamic Checkpoint)**
 ```xml
 <task type="auto">
   <name>Deploy to Vercel</name>
@@ -317,7 +317,7 @@ Plans execute autonomously. Checkpoints formalize the interaction points where h
 
 <task type="auto">
   <name>Retry Vercel deployment</name>
-  <action>Run `vercel --yes` (now authenticated</action>
+  <action>Run `vercel --yes` (now authenticated)</action>
   <verify>vercel ls shows deployment, curl returns 200</verify>
 </task>
 ```
@@ -350,9 +350,9 @@ Built: Responsive dashboard at /dashboard
 How to verify:
   1. Run: npm run dev
   2. Visit: http://localhost:3000/dashboard
-  3. Desktop (>1024px: Sidebar visible, content fills remaining space
-  4. Tablet (768px: Sidebar collapses to icons
-  5. Mobile (375px: Sidebar hidden, hamburger menu appears
+  3. Desktop (>1024px): Sidebar visible, content fills remaining space
+  4. Tablet (768px): Sidebar collapses to icons
+  5. Mobile (375px): Sidebar hidden, hamburger menu appears
 
 ────────────────────────────────────────────────────────
 → YOUR ACTION: Type "approved" or describe issues
@@ -430,7 +430,7 @@ I'll verify: vercel whoami returns your account
 6. Retry the original task
 7. Continue normally
 
-**Example execution flow (Vercel auth gate:**
+**Example execution flow (Vercel auth gate):**
 
 ```
 OpenCode: Running `vercel --yes` to deploy...
@@ -471,8 +471,8 @@ Task 3 complete. Continuing to task 4...
 ```
 
 **Key distinction:**
-- Pre-planned checkpoint: "I need you to do X" (wrong - OpenCode should automate
-- Auth gate: "I tried to automate X but need credentials" (correct - unblocks automation
+- Pre-planned checkpoint: "I need you to do X" (wrong - OpenCode should automate)
+- Auth gate: "I tried to automate X but need credentials" (correct - unblocks automation)
 
 </authentication_gates>
 
@@ -498,7 +498,7 @@ Task 3 complete. Continuing to task 4...
 
 ## Environment Variable Automation
 
-**Env files:** Use Write/Edit tools. Never ask human to create .env manually.
+**Env files:** Use write/edit tools. Never ask human to create .env manually.
 
 **Dashboard env vars via CLI:**
 
@@ -524,7 +524,7 @@ Task 3 complete. Continuing to task 4...
   <instructions>
     I need your OpenAI API key to configure the Convex backend.
     Get it from: https://platform.openai.com/api-keys
-    Paste the key (starts with sk-
+    Paste the key (starts with sk-)
   </instructions>
   <verification>I'll add it via `npx convex env set` and verify it's configured</verification>
   <resume-signal>Paste your API key</resume-signal>
@@ -533,7 +533,7 @@ Task 3 complete. Continuing to task 4...
 <task type="auto">
   <name>Configure OpenAI key in Convex</name>
   <action>Run `npx convex env set OPENAI_API_KEY {user-provided-key}`</action>
-  <verify>`npx convex env get OPENAI_API_KEY` returns the key (masked</verify>
+  <verify>`npx convex env get OPENAI_API_KEY` returns the key (masked)</verify>
 </task>
 ```
 
@@ -545,7 +545,7 @@ Task 3 complete. Continuing to task 4...
 |-----------|---------------|--------------|-------------|
 | Next.js | `npm run dev` | "Ready in" or "started server" | http://localhost:3000 |
 | Vite | `npm run dev` | "ready in" | http://localhost:5173 |
-| Convex | `npx convex dev` | "Convex functions ready" | N/A (backend only |
+| Convex | `npx convex dev` | "Convex functions ready" | N/A (backend only) |
 | Express | `npm start` | "listening on port" | http://localhost:3000 |
 | Django | `python manage.py runserver` | "Starting development server" | http://localhost:8000 |
 
@@ -557,7 +557,7 @@ Task 3 complete. Continuing to task 4...
 npm run dev &
 DEV_SERVER_PID=$!
 
-# Wait for ready signal (max 30s
+# Wait for ready signal (max 30s)
 timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; done'
 ```
 
@@ -600,10 +600,10 @@ If default port is in use, check what's running and either:
 |-----|---------------|---------|
 | npm/pnpm/yarn | No - ask user | User chooses package manager |
 | vercel | Yes | `npm i -g vercel` |
-| gh (GitHub | Yes | `brew install gh` (macOS or `apt install gh` (Linux |
+| gh (GitHub) | Yes | `brew install gh` (macOS) or `apt install gh` (Linux) |
 | stripe | Yes | `npm i -g stripe` |
 | supabase | Yes | `npm i -g supabase` |
-| convex | No - use npx | `npx convex` (no install needed |
+| convex | No - use npx | `npx convex` (no install needed) |
 | fly | Yes | `brew install flyctl` or curl installer |
 | railway | Yes | `npm i -g @railway/cli` |
 
@@ -629,10 +629,10 @@ If default port is in use, check what's running and either:
 
 | Failure | Response |
 |---------|----------|
-| Server won't start | Check error output, fix issue, retry (don't proceed to checkpoint |
+| Server won't start | Check error output, fix issue, retry (don't proceed to checkpoint) |
 | Port in use | Kill stale process or use alternate port |
 | Missing dependency | Run `npm install`, retry |
-| Build error | Fix the error first (this is a bug, not a checkpoint issue |
+| Build error | Fix the error first (this is a bug, not a checkpoint issue) |
 | Auth error | Create auth gate checkpoint |
 | Network timeout | Retry with backoff, then checkpoint if persistent |
 
@@ -641,7 +641,7 @@ If default port is in use, check what's running and either:
 ```xml
 <!-- WRONG: Checkpoint with broken environment -->
 <task type="checkpoint:human-verify">
-  <what-built>Dashboard (server failed to start</what-built>
+  <what-built>Dashboard (server failed to start)</what-built>
   <how-to-verify>Visit http://localhost:3000...</how-to-verify>
 </task>
 
@@ -663,15 +663,15 @@ If default port is in use, check what's running and either:
 
 | Action | Automatable? | OpenCode does it? |
 |--------|--------------|-----------------|
-| Deploy to Vercel | Yes (`vercel` | YES |
-| Create Stripe webhook | Yes (API | YES |
-| Write .env file | Yes (Write tool | YES |
-| Create Upstash DB | Yes (`upstash` | YES |
-| Run tests | Yes (`npm test` | YES |
-| Start dev server | Yes (`npm run dev` | YES |
-| Add env vars to Convex | Yes (`npx convex env set` | YES |
-| Add env vars to Vercel | Yes (`vercel env add` | YES |
-| Seed database | Yes (CLI/API | YES |
+| Deploy to Vercel | Yes (`vercel`) | YES |
+| Create Stripe webhook | Yes (API) | YES |
+| write .env file | Yes (write tool) | YES |
+| Create Upstash DB | Yes (`upstash`) | YES |
+| Run tests | Yes (`npm test`) | YES |
+| Start dev server | Yes (`npm run dev`) | YES |
+| Add env vars to Convex | Yes (`npx convex env set`) | YES |
+| Add env vars to Vercel | Yes (`vercel env add`) | YES |
+| Seed database | Yes (CLI/API) | YES |
 | Click email verification link | No | NO |
 | Enter credit card with 3DS | No | NO |
 | Complete OAuth in browser | No | NO |
@@ -691,11 +691,11 @@ If default port is in use, check what's running and either:
 - Make verification executable: clear, testable steps
 
 **DON'T:**
-- Ask human to do work OpenCode can automate (deploy, create resources, run builds
+- Ask human to do work OpenCode can automate (deploy, create resources, run builds)
 - Assume knowledge: "Configure the usual settings" ❌
-- Skip steps: "Set up database" ❌ (too vague
-- Mix multiple verifications in one checkpoint (split them
-- Make verification impossible (OpenCode can't check visual appearance without user confirmation
+- Skip steps: "Set up database" ❌ (too vague)
+- Mix multiple verifications in one checkpoint (split them)
+- Make verification impossible (OpenCode can't check visual appearance without user confirmation)
 
 **Placement:**
 - **After automation completes** - not before OpenCode does the work
@@ -704,14 +704,14 @@ If default port is in use, check what's running and either:
 - **At integration points** - after configuring external services
 
 **Bad placement:**
-- Before OpenCode automates (asking human to do automatable work ❌
-- Too frequent (every other task is a checkpoint ❌
-- Too late (checkpoint is last task, but earlier tasks needed its result ❌
+- Before OpenCode automates (asking human to do automatable work) ❌
+- Too frequent (every other task is a checkpoint) ❌
+- Too late (checkpoint is last task, but earlier tasks needed its result) ❌
 </writing_guidelines>
 
 <examples>
 
-### Example 1: Deployment Flow (Correct
+### Example 1: Deployment Flow (Correct)
 
 ```xml
 <!-- OpenCode automates everything -->
@@ -746,7 +746,7 @@ If default port is in use, check what's running and either:
 </task>
 ```
 
-### Example 2: Database Setup (No Checkpoint Needed
+### Example 2: Database Setup (No Checkpoint Needed)
 
 ```xml
 <!-- OpenCode automates everything -->
@@ -756,7 +756,7 @@ If default port is in use, check what's running and either:
   <action>
     1. Run `upstash redis create myapp-cache --region us-east-1`
     2. Capture connection URL from output
-    3. Write to .env: UPSTASH_REDIS_URL={url}
+    3. write to .env: UPSTASH_REDIS_URL={url}
     4. Verify connection with test command
   </action>
   <verify>
@@ -770,7 +770,7 @@ If default port is in use, check what's running and either:
 <!-- NO CHECKPOINT NEEDED - OpenCode automated everything and verified programmatically -->
 ```
 
-### Example 3: Stripe Webhooks (Correct
+### Example 3: Stripe Webhooks (Correct)
 
 ```xml
 <!-- OpenCode automates everything -->
@@ -802,7 +802,7 @@ If default port is in use, check what's running and either:
 </task>
 ```
 
-### Example 4: Full Auth Flow Verification (Correct
+### Example 4: Full Auth Flow Verification (Correct)
 
 ```xml
 <task type="auto">
@@ -876,7 +876,7 @@ If default port is in use, check what's running and either:
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>Dashboard at http://localhost:3000/dashboard (server running</what-built>
+  <what-built>Dashboard at http://localhost:3000/dashboard (server running)</what-built>
   <how-to-verify>
     Visit http://localhost:3000/dashboard and verify:
     1. Layout matches design
@@ -908,7 +908,7 @@ If default port is in use, check what's running and either:
   <action>Provide your OpenAI API key</action>
   <instructions>
     I need your OpenAI API key. Get it from: https://platform.openai.com/api-keys
-    Paste the key below (starts with sk-
+    Paste the key below (starts with sk-)
   </instructions>
   <verification>I'll configure it via CLI</verification>
   <resume-signal>Paste your key</resume-signal>
@@ -976,7 +976,7 @@ If default port is in use, check what's running and either:
 <task type="auto">Create UI form</task>
 
 <task type="checkpoint:human-verify">
-  <what-built>Complete auth flow (schema + API + UI</what-built>
+  <what-built>Complete auth flow (schema + API + UI)</what-built>
   <how-to-verify>Test full flow: register, login, access protected page</how-to-verify>
   <resume-signal>Type "approved"</resume-signal>
 </task>
@@ -995,7 +995,7 @@ If default port is in use, check what's running and either:
 </task>
 ```
 
-**Why bad:** OpenCode has Write tool. This should be `type="auto"`.
+**Why bad:** OpenCode has write tool. This should be `type="auto"`.
 
 ### ❌ BAD: Vague verification steps
 
@@ -1009,16 +1009,16 @@ If default port is in use, check what's running and either:
 
 **Why bad:** No specifics. User doesn't know what to test or what "works" means.
 
-### ✅ GOOD: Specific verification steps (server already running
+### ✅ GOOD: Specific verification steps (server already running)
 
 ```xml
 <task type="checkpoint:human-verify">
   <what-built>Responsive dashboard - server running at http://localhost:3000</what-built>
   <how-to-verify>
     Visit http://localhost:3000/dashboard and verify:
-    1. Desktop (>1024px: Sidebar visible, content area fills remaining space
-    2. Tablet (768px: Sidebar collapses to icons
-    3. Mobile (375px: Sidebar hidden, hamburger menu in header
+    1. Desktop (>1024px): Sidebar visible, content area fills remaining space
+    2. Tablet (768px): Sidebar collapses to icons
+    3. Mobile (375px): Sidebar hidden, hamburger menu in header
     4. No horizontal scroll at any size
   </how-to-verify>
   <resume-signal>Type "approved" or describe layout issues</resume-signal>
@@ -1066,13 +1066,13 @@ Checkpoints formalize human-in-the-loop points. Use them when OpenCode cannot co
 **The golden rule:** If OpenCode CAN automate it, OpenCode MUST automate it.
 
 **Checkpoint priority:**
-1. **checkpoint:human-verify** (90% of checkpoints - OpenCode automated everything, human confirms visual/functional correctness
-2. **checkpoint:decision** (9% of checkpoints - Human makes architectural/technology choices
-3. **checkpoint:human-action** (1% of checkpoints - Truly unavoidable manual steps with no API/CLI
+1. **checkpoint:human-verify** (90% of checkpoints) - OpenCode automated everything, human confirms visual/functional correctness
+2. **checkpoint:decision** (9% of checkpoints) - Human makes architectural/technology choices
+3. **checkpoint:human-action** (1% of checkpoints) - Truly unavoidable manual steps with no API/CLI
 
 **When NOT to use checkpoints:**
-- Things OpenCode can verify programmatically (tests pass, build succeeds
-- File operations (OpenCode can read files to verify
-- Code correctness (use tests and static analysis
+- Things OpenCode can verify programmatically (tests pass, build succeeds)
+- File operations (OpenCode can read files to verify)
+- Code correctness (use tests and static analysis)
 - Anything automatable via CLI/API
 </summary>

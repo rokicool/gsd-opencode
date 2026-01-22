@@ -85,9 +85,9 @@ Translate the entire get-shit-done metaprompt system from Claude Code to OpenCod
 <process>
 For maximum efficiency, follow this sequential approach:
 
-## Step 1: Create Translation Mapping Document
+## Step 1: Create or update Translation Mapping Document
 
-Create `./TRANSLATION-MAPPING.md` to document all transformations for consistency:
+Create or update `./assets/prompts/TRANSLATION-MAPPING.md` to document all transformations for consistency:
 
 ```markdown
 # Translation Mapping: Claude Code → OpenCode
@@ -165,6 +165,11 @@ Translate each category systematically, applying all transformation rules:
 - Map to equivalent OpenCode agent functionality
 - Update all tool references to OpenCode tools
 
+## Step 3a: Modify use OR just use assets/bin/translate-files.js
+
+- Check the consistancy of assets/bin/translate-files.js file according to assets/prompts/TRANSLATION-MAPPING.md
+- Use assets/bin/translate-files.js it suits the task
+
 ## Step 4: Verify Translations
 
 Run the forbidden strings checker:
@@ -177,7 +182,7 @@ Review any issues and fix them.
 
 ## Step 5: Create Translation Summary
 
-Create `./TRANSLATION-SUMMARY.md` documenting:
+Create `./assets/prompts/TRANSLATION-SUMMARY.md` documenting:
 - Total files translated
 - Key transformations made
 - Any issues encountered and resolutions
@@ -208,13 +213,14 @@ Create `./TRANSLATION-SUMMARY.md` documenting:
 
 <output>
 **Create/modify these files**:
-- `./TRANSLATION-MAPPING.md` - Document all transformations
-- `./TRANSLATION-SUMMARY.md` - Summary of translation work
+- `./assets/prompts/TRANSLATION-MAPPING.md` - Document all transformations
+- `./assets/prompts/TRANSLATION-SUMMARY.md` - Summary of translation work
 - `./gsd-opencode/command/gsd/*.md` - Translated commands
 - `./gsd-opencode/get-shit-done/references/*.md` - Translated references
 - `./gsd-opencode/get-shit-done/templates/*.md` - Translated templates
 - `./gsd-opencode/get-shit-done/workflows/*.md` - Translated workflows
 - `./gsd-opencode/agents/*.md` - Translated agents
+- './translated-README.md' - translated original/get-shit-done/README.md
 </output>
 
 <verification>

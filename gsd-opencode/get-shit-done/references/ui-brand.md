@@ -12,7 +12,7 @@ Use for major workflow transitions.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-**Stage names (uppercase:**
+**Stage names (uppercase):**
 - `QUESTIONING`
 - `RESEARCHING`
 - `DEFINING REQUIREMENTS`
@@ -57,7 +57,7 @@ User action required. 62-character width.
 ○  Pending
 ⚡ Auto-approved
 ⚠  Warning
-🎉 Milestone complete (only in banner
+🎉 Milestone complete (only in banner)
 ```
 
 ---
@@ -152,9 +152,9 @@ Always at end of major completions.
 ## Anti-Patterns
 
 - Varying box/banner widths
-- Mixing banner styles (`===`, `---`, `***`
+- Mixing banner styles (`===`, `---`, `***`)
 - Skipping `GSD ►` prefix in banners
-- Random emoji (`🚀`, `✨`, `💫`
+- Random emoji (`🚀`, `✨`, `💫`)
 - Missing Next Up block after completions
 
 </ui_patterns>

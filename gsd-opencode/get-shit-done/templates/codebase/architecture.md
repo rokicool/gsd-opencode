@@ -2,7 +2,7 @@
 
 Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code organization.
 
-**Purpose:** Document how the code is organized at a conceptual level. Complements STRUCTURE.md (which shows physical file locations.
+**Purpose:** Document how the code is organized at a conceptual level. Complements STRUCTURE.md (which shows physical file locations).
 
 ---
 
@@ -42,7 +42,7 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 
 [Describe the typical request/execution lifecycle]
 
-**[Flow Name] (e.g., "HTTP Request", "CLI Command", "Event Processing":**
+**[Flow Name] (e.g., "HTTP Request", "CLI Command", "Event Processing"):**
 
 1. [Entry point: e.g., "User runs command"]
 2. [Processing step: e.g., "Router matches path"]
@@ -116,7 +116,7 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 **Key Characteristics:**
 - Single executable with subcommands
 - Plugin-based extensibility
-- File-based state (no database
+- File-based state (no database)
 - Synchronous execution model
 
 ## Layers
@@ -126,7 +126,7 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 - Contains: Command definitions, argument parsing, help text
 - Location: `src/commands/*.ts`
 - Depends on: Service layer for business logic
-- Used by: CLI entry point (`src/index.ts`
+- Used by: CLI entry point (`src/index.ts`)
 
 **Service Layer:**
 - Purpose: Core business logic
@@ -148,8 +148,8 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 
 1. User runs: `gsd new-project`
 2. Commander parses args and flags
-3. Command handler invoked (`src/commands/new-project.ts`
-4. Handler calls service methods (`src/services/project.ts` → `create(`
+3. Command handler invoked (`src/commands/new-project.ts`)
+4. Handler calls service methods (`src/services/project.ts` → `create()`)
 5. Service reads templates, processes files, writes output
 6. Results logged to console
 7. Process exits with status code
@@ -164,7 +164,7 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 **Service:**
 - Purpose: Encapsulate business logic for a domain
 - Examples: `src/services/file.ts`, `src/services/template.ts`, `src/services/project.ts`
-- Pattern: Singleton-like (imported as modules, not instantiated
+- Pattern: Singleton-like (imported as modules, not instantiated)
 
 **Command:**
 - Purpose: CLI command definition
@@ -194,8 +194,8 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 
 **Patterns:**
 - Services throw Error with descriptive messages
-- Command handlers catch, log error to stderr, exit(1
-- Validation errors shown before execution (fail fast
+- Command handlers catch, log error to stderr, exit(1)
+- Validation errors shown before execution (fail fast)
 
 ## Cross-Cutting Concerns
 
@@ -212,7 +212,7 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 **File Operations:**
 - FileService abstraction over fs-extra
 - All paths validated before operations
-- Atomic writes (temp file + rename
+- Atomic writes (temp file + rename)
 
 ---
 
@@ -223,33 +223,33 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 
 <guidelines>
 **What belongs in ARCHITECTURE.md:**
-- Overall architectural pattern (monolith, microservices, layered, etc.
+- Overall architectural pattern (monolith, microservices, layered, etc.)
 - Conceptual layers and their relationships
 - Data flow / request lifecycle
 - Key abstractions and patterns
 - Entry points
 - Error handling strategy
-- Cross-cutting concerns (logging, auth, validation
+- Cross-cutting concerns (logging, auth, validation)
 
 **What does NOT belong here:**
-- Exhaustive file listings (that's STRUCTURE.md
-- Technology choices (that's STACK.md
-- Line-by-line code walkthrough (defer to code reading
+- Exhaustive file listings (that's STRUCTURE.md)
+- Technology choices (that's STACK.md)
+- Line-by-line code walkthrough (defer to code reading)
 - Implementation details of specific features
 
 **File paths ARE welcome:**
 Include file paths as concrete examples of abstractions. Use backtick formatting: `src/services/user.ts`. This makes the architecture document actionable for OpenCode when planning.
 
 **When filling this template:**
-- Read main entry points (index, server, main
+- read main entry points (index, server, main)
 - Identify layers by reading imports/dependencies
 - Trace a typical request/command execution
-- Note recurring patterns (services, controllers, repositories
+- Note recurring patterns (services, controllers, repositories)
 - Keep descriptions conceptual, not mechanical
 
 **Useful for phase planning when:**
-- Adding new features (where does it fit in the layers?
-- Refactoring (understanding current patterns
-- Identifying where to add code (which layer handles X?
+- Adding new features (where does it fit in the layers?)
+- Refactoring (understanding current patterns)
+- Identifying where to add code (which layer handles X?)
 - Understanding dependencies between components
 </guidelines>

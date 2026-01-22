@@ -49,7 +49,7 @@ completed: YYYY-MM-DD
 
 ## Performance
 
-- **Duration:** [time] (e.g., 23 min, 1h 15m
+- **Duration:** [time] (e.g., 23 min, 1h 15m)
 - **Started:** [ISO timestamp]
 - **Completed:** [ISO timestamp]
 - **Tasks:** [count completed]
@@ -64,13 +64,13 @@ completed: YYYY-MM-DD
 
 Each task was committed atomically:
 
-1. **Task 1: [task name]** - `abc123f` (feat/fix/test/refactor
-2. **Task 2: [task name]** - `def456g` (feat/fix/test/refactor
-3. **Task 3: [task name]** - `hij789k` (feat/fix/test/refactor
+1. **Task 1: [task name]** - `abc123f` (feat/fix/test/refactor)
+2. **Task 2: [task name]** - `def456g` (feat/fix/test/refactor)
+3. **Task 3: [task name]** - `hij789k` (feat/fix/test/refactor)
 
-**Plan metadata:** `lmn012o` (docs: complete plan
+**Plan metadata:** `lmn012o` (docs: complete plan)
 
-_Note: TDD tasks may have multiple commits (test → feat → refactor_
+_Note: TDD tasks may have multiple commits (test → feat → refactor)_
 
 ## Files Created/Modified
 - `path/to/file.ts` - What it does
@@ -88,18 +88,18 @@ _Note: TDD tasks may have multiple commits (test → feat → refactor_
 ### Auto-fixed Issues
 
 **1. [Rule X - Category] Brief description**
-- **Found during:** Task [N] ([task name]
+- **Found during:** Task [N] ([task name])
 - **Issue:** [What was wrong]
 - **Fix:** [What was done]
 - **Files modified:** [file paths]
 - **Verification:** [How it was verified]
-- **Committed in:** [hash] (part of task commit
+- **Committed in:** [hash] (part of task commit)
 
 [... repeat for each auto-fix ...]
 
 ---
 
-**Total deviations:** [N] auto-fixed ([breakdown by rule]
+**Total deviations:** [N] auto-fixed ([breakdown by rule])
 **Impact on plan:** [Brief assessment - e.g., "All auto-fixes necessary for correctness/security. No scope creep."]
 
 ## Issues Encountered
@@ -110,7 +110,7 @@ _Note: TDD tasks may have multiple commits (test → feat → refactor_
 ## User Setup Required
 
 [If USER-SETUP.md was generated:]
-**External services require manual configuration.** See [{phase}-USER-SETUP.md](./{phase}-USER-SETUP.md for:
+**External services require manual configuration.** See [{phase}-USER-SETUP.md](./{phase}-USER-SETUP.md) for:
 - Environment variables to add
 - Dashboard configuration steps
 - Verification commands
@@ -134,9 +134,9 @@ None - no external service configuration required.
 
 **Dependency graph:** `requires`/`provides`/`affects` create explicit links between phases, enabling transitive closure for context selection.
 
-**Subsystem:** Primary categorization (auth, payments, ui, api, database, infra, testing for detecting related phases.
+**Subsystem:** Primary categorization (auth, payments, ui, api, database, infra, testing) for detecting related phases.
 
-**Tags:** Searchable technical keywords (libraries, frameworks, tools for tech stack awareness.
+**Tags:** Searchable technical keywords (libraries, frameworks, tools) for tech stack awareness.
 
 **Key-files:** Important files for @context references in PLAN.md.
 
@@ -190,7 +190,7 @@ The one-liner should tell someone what actually shipped.
 - `src/lib/auth.ts` - JWT helpers using jose
 
 ## Decisions Made
-- Used jose instead of jsonwebtoken (ESM-native, Edge-compatible
+- Used jose instead of jsonwebtoken (ESM-native, Edge-compatible)
 - 15-min access tokens with 7-day refresh tokens
 - Storing refresh tokens in database for revocation capability
 
@@ -199,28 +199,28 @@ The one-liner should tell someone what actually shipped.
 ### Auto-fixed Issues
 
 **1. [Rule 2 - Missing Critical] Added password hashing with bcrypt**
-- **Found during:** Task 2 (Login endpoint implementation
+- **Found during:** Task 2 (Login endpoint implementation)
 - **Issue:** Plan didn't specify password hashing - storing plaintext would be critical security flaw
 - **Fix:** Added bcrypt hashing on registration, comparison on login with salt rounds 10
 - **Files modified:** src/app/api/auth/login/route.ts, src/lib/auth.ts
 - **Verification:** Password hash test passes, plaintext never stored
-- **Committed in:** abc123f (Task 2 commit
+- **Committed in:** abc123f (Task 2 commit)
 
 **2. [Rule 3 - Blocking] Installed missing jose dependency**
-- **Found during:** Task 4 (JWT token generation
+- **Found during:** Task 4 (JWT token generation)
 - **Issue:** jose package not in package.json, import failing
 - **Fix:** Ran `npm install jose`
 - **Files modified:** package.json, package-lock.json
 - **Verification:** Import succeeds, build passes
-- **Committed in:** def456g (Task 4 commit
+- **Committed in:** def456g (Task 4 commit)
 
 ---
 
-**Total deviations:** 2 auto-fixed (1 missing critical, 1 blocking
+**Total deviations:** 2 auto-fixed (1 missing critical, 1 blocking)
 **Impact on plan:** Both auto-fixes essential for security and functionality. No scope creep.
 
 ## Issues Encountered
-- jsonwebtoken CommonJS import failed in Edge runtime - switched to jose (planned library change, worked as expected
+- jsonwebtoken CommonJS import failed in Edge runtime - switched to jose (planned library change, worked as expected)
 
 ## Next Phase Readiness
 - Auth foundation complete, ready for feature development
@@ -244,7 +244,7 @@ The one-liner should tell someone what actually shipped.
 - Frontmatter enables automatic context assembly for future planning
 
 **One-liner requirements:**
-- Must be substantive (describe what shipped, not "phase complete"
+- Must be substantive (describe what shipped, not "phase complete")
 - Should tell someone what was accomplished
 - Examples: "JWT auth with refresh rotation using jose library" not "Authentication implemented"
 
@@ -254,12 +254,12 @@ The one-liner should tell someone what actually shipped.
 
 **Deviations section:**
 - Documents unplanned work handled via deviation rules
-- Separate from "Issues Encountered" (which is planned work problems
+- Separate from "Issues Encountered" (which is planned work problems)
 - Auto-fixed issues: What was wrong, how fixed, verification
 
 **Decisions section:**
 - Key decisions made during execution
-- Include rationale (why this choice
+- Include rationale (why this choice)
 - Extracted to STATE.md accumulated context
 - Use "None - followed plan as specified" if no deviations
 

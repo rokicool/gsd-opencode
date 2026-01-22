@@ -62,6 +62,27 @@ const translationRules = {
   // MCP server references - mark as optional
   mcp: (content) =>
     content.replace(/mcp__context7__\*/g, '(optional MCP tool)'),
+
+  // Additional forbidden strings and edge cases
+  additional: (content) =>
+    content
+      .replace(/subagent_type="Explore"/g, 'mode="subagent"')
+      .replace(/SlashCommand/g, 'Command')
+      .replace(/\bTodoWrite\b/g, 'todowrite')
+      .replace(/\bWebSearch\b/g, 'webfetch')
+      .replace(/\bBashOutput\b/g, '(bash output)')
+      .replace(/rokicool\/get-shit-done/g, 'rokicool/gsd-opencode')
+      // Color conversion for agents
+      .replace(/color: cyan/g, 'color: "#00FFFF"')
+      .replace(/color: orange/g, 'color: "#FFA500"')
+      .replace(/color: yellow/g, 'color: "#FFFF00"')
+      .replace(/color: blue/g, 'color: "#0000FF"')
+      .replace(/color: green/g, 'color: "#008000"')
+      .replace(/color: purple/g, 'color: "#800080"')
+      .replace(/color: red/g, 'color: "#FF0000"')
+      // Cleanup tool lists in frontmatter
+      .replace(/tools: read, write, edit, bash, grep, glob, webfetch/g, 'tools: read, write, edit, bash, grep, glob, webfetch')
+      .replace(/tools: read, write, bash, grep, glob, webfetch, webfetch/g, 'tools: read, write, bash, grep, glob, webfetch'),
 };
 
 /**

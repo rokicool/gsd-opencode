@@ -11,14 +11,14 @@ Template for `.planning/STATE.md` — the project's living memory.
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated [date]
+See: .planning/PROJECT.md (updated [date])
 
 **Core value:** [One-liner from PROJECT.md Core Value section]
 **Current focus:** [Current phase name]
 
 ## Current Position
 
-Phase: [X] of [Y] ([Phase name]
+Phase: [X] of [Y] ([Phase name])
 Plan: [A] of [B] in current phase
 Status: [Ready to plan / Planning / Ready to execute / In progress / Phase complete]
 Last activity: [YYYY-MM-DD] — [What happened]
@@ -80,7 +80,7 @@ STATE.md is the project's short-term memory spanning all phases and sessions.
 **Problem it solves:** Information is captured in summaries, issues, and decisions but not systematically consumed. Sessions start without context.
 
 **Solution:** A single, small file that's:
-- Read first in every workflow
+- read first in every workflow
 - Updated after every significant action
 - Contains digest of accumulated context
 - Enables instant session restoration
@@ -89,8 +89,8 @@ STATE.md is the project's short-term memory spanning all phases and sessions.
 
 <lifecycle>
 
-**Creation:** After ROADMAP.md is created (during init
-- Reference PROJECT.md (read it for current context
+**Creation:** After ROADMAP.md is created (during init)
+- Reference PROJECT.md (read it for current context)
 - Initialize empty accumulated context sections
 - Set position to "Phase 1 ready to plan"
 
@@ -102,8 +102,8 @@ STATE.md is the project's short-term memory spanning all phases and sessions.
 
 **Writing:** After every significant action
 - execute: After SUMMARY.md created
-  - Update position (phase, plan, status
-  - Note new decisions (detail in PROJECT.md
+  - Update position (phase, plan, status)
+  - Note new decisions (detail in PROJECT.md)
   - Add blockers/concerns
 - transition: After phase marked complete
   - Update progress bar
@@ -116,9 +116,9 @@ STATE.md is the project's short-term memory spanning all phases and sessions.
 
 ### Project Reference
 Points to PROJECT.md for full context. Includes:
-- Core value (the ONE thing that matters
-- Current focus (which phase
-- Last update date (triggers re-read if stale
+- Core value (the ONE thing that matters)
+- Current focus (which phase)
+- Last update date (triggers re-read if stale)
 
 OpenCode reads PROJECT.md directly for requirements, constraints, and decisions.
 
@@ -130,14 +130,14 @@ Where we are right now:
 - Last activity — what happened most recently
 - Progress bar — visual indicator of overall completion
 
-Progress calculation: (completed plans / (total plans across all phases × 100%
+Progress calculation: (completed plans) / (total plans across all phases) × 100%
 
 ### Performance Metrics
 Track velocity to understand execution patterns:
 - Total plans completed
 - Average duration per plan
 - Per-phase breakdown
-- Recent trend (improving/stable/degrading
+- Recent trend (improving/stable/degrading)
 
 Updated after each plan completion.
 
@@ -148,7 +148,7 @@ Updated after each plan completion.
 **Pending Todos:** Ideas captured via /gsd-add-todo
 - Count of pending todos
 - Reference to .planning/todos/pending/
-- Brief list if few, count if many (e.g., "5 pending todos — see /gsd-check-todos"
+- Brief list if few, count if many (e.g., "5 pending todos — see /gsd-check-todos")
 
 **Blockers/Concerns:** From "Next Phase Readiness" sections
 - Issues that affect future work
@@ -168,7 +168,7 @@ Enables instant resumption:
 Keep STATE.md under 100 lines.
 
 It's a DIGEST, not an archive. If accumulated context grows too large:
-- Keep only 3-5 recent decisions in summary (full log in PROJECT.md
+- Keep only 3-5 recent decisions in summary (full log in PROJECT.md)
 - Keep only active blockers, remove resolved ones
 
 The goal is "read once, know where we are" — if it's too long, that fails.
@@ -178,8 +178,8 @@ The goal is "read once, know where we are" — if it's too long, that fails.
 <guidelines>
 
 **When created:**
-- During project initialization (after ROADMAP.md
-- Reference PROJECT.md (extract core value and current focus
+- During project initialization (after ROADMAP.md)
+- Reference PROJECT.md (extract core value and current focus)
 - Initialize empty sections
 
 **When read:**
@@ -188,17 +188,17 @@ The goal is "read once, know where we are" — if it's too long, that fails.
 - Provides instant context restoration
 
 **When updated:**
-- After each plan execution (update position, note decisions, update issues/blockers
-- After phase transitions (update progress bar, clear resolved blockers, refresh project reference
+- After each plan execution (update position, note decisions, update issues/blockers)
+- After phase transitions (update progress bar, clear resolved blockers, refresh project reference)
 
 **Size management:**
 - Keep under 100 lines total
-- Recent decisions only in STATE.md (full log in PROJECT.md
+- Recent decisions only in STATE.md (full log in PROJECT.md)
 - Keep only active blockers
 
 **Sections:**
 - Project Reference: Pointer to PROJECT.md with core value
-- Current Position: Where we are now (phase, plan, status
+- Current Position: Where we are now (phase, plan, status)
 - Performance Metrics: Velocity tracking
 - Accumulated Context: Recent decisions, pending todos, blockers
 - Session Continuity: Resume information

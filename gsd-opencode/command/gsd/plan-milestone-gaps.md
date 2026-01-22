@@ -1,13 +1,13 @@
 ---
 name: gsd-plan-milestone-gaps
 description: Create phases to close all gaps identified by milestone audit
-allowed-tools:
+tools:
   - read
   - write
   - bash
   - glob
   - grep
-
+  - question
 ---
 
 <objective>
@@ -24,9 +24,9 @@ One command creates all fix phases — no manual `/gsd-add-phase` per gap.
 
 <context>
 **Audit results:**
-Glob: .planning/v*-MILESTONE-AUDIT.md (use most recent
+glob: .planning/v*-MILESTONE-AUDIT.md (use most recent)
 
-**Original intent (for prioritization:**
+**Original intent (for prioritization):**
 @.planning/PROJECT.md
 @.planning/REQUIREMENTS.md
 
@@ -72,14 +72,14 @@ Cluster related gaps into logical phases:
 
 **Grouping rules:**
 - Same affected phase → combine into one fix phase
-- Same subsystem (auth, API, UI → combine
-- Dependency order (fix stubs before wiring
+- Same subsystem (auth, API, UI) → combine
+- Dependency order (fix stubs before wiring)
 - Keep phases focused: 2-4 tasks each
 
 **Example grouping:**
 ```
-Gap: DASH-01 unsatisfied (Dashboard doesn't fetch
-Gap: Integration Phase 1→3 (Auth not passed to API calls
+Gap: DASH-01 unsatisfied (Dashboard doesn't fetch)
+Gap: Integration Phase 1→3 (Auth not passed to API calls)
 Gap: Flow "View dashboard" broken at data fetch
 
 → Phase 6: "Wire Dashboard to API"
@@ -123,7 +123,7 @@ Tasks: {count}
 
 {If nice-to-have gaps exist:}
 
-### Deferred (nice-to-have
+### Deferred (nice-to-have)
 
 These gaps are optional. Include them?
 - {gap description}
@@ -131,7 +131,7 @@ These gaps are optional. Include them?
 
 ---
 
-Create these {X} phases? (yes / adjust / defer all optional
+Create these {X} phases? (yes / adjust / defer all optional)
 ```
 
 Wait for user confirmation.
@@ -161,17 +161,17 @@ mkdir -p ".planning/phases/{NN}-{name}"
 **Check planning config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true"
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 **If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
 
-**If `COMMIT_PLANNING_DOCS=true` (default:**
+**If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
 git add .planning/ROADMAP.md
-git commit -m "docs(roadmap: add gap closure phases {N}-{M}"
+git commit -m "docs(roadmap): add gap closure phases {N}-{M}"
 ```
 
 ## 9. Offer Next Steps
@@ -285,7 +285,7 @@ becomes:
 
 <success_criteria>
 - [ ] MILESTONE-AUDIT.md loaded and gaps parsed
-- [ ] Gaps prioritized (must/should/nice
+- [ ] Gaps prioritized (must/should/nice)
 - [ ] Gaps grouped into logical phases
 - [ ] User confirmed phase plan
 - [ ] ROADMAP.md updated with new phases

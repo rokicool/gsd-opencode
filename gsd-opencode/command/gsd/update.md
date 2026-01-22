@@ -12,7 +12,7 @@ Provides a better update experience than raw `npx gsd-opencode` by showing versi
 <process>
 
 <step name="get_installed_version">
-Read installed version:
+read installed version:
 
 ```bash
 cat ~/.config/opencode/get-shit-done/VERSION 2>/dev/null
@@ -29,7 +29,7 @@ Your installation doesn't include version tracking.
 Running fresh install...
 ```
 
-Proceed to install step (treat as version 0.0.0 for comparison.
+Proceed to install step (treat as version 0.0.0 for comparison).
 </step>
 
 <step name="check_latest_version">
@@ -41,7 +41,7 @@ npm view gsd-opencode version 2>/dev/null
 
 **If npm check fails:**
 ```
-Couldn't check for updates (offline or npm unavailable.
+Couldn't check for updates (offline or npm unavailable).
 
 To update manually: `npx gsd-opencode --global`
 ```
@@ -71,7 +71,7 @@ STOP here if already up to date.
 **Installed:** X.Y.Z
 **Latest:** A.B.C
 
-You're ahead of the latest release (development version?.
+You're ahead of the latest release (development version?).
 ```
 
 STOP here if ahead.
@@ -80,7 +80,7 @@ STOP here if ahead.
 <step name="show_changes_and_confirm">
 **If update available**, fetch and show what's new BEFORE updating:
 
-1. Fetch changelog (same as fetch_changelog step
+1. Fetch changelog (same as fetch_changelog step)
 2. Extract entries between installed and latest versions
 3. Display preview and ask for confirmation:
 
@@ -119,7 +119,7 @@ Your custom files in other locations are preserved:
 If you've modified any GSD files directly, back them up first.
 ```
 
-Use :
+Use question:
 - Question: "Proceed with update?"
 - Options:
   - "Yes, update now"
@@ -145,7 +145,7 @@ rm -f ~/.config/opencode/cache/gsd-update-check.json
 </step>
 
 <step name="display_result">
-Format completion message (changelog was already shown in confirmation step:
+Format completion message (changelog was already shown in confirmation step):
 
 ```
 ╔═══════════════════════════════════════════════════════════╗
@@ -154,7 +154,7 @@ Format completion message (changelog was already shown in confirmation step:
 
 ⚠️  Restart OpenCode to pick up the new commands.
 
-[View full changelog](https://github.com/rokicool/gsd-opencode/blob/main/CHANGELOG.md
+[View full changelog](https://github.com/rokicool/gsd-opencode/blob/main/CHANGELOG.md)
 ```
 </step>
 

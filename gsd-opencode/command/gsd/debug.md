@@ -2,9 +2,11 @@
 name: gsd-debug
 description: Systematic debugging with persistent state across context resets
 argument-hint: [issue description]
-allowed-tools:
+tools:
   - read
   - bash
+
+  - question
 ---
 
 <objective>
@@ -12,7 +14,7 @@ Debug issues using scientific method with subagent isolation.
 
 **Orchestrator role:** Gather symptoms, spawn gsd-debugger agent, handle checkpoints, spawn continuations.
 
-**Why subagent:** Investigation burns context fast (reading files, forming hypotheses, testing. Fresh 200k context per investigation. Main context stays lean for user interaction.
+**Why subagent:** Investigation burns context fast (reading files, forming hypotheses, testing). Fresh 200k context per investigation. Main context stays lean for user interaction.
 </objective>
 
 <context>
@@ -28,10 +30,10 @@ ls .planning/debug/*.md 2>/dev/null | grep -v resolved | head -5
 
 ## 0. Resolve Model Profile
 
-Read model profile for agent spawning:
+read model profile for agent spawning:
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced"
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -53,13 +55,13 @@ If active sessions exist AND no $ARGUMENTS:
 If $ARGUMENTS provided OR user describes new issue:
 - Continue to symptom gathering
 
-## 2. Gather Symptoms (if new issue
+## 2. Gather Symptoms (if new issue)
 
-Use  for each:
+Use question for each:
 
 1. **Expected behavior** - What should happen?
 2. **Actual behavior** - What happens instead?
-3. **Error messages** - Any errors? (paste or describe
+3. **Error messages** - Any errors? (paste or describe)
 4. **Timeline** - When did this start? Ever worked?
 5. **Reproduction** - How do you trigger it?
 
@@ -100,7 +102,7 @@ Task(
   subagent_type="gsd-debugger",
   model="{debugger_model}",
   description="Debug {slug}"
-
+)
 ```
 
 ## 4. Handle Agent Return
@@ -115,7 +117,7 @@ Task(
 **If `## CHECKPOINT REACHED`:**
 - Present checkpoint details to user
 - Get user response
-- Spawn continuation agent (see step 5
+- Spawn continuation agent (see step 5)
 
 **If `## INVESTIGATION INCONCLUSIVE`:**
 - Show what was checked and eliminated
@@ -124,7 +126,7 @@ Task(
   - "Manual investigation" - done
   - "Add more context" - gather more symptoms, spawn again
 
-## 5. Spawn Continuation Agent (After Checkpoint
+## 5. Spawn Continuation Agent (After Checkpoint)
 
 When user responds to checkpoint, spawn fresh agent:
 
@@ -153,14 +155,14 @@ Task(
   subagent_type="gsd-debugger",
   model="{debugger_model}",
   description="Continue debug {slug}"
-
+)
 ```
 
 </process>
 
 <success_criteria>
 - [ ] Active sessions checked
-- [ ] Symptoms gathered (if new
+- [ ] Symptoms gathered (if new)
 - [ ] gsd-debugger spawned with context
 - [ ] Checkpoints handled correctly
 - [ ] Root cause confirmed before fixing

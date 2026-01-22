@@ -1,5 +1,5 @@
 ---
-name: gsd-set-profile
+name: set-profile
 description: Switch model profile for GSD agents (quality/balanced/budget)
 arguments:
   - name: profile
@@ -15,7 +15,7 @@ Switch the model profile used by GSD agents. This controls which OpenCode model 
 | Profile | Description |
 |---------|-------------|
 | **quality** | Opus everywhere except read-only verification |
-| **balanced** | Opus for planning, Sonnet for execution/verification (default |
+| **balanced** | Opus for planning, Sonnet for execution/verification (default) |
 | **budget** | Sonnet for writing, Haiku for research/verification |
 </profiles>
 
@@ -44,19 +44,19 @@ Run /gsd-new-project first to initialize a project.
 
 ## 3. Update config.json
 
-Read current config:
+read current config:
 ```bash
 cat .planning/config.json
 ```
 
-Update `model_profile` field (or add if missing:
+Update `model_profile` field (or add if missing):
 ```json
 {
   "model_profile": "$ARGUMENTS.profile"
 }
 ```
 
-Write updated config back to `.planning/config.json`.
+write updated config back to `.planning/config.json`.
 
 ## 4. Confirm
 

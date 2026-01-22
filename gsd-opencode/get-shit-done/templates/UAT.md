@@ -88,7 +88,7 @@ skipped: [N]
 **Tests:**
 - Each test: OVERWRITE result field when user responds
 - `result` values: [pending], pass, issue, skipped
-- If issue: add `reported` (verbatim and `severity` (inferred
+- If issue: add `reported` (verbatim) and `severity` (inferred)
 - If skipped: add `reason` if provided
 
 **Summary:**
@@ -96,7 +96,7 @@ skipped: [N]
 - Tracks: total, passed, issues, pending, skipped
 
 **Gaps:**
-- APPEND only when issue found (YAML format
+- APPEND only when issue found (YAML format)
 - After diagnosis: fill `root_cause`, `artifacts`, `missing`, `debug_session`
 - This section feeds directly into /gsd-plan-phase --gaps
 
@@ -104,9 +104,9 @@ skipped: [N]
 
 <diagnosis_lifecycle>
 
-**After testing complete (status: complete, if gaps exist:**
+**After testing complete (status: complete), if gaps exist:**
 
-1. User runs diagnosis (from verify-work offer or manually
+1. User runs diagnosis (from verify-work offer or manually)
 2. diagnose-issues workflow spawns parallel debug agents
 3. Each agent investigates one gap, returns root cause
 4. UAT.md Gaps section updated with diagnosis:
@@ -145,9 +145,9 @@ skipped: [N]
 **During testing:**
 - Present test from Current Test section
 - User responds with pass confirmation or issue description
-- Update test result (pass/issue/skipped
+- Update test result (pass/issue/skipped)
 - Update Summary counts
-- If issue: append to Gaps section (YAML format, infer severity
+- If issue: append to Gaps section (YAML format), infer severity
 - Move Current Test to next pending test
 
 **On completion:**
@@ -157,8 +157,8 @@ skipped: [N]
 - Present summary with next steps
 
 **Resume after /new:**
-1. Read frontmatter → know phase and status
-2. Read Current Test → know where we are
+1. read frontmatter → know phase and status
+2. read Current Test → know where we are
 3. Find first [pending] result → continue from there
 4. Summary shows progress so far
 
@@ -175,7 +175,7 @@ Severity is INFERRED from user's natural language, never asked.
 | Works but..., slow, weird, minor, small issue | minor |
 | Color, font, spacing, alignment, visual, looks off | cosmetic |
 
-Default: **major** (safe default, user can clarify if wrong
+Default: **major** (safe default, user can clarify if wrong)
 
 </severity_guide>
 

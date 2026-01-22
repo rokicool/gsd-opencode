@@ -99,14 +99,14 @@ user_setup:
 
 **USER-SETUP.md contains ONLY what OpenCode literally cannot do.**
 
-| OpenCode CAN Do (not in USER-SETUP | OpenCode CANNOT Do (→ USER-SETUP |
+| OpenCode CAN Do (not in USER-SETUP) | OpenCode CANNOT Do (→ USER-SETUP) |
 |-----------------------------------|--------------------------------|
 | `npm install stripe` | Create Stripe account |
-| Write webhook handler code | Get API keys from dashboard |
+| write webhook handler code | Get API keys from dashboard |
 | Create `.env.local` file structure | Copy actual secret values |
-| Run `stripe listen` | Authenticate Stripe CLI (browser OAuth |
+| Run `stripe listen` | Authenticate Stripe CLI (browser OAuth) |
 | Configure package.json | Access external service dashboards |
-| Write any code | Retrieve secrets from third-party systems |
+| write any code | Retrieve secrets from third-party systems |
 
 **The test:** "Does this require a human in a browser, accessing an account OpenCode doesn't have credentials for?"
 - Yes → USER-SETUP.md
@@ -136,7 +136,7 @@ Complete these items for Stripe integration to function.
 
 ## Account Setup
 
-- [ ] **Create Stripe account** (if needed
+- [ ] **Create Stripe account** (if needed)
   - URL: https://dashboard.stripe.com/register
   - Skip if: Already have Stripe account
 
@@ -151,7 +151,7 @@ Complete these items for Stripe integration to function.
     - `customer.subscription.updated`
     - `customer.subscription.deleted`
 
-- [ ] **Create products and prices** (if using subscription tiers
+- [ ] **Create products and prices** (if using subscription tiers)
   - Location: Stripe Dashboard → Products → Add product
   - Create each subscription tier
   - Copy Price IDs to:
@@ -164,7 +164,7 @@ For local webhook testing:
 ```bash
 stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ```
-Use the webhook signing secret from CLI output (starts with `whsec_`.
+Use the webhook signing secret from CLI output (starts with `whsec_`).
 
 ## Verification
 
@@ -177,13 +177,13 @@ grep STRIPE .env.local
 # Verify build passes
 npm run build
 
-# Test webhook endpoint (should return 400 bad signature, not 500 crash
+# Test webhook endpoint (should return 400 bad signature, not 500 crash)
 curl -X POST http://localhost:3000/api/webhooks/stripe \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
 
-Expected: Build passes, webhook returns 400 (signature validation working.
+Expected: Build passes, webhook returns 400 (signature validation working).
 
 ---
 
@@ -220,9 +220,9 @@ Complete these items for Supabase Auth to function.
 - [ ] **Enable Email Auth**
   - Location: Supabase Dashboard → Authentication → Providers
   - Enable: Email provider
-  - Configure: Confirm email (on/off based on preference
+  - Configure: Confirm email (on/off based on preference)
 
-- [ ] **Configure OAuth providers** (if using social login
+- [ ] **Configure OAuth providers** (if using social login)
   - Location: Supabase Dashboard → Authentication → Providers
   - For Google: Add Client ID and Secret from Google Cloud Console
   - For GitHub: Add Client ID and Secret from GitHub OAuth Apps
@@ -235,7 +235,7 @@ After completing setup:
 # Check env vars
 grep SUPABASE .env.local
 
-# Verify connection (run in project directory
+# Verify connection (run in project directory)
 npx supabase status
 ```
 
@@ -272,13 +272,13 @@ Complete these items for SendGrid email to function.
 
 - [ ] **Verify sender identity**
   - Location: SendGrid Dashboard → Settings → Sender Authentication
-  - Option 1: Single Sender Verification (quick, for dev
-  - Option 2: Domain Authentication (production
+  - Option 1: Single Sender Verification (quick, for dev)
+  - Option 2: Domain Authentication (production)
 
 - [ ] **Create API Key**
   - Location: SendGrid Dashboard → Settings → API Keys → Create API Key
-  - Permission: Restricted Access → Mail Send (Full Access
-  - Copy key immediately (shown only once
+  - Permission: Restricted Access → Mail Send (Full Access)
+  - Copy key immediately (shown only once)
 
 ## Verification
 
@@ -288,7 +288,7 @@ After completing setup:
 # Check env var
 grep SENDGRID .env.local
 
-# Test email sending (replace with your test email
+# Test email sending (replace with your test email)
 curl -X POST http://localhost:3000/api/test-email \
   -H "Content-Type: application/json" \
   -d '{"to": "your@email.com"}'
@@ -306,15 +306,15 @@ curl -X POST http://localhost:3000/api/test-email \
 
 **Include in USER-SETUP.md:**
 - Environment variable names and where to find values
-- Account creation URLs (if new service
+- Account creation URLs (if new service)
 - Dashboard configuration steps
 - Verification commands to confirm setup works
-- Local development alternatives (e.g., `stripe listen`
+- Local development alternatives (e.g., `stripe listen`)
 
 **Do NOT include:**
-- Actual secret values (never
-- Steps OpenCode can automate (package installs, code changes, file creation
-- Generic instructions ("set up your environment"
+- Actual secret values (never)
+- Steps OpenCode can automate (package installs, code changes, file creation)
+- Generic instructions ("set up your environment")
 
 **Naming:** `{phase}-USER-SETUP.md` matches the phase number pattern.
 

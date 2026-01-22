@@ -23,7 +23,7 @@ One sentence that drives prioritization when tradeoffs arise.]
 
 <!-- Shipped and confirmed valuable. -->
 
-(None yet — ship to validate
+(None yet — ship to validate)
 
 ### Active
 
@@ -95,7 +95,7 @@ Common types: Tech stack, Timeline, Budget, Dependencies, Compatibility, Perform
 
 **Requirements — Out of Scope:**
 - Explicit boundaries on what we're not building
-- Always include reasoning (prevents re-adding later
+- Always include reasoning (prevents re-adding later)
 - Includes: considered and rejected, deferred to future, explicitly excluded
 
 **Context:**
@@ -139,7 +139,7 @@ PROJECT.md evolves throughout the project lifecycle.
 1. Full review of all sections
 2. Core Value check — still the right priority?
 3. Audit Out of Scope — reasons still valid?
-4. Update Context with current state (users, feedback, metrics
+4. Update Context with current state (users, feedback, metrics)
 
 </evolution>
 
@@ -173,7 +173,7 @@ STATE.md references PROJECT.md:
 ```markdown
 ## Project Reference
 
-See: .planning/PROJECT.md (updated [date]
+See: .planning/PROJECT.md (updated [date])
 
 **Core value:** [One-liner from Core Value section]
 **Current focus:** [Current phase name]

@@ -1,23 +1,24 @@
 ---
 name: gsd-new-project
 description: Initialize a new project with deep context gathering and PROJECT.md
-allowed-tools:
+tools:
   - read
   - bash
   - write
 
+  - question
 ---
 
 <objective>
 
-Initialize a new project through unified flow: questioning → research (optional → requirements → roadmap.
+Initialize a new project through unified flow: questioning → research (optional) → requirements → roadmap.
 
 This is the most leveraged moment in any project. Deep questioning here means better plans, better execution, better outcomes. One command takes you from idea to ready-for-planning.
 
 **Creates:**
 - `.planning/PROJECT.md` — project context
 - `.planning/config.json` — workflow preferences
-- `.planning/research/` — domain research (optional
+- `.planning/research/` — domain research (optional)
 - `.planning/REQUIREMENTS.md` — scoped requirements
 - `.planning/ROADMAP.md` — phase structure
 - `.planning/STATE.md` — project memory
@@ -46,7 +47,7 @@ This is the most leveraged moment in any project. Deep questioning here means be
    [ -f .planning/PROJECT.md ] && echo "ERROR: Project already initialized. Use /gsd-progress" && exit 1
    ```
 
-2. **Initialize git repo in THIS directory** (required even if inside a parent repo:
+2. **Initialize git repo in THIS directory** (required even if inside a parent repo):
    ```bash
    if [ -d .git ] || [ -f .git ]; then
        echo "Git repo exists in current directory"
@@ -56,14 +57,14 @@ This is the most leveraged moment in any project. Deep questioning here means be
    fi
    ```
 
-3. **Detect existing code (brownfield detection:**
+3. **Detect existing code (brownfield detection):**
    ```bash
-   CODE_FILES=$(find . -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" 2>/dev/null | grep -v node_modules | grep -v .git | head -20
-   HAS_PACKAGE=$([ -f package.json ] || [ -f requirements.txt ] || [ -f Cargo.toml ] || [ -f go.mod ] || [ -f Package.swift ] && echo "yes"
-   HAS_CODEBASE_MAP=$([ -d .planning/codebase ] && echo "yes"
+   CODE_FILES=$(find . -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" 2>/dev/null | grep -v node_modules | grep -v .git | head -20)
+   HAS_PACKAGE=$([ -f package.json ] || [ -f requirements.txt ] || [ -f Cargo.toml ] || [ -f go.mod ] || [ -f Package.swift ] && echo "yes")
+   HAS_CODEBASE_MAP=$([ -d .planning/codebase ] && echo "yes")
    ```
 
-   **You MUST run all bash commands above using the Bash tool before proceeding.**
+   **You MUST run all bash commands above using the bash tool before proceeding.**
 
 ## Phase 2: Brownfield Offer
 
@@ -73,11 +74,11 @@ Check the results from setup step:
 - If `CODE_FILES` is non-empty OR `HAS_PACKAGE` is "yes"
 - AND `HAS_CODEBASE_MAP` is NOT "yes"
 
-Use :
+Use question:
 - header: "Existing Code"
 - question: "I detected existing code in this directory. Would you like to map the codebase first?"
 - options:
-  - "Map codebase first" — Run /gsd-map-codebase to understand existing architecture (Recommended
+  - "Map codebase first" — Run /gsd-map-codebase to understand existing architecture (Recommended)
   - "Skip mapping" — Proceed with project initialization
 
 **If "Map codebase first":**
@@ -102,7 +103,7 @@ Exit command.
 
 **Open the conversation:**
 
-Ask inline (freeform, NOT :
+Ask inline (freeform, NOT question):
 
 "What do you want to build?"
 
@@ -110,7 +111,7 @@ Wait for their response. This gives you the context needed to ask intelligent fo
 
 **Follow the thread:**
 
-Based on what they said, ask follow-up questions that dig into their response. Use  with options that probe what they mentioned — interpretations, clarifications, concrete examples.
+Based on what they said, ask follow-up questions that dig into their response. Use question with options that probe what they mentioned — interpretations, clarifications, concrete examples.
 
 Keep following threads. Each answer opens new threads to explore. Ask about:
 - What excited them
@@ -126,13 +127,13 @@ Consult `questioning.md` for techniques:
 - Find edges
 - Reveal motivation
 
-**Check context (background, not out loud:**
+**Check context (background, not out loud):**
 
 As you go, mentally check the context checklist from `questioning.md`. If gaps remain, weave questions naturally. Don't suddenly switch to checklist mode.
 
 **Decision gate:**
 
-When you could write a clear PROJECT.md, use :
+When you could write a clear PROJECT.md, use question:
 
 - header: "Ready?"
 - question: "I think I understand what you're after. Ready to create PROJECT.md?"
@@ -144,7 +145,7 @@ If "Keep exploring" — ask what they want to add, or identify gaps and probe na
 
 Loop until "Create PROJECT.md" selected.
 
-## Phase 4: Write PROJECT.md
+## Phase 4: write PROJECT.md
 
 Synthesize all context into `.planning/PROJECT.md` using the template from `templates/project.md`.
 
@@ -157,7 +158,7 @@ Initialize requirements as hypotheses:
 
 ### Validated
 
-(None yet — ship to validate
+(None yet — ship to validate)
 
 ### Active
 
@@ -173,11 +174,11 @@ Initialize requirements as hypotheses:
 
 All Active requirements are hypotheses until shipped and validated.
 
-**For brownfield projects (codebase map exists:**
+**For brownfield projects (codebase map exists):**
 
 Infer Validated requirements from existing code:
 
-1. Read `.planning/codebase/ARCHITECTURE.md` and `STACK.md`
+1. read `.planning/codebase/ARCHITECTURE.md` and `STACK.md`
 2. Identify what the codebase already does
 3. These become the initial Validated set
 
@@ -231,12 +232,12 @@ docs: initialize project
 
 [One-liner from PROJECT.md What This Is section]
 EOF
-"
+)"
 ```
 
 ## Phase 5: Workflow Preferences
 
-**Round 1 — Core workflow settings (4 questions:**
+**Round 1 — Core workflow settings (4 questions):**
 
 ```
 questions: [
@@ -245,7 +246,7 @@ questions: [
     question: "How do you want to work?",
     multiSelect: false,
     options: [
-      { label: "YOLO (Recommended", description: "Auto-approve, just execute" },
+      { label: "YOLO (Recommended)", description: "Auto-approve, just execute" },
       { label: "Interactive", description: "Confirm at each step" }
     ]
   },
@@ -254,9 +255,9 @@ questions: [
     question: "How thorough should planning be?",
     multiSelect: false,
     options: [
-      { label: "Quick", description: "Ship fast (3-5 phases, 1-3 plans each" },
-      { label: "Standard", description: "Balanced scope and speed (5-8 phases, 3-5 plans each" },
-      { label: "Comprehensive", description: "Thorough coverage (8-12 phases, 5-10 plans each" }
+      { label: "Quick", description: "Ship fast (3-5 phases, 1-3 plans each)" },
+      { label: "Standard", description: "Balanced scope and speed (5-8 phases, 3-5 plans each)" },
+      { label: "Comprehensive", description: "Thorough coverage (8-12 phases, 5-10 plans each)" }
     ]
   },
   {
@@ -264,7 +265,7 @@ questions: [
     question: "Run plans in parallel?",
     multiSelect: false,
     options: [
-      { label: "Parallel (Recommended", description: "Independent plans run simultaneously" },
+      { label: "Parallel (Recommended)", description: "Independent plans run simultaneously" },
       { label: "Sequential", description: "One plan at a time" }
     ]
   },
@@ -273,8 +274,8 @@ questions: [
     question: "Commit planning docs to git?",
     multiSelect: false,
     options: [
-      { label: "Yes (Recommended", description: "Planning docs tracked in version control" },
-      { label: "No", description: "Keep .planning/ local-only (add to .gitignore" }
+      { label: "Yes (Recommended)", description: "Planning docs tracked in version control" },
+      { label: "No", description: "Keep .planning/ local-only (add to .gitignore)" }
     ]
   }
 ]
@@ -296,28 +297,28 @@ All recommended for important projects. Skip for quick experiments.
 questions: [
   {
     header: "Research",
-    question: "Research before planning each phase? (adds tokens/time",
+    question: "Research before planning each phase? (adds tokens/time)",
     multiSelect: false,
     options: [
-      { label: "Yes (Recommended", description: "Investigate domain, find patterns, surface gotchas" },
+      { label: "Yes (Recommended)", description: "Investigate domain, find patterns, surface gotchas" },
       { label: "No", description: "Plan directly from requirements" }
     ]
   },
   {
     header: "Plan Check",
-    question: "Verify plans will achieve their goals? (adds tokens/time",
+    question: "Verify plans will achieve their goals? (adds tokens/time)",
     multiSelect: false,
     options: [
-      { label: "Yes (Recommended", description: "Catch gaps before execution starts" },
+      { label: "Yes (Recommended)", description: "Catch gaps before execution starts" },
       { label: "No", description: "Execute plans without verification" }
     ]
   },
   {
     header: "Verifier",
-    question: "Verify work satisfies requirements after each phase? (adds tokens/time",
+    question: "Verify work satisfies requirements after each phase? (adds tokens/time)",
     multiSelect: false,
     options: [
-      { label: "Yes (Recommended", description: "Confirm deliverables match phase goals" },
+      { label: "Yes (Recommended)", description: "Confirm deliverables match phase goals" },
       { label: "No", description: "Trust execution, skip verification" }
     ]
   },
@@ -326,7 +327,7 @@ questions: [
     question: "Which AI models for planning agents?",
     multiSelect: false,
     options: [
-      { label: "Balanced (Recommended", description: "Sonnet for most agents — good quality/cost ratio" },
+      { label: "Balanced (Recommended)", description: "Sonnet for most agents — good quality/cost ratio" },
       { label: "Quality", description: "Opus for research/roadmap — higher cost, deeper analysis" },
       { label: "Budget", description: "Haiku where possible — fastest, lowest cost" }
     ]
@@ -353,7 +354,7 @@ Create `.planning/config.json` with all settings:
 
 **If commit_docs = No:**
 - Set `commit_docs: false` in config.json
-- Add `.planning/` to `.gitignore` (create if needed
+- Add `.planning/` to `.gitignore` (create if needed)
 
 **If commit_docs = Yes:**
 - No additional gitignore entries needed
@@ -370,17 +371,17 @@ Depth: [chosen depth]
 Parallelization: [enabled/disabled]
 Workflow agents: research=[on/off], plan_check=[on/off], verifier=[on/off]
 EOF
-"
+)"
 ```
 
 **Note:** Run `/gsd-settings` anytime to update these preferences.
 
 ## Phase 5.5: Resolve Model Profile
 
-Read model profile for agent spawning:
+read model profile for agent spawning:
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced"
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -397,11 +398,11 @@ Store resolved models for use in Task calls below.
 
 ## Phase 6: Research Decision
 
-Use :
+Use question:
 - header: "Research"
 - question: "Research the domain ecosystem before defining requirements?"
 - options:
-  - "Research first (Recommended" — Discover standard stacks, expected features, architecture patterns
+  - "Research first (Recommended)" — Discover standard stacks, expected features, architecture patterns
   - "Skip research" — I know this domain well, go straight to requirements
 
 **If "Research first":**
@@ -423,8 +424,8 @@ mkdir -p .planning/research
 **Determine milestone context:**
 
 Check if this is greenfield or subsequent milestone:
-- If no "Validated" requirements in PROJECT.md → Greenfield (building from scratch
-- If "Validated" requirements exist → Subsequent milestone (adding to existing app
+- If no "Validated" requirements in PROJECT.md → Greenfield (building from scratch)
+- If "Validated" requirements exist → Subsequent milestone (adding to existing app)
 
 Display spawning indicator:
 ```
@@ -466,16 +467,16 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 </downstream_consumer>
 
 <quality_gate>
-- [ ] Versions are current (verify with Context7/official docs, not training data
+- [ ] Versions are current (verify with Context7/official docs, not training data)
 - [ ] Rationale explains WHY, not just WHAT
 - [ ] Confidence levels assigned to each recommendation
 </quality_gate>
 
 <output>
-Write to: .planning/research/STACK.md
+write to: .planning/research/STACK.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/STACK.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Stack research"
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Stack research")
 
 Task(prompt="
 <research_type>
@@ -499,22 +500,22 @@ What features do [domain] products have? What's table stakes vs differentiating?
 
 <downstream_consumer>
 Your FEATURES.md feeds into requirements definition. Categorize clearly:
-- Table stakes (must have or users leave
-- Differentiators (competitive advantage
-- Anti-features (things to deliberately NOT build
+- Table stakes (must have or users leave)
+- Differentiators (competitive advantage)
+- Anti-features (things to deliberately NOT build)
 </downstream_consumer>
 
 <quality_gate>
-- [ ] Categories are clear (table stakes vs differentiators vs anti-features
+- [ ] Categories are clear (table stakes vs differentiators vs anti-features)
 - [ ] Complexity noted for each feature
 - [ ] Dependencies between features identified
 </quality_gate>
 
 <output>
-Write to: .planning/research/FEATURES.md
+write to: .planning/research/FEATURES.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/FEATURES.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Features research"
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Features research")
 
 Task(prompt="
 <research_type>
@@ -538,9 +539,9 @@ How are [domain] systems typically structured? What are major components?
 
 <downstream_consumer>
 Your ARCHITECTURE.md informs phase structure in roadmap. Include:
-- Component boundaries (what talks to what
-- Data flow (how information moves
-- Suggested build order (dependencies between components
+- Component boundaries (what talks to what)
+- Data flow (how information moves)
+- Suggested build order (dependencies between components)
 </downstream_consumer>
 
 <quality_gate>
@@ -550,10 +551,10 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 </quality_gate>
 
 <output>
-Write to: .planning/research/ARCHITECTURE.md
+write to: .planning/research/ARCHITECTURE.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Architecture research"
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Architecture research")
 
 Task(prompt="
 <research_type>
@@ -577,22 +578,22 @@ What do [domain] projects commonly get wrong? Critical mistakes?
 
 <downstream_consumer>
 Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
-- Warning signs (how to detect early
-- Prevention strategy (how to avoid
+- Warning signs (how to detect early)
+- Prevention strategy (how to avoid)
 - Which phase should address it
 </downstream_consumer>
 
 <quality_gate>
-- [ ] Pitfalls are specific to this domain (not generic advice
+- [ ] Pitfalls are specific to this domain (not generic advice)
 - [ ] Prevention strategies are actionable
 - [ ] Phase mapping included where relevant
 </quality_gate>
 
 <output>
-Write to: .planning/research/PITFALLS.md
+write to: .planning/research/PITFALLS.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/PITFALLS.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Pitfalls research"
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Pitfalls research")
 ```
 
 After all 4 agents complete, spawn synthesizer to create SUMMARY.md:
@@ -604,7 +605,7 @@ Synthesize research outputs into SUMMARY.md.
 </task>
 
 <research_files>
-Read these files:
+read these files:
 - .planning/research/STACK.md
 - .planning/research/FEATURES.md
 - .planning/research/ARCHITECTURE.md
@@ -612,11 +613,11 @@ Read these files:
 </research_files>
 
 <output>
-Write to: .planning/research/SUMMARY.md
+write to: .planning/research/SUMMARY.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 </output>
-", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research"
+", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
 ```
 
 Display research complete banner and key findings:
@@ -647,12 +648,12 @@ Display stage banner:
 
 **Load context:**
 
-Read PROJECT.md and extract:
-- Core value (the ONE thing that must work
-- Stated constraints (budget, timeline, tech limitations
+read PROJECT.md and extract:
+- Core value (the ONE thing that must work)
+- Stated constraints (budget, timeline, tech limitations)
 - Any explicit scope boundaries
 
-**If research exists:** Read research/FEATURES.md and extract feature categories.
+**If research exists:** read research/FEATURES.md and extract feature categories.
 
 **Present features by category:**
 
@@ -668,7 +669,7 @@ Here are the features for [domain]:
 
 **Differentiators:**
 - Magic link login
-- OAuth (Google, GitHub
+- OAuth (Google, GitHub)
 - 2FA
 
 **Research notes:** [any relevant notes]
@@ -690,7 +691,7 @@ For each capability mentioned:
 
 **Scope each category:**
 
-For each category, use :
+For each category, use question:
 
 - header: "[Category name]"
 - question: "Which [category] features are in v1?"
@@ -703,14 +704,14 @@ For each category, use :
 
 Track responses:
 - Selected features → v1 requirements
-- Unselected table stakes → v2 (users expect these
+- Unselected table stakes → v2 (users expect these)
 - Unselected differentiators → out of scope
 
 **Identify gaps:**
 
-Use :
+Use question:
 - header: "Additions"
-- question: "Any requirements research missed? (Features specific to your vision"
+- question: "Any requirements research missed? (Features specific to your vision)"
 - options:
   - "No, research covered it" — Proceed
   - "Yes, let me add some" — Capture additions
@@ -722,19 +723,19 @@ Cross-check requirements against Core Value from PROJECT.md. If gaps detected, s
 **Generate REQUIREMENTS.md:**
 
 Create `.planning/REQUIREMENTS.md` with:
-- v1 Requirements grouped by category (checkboxes, REQ-IDs
-- v2 Requirements (deferred
-- Out of Scope (explicit exclusions with reasoning
-- Traceability section (empty, filled by roadmap
+- v1 Requirements grouped by category (checkboxes, REQ-IDs)
+- v2 Requirements (deferred)
+- Out of Scope (explicit exclusions with reasoning)
+- Traceability section (empty, filled by roadmap)
 
-**REQ-ID format:** `[CATEGORY]-[NUMBER]` (AUTH-01, CONTENT-02
+**REQ-ID format:** `[CATEGORY]-[NUMBER]` (AUTH-01, CONTENT-02)
 
 **Requirement quality criteria:**
 
 Good requirements are:
-- **Specific and testable:** "User can reset password via email link" (not "Handle password reset"
-- **User-centric:** "User can X" (not "System does Y"
-- **Atomic:** One capability per requirement (not "User can login and manage profile"
+- **Specific and testable:** "User can reset password via email link" (not "Handle password reset")
+- **User-centric:** "User can X" (not "System does Y")
+- **Atomic:** One capability per requirement (not "User can login and manage profile")
 - **Independent:** Minimal dependencies on other requirements
 
 Reject vague requirements. Push for specificity:
@@ -743,7 +744,7 @@ Reject vague requirements. Push for specificity:
 
 **Present full requirements list:**
 
-Show every requirement (not counts for user confirmation:
+Show every requirement (not counts) for user confirmation:
 
 ```
 ## v1 Requirements
@@ -761,7 +762,7 @@ Show every requirement (not counts for user confirmation:
 
 ---
 
-Does this capture what you're building? (yes / adjust
+Does this capture what you're building? (yes / adjust)
 ```
 
 If "adjust": Return to scoping.
@@ -776,7 +777,7 @@ docs: define v1 requirements
 [X] requirements across [N] categories
 [Y] requirements deferred to v2
 EOF
-"
+)"
 ```
 
 ## Phase 8: Create Roadmap
@@ -802,7 +803,7 @@ Task(prompt="
 **Requirements:**
 @.planning/REQUIREMENTS.md
 
-**Research (if exists:**
+**Research (if exists):**
 @.planning/research/SUMMARY.md
 
 **Config:**
@@ -812,16 +813,16 @@ Task(prompt="
 
 <instructions>
 Create roadmap:
-1. Derive phases from requirements (don't impose structure
+1. Derive phases from requirements (don't impose structure)
 2. Map every v1 requirement to exactly one phase
-3. Derive 2-5 success criteria per phase (observable user behaviors
+3. Derive 2-5 success criteria per phase (observable user behaviors)
 4. Validate 100% coverage
-5. Write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability
+5. write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
 6. Return ROADMAP CREATED with summary
 
-Write files first, then return. This ensures artifacts persist even if context is lost.
+write files first, then return. This ensures artifacts persist even if context is lost.
 </instructions>
-", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap"
+", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
 ```
 
 **Handle roadmapper return:**
@@ -833,7 +834,7 @@ Write files first, then return. This ensures artifacts persist even if context i
 
 **If `## ROADMAP CREATED`:**
 
-Read the created ROADMAP.md and present it nicely inline:
+read the created ROADMAP.md and present it nicely inline:
 
 ```
 ---
@@ -873,7 +874,7 @@ Success criteria:
 
 **CRITICAL: Ask for approval before committing:**
 
-Use :
+Use question:
 - header: "Roadmap"
 - question: "Does this roadmap structure work for you?"
 - options:
@@ -894,22 +895,22 @@ Use :
 
   Current ROADMAP.md: @.planning/ROADMAP.md
 
-  Update the roadmap based on feedback. Edit files in place.
+  Update the roadmap based on feedback. edit files in place.
   Return ROADMAP REVISED with changes made.
   </revision>
-  ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Revise roadmap"
+  ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Revise roadmap")
   ```
 - Present revised roadmap
 - Loop until user approves
 
 **If "Review full file":** Display raw `cat .planning/ROADMAP.md`, then re-ask.
 
-**Commit roadmap (after approval:**
+**Commit roadmap (after approval):**
 
 ```bash
 git add .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md
 git commit -m "$(cat <<'EOF'
-docs: create roadmap ([N] phases
+docs: create roadmap ([N] phases)
 
 Phases:
 1. [phase-name]: [requirements covered]
@@ -918,7 +919,7 @@ Phases:
 
 All v1 requirements mapped to phases.
 EOF
-"
+)"
 ```
 
 ## Phase 10: Done
@@ -966,7 +967,7 @@ Present completion with next steps:
 
 - `.planning/PROJECT.md`
 - `.planning/config.json`
-- `.planning/research/` (if research selected
+- `.planning/research/` (if research selected)
   - `STACK.md`
   - `FEATURES.md`
   - `ARCHITECTURE.md`
@@ -983,16 +984,16 @@ Present completion with next steps:
 - [ ] .planning/ directory created
 - [ ] Git repo initialized
 - [ ] Brownfield detection completed
-- [ ] Deep questioning completed (threads followed, not rushed
+- [ ] Deep questioning completed (threads followed, not rushed)
 - [ ] PROJECT.md captures full context → **committed**
 - [ ] config.json has workflow mode, depth, parallelization → **committed**
-- [ ] Research completed (if selected — 4 parallel agents spawned → **committed**
-- [ ] Requirements gathered (from research or conversation
-- [ ] User scoped each category (v1/v2/out of scope
+- [ ] Research completed (if selected) — 4 parallel agents spawned → **committed**
+- [ ] Requirements gathered (from research or conversation)
+- [ ] User scoped each category (v1/v2/out of scope)
 - [ ] REQUIREMENTS.md created with REQ-IDs → **committed**
 - [ ] gsd-roadmapper spawned with context
-- [ ] Roadmap files written immediately (not draft
-- [ ] User feedback incorporated (if any
+- [ ] Roadmap files written immediately (not draft)
+- [ ] User feedback incorporated (if any)
 - [ ] ROADMAP.md created with phases, requirement mappings, success criteria
 - [ ] STATE.md initialized
 - [ ] REQUIREMENTS.md traceability updated

@@ -1,10 +1,10 @@
 ---
 name: gsd-settings
 description: Configure GSD workflow toggles and model profile
-allowed-tools:
+tools:
   - read
   - write
-
+  - question
 ---
 
 <objective>
@@ -23,36 +23,36 @@ ls .planning/config.json 2>/dev/null
 
 **If not found:** Error - run `/gsd-new-project` first.
 
-## 2. Read Current Config
+## 2. read Current Config
 
 ```bash
 cat .planning/config.json
 ```
 
-Parse current values (default to `true` if not present:
+Parse current values (default to `true` if not present):
 - `workflow.research` — spawn researcher during plan-phase
 - `workflow.plan_check` — spawn plan checker during plan-phase
 - `workflow.verifier` — spawn verifier during execute-phase
-- `model_profile` — which model each agent uses (default: `balanced`
+- `model_profile` — which model each agent uses (default: `balanced`)
 
 ## 3. Present Settings
 
-Use  with current values shown:
+Use question with current values shown:
 
 ```
-([
+question([
   {
     question: "Which model profile for agents?",
     header: "Model",
     multiSelect: false,
     options: [
-      { label: "Quality", description: "Opus everywhere except verification (highest cost" },
-      { label: "Balanced (Recommended", description: "Opus for planning, Sonnet for execution/verification" },
-      { label: "Budget", description: "Sonnet for writing, Haiku for research/verification (lowest cost" }
+      { label: "Quality", description: "Opus everywhere except verification (highest cost)" },
+      { label: "Balanced (Recommended)", description: "Opus for planning, Sonnet for execution/verification" },
+      { label: "Budget", description: "Sonnet for writing, Haiku for research/verification (lowest cost)" }
     ]
   },
   {
-    question: "Spawn Plan Researcher? (researches domain before planning",
+    question: "Spawn Plan Researcher? (researches domain before planning)",
     header: "Research",
     multiSelect: false,
     options: [
@@ -61,7 +61,7 @@ Use  with current values shown:
     ]
   },
   {
-    question: "Spawn Plan Checker? (verifies plans before execution",
+    question: "Spawn Plan Checker? (verifies plans before execution)",
     header: "Plan Check",
     multiSelect: false,
     options: [
@@ -70,7 +70,7 @@ Use  with current values shown:
     ]
   },
   {
-    question: "Spawn Execution Verifier? (verifies phase completion",
+    question: "Spawn Execution Verifier? (verifies phase completion)",
     header: "Verifier",
     multiSelect: false,
     options: [
@@ -78,7 +78,7 @@ Use  with current values shown:
       { label: "No", description: "Skip post-execution verification" }
     ]
   }
-]
+])
 ```
 
 **Pre-select based on current config values.**
@@ -99,7 +99,7 @@ Merge new settings into existing config.json:
 }
 ```
 
-Write updated config to `.planning/config.json`.
+write updated config to `.planning/config.json`.
 
 ## 5. Confirm Changes
 
@@ -130,7 +130,7 @@ Quick commands:
 
 <success_criteria>
 - [ ] Current config read
-- [ ] User presented with 4 settings (profile + 3 toggles
+- [ ] User presented with 4 settings (profile + 3 toggles)
 - [ ] Config updated with model_profile and workflow section
 - [ ] Changes confirmed to user
 </success_criteria>

@@ -46,7 +46,7 @@ score: N/M must-haves verified
 
 | From | To | Via | Status | Details |
 |------|----|----|--------|---------|
-| Chat.tsx | /api/chat | fetch in useEffect | ✓ WIRED | Line 23: `fetch('/api/chat'` with response handling |
+| Chat.tsx | /api/chat | fetch in useEffect | ✓ WIRED | Line 23: `fetch('/api/chat')` with response handling |
 | ChatInput | /api/chat POST | onSubmit handler | ✗ NOT WIRED | onSubmit only calls console.log |
 | /api/chat POST | database | prisma.message.create | ✗ NOT WIRED | Returns hardcoded response, no DB call |
 
@@ -70,7 +70,7 @@ score: N/M must-haves verified
 | src/components/Chat.tsx | 45 | `return <div>Placeholder</div>` | 🛑 Blocker | Renders no content |
 | src/hooks/useChat.ts | - | File missing | 🛑 Blocker | Expected hook doesn't exist |
 
-**Anti-patterns:** {N} found ({blockers} blockers, {warnings} warnings
+**Anti-patterns:** {N} found ({blockers} blockers, {warnings} warnings)
 
 ## Human Verification Required
 
@@ -96,7 +96,7 @@ None — all verifiable items checked programmatically.
 
 {If gaps found:}
 
-### Critical Gaps (Block Progress
+### Critical Gaps (Block Progress)
 
 1. **{Gap name}**
    - Missing: {what's missing}
@@ -108,7 +108,7 @@ None — all verifiable items checked programmatically.
    - Impact: {why this blocks the goal}
    - Fix: {what needs to happen}
 
-### Non-Critical Gaps (Can Defer
+### Non-Critical Gaps (Can Defer)
 
 1. **{Gap name}**
    - Issue: {what's wrong}
@@ -146,7 +146,7 @@ None — all verifiable items checked programmatically.
 
 ## Verification Metadata
 
-**Verification approach:** Goal-backward (derived from phase goal
+**Verification approach:** Goal-backward (derived from phase goal)
 **Must-haves source:** {PLAN.md frontmatter | derived from ROADMAP.md goal}
 **Automated checks:** {N} passed, {M} failed
 **Human checks required:** {N}
@@ -154,7 +154,7 @@ None — all verifiable items checked programmatically.
 
 ---
 *Verified: {timestamp}*
-*Verifier: OpenCode (subagent*
+*Verifier: OpenCode (subagent)*
 ```
 
 ---
@@ -252,10 +252,10 @@ score: 2/5 must-haves verified
 | File | Line | Pattern | Severity | Impact |
 |------|------|---------|----------|--------|
 | src/components/Chat.tsx | 8 | `<div>Chat will be here</div>` | 🛑 Blocker | No actual content |
-| src/app/api/chat/route.ts | 5 | `return Response.json([]` | 🛑 Blocker | Hardcoded empty |
+| src/app/api/chat/route.ts | 5 | `return Response.json([])` | 🛑 Blocker | Hardcoded empty |
 | src/app/api/chat/route.ts | 12 | `// TODO: save to database` | ⚠️ Warning | Incomplete |
 
-**Anti-patterns:** 3 found (2 blockers, 1 warning
+**Anti-patterns:** 3 found (2 blockers, 1 warning)
 
 ## Human Verification Required
 
@@ -263,7 +263,7 @@ None needed until automated gaps are fixed.
 
 ## Gaps Summary
 
-### Critical Gaps (Block Progress
+### Critical Gaps (Block Progress)
 
 1. **Chat component is placeholder**
    - Missing: Actual message list rendering
@@ -310,13 +310,13 @@ None needed until automated gaps are fixed.
 
 ## Verification Metadata
 
-**Verification approach:** Goal-backward (derived from phase goal
+**Verification approach:** Goal-backward (derived from phase goal)
 **Must-haves source:** 03-01-PLAN.md frontmatter
 **Automated checks:** 2 passed, 8 failed
-**Human checks required:** 0 (blocked by automated failures
+**Human checks required:** 0 (blocked by automated failures)
 **Total verification time:** 2 min
 
 ---
 *Verified: 2025-01-15T14:30:00Z*
-*Verifier: OpenCode (subagent*
+*Verifier: OpenCode (subagent)*
 ```
