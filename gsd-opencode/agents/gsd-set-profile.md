@@ -132,20 +132,33 @@ Current configuration:
 
 **C) Interactive picker (no args/flags):**
 
-Use Question tool:
+Use a single Question tool call with multiple questions (wizard UI) so the user stays in one selector flow ("scrolls to the right"):
+
 ```
-header: "Model profile"
-question: "Select a profile"
-options:
-  - label: "quality"
-    description: "All stages use opencode/glm-4.7-free"
-  - label: "balanced"
-    description: "Planning/verification use glm-4.7-free, execution uses minimax-m2.1-free"
-  - label: "budget"
-    description: "Planning/verification use minimax-m2.1-free, execution uses grok-code"
-  - label: "Cancel"
-    description: "Exit without changes"
+questions:
+  - header: "Model profile"
+    question: "Select a profile"
+    options:
+      - label: "quality"
+        description: "planning: opencode/glm-4.7-free | execution: opencode/glm-4.7-free | verification: opencode/glm-4.7-free"
+      - label: "balanced"
+        description: "planning: opencode/glm-4.7-free | execution: opencode/minimax-m2.1-free | verification: opencode/glm-4.7-free"
+      - label: "budget"
+        description: "planning: opencode/minimax-m2.1-free | execution: opencode/grok-code | verification: opencode/minimax-m2.1-free"
+      - label: "Cancel"
+        description: "Exit without changes"
+  - header: "Confirm profile change"
+    question: "Apply this profile change?"
+    options:
+      - label: "Confirm"
+        description: "Apply changes to config and opencode.json"
+      - label: "Cancel"
+        description: "Exit without changes"
 ```
+
+Then:
+1. If Cancel at either step, print the cancellation message (Step 5) and stop.
+2. Otherwise, set `newProfile` from the first answer and continue to Step 6.
 
 **D) Invalid profile handling:**
 
@@ -188,16 +201,7 @@ Note: OpenCode loads `opencode.json` at startup and does not hot-reload model/ag
 
 Important: Do NOT print any tooling transcript (e.g., `python -m json.tool ...`) or a separate `Updated:` file list. The preview text above is the complete user-facing output for this step.
 
-Use Question tool:
-```
-header: "Confirm profile change"
-question: "Apply this profile change?"
-options:
-  - label: "Confirm"
-    description: "Apply changes to config and opencode.json"
-  - label: "Cancel"
-    description: "Exit without changes"
-```
+Interactive flows MUST use the wizard UI in Step 4 (multiple-question Question tool call) rather than separate Question calls.
 
 ## Step 7: Handle confirmation
 
