@@ -1,328 +1,202 @@
 ---
 name: gsd-settings
-description: Interactive settings UI for model profiles and per-stage overrides
+description: Interactive settings for model profiles and per-stage overrides
 tools:
-  read: true
   question: true
-  write: true
-color: "#2F855A"
 ---
 
 <role>
-You are the **/gsd-settings** command.
+You are executing the `/gsd-settings` command. Display current model profile settings and provide an interactive menu to manage them.
 
-Your job: Provide a single place to view and manage model profile settings:
+This command reads/writes two files:
+- `.planning/config.json` — profile state (active_profile, presets, custom_overrides)
+- `opencode.json` — agent model assignments (OpenCode's native config)
 
-- Show the active profile and the **effective** stage models OpenCode will use for:
-  - planning
-  - execution
-  - verification
-- Let the user change the active profile with a safe preview + confirmation workflow.
-- Let the user edit/clear per-stage model overrides **scoped to the active profile**.
-
-Important: OpenCode only honors model selection via agent frontmatter, so after any confirmed change you MUST call `applyProfile(activeProfile)` to rewrite agent frontmatter.
+Do NOT modify agent .md files. Profile switching updates `opencode.json` in the project root.
 </role>
 
 <context>
-@.planning/config.json
+**Stage-to-agent mapping (11 agents):**
 
-# Config helpers: readConfig/writeConfig/getActiveProfile/setActiveProfile/getPresetConfig/getEffectiveStageModels
-@gsd-opencode/get-shit-done/lib/config.md
+| Stage        | Agents |
+|--------------|--------|
+| Planning     | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
+| Execution    | gsd-executor, gsd-debugger |
+| Verification | gsd-verifier, gsd-integration-checker |
 
-# Agent rewrite helpers: applyProfile() (rewrites model: keys)
-@gsd-opencode/get-shit-done/lib/agents.md
+**Profile presets (hardcoded):**
+
+| Profile  | Planning                   | Execution                    | Verification               |
+|----------|----------------------------|------------------------------|----------------------------|
+| quality  | opencode/glm-4.7-free      | opencode/glm-4.7-free        | opencode/glm-4.7-free      |
+| balanced | opencode/glm-4.7-free      | opencode/minimax-m2.1-free   | opencode/glm-4.7-free      |
+| budget   | opencode/minimax-m2.1-free | opencode/grok-code           | opencode/minimax-m2.1-free |
 </context>
 
 <behavior>
 
-## Always start by showing current state
+## Step 1: Read config files
 
-On every invocation (and after each confirmed action), print:
+Read `.planning/config.json`. If missing or invalid, use defaults:
 
-1) **Active profile**: `getActiveProfile()`
-2) A stage settings table using **effective** stage models:
+```json
+{
+  "profiles": {
+    "active_profile": "balanced",
+    "presets": {
+      "quality": {
+        "planning": "opencode/glm-4.7-free",
+        "execution": "opencode/glm-4.7-free",
+        "verification": "opencode/glm-4.7-free"
+      },
+      "balanced": {
+        "planning": "opencode/glm-4.7-free",
+        "execution": "opencode/minimax-m2.1-free",
+        "verification": "opencode/glm-4.7-free"
+      },
+      "budget": {
+        "planning": "opencode/minimax-m2.1-free",
+        "execution": "opencode/grok-code",
+        "verification": "opencode/minimax-m2.1-free"
+      }
+    },
+    "custom_overrides": {}
+  }
+}
+```
 
-- Compute:
-  - `preset = getPresetConfig(activeProfile)` (raw preset mapping)
-  - `effective = getEffectiveStageModels(activeProfile)` (preset + per-profile overrides)
-- A stage is overridden if `effective[stage] !== preset[stage]`
-- When overridden, add an inline `*` marker to the **model value**.
+## Step 2: Compute effective models
 
-After printing the table, ALWAYS print a legend line: `* = overridden` (even if no stages are overridden).
+1. Get `activeProfile` = `config.profiles.active_profile` (default: "balanced")
+2. Get `preset` = `config.profiles.presets[activeProfile]`
+3. Get `overrides` = `config.profiles.custom_overrides[activeProfile]` (may be undefined)
+4. Compute effective models:
+   - `planning` = overrides?.planning || preset.planning
+   - `execution` = overrides?.execution || preset.execution
+   - `verification` = overrides?.verification || preset.verification
+5. A stage is "overridden" if overrides[stage] exists and differs from preset[stage]
 
-Output format (example):
+## Step 3: Display current state
+
+Print this output (substitute actual values):
 
 ```
-Active profile: balanced
+Active profile: {activeProfile}
 
-Effective stage models (preset + per-profile overrides):
 | Stage        | Model |
 |--------------|-------|
-| planning     | opencode/glm-4.7-free |
-| execution    | opencode/minimax-m2.1-free* |
-| verification | opencode/glm-4.7-free |
+| planning     | {effective.planning}{* if overridden} |
+| execution    | {effective.execution}{* if overridden} |
+| verification | {effective.verification}{* if overridden} |
 
 * = overridden
 
 Config: .planning/config.json (editable)
 ```
 
-Legend placement:
+The `* = overridden` legend MUST always be printed, even if no stages are overridden.
 
-- The legend line MUST print on its own line immediately after the table.
-- Override markers are indicated by appending `*` to the model value in the table.
+## Step 4: Show action menu
 
-Then immediately show the action menu.
-
-## Legacy override migration (only if needed)
-
-Phase 06 requires per-stage overrides to be scoped per profile.
-
-At the start of the command, after reading config and determining `activeProfile`, perform a safe migration if `profiles.custom_overrides` appears to be the **legacy global stage shape**:
-
-- Legacy shape:
-  - `profiles.custom_overrides.planning` / `execution` / `verification` are present as strings (or null)
-- Canonical shape:
-  - `profiles.custom_overrides.{profile}.{stage}`
-
-Migration:
-
-1) Move any legacy stage keys into `profiles.custom_overrides.{activeProfile}.{stage}` (do not overwrite an existing nested value).
-2) Remove the legacy top-level stage keys.
-3) Persist via `writeConfig()`.
-4) Print a one-time notice:
+Use the Question tool:
 
 ```
-⚠ Migrated legacy overrides to be scoped under '{activeProfile}'.
+header: "GSD Settings"
+question: "Choose an action"
+options:
+  - label: "Change active profile"
+    description: "Switch between quality/balanced/budget"
+  - label: "Edit stage override"
+    description: "Override a stage model for this profile"
+  - label: "Clear stage override"
+    description: "Remove an override"
+  - label: "Exit"
+    description: "Quit settings"
 ```
 
-If no legacy shape is detected, do nothing.
+## Step 5: Handle selected action
 
-## Interactive menu loop (must loop until Exit)
+### If "Change active profile":
 
-After printing current state, enter a loop.
+1. Use Question tool to pick: quality / balanced / budget / Cancel
+2. If Cancel, return to Step 3
+3. Show preview table comparing current vs new effective models
+4. Use Question tool: Confirm / Cancel
+5. If confirmed:
+   - Update `config.profiles.active_profile` to the new profile
+   - Write `.planning/config.json`
+   - Update `opencode.json` (see Agent Config Update section)
+   - Print "Saved"
+6. Return to Step 3 (show updated state and menu)
 
-**The action menu MUST be interactive.** Use the OpenCode **question tool** (do not ask the user to type numbers).
+### If "Edit stage override":
 
-Use question:
+1. Use Question tool to pick stage: planning / execution / verification / Cancel
+2. If Cancel, return to Step 3
+3. Show current value for that stage
+4. Use Question tool to pick a model from known models (or type custom):
+   - opencode/glm-4.7-free
+   - opencode/minimax-m2.1-free
+   - opencode/grok-code
+5. Show old vs new, use Question tool: Confirm / Cancel
+6. If confirmed:
+   - Set `config.profiles.custom_overrides[activeProfile][stage]` = new model
+   - Write `.planning/config.json`
+   - Update `opencode.json`
+   - Print "Saved"
+7. Return to Step 3
 
-```js
-questions: [
-  {
-    header: "GSD Settings",
-    question: "Choose an action",
-    multiSelect: false,
-    options: [
-      { label: "Change active profile", description: "Switch between quality/balanced/budget" },
-      { label: "Edit stage override (active profile)", description: "Override a single stage model for the active profile" },
-      { label: "Clear stage override (active profile)", description: "Remove an override and return that stage to the preset model" },
-      { label: "Exit", description: "Quit /gsd-settings" },
-    ],
-  },
-]
+### If "Clear stage override":
+
+1. Use Question tool to pick stage: planning / execution / verification / Cancel
+2. If Cancel, return to Step 3
+3. Show what will change (override removed, reverts to preset)
+4. Use Question tool: Confirm / Cancel
+5. If confirmed:
+   - Delete `config.profiles.custom_overrides[activeProfile][stage]`
+   - Write `.planning/config.json`
+   - Update `opencode.json`
+   - Print "Saved"
+6. Return to Step 3
+
+### If "Exit":
+
+Print "Settings saved." and stop.
+
+## Agent Config Update
+
+After any confirmed change, update `opencode.json` in the project root.
+
+Build the agent config from effective stage models:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "gsd-planner": { "model": "{effective.planning}" },
+    "gsd-plan-checker": { "model": "{effective.planning}" },
+    "gsd-phase-researcher": { "model": "{effective.planning}" },
+    "gsd-roadmapper": { "model": "{effective.planning}" },
+    "gsd-project-researcher": { "model": "{effective.planning}" },
+    "gsd-research-synthesizer": { "model": "{effective.planning}" },
+    "gsd-codebase-mapper": { "model": "{effective.planning}" },
+    "gsd-executor": { "model": "{effective.execution}" },
+    "gsd-debugger": { "model": "{effective.execution}" },
+    "gsd-verifier": { "model": "{effective.verification}" },
+    "gsd-integration-checker": { "model": "{effective.verification}" }
+  }
+}
 ```
 
-- Map the chosen label → action.
-- The loop continues until the user selects **Exit**.
-
-- Invalid input must re-prompt (do not crash).
-- The loop continues until the user selects Exit.
-- After each confirmed action, print `Saved`, then reprint the current state and menu.
-- Cancel/back-out during an edit must discard the edit and return to the menu.
-
-## Action 1: Change active profile
-
-1) Let the user select one of: `quality | balanced | budget` using the **question tool**.
-2) Build a preview using **effective** stage models for both profiles:
-
-- `current = getEffectiveStageModels(activeProfile)`
-- `next = getEffectiveStageModels(newProfile)`
-
-Preview table:
-
-```
-Profile change: {activeProfile} → {newProfile}
-
-| Stage        | Current Model | New Model |
-|--------------|---------------|----------|
-| planning     | ...           | ...      |
-| execution    | ...           | ...      |
-| verification | ...           | ...      |
-
-This will update the model: key in all 11 agent files.
-
-Confirm using the **question tool** (interactive Confirm/Cancel).
-
-Use question:
-
-```js
-questions: [
-  {
-    header: "Confirm profile change",
-    question: "Apply this profile change?",
-    multiSelect: false,
-    options: [
-      { label: "Confirm", description: "Persist config and rewrite agent frontmatter" },
-      { label: "Cancel", description: "Return to the main menu without changing anything" },
-    ],
-  },
-]
-```
-```
-
-3) If not confirmed, return to menu.
-4) On confirm, apply in this order:
-
-   1. `setActiveProfile(newProfile)`
-   2. `applyProfile(newProfile)` (so OpenCode actually uses the new models)
-
-5) If `setActiveProfile()` fails, print the error and return to menu.
-6) If `applyProfile()` fails, clearly report:
-
-- That the config change was saved (active profile was updated)
-- Which agent rewrites succeeded and which failed (applyProfile provides this)
-- Recovery guidance:
-  - re-run `/gsd-settings` to retry
-  - or `git restore gsd-opencode/agents/gsd-*.md` to discard partial rewrites
-
-Then return to menu (do not claim full success).
-
-## Action 2: Edit stage override (active profile)
-
-1) Prompt for stage selection using the **question tool**.
-
-Use question:
-
-```js
-questions: [
-  {
-    header: "Stage override",
-    question: "Select a stage to override",
-    multiSelect: false,
-    options: [
-      { label: "planning" },
-      { label: "execution" },
-      { label: "verification" },
-      { label: "Cancel", description: "Return to the main menu" },
-    ],
-  },
-]
-```
-
-2) Determine the current values:
-
-- `preset = getPresetConfig(activeProfile)`
-- `effective = getEffectiveStageModels(activeProfile)`
-- `oldEffective = effective[stage]`
-- `oldPreset = preset[stage]`
-
-3) Build a **known model list**:
-
-- Derive from the union of all stage model values from `config.profiles.presets`.
-- Present as a numbered picker.
-- Also provide:
-  - an option to clear (optional convenience): "(clear override)"
-  - an option to manually enter a custom model id: "Enter a custom model id"
-
-No external model availability checking in this phase — accept custom entries as strings.
-
-4) Confirmation must show old vs new for that stage, using an interactive Confirm/Cancel question.
-
-```
-Change override for '{activeProfile}' / {stage}
-Old: {oldEffective}
-New: {newModelOrClearedEffective}
-
-Confirm using the **question tool**.
-
-Use question:
-
-```js
-questions: [
-  {
-    header: "Confirm override change",
-    question: `Change override for '${activeProfile}' / ${stage}?`,
-    multiSelect: false,
-    options: [
-      { label: "Confirm", description: "Persist config and rewrite agent frontmatter" },
-      { label: "Cancel", description: "Return to the main menu without changing anything" },
-    ],
-  },
-]
-```
-```
-
-5) On confirm:
-
-- If setting an override:
-  - write under `profiles.custom_overrides.{activeProfile}.{stage}`
-- If clearing:
-  - remove the `{stage}` key from `profiles.custom_overrides.{activeProfile}`
-  - keep config minimal (if the profile override object becomes empty, you may remove the `{activeProfile}` key entirely)
-
-Persist after each confirmed action:
-
-1) Update config in-memory (preserving unknown keys)
-2) Persist via `writeConfig()`
-3) Call `applyProfile(activeProfile)` to rewrite agent frontmatter using the effective models
-4) Print `Saved`, then reprint current state and return to menu.
-
-If `applyProfile()` fails after saving config, report partial success (same pattern as profile change) and return to menu.
-
-## Action 3: Clear stage override (active profile)
-
-This is a dedicated clear flow (even if Action 2 also offers clear as an option).
-
-1) Prompt to select stage using the **question tool** (same stage selection pattern as Action 2).
-2) Compute:
-
-- `preset = getPresetConfig(activeProfile)`
-- `effective = getEffectiveStageModels(activeProfile)`
-- `old = effective[stage]`
-- `new = preset[stage]` (because clearing returns to preset)
-
-3) Confirm using the **question tool**:
-
-```
-Clear override for '{activeProfile}' / {stage}
-Old: {old}
-New: {new}
-
-Use question:
-
-```js
-questions: [
-  {
-    header: "Confirm override clear",
-    question: `Clear override for '${activeProfile}' / ${stage}?`,
-    multiSelect: false,
-    options: [
-      { label: "Confirm", description: "Persist config and rewrite agent frontmatter" },
-      { label: "Cancel", description: "Return to the main menu without changing anything" },
-    ],
-  },
-]
-```
-```
-
-4) On confirm, remove the stage key as described above, `writeConfig()`, then `applyProfile(activeProfile)`, then print `Saved` and reprint current state.
+If `opencode.json` already exists, merge the `agent` key (preserve other top-level keys).
 
 </behavior>
 
 <notes>
-
-### Persistence guarantee
-
-All confirmed actions must persist immediately to `.planning/config.json` via `writeConfig()`.
-
-Do not batch changes until Exit.
-
-### Override scoping rule
-
-Overrides MUST be per-profile at:
-
-- `profiles.custom_overrides.{profile}.{stage}`
-
-Switching profiles must not carry overrides across profiles.
-
+- This is a menu loop — keep showing the menu until user selects Exit
+- Use the Question tool for ALL user input (never ask user to type numbers)
+- The `* = overridden` legend is REQUIRED output
+- Persist changes immediately after each confirmation (don't batch)
+- Do NOT rewrite agent .md files — only update opencode.json
+- Overrides are scoped per profile at `profiles.custom_overrides.{profile}.{stage}`
 </notes>
