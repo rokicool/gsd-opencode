@@ -144,16 +144,39 @@ Important:
 
 ### If "Change active profile":
 
-1. Use Question tool to pick: quality / balanced / budget / Cancel
-2. If Cancel, return to Step 3
-3. Show preview table comparing current vs new effective models
-4. Use Question tool: Confirm / Cancel
-5. If confirmed:
-   - Update `config.profiles.active_profile` to the new profile
-   - Write `.planning/config.json`
-   - Update `opencode.json` (see Agent Config Update section)
-   - Print "Saved"
-6. Return to Step 3 (show updated state and menu)
+Use a single Question tool call with multiple questions (wizard UI) so the user stays in one selector flow:
+
+```
+questions:
+  - header: "GSD Settings"
+    question: "Select new active profile"
+    options:
+      - label: "quality"
+        description: "planning: opencode/glm-4.7-free | execution: opencode/glm-4.7-free | verification: opencode/glm-4.7-free"
+      - label: "balanced"
+        description: "planning: opencode/glm-4.7-free | execution: opencode/minimax-m2.1-free | verification: opencode/glm-4.7-free"
+      - label: "budget"
+        description: "planning: opencode/minimax-m2.1-free | execution: opencode/grok-code | verification: opencode/minimax-m2.1-free"
+      - label: "Cancel"
+        description: "Return to settings"
+  - header: "GSD Settings"
+    question: "Apply this profile change?"
+    options:
+      - label: "Confirm"
+        description: "Write config + regenerate opencode.json"
+      - label: "Cancel"
+        description: "Return to settings"
+```
+
+Then:
+1. If user selected Cancel at either step, return to Step 3
+2. Compute the effective models for the selected profile (preset + per-profile overrides)
+3. Apply the change and save:
+    - Update `config.profiles.active_profile` to the new profile
+    - Write `.planning/config.json`
+    - Update `opencode.json` (see Agent Config Update section)
+    - Print "Saved"
+4. Return to Step 3 (show updated state and menu)
 
 Important:
 - Use the Question tool for the profile picker and confirm/cancel.
