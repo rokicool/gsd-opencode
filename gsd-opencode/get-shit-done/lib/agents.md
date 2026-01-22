@@ -1,3 +1,17 @@
+> ⚠️ **DEPRECATED**: This library file is deprecated as of Phase 6 refactoring.
+>
+> Commands should be **self-contained** and not @-reference this file.
+> The pseudocode approach confused OpenCode into implementing instead of executing.
+>
+> See `/gsd-settings` and `/gsd-set-profile` for the correct pattern:
+> - Inline agent paths and stage mappings directly in the command
+> - Use direct Read/Write tool instructions for frontmatter rewriting
+> - No external library references
+>
+> This file is kept for historical reference only. Do not use in new commands.
+
+---
+
 # Agent Discovery Library (Phase 04-01)
 
 This file is designed to be **@-referenced** by other GSD commands that need to discover, parse, and validate agent files before frontmatter modification.
