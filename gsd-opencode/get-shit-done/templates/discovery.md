@@ -4,7 +4,7 @@ Template for `.planning/phases/XX-name/DISCOVERY.md` - shallow research for libr
 
 **Purpose:** Answer "which library/option should we use" questions during mandatory discovery in plan-phase.
 
-For deep ecosystem research ("how do experts build this"), use `/gsd-research-phase` which produces RESEARCH.md.
+For deep ecosystem research ("how do experts build this", use `/gsd-research-phase` which produces RESEARCH.md.
 
 ---
 
@@ -49,26 +49,25 @@ Output: DISCOVERY.md with recommendation
 <discovery_protocol>
 
 **Source Priority:**
-1. **Context7 MCP** - For library/framework documentation (current, authoritative)
+1. **Context7 MCP** - For library/framework documentation (current, authoritative
 2. **Official Docs** - For platform-specific or non-indexed libraries
-3. **webfetch** - For comparisons, trends, community patterns (verify all findings)
+3. **websearch** - For comparisons, trends, community patterns (verify all findings
 
 **Quality Checklist:**
 Before completing discovery, verify:
-- [ ] All claims have authoritative sources (Context7 or official docs)
-- [ ] Negative claims ("X is not possible") verified with official documentation
-- [ ] API syntax/configuration from Context7 or official docs (never webfetch alone)
+- [ ] All claims have authoritative sources (Context7 or official docs
+- [ ] Negative claims ("X is not possible" verified with official documentation
+- [ ] API syntax/configuration from Context7 or official docs (never websearch alone
 - [ ] webfetch findings cross-checked with authoritative sources
 - [ ] Recent updates/changelogs checked for breaking changes
-- [ ] Alternative approaches considered (not just first solution found)
+- [ ] Alternative approaches considered (not just first solution found
 
 **Confidence Levels:**
 - HIGH: Context7 or official docs confirm
-- MEDIUM: webfetch + Context7/official docs confirm
-- LOW: webfetch only or training knowledge only (mark for validation)
+- MEDIUM: websearch + Context7/official docs confirm
+- LOW: websearch only or training knowledge only (mark for validation
 
 </discovery_protocol>
-
 
 <output_structure>
 Create `.planning/phases/XX-name/DISCOVERY.md`:
@@ -128,18 +127,18 @@ Create `.planning/phases/XX-name/DISCOVERY.md`:
 
 <guidelines>
 **When to use discovery:**
-- Technology choice unclear (library A vs B)
+- Technology choice unclear (library A vs B
 - Best practices needed for unfamiliar integration
 - API/library investigation required
 - Single decision pending
 
 **When NOT to use:**
-- Established patterns (CRUD, auth with known library)
-- Implementation details (defer to execution)
+- Established patterns (CRUD, auth with known library
+- Implementation details (defer to execution
 - Questions answerable from existing project context
 
 **When to use RESEARCH.md instead:**
-- Niche/complex domains (3D, games, audio, shaders)
+- Niche/complex domains (3D, games, audio, shaders
 - Need ecosystem knowledge, not just library choice
 - "How do experts build this" questions
 - Use `/gsd-research-phase` for these

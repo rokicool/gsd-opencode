@@ -2,7 +2,7 @@
 name: gsd-list-phase-assumptions
 description: Surface OpenCode's assumptions about a phase approach before planning
 argument-hint: "[phase]"
-tools:
+allowed-tools:
   - read
   - bash
   - grep
@@ -13,7 +13,7 @@ tools:
 Analyze a phase and present OpenCode's assumptions about technical approach, implementation order, scope boundaries, risk areas, and dependencies.
 
 Purpose: Help users see what OpenCode thinks BEFORE planning begins - enabling course correction early when assumptions are wrong.
-Output: Conversational output only (no file creation) - ends with "What do you think?" prompt
+Output: Conversational output only (no file creation - ends with "What do you think?" prompt
 </objective>
 
 <execution_context>
@@ -21,7 +21,7 @@ Output: Conversational output only (no file creation) - ends with "What do you t
 </execution_context>
 
 <context>
-Phase number: $ARGUMENTS (required)
+Phase number: $ARGUMENTS (required
 
 **Load project state first:**
 @.planning/STATE.md
@@ -31,7 +31,7 @@ Phase number: $ARGUMENTS (required)
 </context>
 
 <process>
-1. Validate phase number argument (error if missing or invalid)
+1. Validate phase number argument (error if missing or invalid
 2. Check if phase exists in roadmap
 3. Follow list-phase-assumptions.md workflow:
    - Analyze roadmap description
@@ -46,5 +46,5 @@ Phase number: $ARGUMENTS (required)
 - Phase validated against roadmap
 - Assumptions surfaced across five areas
 - User prompted for feedback
-- User knows next steps (discuss context, plan phase, or correct assumptions)
+- User knows next steps (discuss context, plan phase, or correct assumptions
   </success_criteria>

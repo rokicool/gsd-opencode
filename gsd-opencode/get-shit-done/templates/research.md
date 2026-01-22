@@ -149,7 +149,7 @@ Verified patterns from official sources:
 </code_examples>
 
 <sota_updates>
-## State of the Art (2024-2025)
+## State of the Art (2024-2025
 
 What's changed recently:
 
@@ -184,15 +184,15 @@ Things that couldn't be fully resolved:
 <sources>
 ## Sources
 
-### Primary (HIGH confidence)
+### Primary (HIGH confidence
 - [Context7 library ID] - [topics fetched]
 - [Official docs URL] - [what was checked]
 
-### Secondary (MEDIUM confidence)
+### Secondary (MEDIUM confidence
 - [webfetch verified with official source] - [finding + verification]
 
-### Tertiary (LOW confidence - needs validation)
-- [webfetch only] - [finding, marked for validation during implementation]
+### Tertiary (LOW confidence - needs validation
+- [websearch only] - [finding, marked for validation during implementation]
 </sources>
 
 <metadata>
@@ -237,7 +237,7 @@ Things that couldn't be fully resolved:
 
 Researched the Three.js ecosystem for building a 3D city driving game. The standard approach uses Three.js with React Three Fiber for component architecture, Rapier for physics, and drei for common helpers.
 
-Key finding: Don't hand-roll physics or collision detection. Rapier (via @react-three/rapier) handles vehicle physics, terrain collision, and city object interactions efficiently. Custom physics code leads to bugs and performance issues.
+Key finding: Don't hand-roll physics or collision detection. Rapier (via @react-three/rapier handles vehicle physics, terrain collision, and city object interactions efficiently. Custom physics code leads to bugs and performance issues.
 
 **Primary recommendation:** Use R3F + Rapier + drei stack. Start with vehicle controller from drei, add Rapier vehicle physics, build city with instanced meshes for performance.
 </research_summary>
@@ -302,8 +302,8 @@ src/
 // Source: @react-three/rapier docs
 import { RigidBody, useRapier } from '@react-three/rapier'
 
-function Vehicle() {
-  const rigidBody = useRef()
+function Vehicle( {
+  const rigidBody = useRef(
 
   return (
     <RigidBody
@@ -319,28 +319,28 @@ function Vehicle() {
         <meshStandardMaterial />
       </mesh>
     </RigidBody>
-  )
+  
 }
 ```
 
 ### Pattern 2: Instanced Meshes for City
-**What:** Use InstancedMesh for repeated objects (buildings, trees, props)
+**What:** Use InstancedMesh for repeated objects (buildings, trees, props
 **When to use:** >100 similar objects
 **Example:**
 ```typescript
 // Source: drei docs
 import { Instances, Instance } from '@react-three/drei'
 
-function Buildings({ positions }) {
+function Buildings({ positions } {
   return (
     <Instances limit={1000}>
       <boxGeometry />
       <meshStandardMaterial />
-      {positions.map((pos, i) => (
-        <Instance key={i} position={pos} scale={[1, Math.random() * 5 + 1, 1]} />
-      ))}
+      {positions.map((pos, i => (
+        <Instance key={i} position={pos} scale={[1, Math.random( * 5 + 1, 1]} />
+      }
     </Instances>
-  )
+  
 }
 ```
 
@@ -370,7 +370,7 @@ function Buildings({ positions }) {
 ### Pitfall 1: Physics Tunneling
 **What goes wrong:** Fast objects pass through walls
 **Why it happens:** Default physics step too large for velocity
-**How to avoid:** Use CCD (Continuous Collision Detection) in Rapier
+**How to avoid:** Use CCD (Continuous Collision Detection in Rapier
 **Warning signs:** Objects randomly appearing outside buildings
 
 ### Pitfall 2: Performance Death by Draw Calls
@@ -395,7 +395,7 @@ function Buildings({ positions }) {
 import { Canvas } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 
-function Game() {
+function Game( {
   return (
     <Canvas>
       <Physics gravity={[0, -9.81, 0]}>
@@ -404,7 +404,7 @@ function Game() {
         <Ground />
       </Physics>
     </Canvas>
-  )
+  
 }
 ```
 
@@ -414,29 +414,29 @@ function Game() {
 import { useFrame } from '@react-three/fiber'
 import { useKeyboardControls } from '@react-three/drei'
 
-function useVehicleControls(rigidBodyRef) {
-  const [, getKeys] = useKeyboardControls()
+function useVehicleControls(rigidBodyRef {
+  const [, getKeys] = useKeyboardControls(
 
-  useFrame(() => {
-    const { forward, back, left, right } = getKeys()
+  useFrame(( => {
+    const { forward, back, left, right } = getKeys(
     const body = rigidBodyRef.current
-    if (!body) return
+    if (!body return
 
     const impulse = { x: 0, y: 0, z: 0 }
-    if (forward) impulse.z -= 10
-    if (back) impulse.z += 5
+    if (forward impulse.z -= 10
+    if (back impulse.z += 5
 
-    body.applyImpulse(impulse, true)
+    body.applyImpulse(impulse, true
 
-    if (left) body.applyTorqueImpulse({ x: 0, y: 2, z: 0 }, true)
-    if (right) body.applyTorqueImpulse({ x: 0, y: -2, z: 0 }, true)
-  })
+    if (left body.applyTorqueImpulse({ x: 0, y: 2, z: 0 }, true
+    if (right body.applyTorqueImpulse({ x: 0, y: -2, z: 0 }, true
+  }
 }
 ```
 </code_examples>
 
 <sota_updates>
-## State of the Art (2024-2025)
+## State of the Art (2024-2025
 
 | Old Approach | Current Approach | When Changed | Impact |
 |--------------|------------------|--------------|--------|
@@ -445,27 +445,27 @@ function useVehicleControls(rigidBodyRef) {
 | Manual InstancedMesh | drei <Instances> | 2022 | Simpler API, handles updates |
 
 **New tools/patterns to consider:**
-- **WebGPU:** Coming but not production-ready for games yet (2025)
+- **WebGPU:** Coming but not production-ready for games yet (2025
 - **drei Gltf helpers:** <useGLTF.preload> for loading screens
 
 **Deprecated/outdated:**
-- **cannon.js (original):** Use cannon-es fork or better, Rapier
+- **cannon.js (original:** Use cannon-es fork or better, Rapier
 - **Manual raycasting for physics:** Just use Rapier colliders
 </sota_updates>
 
 <sources>
 ## Sources
 
-### Primary (HIGH confidence)
+### Primary (HIGH confidence
 - /pmndrs/react-three-fiber - getting started, hooks, performance
 - /pmndrs/drei - instances, controls, helpers
 - /dimforge/rapier-js - physics setup, vehicle physics
 
-### Secondary (MEDIUM confidence)
+### Secondary (MEDIUM confidence
 - Three.js discourse "city driving game" threads - verified patterns against docs
 - R3F examples repository - verified code works
 
-### Tertiary (LOW confidence - needs validation)
+### Tertiary (LOW confidence - needs validation
 - None - all findings verified
 </sources>
 
@@ -485,7 +485,7 @@ function useVehicleControls(rigidBodyRef) {
 - Code examples: HIGH - from Context7/official sources
 
 **Research date:** 2025-01-20
-**Valid until:** 2025-02-20 (30 days - R3F ecosystem stable)
+**Valid until:** 2025-02-20 (30 days - R3F ecosystem stable
 </metadata>
 
 ---
@@ -501,13 +501,13 @@ function useVehicleControls(rigidBodyRef) {
 
 **When to create:**
 - Before planning phases in niche/complex domains
-- When OpenCode's training data is likely stale or sparse
+- When AI training data is likely stale or sparse
 - When "how do experts do this" matters more than "which library"
 
 **Structure:**
-- Use XML tags for section markers (matches GSD templates)
+- Use XML tags for section markers (matches GSD templates
 - Seven core sections: summary, standard_stack, architecture_patterns, dont_hand_roll, common_pitfalls, code_examples, sources
-- All sections required (drives comprehensive research)
+- All sections required (drives comprehensive research
 
 **Content quality:**
 - Standard stack: Specific versions, not just names

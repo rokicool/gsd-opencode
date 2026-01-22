@@ -18,16 +18,16 @@ Template for spawning gsd-planner agent. The agent contains all planning experti
 **Roadmap:**
 @.planning/ROADMAP.md
 
-**Requirements (if exists):**
+**Requirements (if exists:**
 @.planning/REQUIREMENTS.md
 
-**Phase Context (if exists):**
+**Phase Context (if exists:**
 @.planning/phases/{phase_dir}/{phase}-CONTEXT.md
 
-**Research (if exists):**
+**Research (if exists:**
 @.planning/phases/{phase_dir}/{phase}-RESEARCH.md
 
-**Gap Closure (if --gaps mode):**
+**Gap Closure (if --gaps mode:**
 @.planning/phases/{phase_dir}/{phase}-VERIFICATION.md
 @.planning/phases/{phase_dir}/{phase}-UAT.md
 
@@ -36,7 +36,7 @@ Template for spawning gsd-planner agent. The agent contains all planning experti
 <downstream_consumer>
 Output consumed by /gsd-execute-phase
 Plans must be executable prompts with:
-- Frontmatter (wave, depends_on, files_modified, autonomous)
+- Frontmatter (wave, depends_on, files_modified, autonomous
 - Tasks in XML format
 - Verification criteria
 - must_haves for goal-backward verification
@@ -68,22 +68,22 @@ Before returning PLANNING COMPLETE:
 
 ## Usage
 
-**From /gsd-plan-phase (standard mode):**
+**From /gsd-plan-phase (standard mode:**
 ```python
 Task(
   prompt=filled_template,
   subagent_type="gsd-planner",
   description="Plan Phase {phase}"
-)
+
 ```
 
-**From /gsd-plan-phase --gaps (gap closure mode):**
+**From /gsd-plan-phase --gaps (gap closure mode:**
 ```python
 Task(
   prompt=filled_template,  # with mode: gap_closure
   subagent_type="gsd-planner",
   description="Plan gaps for Phase {phase}"
-)
+
 ```
 
 ---

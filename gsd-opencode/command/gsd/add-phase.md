@@ -2,7 +2,7 @@
 name: gsd-add-phase
 description: Add phase to end of current milestone in roadmap
 argument-hint: <description>
-tools:
+allowed-tools:
   - read
   - write
   - bash
@@ -25,7 +25,7 @@ Purpose: Add planned work discovered during execution that belongs at the end of
 
 <step name="parse_arguments">
 Parse the command arguments:
-- $ARGUMENTS the phase description
+- All provided arguments become the phase description
 - Example: `/gsd-add-phase Add authentication` → description = "Add authentication"
 - Example: `/gsd-add-phase Fix critical performance issues` → description = "Fix critical performance issues"
 
@@ -47,12 +47,12 @@ Load the roadmap file:
 if [ -f .planning/ROADMAP.md ]; then
   ROADMAP=".planning/ROADMAP.md"
 else
-  echo "ERROR: No roadmap found (.planning/ROADMAP.md)"
+  echo "ERROR: No roadmap found (.planning/ROADMAP.md"
   exit 1
 fi
 ```
 
-read roadmap content for parsing.
+Read roadmap content for parsing.
 </step>
 
 <step name="find_current_milestone">
@@ -60,8 +60,8 @@ Parse the roadmap to find the current milestone section:
 
 1. Locate the "## Current Milestone:" heading
 2. Extract milestone name and version
-3. Identify all phases under this milestone (before next "---" separator or next milestone heading)
-4. Parse existing phase numbers (including decimals if present)
+3. Identify all phases under this milestone (before next "---" separator or next milestone heading
+4. Parse existing phase numbers (including decimals if present
 
 Example structure:
 
@@ -78,8 +78,8 @@ Example structure:
 <step name="calculate_next_phase">
 Find the highest integer phase number in the current milestone:
 
-1. Extract all phase numbers from phase headings (### Phase N:)
-2. Filter to integer phases only (ignore decimals like 4.1, 4.2)
+1. Extract all phase numbers from phase headings (### Phase N:
+2. Filter to integer phases only (ignore decimals like 4.1, 4.2
 3. Find the maximum integer value
 4. Add 1 to get the next phase number
 
@@ -96,7 +96,7 @@ Convert the phase description to a kebab-case slug:
 # "Add authentication" → "add-authentication"
 # "Fix critical performance issues" → "fix-critical-performance-issues"
 
-slug=$(echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+slug=$(echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//'
 ```
 
 Phase directory name: `{two-digit-phase}-{slug}`
@@ -117,7 +117,7 @@ Confirm: "Created directory: $phase_dir"
 <step name="update_roadmap">
 Add the new phase entry to the roadmap:
 
-1. Find the insertion point (after last phase in current milestone, before "---" separator)
+1. Find the insertion point (after last phase in current milestone, before "---" separator
 2. Insert new phase heading:
 
    ```
@@ -128,21 +128,21 @@ Add the new phase entry to the roadmap:
    **Plans:** 0 plans
 
    Plans:
-   - [ ] TBD (run /gsd-plan-phase {N} to break down)
+   - [ ] TBD (run /gsd-plan-phase {N} to break down
 
    **Details:**
    [To be added during planning]
    ```
 
-3. write updated roadmap back to file
+3. Write updated roadmap back to file
 
-Preserve all other content exactly (formatting, spacing, other phases).
+Preserve all other content exactly (formatting, spacing, other phases.
 </step>
 
 <step name="update_project_state">
 Update STATE.md to reflect the new phase:
 
-1. read `.planning/STATE.md`
+1. Read `.planning/STATE.md`
 2. Under "## Current Position" → "**Next Phase:**" add reference to new phase
 3. Under "## Accumulated Context" → "### Roadmap Evolution" add entry:
    ```
@@ -190,9 +190,9 @@ Project state updated: .planning/STATE.md
 
 - Don't modify phases outside current milestone
 - Don't renumber existing phases
-- Don't use decimal numbering (that's /gsd-insert-phase)
-- Don't create plans yet (that's /gsd-plan-phase)
-- Don't commit changes (user decides when to commit)
+- Don't use decimal numbering (that's /gsd-insert-phase
+- Don't create plans yet (that's /gsd-plan-phase
+- Don't commit changes (user decides when to commit
   </anti_patterns>
 
 <success_criteria>
@@ -202,6 +202,6 @@ Phase addition is complete when:
 - [ ] Roadmap updated with new phase entry
 - [ ] STATE.md updated with roadmap evolution note
 - [ ] New phase appears at end of current milestone
-- [ ] Next phase number calculated correctly (ignoring decimals)
+- [ ] Next phase number calculated correctly (ignoring decimals
 - [ ] User informed of next steps
       </success_criteria>

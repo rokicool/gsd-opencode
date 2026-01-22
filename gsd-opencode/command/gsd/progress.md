@@ -1,11 +1,12 @@
 ---
 name: gsd-progress
-description: Check project progress, show context, and route to next action (execute or plan)
-tools:
+description: Check project progress, show context, and route to next action (execute or plan
+allowed-tools:
   - read
   - bash
   - grep
   - glob
+  - Command
 ---
 
 <objective>
@@ -14,11 +15,16 @@ Check project progress, summarize recent work and what's ahead, then intelligent
 Provides situational awareness before continuing work.
 </objective>
 
-
 <process>
 
 <step name="verify">
 **Verify planning structure exists:**
+
+Use Bash (not Glob to check—Glob respects .gitignore but .planning/ is often gitignored:
+
+```bash
+test -d .planning && echo "exists" || echo "missing"
+```
 
 If no `.planning/` directory:
 
@@ -34,7 +40,7 @@ If missing STATE.md: suggest `/gsd-new-project`.
 
 **If ROADMAP.md missing but PROJECT.md exists:**
 
-This means a milestone was completed and archived. Go to **Route F** (between milestones).
+This means a milestone was completed and archived. Go to **Route F** (between milestones.
 
 If missing both ROADMAP.md and PROJECT.md: suggest `/gsd-new-project`.
 </step>
@@ -42,9 +48,10 @@ If missing both ROADMAP.md and PROJECT.md: suggest `/gsd-new-project`.
 <step name="load">
 **Load full project context:**
 
-- read `.planning/STATE.md` for living memory (position, decisions, issues)
-- read `.planning/ROADMAP.md` for phase structure and objectives
-- read `.planning/PROJECT.md` for current state (What This Is, Core Value, Requirements)
+- Read `.planning/STATE.md` for living memory (position, decisions, issues
+- Read `.planning/ROADMAP.md` for phase structure and objectives
+- Read `.planning/PROJECT.md` for current state (What This Is, Core Value, Requirements
+- Read `.planning/config.json` for settings (model_profile, workflow toggles
   </step>
 
 <step name="recent">
@@ -73,6 +80,7 @@ If missing both ROADMAP.md and PROJECT.md: suggest `/gsd-new-project`.
 # [Project Name]
 
 **Progress:** [████████░░] 8/10 plans complete
+**Profile:** [quality/balanced/budget]
 
 ## Recent Work
 - [Phase X, Plan Y]: [what was accomplished - 1 line]
@@ -95,7 +103,7 @@ CONTEXT: [✓ if CONTEXT.md exists | - if not]
 
 ## Active Debug Sessions
 - [count] active — /gsd-debug to continue
-(Only show this section if count > 0)
+(Only show this section if count > 0
 
 ## What's Next
 [Next phase/plan objective from ROADMAP]
@@ -120,7 +128,7 @@ State: "This phase has {X} plans, {Y} summaries."
 
 **Step 1.5: Check for unaddressed UAT gaps**
 
-Check for UAT.md files with status "diagnosed" (has gaps needing fixes).
+Check for UAT.md files with status "diagnosed" (has gaps needing fixes.
 
 ```bash
 # Check for diagnosed UAT with gaps
@@ -128,7 +136,7 @@ grep -l "status: diagnosed" .planning/phases/[current-phase-dir]/*-UAT.md 2>/dev
 ```
 
 Track:
-- `uat_with_gaps`: UAT.md files with status "diagnosed" (gaps need fixing)
+- `uat_with_gaps`: UAT.md files with status "diagnosed" (gaps need fixing
 
 **Step 2: Route based on counts**
 
@@ -144,7 +152,7 @@ Track:
 **Route A: Unexecuted plan exists**
 
 Find the first PLAN.md without matching SUMMARY.md.
-read its `<objective>` section.
+Read its `<objective>` section.
 
 ```
 ---
@@ -209,7 +217,7 @@ Check if `{phase}-CONTEXT.md` exists in phase directory.
 
 **Route E: UAT gaps need fix plans**
 
-UAT.md exists with gaps (diagnosed issues). User needs to plan fixes.
+UAT.md exists with gaps (diagnosed issues. User needs to plan fixes.
 
 ```
 ---
@@ -233,15 +241,15 @@ UAT.md exists with gaps (diagnosed issues). User needs to plan fixes.
 
 ---
 
-**Step 3: Check milestone status (only when phase complete)**
+**Step 3: Check milestone status (only when phase complete**
 
-read ROADMAP.md and identify:
+Read ROADMAP.md and identify:
 1. Current phase number
 2. All phase numbers in the current milestone section
 
 Count total phases and identify the highest phase number.
 
-State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
+State: "Current phase is {X}. Milestone has {N} phases (highest: {Y}."
 
 **Route based on milestone status:**
 
@@ -254,7 +262,7 @@ State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
 
 **Route C: Phase complete, more phases remain**
 
-read ROADMAP.md to get the next phase's name and goal.
+Read ROADMAP.md to get the next phase's name and goal.
 
 ```
 ---
@@ -307,11 +315,11 @@ All {N} phases finished!
 
 ---
 
-**Route F: Between milestones (ROADMAP.md missing, PROJECT.md exists)**
+**Route F: Between milestones (ROADMAP.md missing, PROJECT.md exists**
 
 A milestone was completed and archived. Ready to start the next milestone cycle.
 
-read MILESTONES.md to find the last completed milestone version.
+Read MILESTONES.md to find the last completed milestone version.
 
 ```
 ---
@@ -346,7 +354,7 @@ Ready to plan the next milestone.
 
 <success_criteria>
 
-- [ ] Rich context provided (recent work, decisions, issues)
+- [ ] Rich context provided (recent work, decisions, issues
 - [ ] Current position clear with visual progress
 - [ ] What's next clearly explained
 - [ ] Smart routing: /gsd-execute-phase if plans exist, /gsd-plan-phase if not

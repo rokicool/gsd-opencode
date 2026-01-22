@@ -178,7 +178,7 @@ How roadmap phases should address these pitfalls.
 - Include the long-term cost to inform tradeoff decisions
 
 **Performance Traps:**
-- Include scale thresholds ("breaks at 10k users")
+- Include scale thresholds ("breaks at 10k users"
 - Focus on what's relevant for this project's expected scale
 - Don't over-engineer for hypothetical scale
 

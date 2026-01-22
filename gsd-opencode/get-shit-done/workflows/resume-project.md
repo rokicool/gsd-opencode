@@ -13,6 +13,10 @@ Enables seamless session continuity for fully autonomous workflows.
 "Where were we?" should have an immediate, complete answer.
 </purpose>
 
+<required_reading>
+@~/.config/opencode/get-shit-done/references/continuation-format.md
+</required_reading>
+
 <process>
 
 <step name="detect_existing_project">
@@ -31,7 +35,7 @@ ls .planning/PROJECT.md 2>/dev/null && echo "Project file exists"
 
 <step name="load_state">
 
-read and parse STATE.md, then PROJECT.md:
+Read and parse STATE.md, then PROJECT.md:
 
 ```bash
 cat .planning/STATE.md
@@ -61,10 +65,10 @@ cat .planning/PROJECT.md
 Look for incomplete work that needs attention:
 
 ```bash
-# Check for continue-here files (mid-plan resumption)
+# Check for continue-here files (mid-plan resumption
 ls .planning/phases/*/.continue-here*.md 2>/dev/null
 
-# Check for plans without summaries (incomplete execution)
+# Check for plans without summaries (incomplete execution
 for plan in .planning/phases/*/*-PLAN.md; do
   summary="${plan/PLAN/SUMMARY}"
   [ ! -f "$summary" ] && echo "Incomplete: $plan"
@@ -72,7 +76,7 @@ done 2>/dev/null
 
 # Check for interrupted agents
 if [ -f .planning/current-agent-id.txt ] && [ -s .planning/current-agent-id.txt ]; then
-  AGENT_ID=$(cat .planning/current-agent-id.txt | tr -d '\n')
+  AGENT_ID=$(cat .planning/current-agent-id.txt | tr -d '\n'
   echo "Interrupted agent: $AGENT_ID"
 fi
 ```
@@ -80,7 +84,7 @@ fi
 **If .continue-here file exists:**
 
 - This is a mid-plan resumption point
-- read the file for specific resumption context
+- Read the file for specific resumption context
 - Flag: "Found mid-plan checkpoint"
 
 **If PLAN without SUMMARY exists:**
@@ -91,7 +95,7 @@ fi
 **If interrupted agent found:**
 
 - Subagent was spawned but session ended before completion
-- read agent-history.json for task details
+- Read agent-history.json for task details
 - Flag: "Found interrupted agent"
   </step>
 
@@ -121,7 +125,7 @@ Present complete project status to user:
     Task: [task description from agent-history.json]
     Interrupted: [timestamp]
 
-    Resume with: Task tool (resume parameter with agent ID)
+    Resume with: Task tool (resume parameter with agent ID
 
 [If pending todos exist:]
 📋 [N] pending todos — /gsd-check-todos to review
@@ -141,14 +145,14 @@ Present complete project status to user:
 Based on project state, determine the most logical next action:
 
 **If interrupted agent exists:**
-→ Primary: Resume interrupted agent (Task tool with resume parameter)
-→ Option: Start fresh (abandon agent work)
+→ Primary: Resume interrupted agent (Task tool with resume parameter
+→ Option: Start fresh (abandon agent work
 
 **If .continue-here file exists:**
 → Primary: Resume from checkpoint
 → Option: Start fresh on current plan
 
-**If incomplete plan (PLAN without SUMMARY):**
+**If incomplete plan (PLAN without SUMMARY:**
 → Primary: Complete the incomplete plan
 → Option: Abandon and move on
 
@@ -160,8 +164,8 @@ Based on project state, determine the most logical next action:
 → Check if CONTEXT.md exists for this phase:
 
 - If CONTEXT.md missing:
-  → Primary: Discuss phase vision (how user imagines it working)
-  → Secondary: Plan directly (skip context gathering)
+  → Primary: Discuss phase vision (how user imagines it working
+  → Secondary: Plan directly (skip context gathering
 - If CONTEXT.md exists:
   → Primary: Plan the phase
   → Option: Review roadmap
@@ -180,15 +184,15 @@ What would you like to do?
 [Primary action based on state - e.g.:]
 1. Resume interrupted agent [if interrupted agent found]
    OR
-1. Execute phase (/gsd-execute-phase {phase})
+1. Execute phase (/gsd-execute-phase {phase}
    OR
-1. Discuss Phase 3 context (/gsd-discuss-phase 3) [if CONTEXT.md missing]
+1. Discuss Phase 3 context (/gsd-discuss-phase 3 [if CONTEXT.md missing]
    OR
-1. Plan Phase 3 (/gsd-plan-phase 3) [if CONTEXT.md exists or discuss option declined]
+1. Plan Phase 3 (/gsd-plan-phase 3 [if CONTEXT.md exists or discuss option declined]
 
 [Secondary options:]
 2. Review current phase status
-3. Check pending todos ([N] pending)
+3. Check pending todos ([N] pending
 4. Review brief alignment
 5. Something else
 ```
@@ -242,8 +246,8 @@ Based on user selection, route to appropriate workflow:
   ---
   ```
 - **Transition** → ./transition.md
-- **Check todos** → read .planning/todos/pending/, present summary
-- **Review alignment** → read PROJECT.md, compare to current state
+- **Check todos** → Read .planning/todos/pending/, present summary
+- **Review alignment** → Read PROJECT.md, compare to current state
 - **Something else** → Ask what they need
 </step>
 
@@ -270,8 +274,8 @@ If STATE.md is missing but other artifacts exist:
 
 "STATE.md missing. Reconstructing from artifacts..."
 
-1. read PROJECT.md → Extract "What This Is" and Core Value
-2. read ROADMAP.md → Determine phases, find current position
+1. Read PROJECT.md → Extract "What This Is" and Core Value
+2. Read ROADMAP.md → Determine phases, find current position
 3. Scan \*-SUMMARY.md files → Extract decisions, concerns
 4. Count pending todos in .planning/todos/pending/
 5. Check for .continue-here files → Session continuity
@@ -302,7 +306,7 @@ This enables fully autonomous "just keep going" workflow.
 <success_criteria>
 Resume is complete when:
 
-- [ ] STATE.md loaded (or reconstructed)
+- [ ] STATE.md loaded (or reconstructed
 - [ ] Incomplete work detected and flagged
 - [ ] Clear status presented to user
 - [ ] Contextual next actions offered

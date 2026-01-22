@@ -51,10 +51,10 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 ## Import Organization
 
 **Order:**
-1. [e.g., "External packages (react, express, etc.)"]
-2. [e.g., "Internal modules (@/lib, @/components)"]
-3. [e.g., "Relative imports (., ..)"]
-4. [e.g., "Type imports (import type {})"]
+1. [e.g., "External packages (react, express, etc."]
+2. [e.g., "Internal modules (@/lib, @/components"]
+3. [e.g., "Relative imports (., .."]
+4. [e.g., "Type imports (import type {}"]
 
 **Grouping:**
 - [Blank lines: e.g., "blank line between groups"]
@@ -68,7 +68,7 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 **Patterns:**
 - [Strategy: e.g., "throw errors, catch at boundaries"]
 - [Custom errors: e.g., "extend Error class, named *Error"]
-- [Async: e.g., "use try/catch, no .catch() chains"]
+- [Async: e.g., "use try/catch, no .catch( chains"]
 
 **Error Types:**
 - [When to throw: e.g., "invalid input, missing dependencies"]
@@ -98,7 +98,7 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 - [Format: e.g., "use @param, @returns, @throws tags"]
 
 **TODO Comments:**
-- [Pattern: e.g., "// TODO(username): description"]
+- [Pattern: e.g., "// TODO(username: description"]
 - [Tracking: e.g., "link to issue number if available"]
 
 ## Function Design
@@ -139,24 +139,24 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 ## Naming Patterns
 
 **Files:**
-- kebab-case for all files (command-handler.ts, user-service.ts)
+- kebab-case for all files (command-handler.ts, user-service.ts
 - *.test.ts alongside source files
 - index.ts for barrel exports
 
 **Functions:**
 - camelCase for all functions
 - No special prefix for async functions
-- handleEventName for event handlers (handleClick, handleSubmit)
+- handleEventName for event handlers (handleClick, handleSubmit
 
 **Variables:**
 - camelCase for variables
-- UPPER_SNAKE_CASE for constants (MAX_RETRIES, API_BASE_URL)
-- No underscore prefix (no private marker in TS)
+- UPPER_SNAKE_CASE for constants (MAX_RETRIES, API_BASE_URL
+- No underscore prefix (no private marker in TS
 
 **Types:**
-- PascalCase for interfaces, no I prefix (User, not IUser)
-- PascalCase for type aliases (UserConfig, ResponseData)
-- PascalCase for enum names, UPPER_CASE for values (Status.PENDING)
+- PascalCase for interfaces, no I prefix (User, not IUser
+- PascalCase for type aliases (UserConfig, ResponseData
+- PascalCase for enum names, UPPER_CASE for values (Status.PENDING
 
 ## Code Style
 
@@ -170,16 +170,16 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 **Linting:**
 - ESLint with eslint.config.js
 - Extends @typescript-eslint/recommended
-- No console.log in production code (use logger)
+- No console.log in production code (use logger
 - Run: npm run lint
 
 ## Import Organization
 
 **Order:**
-1. External packages (react, express, commander)
-2. Internal modules (@/lib, @/services)
-3. Relative imports (./utils, ../types)
-4. Type imports (import type { User })
+1. External packages (react, express, commander
+2. Internal modules (@/lib, @/services
+3. Relative imports (./utils, ../types
+4. Type imports (import type { User }
 
 **Grouping:**
 - Blank line between groups
@@ -193,23 +193,23 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 ## Error Handling
 
 **Patterns:**
-- Throw errors, catch at boundaries (route handlers, main functions)
-- Extend Error class for custom errors (ValidationError, NotFoundError)
-- Async functions use try/catch, no .catch() chains
+- Throw errors, catch at boundaries (route handlers, main functions
+- Extend Error class for custom errors (ValidationError, NotFoundError
+- Async functions use try/catch, no .catch( chains
 
 **Error Types:**
 - Throw on invalid input, missing dependencies, invariant violations
-- Log error with context before throwing: logger.error({ err, userId }, 'Failed to process')
-- Include cause in error message: new Error('Failed to X', { cause: originalError })
+- Log error with context before throwing: logger.error({ err, userId }, 'Failed to process'
+- Include cause in error message: new Error('Failed to X', { cause: originalError }
 
 ## Logging
 
 **Framework:**
 - pino logger instance exported from lib/logger.ts
-- Levels: debug, info, warn, error (no trace)
+- Levels: debug, info, warn, error (no trace
 
 **Patterns:**
-- Structured logging with context: logger.info({ userId, action }, 'User action')
+- Structured logging with context: logger.info({ userId, action }, 'User action'
 - Log at service boundaries, not in utility functions
 - Log state transitions, external API calls, errors
 - No console.log in committed code
@@ -228,8 +228,8 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 - Use @param, @returns, @throws tags
 
 **TODO Comments:**
-- Format: // TODO: description (no username, using git blame)
-- Link to issue if exists: // TODO: Fix race condition (issue #123)
+- Format: // TODO: description (no username, using git blame
+- Link to issue if exists: // TODO: Fix race condition (issue #123
 
 ## Function Design
 
@@ -240,8 +240,8 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 
 **Parameters:**
 - Max 3 parameters
-- Use options object for 4+ parameters: function create(options: CreateOptions)
-- Destructure in parameter list: function process({ id, name }: ProcessParams)
+- Use options object for 4+ parameters: function create(options: CreateOptions
+- Destructure in parameter list: function process({ id, name }: ProcessParams
 
 **Return Values:**
 - Explicit return statements
@@ -257,8 +257,8 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 
 **Barrel Files:**
 - index.ts re-exports public API
-- Keep internal helpers private (don't export from index)
-- Avoid circular dependencies (import from specific files if needed)
+- Keep internal helpers private (don't export from index
+- Avoid circular dependencies (import from specific files if needed
 
 ---
 
@@ -270,7 +270,7 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 <guidelines>
 **What belongs in CONVENTIONS.md:**
 - Naming patterns observed in the codebase
-- Formatting rules (Prettier config, linting rules)
+- Formatting rules (Prettier config, linting rules
 - Import organization patterns
 - Error handling strategy
 - Logging approach
@@ -278,10 +278,10 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 - Function and module design patterns
 
 **What does NOT belong here:**
-- Architecture decisions (that's ARCHITECTURE.md)
-- Technology choices (that's STACK.md)
-- Test patterns (that's TESTING.md)
-- File organization (that's STRUCTURE.md)
+- Architecture decisions (that's ARCHITECTURE.md
+- Technology choices (that's STACK.md
+- Test patterns (that's TESTING.md
+- File organization (that's STRUCTURE.md
 
 **When filling this template:**
 - Check .prettierrc, .eslintrc, or similar config files
@@ -292,16 +292,16 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 - Keep under ~150 lines total
 
 **Useful for phase planning when:**
-- Writing new code (match existing style)
-- Adding features (follow naming patterns)
-- Refactoring (apply consistent conventions)
-- Code review (check against documented patterns)
-- Onboarding (understand style expectations)
+- Writing new code (match existing style
+- Adding features (follow naming patterns
+- Refactoring (apply consistent conventions
+- Code review (check against documented patterns
+- Onboarding (understand style expectations
 
 **Analysis approach:**
 - Scan src/ directory for file naming patterns
 - Check package.json scripts for lint/format commands
-- read 5-10 files to identify function naming, error handling
-- Look for config files (.prettierrc, eslint.config.js)
+- Read 5-10 files to identify function naming, error handling
+- Look for config files (.prettierrc, eslint.config.js
 - Note patterns in imports, comments, function signatures
 </guidelines>

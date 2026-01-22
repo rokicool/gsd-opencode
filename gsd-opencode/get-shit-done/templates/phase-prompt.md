@@ -5,7 +5,7 @@
 
 Template for `.planning/phases/XX-name/{phase}-{plan}-PLAN.md` - executable phase plans optimized for parallel execution.
 
-**Naming:** Use `{phase}-{plan}-PLAN.md` format (e.g., `01-02-PLAN.md` for Phase 1, Plan 2)
+**Naming:** Use `{phase}-{plan}-PLAN.md` format (e.g., `01-02-PLAN.md` for Phase 1, Plan 2
 
 ---
 
@@ -16,13 +16,13 @@ Template for `.planning/phases/XX-name/{phase}-{plan}-PLAN.md` - executable phas
 phase: XX-name
 plan: NN
 type: execute
-wave: N                     # Execution wave (1, 2, 3...). Pre-computed at plan time.
-depends_on: []              # Plan IDs this plan requires (e.g., ["01-01"]).
+wave: N                     # Execution wave (1, 2, 3.... Pre-computed at plan time.
+depends_on: []              # Plan IDs this plan requires (e.g., ["01-01"].
 files_modified: []          # Files this plan modifies.
 autonomous: true            # false if plan has checkpoints requiring user interaction
-user_setup: []              # Human-required setup OpenCode cannot automate (see below)
+user_setup: []              # Human-required setup OpenCode cannot automate (see below
 
-# Goal-backward verification (derived during planning, verified after execution)
+# Goal-backward verification (derived during planning, verified after execution
 must_haves:
   truths: []                # Observable behaviors that must be true for goal achievement
   artifacts: []             # Files that must exist with real implementation
@@ -39,7 +39,7 @@ Output: [What artifacts will be created]
 <execution_context>
 @~/.config/opencode/get-shit-done/workflows/execute-plan.md
 @~/.config/opencode/get-shit-done/templates/summary.md
-[If plan contains checkpoint tasks (type="checkpoint:*"), add:]
+[If plan contains checkpoint tasks (type="checkpoint:*", add:]
 @~/.config/opencode/get-shit-done/references/checkpoints.md
 </execution_context>
 
@@ -75,33 +75,23 @@ Output: [What artifacts will be created]
   <done>[Acceptance criteria]</done>
 </task>
 
+<!-- For checkpoint task examples and patterns, see @~/.config/opencode/get-shit-done/references/checkpoints.md -->
+<!-- Key rule: OpenCode starts dev server BEFORE human-verify checkpoints. User only visits URLs. -->
+
 <task type="checkpoint:decision" gate="blocking">
   <decision>[What needs deciding]</decision>
   <context>[Why this decision matters]</context>
   <options>
-    <option id="option-a">
-      <name>[Option name]</name>
-      <pros>[Benefits and advantages]</pros>
-      <cons>[Tradeoffs and limitations]</cons>
-    </option>
-    <option id="option-b">
-      <name>[Option name]</name>
-      <pros>[Benefits and advantages]</pros>
-      <cons>[Tradeoffs and limitations]</cons>
-    </option>
+    <option id="option-a"><name>[Name]</name><pros>[Benefits]</pros><cons>[Tradeoffs]</cons></option>
+    <option id="option-b"><name>[Name]</name><pros>[Benefits]</pros><cons>[Tradeoffs]</cons></option>
   </options>
-  <resume-signal>[How to indicate choice - "Select: option-a or option-b"]</resume-signal>
+  <resume-signal>Select: option-a or option-b</resume-signal>
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>[What OpenCode just built that needs verification]</what-built>
-  <how-to-verify>
-    1. Run: [command to start dev server/app]
-    2. Visit: [URL to check]
-    3. Test: [Specific interactions]
-    4. Confirm: [Expected behaviors]
-  </how-to-verify>
-  <resume-signal>Type "approved" to continue, or describe issues to fix</resume-signal>
+  <what-built>[What OpenCode built] - server running at [URL]</what-built>
+  <how-to-verify>Visit [URL] and verify: [visual checks only, NO CLI commands]</how-to-verify>
+  <resume-signal>Type "approved" or describe issues</resume-signal>
 </task>
 
 </tasks>
@@ -132,15 +122,15 @@ After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 
 | Field | Required | Purpose |
 |-------|----------|---------|
-| `phase` | Yes | Phase identifier (e.g., `01-foundation`) |
-| `plan` | Yes | Plan number within phase (e.g., `01`, `02`) |
+| `phase` | Yes | Phase identifier (e.g., `01-foundation` |
+| `plan` | Yes | Plan number within phase (e.g., `01`, `02` |
 | `type` | Yes | Always `execute` for standard plans, `tdd` for TDD plans |
-| `wave` | Yes | Execution wave number (1, 2, 3...). Pre-computed at plan time. |
+| `wave` | Yes | Execution wave number (1, 2, 3.... Pre-computed at plan time. |
 | `depends_on` | Yes | Array of plan IDs this plan requires. |
 | `files_modified` | Yes | Files this plan touches. |
 | `autonomous` | Yes | `true` if no checkpoints, `false` if has checkpoints |
-| `user_setup` | No | Array of human-required setup items (external services) |
-| `must_haves` | Yes | Goal-backward verification criteria (see below) |
+| `user_setup` | No | Array of human-required setup items (external services |
+| `must_haves` | Yes | Goal-backward verification criteria (see below |
 
 **Wave is pre-computed:** Wave numbers are assigned during `/gsd-plan-phase`. Execute-phase reads `wave` directly from frontmatter and groups plans by wave number. No runtime dependency analysis needed.
 
@@ -152,7 +142,7 @@ After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 
 <parallel_examples>
 
-**Wave 1 candidates (parallel):**
+**Wave 1 candidates (parallel:**
 
 ```yaml
 # Plan 01 - User feature
@@ -161,22 +151,22 @@ depends_on: []
 files_modified: [src/models/user.ts, src/api/users.ts]
 autonomous: true
 
-# Plan 02 - Product feature (no overlap with Plan 01)
+# Plan 02 - Product feature (no overlap with Plan 01
 wave: 1
 depends_on: []
 files_modified: [src/models/product.ts, src/api/products.ts]
 autonomous: true
 
-# Plan 03 - Order feature (no overlap)
+# Plan 03 - Order feature (no overlap
 wave: 1
 depends_on: []
 files_modified: [src/models/order.ts, src/api/orders.ts]
 autonomous: true
 ```
 
-All three run in parallel (Wave 1) - no dependencies, no file conflicts.
+All three run in parallel (Wave 1 - no dependencies, no file conflicts.
 
-**Sequential (genuine dependency):**
+**Sequential (genuine dependency:**
 
 ```yaml
 # Plan 01 - Auth foundation
@@ -185,7 +175,7 @@ depends_on: []
 files_modified: [src/lib/auth.ts, src/middleware/auth.ts]
 autonomous: true
 
-# Plan 02 - Protected features (needs auth)
+# Plan 02 - Protected features (needs auth
 wave: 2
 depends_on: ["01"]
 files_modified: [src/features/dashboard.ts]
@@ -232,7 +222,7 @@ Wave 3 runs after Waves 1 and 2. Pauses at checkpoint, orchestrator presents to 
 </context>
 ```
 
-**Bad pattern (creates false dependencies):**
+**Bad pattern (creates false dependencies:**
 ```markdown
 <context>
 @.planning/phases/03-features/03-01-SUMMARY.md  # Just because it's earlier
@@ -252,7 +242,7 @@ Wave 3 runs after Waves 1 and 2. Pauses at checkpoint, orchestrator presents to 
 
 **When to split:**
 
-- Different subsystems (auth vs API vs UI)
+- Different subsystems (auth vs API vs UI
 - >3 tasks
 - Risk of context overflow
 - TDD candidates - separate plans
@@ -260,8 +250,8 @@ Wave 3 runs after Waves 1 and 2. Pauses at checkpoint, orchestrator presents to 
 **Vertical slices preferred:**
 
 ```
-PREFER: Plan 01 = User (model + API + UI)
-        Plan 02 = Product (model + API + UI)
+PREFER: Plan 01 = User (model + API + UI
+        Plan 02 = Product (model + API + UI
 
 AVOID:  Plan 01 = All models
         Plan 02 = All APIs
@@ -274,7 +264,7 @@ AVOID:  Plan 01 = All models
 
 TDD features get dedicated plans with `type: tdd`.
 
-**Heuristic:** Can you write `expect(fn(input)).toBe(output)` before writing `fn`?
+**Heuristic:** Can you write `expect(fn(input.toBe(output` before writing `fn`?
 → Yes: Create a TDD plan
 → No: Standard task in standard plan
 
@@ -289,7 +279,7 @@ See `~/.config/opencode/get-shit-done/references/tdd.md` for TDD plan structure.
 | `auto` | Everything OpenCode can do independently | Fully autonomous |
 | `checkpoint:human-verify` | Visual/functional verification | Pauses, returns to orchestrator |
 | `checkpoint:decision` | Implementation choices | Pauses, returns to orchestrator |
-| `checkpoint:human-action` | Truly unavoidable manual steps (rare) | Pauses, returns to orchestrator |
+| `checkpoint:human-action` | Truly unavoidable manual steps (rare | Pauses, returns to orchestrator |
 
 **Checkpoint behavior in parallel execution:**
 - Plan runs until checkpoint
@@ -340,7 +330,7 @@ Output: User model, API endpoints, and UI components.
 <task type="auto">
   <name>Task 2: Create User API endpoints</name>
   <files>src/features/user/api.ts</files>
-  <action>GET /users (list), GET /users/:id (single), POST /users (create). Use User type from model.</action>
+  <action>GET /users (list, GET /users/:id (single, POST /users (create. Use User type from model.</action>
   <verify>curl tests pass for all endpoints</verify>
   <done>All CRUD operations work</done>
 </task>
@@ -361,7 +351,7 @@ After completion, create `.planning/phases/03-features/03-01-SUMMARY.md`
 </output>
 ```
 
-**Plan with checkpoint (non-autonomous):**
+**Plan with checkpoint (non-autonomous:**
 
 ```markdown
 ---
@@ -403,15 +393,16 @@ Output: Working dashboard component.
   <done>Dashboard renders without errors</done>
 </task>
 
+<!-- Checkpoint pattern: OpenCode starts server, user visits URL. See checkpoints.md for full patterns. -->
+<task type="auto">
+  <name>Start dev server</name>
+  <action>Run `npm run dev` in background, wait for ready</action>
+  <verify>curl localhost:3000 returns 200</verify>
+</task>
+
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>Responsive dashboard with user and product sections</what-built>
-  <how-to-verify>
-    1. Run: npm run dev
-    2. Visit: http://localhost:3000/dashboard
-    3. Desktop: Verify two-column grid
-    4. Mobile: Verify stacked layout
-    5. Check: No layout shift, no scroll issues
-  </how-to-verify>
+  <what-built>Dashboard - server at http://localhost:3000</what-built>
+  <how-to-verify>Visit localhost:3000/dashboard. Check: desktop grid, mobile stack, no scroll issues.</how-to-verify>
   <resume-signal>Type "approved" or describe issues</resume-signal>
 </task>
 </tasks>
@@ -443,8 +434,8 @@ depends_on: ["03-01"]  # Just because 01 comes before 02
 **Bad: Horizontal layer grouping**
 ```
 Plan 01: All models
-Plan 02: All APIs (depends on 01)
-Plan 03: All UIs (depends on 02)
+Plan 02: All APIs (depends on 01
+Plan 03: All UIs (depends on 02
 ```
 
 **Bad: Missing autonomy flag**
@@ -476,7 +467,7 @@ files_modified: [...]
 
 ---
 
-## User Setup (External Services)
+## User Setup (External Services
 
 When a plan introduces external services requiring human configuration, declare in frontmatter:
 
@@ -498,9 +489,9 @@ user_setup:
 ```
 
 **The automation-first rule:** `user_setup` contains ONLY what OpenCode literally cannot do:
-- Account creation (requires human signup)
-- Secret retrieval (requires dashboard access)
-- Dashboard configuration (requires human in browser)
+- Account creation (requires human signup
+- Secret retrieval (requires dashboard access
+- Dashboard configuration (requires human in browser
 
 **NOT included:** Package installs, code changes, file creation, CLI commands OpenCode can run.
 
@@ -510,7 +501,7 @@ See `~/.config/opencode/get-shit-done/templates/user-setup.md` for full schema a
 
 ---
 
-## Must-Haves (Goal-Backward Verification)
+## Must-Haves (Goal-Backward Verification
 
 The `must_haves` field defines what must be TRUE for the phase goal to be achieved. Derived during planning, verified after execution.
 
@@ -540,7 +531,7 @@ must_haves:
     - from: "src/app/api/chat/route.ts"
       to: "prisma.message"
       via: "database query"
-      pattern: "prisma\\.message\\.(find|create)"
+      pattern: "prisma\\.message\\.(find|create"
 ```
 
 **Field descriptions:**
@@ -557,7 +548,7 @@ must_haves:
 | `key_links` | Critical connections between artifacts. |
 | `key_links[].from` | Source artifact. |
 | `key_links[].to` | Target artifact or endpoint. |
-| `key_links[].via` | How they connect (description). |
+| `key_links[].via` | How they connect (description. |
 | `key_links[].pattern` | Optional. Regex to verify connection exists. |
 
 **Why this matters:**
@@ -566,7 +557,7 @@ Task completion ≠ Goal achievement. A task "create chat component" can complet
 
 **Verification flow:**
 
-1. Plan-phase derives must_haves from phase goal (goal-backward)
+1. Plan-phase derives must_haves from phase goal (goal-backward
 2. Must_haves written to PLAN.md frontmatter
 3. Execute-phase runs all plans
 4. Verification subagent checks must_haves against codebase

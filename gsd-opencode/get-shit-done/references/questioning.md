@@ -68,7 +68,7 @@ Use these as inspiration, not a checklist. Pick what's relevant to the thread.
 
 <using_askuserquestion>
 
-Use question to help users think by presenting concrete options to react to.
+Use  to help users think by presenting concrete options to react to.
 
 **Good options:**
 - Interpretations of what they might mean
@@ -76,9 +76,9 @@ Use question to help users think by presenting concrete options to react to.
 - Concrete choices that reveal priorities
 
 **Bad options:**
-- Generic categories ("Technical", "Business", "Other")
+- Generic categories ("Technical", "Business", "Other"
 - Leading options that presume an answer
-- Too many options (2-4 is ideal)
+- Too many options (2-4 is ideal
 
 **Example — vague answer:**
 User says "it should be fast"
@@ -100,10 +100,10 @@ User mentions "frustrated with current tools"
 
 Use this as a **background checklist**, not a conversation structure. Check these mentally as you go. If gaps remain, weave questions naturally.
 
-- [ ] What they're building (concrete enough to explain to a stranger)
-- [ ] Why it needs to exist (the problem or desire driving it)
-- [ ] Who it's for (even if just themselves)
-- [ ] What "done" looks like (observable outcomes)
+- [ ] What they're building (concrete enough to explain to a stranger
+- [ ] Why it needs to exist (the problem or desire driving it
+- [ ] Who it's for (even if just themselves
+- [ ] What "done" looks like (observable outcomes
 
 Four things. If they volunteer more, capture it.
 

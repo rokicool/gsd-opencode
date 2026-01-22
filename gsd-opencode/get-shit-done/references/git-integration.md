@@ -17,8 +17,8 @@ The git log should read like a changelog of what shipped, not a diary of plannin
 | PLAN.md created         | NO      | Intermediate - commit with plan completion       |
 | RESEARCH.md created     | NO      | Intermediate                                     |
 | DISCOVERY.md created    | NO      | Intermediate                                     |
-| **Task completed**      | YES     | Atomic unit of work (1 commit per task)         |
-| **Plan completed**      | YES     | Metadata commit (SUMMARY + STATE + ROADMAP)     |
+| **Task completed**      | YES     | Atomic unit of work (1 commit per task         |
+| **Plan completed**      | YES     | Metadata commit (SUMMARY + STATE + ROADMAP     |
 | Handoff created         | YES     | WIP state preserved                              |
 
 </commit_points>
@@ -35,10 +35,10 @@ If NO_GIT: Run `git init` silently. GSD projects always get their own repo.
 <commit_formats>
 
 <format name="initialization">
-## Project Initialization (brief + roadmap together)
+## Project Initialization (brief + roadmap together
 
 ```
-docs: initialize [project-name] ([N] phases)
+docs: initialize [project-name] ([N] phases
 
 [One-liner from PROJECT.md]
 
@@ -58,12 +58,12 @@ git commit
 </format>
 
 <format name="task-completion">
-## Task Completion (During Plan Execution)
+## Task Completion (During Plan Execution
 
 Each task gets its own commit immediately after completion.
 
 ```
-{type}({phase}-{plan}): {task-name}
+{type}({phase}-{plan}: {task-name}
 
 - [Key change 1]
 - [Key change 2]
@@ -73,8 +73,8 @@ Each task gets its own commit immediately after completion.
 **Commit types:**
 - `feat` - New feature/functionality
 - `fix` - Bug fix
-- `test` - Test-only (TDD RED phase)
-- `refactor` - Code cleanup (TDD REFACTOR phase)
+- `test` - Test-only (TDD RED phase
+- `refactor` - Code cleanup (TDD REFACTOR phase
 - `perf` - Performance improvement
 - `chore` - Dependencies, config, tooling
 
@@ -83,7 +83,7 @@ Each task gets its own commit immediately after completion.
 ```bash
 # Standard task
 git add src/api/auth.ts src/types/user.ts
-git commit -m "feat(08-02): create user registration endpoint
+git commit -m "feat(08-02: create user registration endpoint
 
 - POST /auth/register validates email and password
 - Checks for duplicate users
@@ -92,7 +92,7 @@ git commit -m "feat(08-02): create user registration endpoint
 
 # TDD task - RED phase
 git add src/__tests__/jwt.test.ts
-git commit -m "test(07-02): add failing test for JWT generation
+git commit -m "test(07-02: add failing test for JWT generation
 
 - Tests token contains user ID claim
 - Tests token expires in 1 hour
@@ -101,7 +101,7 @@ git commit -m "test(07-02): add failing test for JWT generation
 
 # TDD task - GREEN phase
 git add src/utils/jwt.ts
-git commit -m "feat(07-02): implement JWT generation
+git commit -m "feat(07-02: implement JWT generation
 
 - Uses jose library for signing
 - Includes user ID and expiry claims
@@ -112,12 +112,12 @@ git commit -m "feat(07-02): implement JWT generation
 </format>
 
 <format name="plan-completion">
-## Plan Completion (After All Tasks Done)
+## Plan Completion (After All Tasks Done
 
 After all tasks committed, one final metadata commit captures plan completion.
 
 ```
-docs({phase}-{plan}): complete [plan-name] plan
+docs({phase}-{plan}: complete [plan-name] plan
 
 Tasks completed: [N]/[N]
 - [Task 1 name]
@@ -142,7 +142,7 @@ git commit
 </format>
 
 <format name="handoff">
-## Handoff (WIP)
+## Handoff (WIP
 
 ```
 wip: [phase-name] paused at task [X]/[Y]
@@ -163,64 +163,64 @@ git commit
 
 <example_log>
 
-**Old approach (per-plan commits):**
+**Old approach (per-plan commits:**
 ```
-a7f2d1 feat(checkout): Stripe payments with webhook verification
-3e9c4b feat(products): catalog with search, filters, and pagination
-8a1b2c feat(auth): JWT with refresh rotation using jose
-5c3d7e feat(foundation): Next.js 15 + Prisma + Tailwind scaffold
-2f4a8d docs: initialize ecommerce-app (5 phases)
+a7f2d1 feat(checkout: Stripe payments with webhook verification
+3e9c4b feat(products: catalog with search, filters, and pagination
+8a1b2c feat(auth: JWT with refresh rotation using jose
+5c3d7e feat(foundation: Next.js 15 + Prisma + Tailwind scaffold
+2f4a8d docs: initialize ecommerce-app (5 phases
 ```
 
-**New approach (per-task commits):**
+**New approach (per-task commits:**
 ```
 # Phase 04 - Checkout
-1a2b3c docs(04-01): complete checkout flow plan
-4d5e6f feat(04-01): add webhook signature verification
-7g8h9i feat(04-01): implement payment session creation
-0j1k2l feat(04-01): create checkout page component
+1a2b3c docs(04-01: complete checkout flow plan
+4d5e6f feat(04-01: add webhook signature verification
+7g8h9i feat(04-01: implement payment session creation
+0j1k2l feat(04-01: create checkout page component
 
 # Phase 03 - Products
-3m4n5o docs(03-02): complete product listing plan
-6p7q8r feat(03-02): add pagination controls
-9s0t1u feat(03-02): implement search and filters
-2v3w4x feat(03-01): create product catalog schema
+3m4n5o docs(03-02: complete product listing plan
+6p7q8r feat(03-02: add pagination controls
+9s0t1u feat(03-02: implement search and filters
+2v3w4x feat(03-01: create product catalog schema
 
 # Phase 02 - Auth
-5y6z7a docs(02-02): complete token refresh plan
-8b9c0d feat(02-02): implement refresh token rotation
-1e2f3g test(02-02): add failing test for token refresh
-4h5i6j docs(02-01): complete JWT setup plan
-7k8l9m feat(02-01): add JWT generation and validation
-0n1o2p chore(02-01): install jose library
+5y6z7a docs(02-02: complete token refresh plan
+8b9c0d feat(02-02: implement refresh token rotation
+1e2f3g test(02-02: add failing test for token refresh
+4h5i6j docs(02-01: complete JWT setup plan
+7k8l9m feat(02-01: add JWT generation and validation
+0n1o2p chore(02-01: install jose library
 
 # Phase 01 - Foundation
-3q4r5s docs(01-01): complete scaffold plan
-6t7u8v feat(01-01): configure Tailwind and globals
-9w0x1y feat(01-01): set up Prisma with database
-2z3a4b feat(01-01): create Next.js 15 project
+3q4r5s docs(01-01: complete scaffold plan
+6t7u8v feat(01-01: configure Tailwind and globals
+9w0x1y feat(01-01: set up Prisma with database
+2z3a4b feat(01-01: create Next.js 15 project
 
 # Initialization
-5c6d7e docs: initialize ecommerce-app (5 phases)
+5c6d7e docs: initialize ecommerce-app (5 phases
 ```
 
-Each plan produces 2-4 commits (tasks + metadata). Clear, granular, bisectable.
+Each plan produces 2-4 commits (tasks + metadata. Clear, granular, bisectable.
 
 </example_log>
 
 <anti_patterns>
 
-**Still don't commit (intermediate artifacts):**
-- PLAN.md creation (commit with plan completion)
-- RESEARCH.md (intermediate)
-- DISCOVERY.md (intermediate)
+**Still don't commit (intermediate artifacts:**
+- PLAN.md creation (commit with plan completion
+- RESEARCH.md (intermediate
+- DISCOVERY.md (intermediate
 - Minor planning tweaks
 - "Fixed typo in roadmap"
 
-**Do commit (outcomes):**
-- Each task completion (feat/fix/test/refactor)
-- Plan completion metadata (docs)
-- Project initialization (docs)
+**Do commit (outcomes:**
+- Each task completion (feat/fix/test/refactor
+- Plan completion metadata (docs
+- Project initialization (docs
 
 **Key principle:** Commit working code and shipped outcomes, not planning process.
 

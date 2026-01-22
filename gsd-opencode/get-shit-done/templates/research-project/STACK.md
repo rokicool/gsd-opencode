@@ -101,7 +101,7 @@ npm install -D [packages]
 
 **Supporting Libraries:**
 - Include libraries commonly needed for this domain
-- Note when each is needed (not all projects need all libraries)
+- Note when each is needed (not all projects need all libraries
 
 **Alternatives:**
 - Don't just dismiss alternatives

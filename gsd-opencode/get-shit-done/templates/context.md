@@ -7,8 +7,8 @@ Template for `.planning/phases/XX-name/{phase}-CONTEXT.md` - captures implementa
 **Key principle:** Categories are NOT predefined. They emerge from what was actually discussed for THIS phase. A CLI phase has CLI-relevant sections, a UI phase has UI-relevant sections.
 
 **Downstream consumers:**
-- `gsd-phase-researcher` — Reads decisions to focus research (e.g., "card layout" → research card component patterns)
-- `gsd-planner` — Reads decisions to create specific tasks (e.g., "infinite scroll" → task includes virtualization)
+- `gsd-phase-researcher` — Reads decisions to focus research (e.g., "card layout" → research card component patterns
+- `gsd-planner` — Reads decisions to create specific tasks (e.g., "infinite scroll" → task includes virtualization
 
 ---
 
@@ -40,7 +40,7 @@ Template for `.planning/phases/XX-name/{phase}-CONTEXT.md` - captures implementa
 ### [Area 3 that was discussed]
 - [Specific decision made]
 
-### OpenCode's Discretion
+### AI Discretion
 [Areas where user explicitly said "you decide" — OpenCode has flexibility here during planning/implementation]
 
 </decisions>
@@ -71,7 +71,7 @@ Template for `.planning/phases/XX-name/{phase}-CONTEXT.md` - captures implementa
 
 <good_examples>
 
-**Example 1: Visual feature (Post Feed)**
+**Example 1: Visual feature (Post Feed**
 
 ```markdown
 # Phase 3: Post Feed - Context
@@ -97,13 +97,13 @@ Display posts from followed users in a scrollable feed. Users can view posts and
 ### Loading behavior
 - Infinite scroll, not pagination
 - Pull-to-refresh on mobile
-- New posts indicator at top ("3 new posts") rather than auto-inserting
+- New posts indicator at top ("3 new posts" rather than auto-inserting
 
 ### Empty state
 - Friendly illustration + "Follow people to see posts here"
 - Suggest 3-5 accounts to follow based on interests
 
-### OpenCode's Discretion
+### AI Discretion
 - Loading skeleton design
 - Exact spacing and typography
 - Error state handling
@@ -132,7 +132,7 @@ Display posts from followed users in a scrollable feed. Users can view posts and
 *Context gathered: 2025-01-20*
 ```
 
-**Example 2: CLI tool (Database backup)**
+**Example 2: CLI tool (Database backup**
 
 ```markdown
 # Phase 2: Backup Command - Context
@@ -153,19 +153,19 @@ CLI command to backup database to local file or S3. Supports full and incrementa
 ### Output format
 - JSON for programmatic use, table format for humans
 - Default to table, --json flag for JSON
-- Verbose mode (-v) shows progress, silent by default
+- Verbose mode (-v shows progress, silent by default
 
 ### Flag design
-- Short flags for common options: -o (output), -v (verbose), -f (force)
+- Short flags for common options: -o (output, -v (verbose, -f (force
 - Long flags for clarity: --incremental, --compress, --encrypt
-- Required: database connection string (positional or --db)
+- Required: database connection string (positional or --db
 
 ### Error recovery
 - Retry 3 times on network failure, then fail with clear message
 - --no-retry flag to fail fast
-- Partial backups are deleted on failure (no corrupt files)
+- Partial backups are deleted on failure (no corrupt files
 
-### OpenCode's Discretion
+### AI Discretion
 - Exact progress bar implementation
 - Compression algorithm choice
 - Temp file handling
@@ -176,7 +176,7 @@ CLI command to backup database to local file or S3. Supports full and incrementa
 ## Specific Ideas
 
 - "I want it to feel like pg_dump — familiar to database people"
-- Should work in CI pipelines (exit codes, no interactive prompts)
+- Should work in CI pipelines (exit codes, no interactive prompts
 
 </specifics>
 
@@ -194,7 +194,7 @@ CLI command to backup database to local file or S3. Supports full and incrementa
 *Context gathered: 2025-01-20*
 ```
 
-**Example 3: Organization task (Photo library)**
+**Example 3: Organization task (Photo library**
 
 ```markdown
 # Phase 1: Photo Organization - Context
@@ -214,12 +214,12 @@ Organize existing photo library into structured folders. Handle duplicates and a
 
 ### Grouping criteria
 - Primary grouping by year, then by month
-- Events detected by time clustering (photos within 2 hours = same event)
+- Events detected by time clustering (photos within 2 hours = same event
 - Event folders named by date + location if available
 
 ### Duplicate handling
 - Keep highest resolution version
-- Move duplicates to _duplicates folder (don't delete)
+- Move duplicates to _duplicates folder (don't delete
 - Log all duplicate decisions for review
 
 ### Naming convention
@@ -227,7 +227,7 @@ Organize existing photo library into structured folders. Handle duplicates and a
 - Preserve original filename as suffix for searchability
 - Handle name collisions with incrementing suffix
 
-### OpenCode's Discretion
+### AI Discretion
 - Exact clustering algorithm
 - How to handle photos with no EXIF data
 - Folder emoji usage
@@ -263,13 +263,13 @@ Organize existing photo library into structured folders. Handle duplicates and a
 
 The output should answer: "What does the researcher need to investigate? What choices are locked for the planner?"
 
-**Good content (concrete decisions):**
+**Good content (concrete decisions:**
 - "Card-based layout, not timeline"
 - "Retry 3 times on network failure, then fail"
 - "Group by year, then by month"
 - "JSON for programmatic use, table for humans"
 
-**Bad content (too vague):**
+**Bad content (too vague:**
 - "Should feel modern and clean"
 - "Good user experience"
 - "Fast and responsive"
@@ -278,8 +278,8 @@ The output should answer: "What does the researcher need to investigate? What ch
 **Sections explained:**
 
 - **Domain** — The scope anchor. Copied/derived from ROADMAP.md. Fixed boundary.
-- **Decisions** — Organized by areas discussed (NOT predefined categories). Section headers come from the actual discussion — "Layout style", "Flag design", "Grouping criteria", etc.
-- **OpenCode's Discretion** — Explicit acknowledgment of what OpenCode can decide during implementation.
+- **Decisions** — Organized by areas discussed (NOT predefined categories. Section headers come from the actual discussion — "Layout style", "Flag design", "Grouping criteria", etc.
+- **AI Discretion** — Explicit acknowledgment of what OpenCode can decide during implementation.
 - **Specifics** — Product references, examples, "like X but..." statements.
 - **Deferred** — Ideas captured but explicitly out of scope. Prevents scope creep while preserving good ideas.
 

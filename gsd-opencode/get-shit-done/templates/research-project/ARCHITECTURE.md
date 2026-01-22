@@ -110,7 +110,7 @@ src/
 
 ```
 [State Store]
-    ↓ (subscribe)
+    ↓ (subscribe
 [Components] ←→ [Actions] → [Reducers/Mutations] → [State Store]
 ```
 

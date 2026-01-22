@@ -7,7 +7,7 @@ Key difference from discuss-phase: This is ANALYSIS of what OpenCode thinks, not
 <process>
 
 <step name="validate_phase" priority="first">
-Phase number: $ARGUMENTS (required)
+Phase number: $ARGUMENTS (required
 
 **If argument missing:**
 
@@ -83,9 +83,9 @@ What does OpenCode assume exists or needs to be in place?
 - "This will be consumed by..."
 
 Be honest about uncertainty. Mark assumptions with confidence levels:
-- "Fairly confident: ..." (clear from roadmap)
-- "Assuming: ..." (reasonable inference)
-- "Unclear: ..." (could go multiple ways)
+- "Fairly confident: ..." (clear from roadmap
+- "Assuming: ..." (reasonable inference
+- "Unclear: ..." (could go multiple ways
 </step>
 
 <step name="present_assumptions">
@@ -153,8 +153,8 @@ Present next steps:
 
 ```
 What's next?
-1. Discuss context (/gsd-discuss-phase ${PHASE}) - Let me ask you questions to build comprehensive context
-2. Plan this phase (/gsd-plan-phase ${PHASE}) - Create detailed execution plans
+1. Discuss context (/gsd-discuss-phase ${PHASE} - Let me ask you questions to build comprehensive context
+2. Plan this phase (/gsd-plan-phase ${PHASE} - Create detailed execution plans
 3. Re-examine assumptions - I'll analyze again with your corrections
 4. Done for now
 ```

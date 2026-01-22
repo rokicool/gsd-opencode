@@ -1,10 +1,10 @@
 <purpose>
 Execute discovery at the appropriate depth level.
-Produces DISCOVERY.md (for Level 2-3) that informs PLAN.md creation.
+Produces DISCOVERY.md (for Level 2-3 that informs PLAN.md creation.
 
 Called from plan-phase.md's mandatory_discovery step with a depth parameter.
 
-NOTE: For comprehensive ecosystem research ("how do experts build this"), use /gsd-research-phase instead, which produces RESEARCH.md.
+NOTE: For comprehensive ecosystem research ("how do experts build this", use /gsd-research-phase instead, which produces RESEARCH.md.
 </purpose>
 
 <depth_levels>
@@ -20,13 +20,13 @@ NOTE: For comprehensive ecosystem research ("how do experts build this"), use /g
 </depth_levels>
 
 <source_hierarchy>
-**MANDATORY: Context7 BEFORE webfetch**
+**MANDATORY: Context7 BEFORE websearch**
 
-OpenCode's training data is 6-18 months stale. Always verify.
+AI training data is 6-18 months stale. Always verify.
 
 1. **Context7 MCP FIRST** - Current docs, no hallucination
 2. **Official docs** - When Context7 lacks coverage
-3. **webfetch LAST** - For comparisons and trends only
+3. **websearch LAST** - For comparisons and trends only
 
 See ~/.config/opencode/get-shit-done/templates/discovery.md `<discovery_protocol>` for full protocol.
 </source_hierarchy>
@@ -35,15 +35,15 @@ See ~/.config/opencode/get-shit-done/templates/discovery.md `<discovery_protocol
 
 <step name="determine_depth">
 Check the depth parameter passed from plan-phase.md:
-- `depth=verify` → Level 1 (Quick Verification)
-- `depth=standard` → Level 2 (Standard Discovery)
-- `depth=deep` → Level 3 (Deep Dive)
+- `depth=verify` → Level 1 (Quick Verification
+- `depth=standard` → Level 2 (Standard Discovery
+- `depth=deep` → Level 3 (Deep Dive
 
 Route to appropriate level workflow below.
 </step>
 
 <step name="level_1_quick_verify">
-**Level 1: Quick Verification (2-5 minutes)**
+**Level 1: Quick Verification (2-5 minutes**
 
 For: Single known library, confirming syntax/version still correct.
 
@@ -77,7 +77,7 @@ For: Single known library, confirming syntax/version still correct.
 </step>
 
 <step name="level_2_standard">
-**Level 2: Standard Discovery (15-30 minutes)**
+**Level 2: Standard Discovery (15-30 minutes**
 
 For: Choosing between options, new external integration.
 
@@ -94,35 +94,33 @@ For: Choosing between options, new external integration.
    ```
    For each library/framework:
    - mcp__context7__resolve-library-id
-   - mcp__context7__get-library-docs (mode: "code" for API, "info" for concepts)
+   - mcp__context7__get-library-docs (mode: "code" for API, "info" for concepts
    ```
 
 3. **Official docs** for anything Context7 lacks.
 
-4. **webfetch** for comparisons:
+4. **websearch** for comparisons:
 
    - "[option A] vs [option B] {current_year}"
    - "[option] known issues"
    - "[option] with [our stack]"
 
-5. **Cross-verify:** Any webfetch finding → confirm with Context7/official docs.
+5. **Cross-verify:** Any websearch finding → confirm with Context7/official docs.
 
-6. **Quality check:** Before finalizing findings, consult the gsd-researcher agent's verification protocols to avoid common research gaps.
-
-7. **Create DISCOVERY.md** using ~/.config/opencode/get-shit-done/templates/discovery.md structure:
+6. **Create DISCOVERY.md** using ~/.config/opencode/get-shit-done/templates/discovery.md structure:
 
    - Summary with recommendation
    - Key findings per option
    - Code examples from Context7
-   - Confidence level (should be MEDIUM-HIGH for Level 2)
+   - Confidence level (should be MEDIUM-HIGH for Level 2
 
-8. Return to plan-phase.md.
+7. Return to plan-phase.md.
 
 **Output:** `.planning/phases/XX-name/DISCOVERY.md`
 </step>
 
 <step name="level_3_deep_dive">
-**Level 3: Deep Dive (1+ hour)**
+**Level 3: Deep Dive (1+ hour**
 
 For: Architectural decisions, novel problems, high-risk choices.
 
@@ -147,7 +145,7 @@ For: Architectural decisions, novel problems, high-risk choices.
    - Migration/upgrade guides
    - Known limitations
 
-4. **webfetch for ecosystem context:**
+4. **websearch for ecosystem context:**
 
    - How others solved similar problems
    - Production experiences
@@ -156,24 +154,22 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 5. **Cross-verify ALL findings:**
 
-   - Every webfetch claim → verify with authoritative source
+   - Every websearch claim → verify with authoritative source
    - Mark what's verified vs assumed
    - Flag contradictions
 
-6. **Quality check:** Before finalizing findings, consult the gsd-researcher agent's verification protocols to ensure comprehensive coverage and avoid common research gaps.
-
-7. **Create comprehensive DISCOVERY.md:**
+6. **Create comprehensive DISCOVERY.md:**
 
    - Full structure from ~/.config/opencode/get-shit-done/templates/discovery.md
    - Quality report with source attribution
    - Confidence by finding
    - If LOW confidence on any critical finding → add validation checkpoints
 
-8. **Confidence gate:** If overall confidence is LOW, present options before proceeding.
+7. **Confidence gate:** If overall confidence is LOW, present options before proceeding.
 
-9. Return to plan-phase.md.
+8. Return to plan-phase.md.
 
-**Output:** `.planning/phases/XX-name/DISCOVERY.md` (comprehensive)
+**Output:** `.planning/phases/XX-name/DISCOVERY.md` (comprehensive
 </step>
 
 <step name="identify_unknowns">
@@ -194,7 +190,7 @@ Include:
 
 - Clear discovery objective
 - Scoped include/exclude lists
-- Source preferences (official docs, Context7, current year)
+- Source preferences (official docs, Context7, current year
 - Output structure for DISCOVERY.md
   </step>
 
@@ -207,18 +203,18 @@ Run the discovery:
 </step>
 
 <step name="create_discovery_output">
-write `.planning/phases/XX-name/DISCOVERY.md`:
+Write `.planning/phases/XX-name/DISCOVERY.md`:
 - Summary with recommendation
 - Key findings with sources
 - Code examples if applicable
-- Metadata (confidence, dependencies, open questions, assumptions)
+- Metadata (confidence, dependencies, open questions, assumptions
 </step>
 
 <step name="confidence_gate">
 After creating DISCOVERY.md, check confidence level.
 
 If confidence is LOW:
-Use question:
+Use :
 
 - header: "Low Confidence"
 - question: "Discovery confidence is LOW: [reason]. How would you like to proceed?"
@@ -228,10 +224,10 @@ Use question:
   - "Pause" - I need to think about this
 
 If confidence is MEDIUM:
-Inline: "Discovery complete (medium confidence). [brief reason]. Proceed to planning?"
+Inline: "Discovery complete (medium confidence. [brief reason]. Proceed to planning?"
 
 If confidence is HIGH:
-Proceed directly, just note: "Discovery complete (high confidence)."
+Proceed directly, just note: "Discovery complete (high confidence."
 </step>
 
 <step name="open_questions_gate">
@@ -243,7 +239,7 @@ Present them inline:
 - [Question 1]
 - [Question 2]
 
-These may affect implementation. Acknowledge and proceed? (yes / address first)"
+These may affect implementation. Acknowledge and proceed? (yes / address first"
 
 If "address first": Gather user input on questions, update discovery.
 </step>
@@ -256,9 +252,9 @@ Confidence: [level]
 
 What's next?
 
-1. Discuss phase context (/gsd-discuss-phase [current-phase])
-2. Create phase plan (/gsd-plan-phase [current-phase])
-3. Refine discovery (dig deeper)
+1. Discuss phase context (/gsd-discuss-phase [current-phase]
+2. Create phase plan (/gsd-plan-phase [current-phase]
+3. Refine discovery (dig deeper
 4. Review discovery
 
 ```
@@ -269,16 +265,21 @@ NOTE: DISCOVERY.md is NOT committed separately. It will be committed with phase 
 </process>
 
 <success_criteria>
-**Level 1 (Quick Verify):**
+**Level 1 (Quick Verify:**
 - Context7 consulted for library/topic
 - Current state verified or concerns escalated
-- Verbal confirmation to proceed (no files)
+- Verbal confirmation to proceed (no files
 
-**Level 2 (Standard):**
+**Level 2 (Standard:**
 - Context7 consulted for all options
 - webfetch findings cross-verified
+- DISCOVERY.md created with recommendation
+- Confidence level MEDIUM or higher
+- Ready to inform PLAN.md creation
 
-7. Quality gate
+**Level 3 (Deep Dive:**
+- Discovery scope defined
+- Context7 exhaustively consulted
 - All webfetch findings verified against authoritative sources
 - DISCOVERY.md created with comprehensive analysis
 - Quality report with source attribution

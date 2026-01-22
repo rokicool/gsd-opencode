@@ -1,11 +1,12 @@
 ---
 name: gsd-resume-work
 description: Resume work from previous session with full context restoration
-tools:
+allowed-tools:
   - read
   - bash
   - write
-  - question
+
+  - Command
 ---
 
 <objective>
@@ -13,9 +14,9 @@ Restore complete project context and resume work seamlessly from previous sessio
 
 Routes to the resume-project workflow which handles:
 
-- STATE.md loading (or reconstruction if missing)
-- Checkpoint detection (.continue-here files)
-- Incomplete work detection (PLAN without SUMMARY)
+- STATE.md loading (or reconstruction if missing
+- Checkpoint detection (.continue-here files
+- Incomplete work detection (PLAN without SUMMARY
 - Status presentation
 - Context-aware next action routing
   </objective>
@@ -33,7 +34,7 @@ The workflow handles all resumption logic including:
 2. STATE.md loading or reconstruction
 3. Checkpoint and incomplete work detection
 4. Visual status presentation
-5. Context-aware option offering (checks CONTEXT.md before suggesting plan vs discuss)
+5. Context-aware option offering (checks CONTEXT.md before suggesting plan vs discuss
 6. Routing to appropriate next command
 7. Session continuity updates
    </process>

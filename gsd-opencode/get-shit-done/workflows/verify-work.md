@@ -20,6 +20,25 @@ No Pass/Fail buttons. No severity questions. Just: "Here's what should happen. D
 
 <process>
 
+<step name="resolve_model_profile" priority="first">
+Read model profile for agent spawning:
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced"
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-planner | opus | opus | sonnet |
+| gsd-plan-checker | sonnet | sonnet | haiku |
+
+Store resolved models for use in Task calls below.
+</step>
+
 <step name="check_active_session">
 **First: Check for active UAT sessions**
 
@@ -29,7 +48,7 @@ find .planning/phases -name "*-UAT.md" -type f 2>/dev/null | head -5
 
 **If active sessions exist AND no $ARGUMENTS provided:**
 
-read each file's frontmatter (status, phase) and Current Test section.
+Read each file's frontmatter (status, phase and Current Test section.
 
 Display inline:
 
@@ -46,7 +65,7 @@ Reply with a number to resume, or provide a phase number to start new.
 
 Wait for user response.
 
-- If user replies with number (1, 2) → Load that file, go to `resume_from_file`
+- If user replies with number (1, 2 → Load that file, go to `resume_from_file`
 - If user replies with phase number → Treat as new session, go to `create_uat_file`
 
 **If active sessions exist AND $ARGUMENTS provided:**
@@ -59,7 +78,7 @@ If no, continue to `create_uat_file`.
 ```
 No active UAT sessions.
 
-Provide a phase number to start testing (e.g., /gsd-verify-work 4)
+Provide a phase number to start testing (e.g., /gsd-verify-work 4
 ```
 
 **If no active sessions AND $ARGUMENTS provided:**
@@ -70,18 +89,18 @@ Continue to `create_uat_file`.
 <step name="find_summaries">
 **Find what to test:**
 
-Parse $ARGUMENTS as phase number (e.g., "4") or plan number (e.g., "04-02").
+Parse $ARGUMENTS as phase number (e.g., "4" or plan number (e.g., "04-02".
 
 ```bash
-# Find phase directory (match both zero-padded and unpadded)
-PADDED_PHASE=$(printf "%02d" ${PHASE_ARG} 2>/dev/null || echo "${PHASE_ARG}")
-PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE_ARG}-* 2>/dev/null | head -1)
+# Find phase directory (match both zero-padded and unpadded
+PADDED_PHASE=$(printf "%02d" ${PHASE_ARG} 2>/dev/null || echo "${PHASE_ARG}"
+PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE_ARG}-* 2>/dev/null | head -1
 
 # Find SUMMARY files
 ls "$PHASE_DIR"/*-SUMMARY.md 2>/dev/null
 ```
 
-read each SUMMARY.md to extract testable deliverables.
+Read each SUMMARY.md to extract testable deliverables.
 </step>
 
 <step name="extract_tests">
@@ -95,14 +114,14 @@ Focus on USER-OBSERVABLE outcomes, not implementation details.
 
 For each deliverable, create a test:
 - name: Brief test name
-- expected: What the user should see/experience (specific, observable)
+- expected: What the user should see/experience (specific, observable
 
 Examples:
 - Accomplishment: "Added comment threading with infinite nesting"
   → Test: "Reply to a Comment"
   → Expected: "Clicking Reply opens inline composer below comment. Submitting shows reply nested under parent with visual indentation."
 
-Skip internal/non-observable items (refactors, type changes, etc.).
+Skip internal/non-observable items (refactors, type changes, etc..
 </step>
 
 <step name="create_uat_file">
@@ -159,7 +178,7 @@ skipped: 0
 [none yet]
 ```
 
-write to `.planning/phases/XX-name/{phase}-UAT.md`
+Write to `.planning/phases/XX-name/{phase}-UAT.md`
 
 Proceed to `present_test`.
 </step>
@@ -167,7 +186,7 @@ Proceed to `present_test`.
 <step name="present_test">
 **Present current test to user:**
 
-read Current Test section from UAT file.
+Read Current Test section from UAT file.
 
 Display using checkpoint box format:
 
@@ -185,7 +204,7 @@ Display using checkpoint box format:
 ──────────────────────────────────────────────────────────────
 ```
 
-Wait for user response (plain text, no question).
+Wait for user response (plain text, no .
 </step>
 
 <step name="process_response">
@@ -231,7 +250,7 @@ reported: "{verbatim user response}"
 severity: {inferred}
 ```
 
-Append to Gaps section (structured YAML for plan-phase --gaps):
+Append to Gaps section (structured YAML for plan-phase --gaps:
 ```yaml
 - truth: "{expected behavior from test}"
   status: failed
@@ -254,7 +273,7 @@ If no more tests → Go to `complete_session`
 <step name="resume_from_file">
 **Resume testing from UAT file:**
 
-read the full UAT file.
+Read the full UAT file.
 
 Find first test with `result: [pending]`.
 
@@ -285,10 +304,21 @@ Clear Current Test section:
 [testing complete]
 ```
 
+**Check planning config:**
+
+```bash
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true"
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
+
+**If `COMMIT_PLANNING_DOCS=true` (default:**
+
 Commit the UAT file:
 ```bash
 git add ".planning/phases/XX-name/{phase}-UAT.md"
-git commit -m "test({phase}): complete UAT - {passed} passed, {issues} issues"
+git commit -m "test({phase}: complete UAT - {passed} passed, {issues} issues"
 ```
 
 Present summary:
@@ -378,8 +408,9 @@ Plans must be executable prompts.
 </downstream_consumer>
 """,
   subagent_type="gsd-planner",
+  model="{planner_model}",
   description="Plan gap fixes for Phase {phase}"
-)
+
 ```
 
 On return:
@@ -423,8 +454,9 @@ Return one of:
 </expected_output>
 """,
   subagent_type="gsd-plan-checker",
+  model="{checker_model}",
   description="Verify Phase {phase} fix plans"
-)
+
 ```
 
 On return:
@@ -433,11 +465,11 @@ On return:
 </step>
 
 <step name="revision_loop">
-**Iterate planner ↔ checker until plans pass (max 3):**
+**Iterate planner ↔ checker until plans pass (max 3:**
 
 **If iteration_count < 3:**
 
-Display: `Sending back to planner for revision... (iteration {N}/3)`
+Display: `Sending back to planner for revision... (iteration {N}/3`
 
 Spawn gsd-planner with revision context:
 
@@ -458,16 +490,17 @@ Task(
 </revision_context>
 
 <instructions>
-read existing PLAN.md files. Make targeted updates to address checker issues.
+Read existing PLAN.md files. Make targeted updates to address checker issues.
 Do NOT replan from scratch unless issues are fundamental.
 </instructions>
 """,
   subagent_type="gsd-planner",
+  model="{planner_model}",
   description="Revise Phase {phase} plans"
-)
+
 ```
 
-After planner returns → spawn checker again (verify_gap_plans logic)
+After planner returns → spawn checker again (verify_gap_plans logic
 Increment iteration_count
 
 **If iteration_count >= 3:**
@@ -475,9 +508,9 @@ Increment iteration_count
 Display: `Max iterations reached. {N} issues remain.`
 
 Offer options:
-1. Force proceed (execute despite issues)
-2. Provide guidance (user gives direction, retry)
-3. Abandon (exit, user runs /gsd-plan-phase manually)
+1. Force proceed (execute despite issues
+2. Provide guidance (user gives direction, retry
+3. Abandon (exit, user runs /gsd-plan-phase manually
 
 Wait for user response.
 </step>
@@ -490,7 +523,7 @@ Wait for user response.
  GSD ► FIXES READY ✓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Phase {X}: {Name}** — {N} gap(s) diagnosed, {M} fix plan(s) created
+**Phase {X}: {Name}** — {N} gap(s diagnosed, {M} fix plan(s created
 
 | Gap | Root Cause | Fix Plan |
 |-----|------------|----------|
@@ -516,10 +549,10 @@ Plans verified and ready for execution.
 <update_rules>
 **Batched writes for efficiency:**
 
-Keep results in memory. write to file only when:
+Keep results in memory. Write to file only when:
 1. **Issue found** — Preserve the problem immediately
 2. **Session complete** — Final write before commit
-3. **Checkpoint** — Every 5 passed tests (safety net)
+3. **Checkpoint** — Every 5 passed tests (safety net
 
 | Section | Rule | When Written |
 |---------|------|--------------|
@@ -552,12 +585,12 @@ Default to **major** if unclear. User can correct if needed.
 - [ ] UAT file created with all tests from SUMMARY.md
 - [ ] Tests presented one at a time with expected behavior
 - [ ] User responses processed as pass/issue/skip
-- [ ] Severity inferred from description (never asked)
+- [ ] Severity inferred from description (never asked
 - [ ] Batched writes: on issue, every 5 passes, or completion
 - [ ] Committed on completion
 - [ ] If issues: parallel debug agents diagnose root causes
-- [ ] If issues: gsd-planner creates fix plans (gap_closure mode)
+- [ ] If issues: gsd-planner creates fix plans (gap_closure mode
 - [ ] If issues: gsd-plan-checker verifies fix plans
-- [ ] If issues: revision loop until plans pass (max 3 iterations)
+- [ ] If issues: revision loop until plans pass (max 3 iterations
 - [ ] Ready for `/gsd-execute-phase --gaps-only` when complete
 </success_criteria>

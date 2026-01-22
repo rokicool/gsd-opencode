@@ -61,19 +61,19 @@ src/
 ```typescript
 [Show actual pattern used, e.g.:
 
-describe('ModuleName', () => {
-  describe('functionName', () => {
-    it('should handle success case', () => {
+describe('ModuleName', ( => {
+  describe('functionName', ( => {
+    it('should handle success case', ( => {
       // arrange
       // act
       // assert
-    });
+    };
 
-    it('should handle error case', () => {
+    it('should handle error case', ( => {
       // test code
-    });
-  });
-});
+    };
+  };
+};
 ]
 ```
 
@@ -86,27 +86,27 @@ describe('ModuleName', () => {
 
 **Framework:**
 - [Tool: e.g., "Jest built-in mocking", "Vitest vi", "Sinon"]
-- [Import mocking: e.g., "vi.mock() at top of file"]
+- [Import mocking: e.g., "vi.mock( at top of file"]
 
 **Patterns:**
 ```typescript
 [Show actual mocking pattern, e.g.:
 
 // Mock external dependency
-vi.mock('./external-service', () => ({
-  fetchData: vi.fn()
-}));
+vi.mock('./external-service', ( => ({
+  fetchData: vi.fn(
+};
 
 // Mock in test
-const mockFetch = vi.mocked(fetchData);
-mockFetch.mockResolvedValue({ data: 'test' });
+const mockFetch = vi.mocked(fetchData;
+mockFetch.mockResolvedValue({ data: 'test' };
 ]
 ```
 
 **What to Mock:**
 - [e.g., "External APIs, file system, database"]
-- [e.g., "Time/dates (use vi.useFakeTimers)"]
-- [e.g., "Network calls (use mock fetch)"]
+- [e.g., "Time/dates (use vi.useFakeTimers"]
+- [e.g., "Network calls (use mock fetch"]
 
 **What NOT to Mock:**
 - [e.g., "Pure functions, utilities"]
@@ -119,7 +119,7 @@ mockFetch.mockResolvedValue({ data: 'test' });
 [Show pattern for creating test data, e.g.:
 
 // Factory pattern
-function createTestUser(overrides?: Partial<User>): User {
+function createTestUser(overrides?: Partial<User>: User {
   return {
     id: 'test-id',
     name: 'Test User',
@@ -177,10 +177,10 @@ export const mockUsers = [/* ... */];
 ```typescript
 [Show pattern, e.g.:
 
-it('should handle async operation', async () => {
-  const result = await asyncFunction();
-  expect(result).toBe('expected');
-});
+it('should handle async operation', async ( => {
+  const result = await asyncFunction(;
+  expect(result.toBe('expected';
+};
 ]
 ```
 
@@ -188,14 +188,14 @@ it('should handle async operation', async () => {
 ```typescript
 [Show pattern, e.g.:
 
-it('should throw on invalid input', () => {
-  expect(() => functionCall()).toThrow('error message');
-});
+it('should throw on invalid input', ( => {
+  expect(( => functionCall(.toThrow('error message';
+};
 
 // Async error
-it('should reject on failure', async () => {
-  await expect(asyncCall()).rejects.toThrow('error message');
-});
+it('should reject on failure', async ( => {
+  await expect(asyncCall(.rejects.toThrow('error message';
+};
 ]
 ```
 
@@ -254,7 +254,7 @@ src/
     install-service.test.ts
   bin/
     install.ts
-    (no test - integration tested via CLI)
+    (no test - integration tested via CLI
 ```
 
 ## Test Structure
@@ -263,41 +263,41 @@ src/
 ```typescript
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-describe('ModuleName', () => {
-  describe('functionName', () => {
-    beforeEach(() => {
+describe('ModuleName', ( => {
+  describe('functionName', ( => {
+    beforeEach(( => {
       // reset state
-    });
+    };
 
-    it('should handle valid input', () => {
+    it('should handle valid input', ( => {
       // arrange
-      const input = createTestInput();
+      const input = createTestInput(;
 
       // act
-      const result = functionName(input);
+      const result = functionName(input;
 
       // assert
-      expect(result).toEqual(expectedOutput);
-    });
+      expect(result.toEqual(expectedOutput;
+    };
 
-    it('should throw on invalid input', () => {
-      expect(() => functionName(null)).toThrow('Invalid input');
-    });
-  });
-});
+    it('should throw on invalid input', ( => {
+      expect(( => functionName(null.toThrow('Invalid input';
+    };
+  };
+};
 ```
 
 **Patterns:**
 - Use beforeEach for per-test setup, avoid beforeAll
-- Use afterEach to restore mocks: vi.restoreAllMocks()
+- Use afterEach to restore mocks: vi.restoreAllMocks(
 - Explicit arrange/act/assert comments in complex tests
-- One assertion focus per test (but multiple expects OK)
+- One assertion focus per test (but multiple expects OK
 
 ## Mocking
 
 **Framework:**
-- Vitest built-in mocking (vi)
-- Module mocking via vi.mock() at top of test file
+- Vitest built-in mocking (vi
+- Module mocking via vi.mock( at top of test file
 
 **Patterns:**
 ```typescript
@@ -305,31 +305,31 @@ import { vi } from 'vitest';
 import { externalFunction } from './external';
 
 // Mock module
-vi.mock('./external', () => ({
-  externalFunction: vi.fn()
-}));
+vi.mock('./external', ( => ({
+  externalFunction: vi.fn(
+};
 
-describe('test suite', () => {
-  it('mocks function', () => {
-    const mockFn = vi.mocked(externalFunction);
-    mockFn.mockReturnValue('mocked result');
+describe('test suite', ( => {
+  it('mocks function', ( => {
+    const mockFn = vi.mocked(externalFunction;
+    mockFn.mockReturnValue('mocked result';
 
     // test code using mocked function
 
-    expect(mockFn).toHaveBeenCalledWith('expected arg');
-  });
-});
+    expect(mockFn.toHaveBeenCalledWith('expected arg';
+  };
+};
 ```
 
 **What to Mock:**
-- File system operations (fs-extra)
-- Child process execution (child_process.exec)
+- File system operations (fs-extra
+- Child process execution (child_process.exec
 - External API calls
-- Environment variables (process.env)
+- Environment variables (process.env
 
 **What NOT to Mock:**
 - Internal pure functions
-- Simple utilities (string manipulation, array helpers)
+- Simple utilities (string manipulation, array helpers
 - TypeScript types
 
 ## Fixtures and Factories
@@ -337,7 +337,7 @@ describe('test suite', () => {
 **Test Data:**
 ```typescript
 // Factory functions in test file
-function createTestConfig(overrides?: Partial<Config>): Config {
+function createTestConfig(overrides?: Partial<Config>: Config {
   return {
     targetDir: '/tmp/test',
     global: false,
@@ -355,7 +355,7 @@ Content here`;
 
 **Location:**
 - Factory functions: define in test file near usage
-- Shared fixtures: tests/fixtures/ (for multi-file test data)
+- Shared fixtures: tests/fixtures/ (for multi-file test data
 - Mock data: inline in test when simple, factory when complex
 
 ## Coverage
@@ -363,10 +363,10 @@ Content here`;
 **Requirements:**
 - No enforced coverage target
 - Coverage tracked for awareness
-- Focus on critical paths (parsers, service logic)
+- Focus on critical paths (parsers, service logic
 
 **Configuration:**
-- Vitest coverage via c8 (built-in)
+- Vitest coverage via c8 (built-in
 - Excludes: *.test.ts, bin/install.ts, config files
 
 **View Coverage:**
@@ -379,14 +379,14 @@ open coverage/index.html
 
 **Unit Tests:**
 - Test single function in isolation
-- Mock all external dependencies (fs, child_process)
+- Mock all external dependencies (fs, child_process
 - Fast: each test <100ms
 - Examples: parser.test.ts, validator.test.ts
 
 **Integration Tests:**
 - Test multiple modules together
-- Mock only external boundaries (file system, process)
-- Examples: install-service.test.ts (tests service + parser)
+- Mock only external boundaries (file system, process
+- Examples: install-service.test.ts (tests service + parser
 
 **E2E Tests:**
 - Not currently used
@@ -396,22 +396,22 @@ open coverage/index.html
 
 **Async Testing:**
 ```typescript
-it('should handle async operation', async () => {
-  const result = await asyncFunction();
-  expect(result).toBe('expected');
-});
+it('should handle async operation', async ( => {
+  const result = await asyncFunction(;
+  expect(result.toBe('expected';
+};
 ```
 
 **Error Testing:**
 ```typescript
-it('should throw on invalid input', () => {
-  expect(() => parse(null)).toThrow('Cannot parse null');
-});
+it('should throw on invalid input', ( => {
+  expect(( => parse(null.toThrow('Cannot parse null';
+};
 
 // Async error
-it('should reject on file not found', async () => {
-  await expect(readConfig('invalid.txt')).rejects.toThrow('ENOENT');
-});
+it('should reject on file not found', async ( => {
+  await expect(readConfig('invalid.txt'.rejects.toThrow('ENOENT';
+};
 ```
 
 **File System Mocking:**
@@ -419,12 +419,12 @@ it('should reject on file not found', async () => {
 import { vi } from 'vitest';
 import * as fs from 'fs-extra';
 
-vi.mock('fs-extra');
+vi.mock('fs-extra';
 
-it('mocks file system', () => {
-  vi.mocked(fs.readFile).mockResolvedValue('file content');
+it('mocks file system', ( => {
+  vi.mocked(fs.readFile.mockResolvedValue('file content';
   // test code
-});
+};
 ```
 
 **Snapshot Testing:**
@@ -442,39 +442,39 @@ it('mocks file system', () => {
 **What belongs in TESTING.md:**
 - Test framework and runner configuration
 - Test file location and naming patterns
-- Test structure (describe/it, beforeEach patterns)
+- Test structure (describe/it, beforeEach patterns
 - Mocking approach and examples
 - Fixture/factory patterns
 - Coverage requirements
-- How to run tests (commands)
+- How to run tests (commands
 - Common testing patterns in actual code
 
 **What does NOT belong here:**
-- Specific test cases (defer to actual test files)
-- Technology choices (that's STACK.md)
-- CI/CD setup (that's deployment docs)
+- Specific test cases (defer to actual test files
+- Technology choices (that's STACK.md
+- CI/CD setup (that's deployment docs
 
 **When filling this template:**
 - Check package.json scripts for test commands
-- Find test config file (jest.config.js, vitest.config.ts)
-- read 3-5 existing test files to identify patterns
+- Find test config file (jest.config.js, vitest.config.ts
+- Read 3-5 existing test files to identify patterns
 - Look for test utilities in tests/ or test-utils/
 - Check for coverage configuration
 - Document actual patterns used, not ideal patterns
 
 **Useful for phase planning when:**
-- Adding new features (write matching tests)
-- Refactoring (maintain test patterns)
-- Fixing bugs (add regression tests)
+- Adding new features (write matching tests
+- Refactoring (maintain test patterns
+- Fixing bugs (add regression tests
 - Understanding verification approach
 - Setting up test infrastructure
 
 **Analysis approach:**
 - Check package.json for test framework and scripts
-- read test config file for coverage, setup
-- Examine test file organization (collocated vs separate)
-- Review 5 test files for patterns (mocking, structure, assertions)
+- Read test config file for coverage, setup
+- Examine test file organization (collocated vs separate
+- Review 5 test files for patterns (mocking, structure, assertions
 - Look for test utilities, fixtures, factories
-- Note any test types (unit, integration, e2e)
+- Note any test types (unit, integration, e2e
 - Document commands for running tests
 </guidelines>

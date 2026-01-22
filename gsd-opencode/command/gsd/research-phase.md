@@ -1,10 +1,11 @@
 ---
 name: gsd-research-phase
-description: Research how to implement a phase (standalone - usually use /gsd-plan-phase instead)
+description: Research how to implement a phase (standalone - usually use /gsd-plan-phase instead
 argument-hint: "[phase]"
-tools:
+allowed-tools:
   - read
   - bash
+
 ---
 
 <objective>
@@ -19,25 +20,43 @@ Research how to implement a phase. Spawns gsd-phase-researcher agent with phase 
 
 **Orchestrator role:** Parse phase, validate against roadmap, check existing research, gather context, spawn researcher agent, present results.
 
-**Why subagent:** Research burns context fast (webfetch, Context7 queries, source verification). Fresh 200k context for investigation. Main context stays lean for user interaction.
+**Why subagent:** Research burns context fast (websearch, Context7 queries, source verification. Fresh 200k context for investigation. Main context stays lean for user interaction.
 </objective>
 
 <context>
-Phase number: $ARGUMENTS (required)
+Phase number: $ARGUMENTS (required
 
 Normalize phase input in step 1 before any directory lookups.
 </context>
 
 <process>
 
+## 0. Resolve Model Profile
+
+Read model profile for agent spawning:
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced"
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-phase-researcher | opus | sonnet | haiku |
+
+Store resolved model for use in Task calls below.
+
 ## 1. Normalize and Validate Phase
 
 ```bash
-# Normalize phase number (8 → 08, but preserve decimals like 2.1 → 02.1)
+# Normalize phase number (8 → 08, but preserve decimals like 2.1 → 02.1
 if [[ "$ARGUMENTS" =~ ^[0-9]+$ ]]; then
-  PHASE=$(printf "%02d" "$ARGUMENTS")
-elif [[ "$ARGUMENTS" =~ ^([0-9]+)\.([0-9]+)$ ]]; then
-  PHASE=$(printf "%02d.%s" "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}")
+  PHASE=$(printf "%02d" "$ARGUMENTS"
+elif [[ "$ARGUMENTS" =~ ^([0-9]+\.([0-9]+$ ]]; then
+  PHASE=$(printf "%02d.%s" "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
 else
   PHASE="$ARGUMENTS"
 fi
@@ -53,7 +72,7 @@ grep -A5 "Phase ${PHASE}:" .planning/ROADMAP.md 2>/dev/null
 ls .planning/phases/${PHASE}-*/RESEARCH.md 2>/dev/null
 ```
 
-**If exists:** Offer: 1) Update research, 2) View existing, 3) Skip. Wait for response.
+**If exists:** Offer: 1 Update research, 2 View existing, 3 Skip. Wait for response.
 
 **If doesn't exist:** Continue.
 
@@ -68,9 +87,9 @@ grep -A30 "### Decisions Made" .planning/STATE.md 2>/dev/null
 
 Present summary with phase description, requirements, prior decisions.
 
-## 4. Spawn gsd-researcher Agent
+## 4. Spawn gsd-phase-researcher Agent
 
-Research modes: ecosystem (default), feasibility, implementation, comparison.
+Research modes: ecosystem (default, feasibility, implementation, comparison.
 
 ```markdown
 <research_type>
@@ -115,7 +134,7 @@ Be prescriptive, not exploratory. "Use X" not "Consider X or Y."
 
 <quality_gate>
 Before declaring complete, verify:
-- [ ] All domains investigated (not just some)
+- [ ] All domains investigated (not just some
 - [ ] Negative claims verified with official docs
 - [ ] Multiple sources for critical claims
 - [ ] Confidence levels assigned honestly
@@ -123,7 +142,7 @@ Before declaring complete, verify:
 </quality_gate>
 
 <output>
-write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
+Write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 </output>
 ```
 
@@ -131,8 +150,9 @@ write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 Task(
   prompt=filled_prompt,
   subagent_type="gsd-phase-researcher",
+  model="{researcher_model}",
   description="Research Phase {phase}"
-)
+
 ```
 
 ## 5. Handle Agent Return
@@ -164,8 +184,9 @@ Research file: @.planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 Task(
   prompt=continuation_prompt,
   subagent_type="gsd-phase-researcher",
+  model="{researcher_model}",
   description="Continue research Phase {phase}"
-)
+
 ```
 
 </process>

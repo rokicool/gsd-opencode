@@ -78,7 +78,7 @@ Template for `.planning/codebase/INTEGRATIONS.md` - captures external service de
   - Events tracked: [e.g., "user actions, page views"]
 
 **Logs:**
-- [Service] - [e.g., "CloudWatch", "Datadog", "none (stdout only)"]
+- [Service] - [e.g., "CloudWatch", "Datadog", "none (stdout only"]
   - Integration: [e.g., "AWS Lambda built-in"]
 
 ## CI/CD & Deployment
@@ -97,7 +97,7 @@ Template for `.planning/codebase/INTEGRATIONS.md` - captures external service de
 
 **Development:**
 - Required env vars: [List critical vars]
-- Secrets location: [e.g., ".env.local (gitignored)", "1Password vault"]
+- Secrets location: [e.g., ".env.local (gitignored", "1Password vault"]
 - Mock/stub services: [e.g., "Stripe test mode", "local PostgreSQL"]
 
 **Staging:**
@@ -141,16 +141,16 @@ Template for `.planning/codebase/INTEGRATIONS.md` - captures external service de
   - Endpoints used: checkout sessions, customer portal, webhooks
 
 **Email/SMS:**
-- SendGrid - Transactional emails (receipts, password resets)
+- SendGrid - Transactional emails (receipts, password resets
   - SDK/Client: @sendgrid/mail v8.1
   - Auth: API key in SENDGRID_API_KEY env var
-  - Templates: Managed in SendGrid dashboard (template IDs in code)
+  - Templates: Managed in SendGrid dashboard (template IDs in code
 
 **External APIs:**
 - OpenAI API - Course content generation
   - Integration method: REST API via openai npm package v4.x
   - Auth: Bearer token in OPENAI_API_KEY env var
-  - Rate limits: 3500 requests/min (tier 3)
+  - Rate limits: 3500 requests/min (tier 3
 
 ## Data Storage
 
@@ -161,13 +161,13 @@ Template for `.planning/codebase/INTEGRATIONS.md` - captures external service de
   - Migrations: prisma migrate in prisma/migrations/
 
 **File Storage:**
-- Supabase Storage - User uploads (profile images, course materials)
+- Supabase Storage - User uploads (profile images, course materials
   - SDK/Client: @supabase/supabase-js v2.x
   - Auth: Service role key in SUPABASE_SERVICE_ROLE_KEY
-  - Buckets: avatars (public), course-materials (private)
+  - Buckets: avatars (public, course-materials (private
 
 **Caching:**
-- None currently (all database queries, no Redis)
+- None currently (all database queries, no Redis
 
 ## Authentication & Identity
 
@@ -179,7 +179,7 @@ Template for `.planning/codebase/INTEGRATIONS.md` - captures external service de
 
 **OAuth Integrations:**
 - Google OAuth - Social sign-in
-  - Credentials: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET (Supabase dashboard)
+  - Credentials: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET (Supabase dashboard
   - Scopes: email, profile
 
 ## Monitoring & Observability
@@ -190,7 +190,7 @@ Template for `.planning/codebase/INTEGRATIONS.md` - captures external service de
   - Release tracking: Git commit SHA via SENTRY_RELEASE
 
 **Analytics:**
-- None (planned: Mixpanel)
+- None (planned: Mixpanel
 
 **Logs:**
 - Vercel logs - stdout/stderr only
@@ -201,18 +201,18 @@ Template for `.planning/codebase/INTEGRATIONS.md` - captures external service de
 **Hosting:**
 - Vercel - Next.js app hosting
   - Deployment: Automatic on main branch push
-  - Environment vars: Configured in Vercel dashboard (synced to .env.example)
+  - Environment vars: Configured in Vercel dashboard (synced to .env.example
 
 **CI Pipeline:**
 - GitHub Actions - Tests and type checking
   - Workflows: .github/workflows/ci.yml
-  - Secrets: None needed (public repo tests only)
+  - Secrets: None needed (public repo tests only
 
 ## Environment Configuration
 
 **Development:**
 - Required env vars: DATABASE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
-- Secrets location: .env.local (gitignored), team shared via 1Password vault
+- Secrets location: .env.local (gitignored, team shared via 1Password vault
 - Mock/stub services: Stripe test mode, Supabase local dev project
 
 **Staging:**
@@ -244,27 +244,27 @@ Template for `.planning/codebase/INTEGRATIONS.md` - captures external service de
 <guidelines>
 **What belongs in INTEGRATIONS.md:**
 - External services the code communicates with
-- Authentication patterns (where secrets live, not the secrets themselves)
+- Authentication patterns (where secrets live, not the secrets themselves
 - SDKs and client libraries used
-- Environment variable names (not values)
+- Environment variable names (not values
 - Webhook endpoints and verification methods
 - Database connection patterns
 - File storage locations
 - Monitoring and logging services
 
 **What does NOT belong here:**
-- Actual API keys or secrets (NEVER write these)
-- Internal architecture (that's ARCHITECTURE.md)
-- Code patterns (that's PATTERNS.md)
-- Technology choices (that's STACK.md)
-- Performance issues (that's CONCERNS.md)
+- Actual API keys or secrets (NEVER write these
+- Internal architecture (that's ARCHITECTURE.md
+- Code patterns (that's PATTERNS.md
+- Technology choices (that's STACK.md
+- Performance issues (that's CONCERNS.md
 
 **When filling this template:**
 - Check .env.example or .env.template for required env vars
-- Look for SDK imports (stripe, @sendgrid/mail, etc.)
+- Look for SDK imports (stripe, @sendgrid/mail, etc.
 - Check for webhook handlers in routes/endpoints
-- Note where secrets are managed (not the secrets)
-- Document environment-specific differences (dev/staging/prod)
+- Note where secrets are managed (not the secrets
+- Document environment-specific differences (dev/staging/prod
 - Include auth patterns for each service
 
 **Useful for phase planning when:**
@@ -276,5 +276,5 @@ Template for `.planning/codebase/INTEGRATIONS.md` - captures external service de
 - Planning for service outages or migrations
 
 **Security note:**
-Document WHERE secrets live (env vars, Vercel dashboard, 1Password), never WHAT the secrets are.
+Document WHERE secrets live (env vars, Vercel dashboard, 1Password, never WHAT the secrets are.
 </guidelines>

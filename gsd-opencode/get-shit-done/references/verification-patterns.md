@@ -22,8 +22,8 @@ These patterns indicate placeholder code regardless of file type:
 
 **Comment-based stubs:**
 ```bash
-# grep patterns for stub comments
-grep -E "(TODO|FIXME|XXX|HACK|PLACEHOLDER)" "$file"
+# Grep patterns for stub comments
+grep -E "(TODO|FIXME|XXX|HACK|PLACEHOLDER" "$file"
 grep -E "implement|add later|coming soon|will be" "$file" -i
 grep -E "// \.\.\.|/\* \.\.\. \*/|# \.\.\." "$file"
 ```
@@ -41,7 +41,7 @@ grep -E "\[.*\]|<.*>|\{.*\}" "$file"  # Template brackets left in
 # Functions that do nothing
 grep -E "return null|return undefined|return \{\}|return \[\]" "$file"
 grep -E "pass$|\.\.\.|\bnothing\b" "$file"
-grep -E "console\.(log|warn|error).*only" "$file"  # Log-only functions
+grep -E "console\.(log|warn|error.*only" "$file"  # Log-only functions
 ```
 
 **Hardcoded values where dynamic expected:**
@@ -61,7 +61,7 @@ grep -E "\\\$\d+\.\d{2}|\d+ items" "$file"  # Hardcoded display values
 **Existence check:**
 ```bash
 # File exists and exports component
-[ -f "$component_path" ] && grep -E "export (default |)function|export const.*=.*\(" "$component_path"
+[ -f "$component_path" ] && grep -E "export (default |function|export const.*=.*\(" "$component_path"
 ```
 
 **Substantive check:**
@@ -69,10 +69,10 @@ grep -E "\\\$\d+\.\d{2}|\d+ items" "$file"  # Hardcoded display values
 # Returns actual JSX, not placeholder
 grep -E "return.*<" "$component_path" | grep -v "return.*null" | grep -v "placeholder" -i
 
-# Has meaningful content (not just wrapper div)
+# Has meaningful content (not just wrapper div
 grep -E "<[A-Z][a-zA-Z]+|className=|onClick=|onChange=" "$component_path"
 
-# Uses props or state (not static)
+# Uses props or state (not static
 grep -E "props\.|useState|useEffect|useContext|\{.*\}" "$component_path"
 ```
 
@@ -87,9 +87,9 @@ return null
 return <></>
 
 // Also stubs - empty handlers:
-onClick={() => {}}
-onChange={() => console.log('clicked')}
-onSubmit={(e) => e.preventDefault()}  // Only prevents default, does nothing
+onClick={( => {}}
+onChange={( => console.log('clicked'}
+onSubmit={(e => e.preventDefault(}  // Only prevents default, does nothing
 ```
 
 **Wiring check:**
@@ -97,15 +97,15 @@ onSubmit={(e) => e.preventDefault()}  // Only prevents default, does nothing
 # Component imports what it needs
 grep -E "^import.*from" "$component_path"
 
-# Props are actually used (not just received)
+# Props are actually used (not just received
 # Look for destructuring or props.X usage
 grep -E "\{ .* \}.*props|\bprops\.[a-zA-Z]+" "$component_path"
 
-# API calls exist (for data-fetching components)
+# API calls exist (for data-fetching components
 grep -E "fetch\(|axios\.|useSWR|useQuery|getServerSideProps|getStaticProps" "$component_path"
 ```
 
-**Functional verification (human required):**
+**Functional verification (human required:**
 - Does the component render visible content?
 - Do interactive elements respond to clicks?
 - Does data load and display?
@@ -115,18 +115,18 @@ grep -E "fetch\(|axios\.|useSWR|useQuery|getServerSideProps|getStaticProps" "$co
 
 <api_routes>
 
-## API Routes (Next.js App Router / Express / etc.)
+## API Routes (Next.js App Router / Express / etc.
 
 **Existence check:**
 ```bash
 # Route file exists
 [ -f "$route_path" ]
 
-# Exports HTTP method handlers (Next.js App Router)
-grep -E "export (async )?(function|const) (GET|POST|PUT|PATCH|DELETE)" "$route_path"
+# Exports HTTP method handlers (Next.js App Router
+grep -E "export (async ?(function|const (GET|POST|PUT|PATCH|DELETE" "$route_path"
 
 # Or Express-style handlers
-grep -E "\.(get|post|put|patch|delete)\(" "$route_path"
+grep -E "\.(get|post|put|patch|delete\(" "$route_path"
 ```
 
 **Substantive check:**
@@ -147,22 +147,22 @@ grep -E "Response\.json|res\.json|res\.send|return.*\{" "$route_path" | grep -v 
 **Stub patterns specific to API routes:**
 ```typescript
 // RED FLAGS - These are stubs:
-export async function POST() {
-  return Response.json({ message: "Not implemented" })
+export async function POST( {
+  return Response.json({ message: "Not implemented" }
 }
 
-export async function GET() {
-  return Response.json([])  // Empty array with no DB query
+export async function GET( {
+  return Response.json([]  // Empty array with no DB query
 }
 
-export async function PUT() {
-  return new Response()  // Empty response
+export async function PUT( {
+  return new Response(  // Empty response
 }
 
 // Console log only:
-export async function POST(req) {
-  console.log(await req.json())
-  return Response.json({ ok: true })
+export async function POST(req {
+  console.log(await req.json(
+  return Response.json({ ok: true }
 }
 ```
 
@@ -171,14 +171,14 @@ export async function POST(req) {
 # Imports database/service clients
 grep -E "^import.*prisma|^import.*db|^import.*client" "$route_path"
 
-# Actually uses request body (for POST/PUT)
-grep -E "req\.json\(\)|req\.body|request\.json\(\)" "$route_path"
+# Actually uses request body (for POST/PUT
+grep -E "req\.json\(\|req\.body|request\.json\(\" "$route_path"
 
-# Validates input (not just trusting request)
+# Validates input (not just trusting request
 grep -E "schema\.parse|validate|zod|yup|joi" "$route_path"
 ```
 
-**Functional verification (human or automated):**
+**Functional verification (human or automated:**
 - Does GET return real data from database?
 - Does POST actually create a record?
 - Does error response have correct status code?
@@ -188,7 +188,7 @@ grep -E "schema\.parse|validate|zod|yup|joi" "$route_path"
 
 <database_schema>
 
-## Database Schema (Prisma / Drizzle / SQL)
+## Database Schema (Prisma / Drizzle / SQL
 
 **Existence check:**
 ```bash
@@ -201,13 +201,13 @@ grep -E "^model $model_name|CREATE TABLE $table_name|export const $table_name" "
 
 **Substantive check:**
 ```bash
-# Has expected fields (not just id)
+# Has expected fields (not just id
 grep -A 20 "model $model_name" "$schema_path" | grep -E "^\s+\w+\s+\w+"
 
 # Has relationships if expected
 grep -E "@relation|REFERENCES|FOREIGN KEY" "$schema_path"
 
-# Has appropriate field types (not all String)
+# Has appropriate field types (not all String
 grep -A 20 "model $model_name" "$schema_path" | grep -E "Int|DateTime|Boolean|Float|Decimal|Json"
 ```
 
@@ -243,8 +243,8 @@ npx prisma migrate status 2>/dev/null | grep -v "pending"
 
 **Functional verification:**
 ```bash
-# Can query the table (automated)
-npx prisma db execute --stdin <<< "SELECT COUNT(*) FROM $table_name"
+# Can query the table (automated
+npx prisma db execute --stdin <<< "SELECT COUNT(* FROM $table_name"
 ```
 
 </database_schema>
@@ -256,35 +256,35 @@ npx prisma db execute --stdin <<< "SELECT COUNT(*) FROM $table_name"
 **Existence check:**
 ```bash
 # File exists and exports function
-[ -f "$hook_path" ] && grep -E "export (default )?(function|const)" "$hook_path"
+[ -f "$hook_path" ] && grep -E "export (default ?(function|const" "$hook_path"
 ```
 
 **Substantive check:**
 ```bash
-# Hook uses React hooks (for custom hooks)
+# Hook uses React hooks (for custom hooks
 grep -E "useState|useEffect|useCallback|useMemo|useRef|useContext" "$hook_path"
 
 # Has meaningful return value
 grep -E "return \{|return \[" "$hook_path"
 
 # More than trivial length
-[ $(wc -l < "$hook_path") -gt 10 ]
+[ $(wc -l < "$hook_path" -gt 10 ]
 ```
 
 **Stub patterns specific to hooks:**
 ```typescript
 // RED FLAGS - These are stubs:
-export function useAuth() {
-  return { user: null, login: () => {}, logout: () => {} }
+export function useAuth( {
+  return { user: null, login: ( => {}, logout: ( => {} }
 }
 
-export function useCart() {
-  const [items, setItems] = useState([])
-  return { items, addItem: () => console.log('add'), removeItem: () => {} }
+export function useCart( {
+  const [items, setItems] = useState([]
+  return { items, addItem: ( => console.log('add', removeItem: ( => {} }
 }
 
 // Hardcoded return:
-export function useUser() {
+export function useUser( {
   return { name: "Test User", email: "test@example.com" }
 }
 ```
@@ -295,7 +295,7 @@ export function useUser() {
 grep -r "import.*$hook_name" src/ --include="*.tsx" --include="*.ts" | grep -v "$hook_path"
 
 # Hook is actually called
-grep -r "$hook_name()" src/ --include="*.tsx" --include="*.ts" | grep -v "$hook_path"
+grep -r "$hook_name(" src/ --include="*.tsx" --include="*.ts" | grep -v "$hook_path"
 ```
 
 </hooks_utilities>
@@ -315,7 +315,7 @@ grep -E "^$VAR_NAME=" .env .env.local 2>/dev/null
 
 **Substantive check:**
 ```bash
-# Variable has actual value (not placeholder)
+# Variable has actual value (not placeholder
 grep -E "^$VAR_NAME=.+" .env .env.local 2>/dev/null | grep -v "your-.*-here|xxx|placeholder|TODO" -i
 
 # Value looks valid for type:
@@ -338,7 +338,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000  # Still pointing to localhost in prod
 # Variable is actually used in code
 grep -r "process\.env\.$VAR_NAME|env\.$VAR_NAME" src/ --include="*.ts" --include="*.tsx"
 
-# Variable is in validation schema (if using zod/etc for env)
+# Variable is in validation schema (if using zod/etc for env
 grep -E "$VAR_NAME" src/env.ts src/env.mjs 2>/dev/null
 ```
 
@@ -356,7 +356,7 @@ Wiring verification checks that components actually communicate. This is where m
 
 ```bash
 # Find the fetch/axios call
-grep -E "fetch\(['\"].*$api_path|axios\.(get|post).*$api_path" "$component_path"
+grep -E "fetch\(['\"].*$api_path|axios\.(get|post.*$api_path" "$component_path"
 
 # Verify it's not commented out
 grep -E "fetch\(|axios\." "$component_path" | grep -v "^.*//.*fetch"
@@ -368,13 +368,13 @@ grep -E "await.*fetch|\.then\(|setData|setState" "$component_path"
 **Red flags:**
 ```typescript
 // Fetch exists but response ignored:
-fetch('/api/messages')  // No await, no .then, no assignment
+fetch('/api/messages'  // No await, no .then, no assignment
 
 // Fetch in comment:
-// fetch('/api/messages').then(r => r.json()).then(setMessages)
+// fetch('/api/messages'.then(r => r.json(.then(setMessages
 
 // Fetch to wrong endpoint:
-fetch('/api/message')  // Typo - should be /api/messages
+fetch('/api/message'  // Typo - should be /api/messages
 ```
 
 ### Pattern: API → Database
@@ -395,12 +395,12 @@ grep -E "return.*json.*data|res\.json.*result" "$route_path"
 **Red flags:**
 ```typescript
 // Query exists but result not returned:
-await prisma.message.findMany()
-return Response.json({ ok: true })  // Returns static, not query result
+await prisma.message.findMany(
+return Response.json({ ok: true }  // Returns static, not query result
 
 // Query not awaited:
-const messages = prisma.message.findMany()  // Missing await
-return Response.json(messages)  // Returns Promise, not data
+const messages = prisma.message.findMany(  // Missing await
+return Response.json(messages  // Returns Promise, not data
 ```
 
 ### Pattern: Form → Handler
@@ -421,15 +421,15 @@ grep -A 5 "onSubmit" "$component_path" | grep -v "only.*preventDefault" -i
 **Red flags:**
 ```typescript
 // Handler only prevents default:
-onSubmit={(e) => e.preventDefault()}
+onSubmit={(e => e.preventDefault(}
 
 // Handler only logs:
-const handleSubmit = (data) => {
-  console.log(data)
+const handleSubmit = (data => {
+  console.log(data
 }
 
 // Handler is empty:
-onSubmit={() => {}}
+onSubmit={( => {}}
 ```
 
 ### Pattern: State → Render
@@ -456,12 +456,12 @@ return <div>
 </div>
 
 // State exists but not rendered:
-const [messages, setMessages] = useState([])
+const [messages, setMessages] = useState([]
 return <div>No messages</div>  // Always shows "no messages"
 
 // Wrong state rendered:
-const [messages, setMessages] = useState([])
-return <div>{otherData.map(...)}</div>  // Uses different data
+const [messages, setMessages] = useState([]
+return <div>{otherData.map(...}</div>  // Uses different data
 ```
 
 </wiring_verification>
@@ -475,9 +475,9 @@ For each artifact type, run through this checklist:
 ### Component Checklist
 - [ ] File exists at expected path
 - [ ] Exports a function/const component
-- [ ] Returns JSX (not null/empty)
+- [ ] Returns JSX (not null/empty
 - [ ] No placeholder text in render
-- [ ] Uses props or state (not static)
+- [ ] Uses props or state (not static
 - [ ] Event handlers have real implementations
 - [ ] Imports resolve correctly
 - [ ] Used somewhere in the app
@@ -487,7 +487,7 @@ For each artifact type, run through this checklist:
 - [ ] Exports HTTP method handlers
 - [ ] Handlers have more than 5 lines
 - [ ] Queries database or service
-- [ ] Returns meaningful response (not empty/placeholder)
+- [ ] Returns meaningful response (not empty/placeholder
 - [ ] Has error handling
 - [ ] Validates input
 - [ ] Called from frontend
@@ -503,7 +503,7 @@ For each artifact type, run through this checklist:
 ### Hook/Utility Checklist
 - [ ] File exists at expected path
 - [ ] Exports function
-- [ ] Has meaningful implementation (not empty returns)
+- [ ] Has meaningful implementation (not empty returns
 - [ ] Used somewhere in the app
 - [ ] Return values consumed
 
@@ -523,32 +523,32 @@ For the verification subagent, use this pattern:
 
 ```bash
 # 1. Check existence
-check_exists() {
+check_exists( {
   [ -f "$1" ] && echo "EXISTS: $1" || echo "MISSING: $1"
 }
 
 # 2. Check for stub patterns
-check_stubs() {
+check_stubs( {
   local file="$1"
-  local stubs=$(grep -c -E "TODO|FIXME|placeholder|not implemented" "$file" 2>/dev/null || echo 0)
+  local stubs=$(grep -c -E "TODO|FIXME|placeholder|not implemented" "$file" 2>/dev/null || echo 0
   [ "$stubs" -gt 0 ] && echo "STUB_PATTERNS: $stubs in $file"
 }
 
-# 3. Check wiring (component calls API)
-check_wiring() {
+# 3. Check wiring (component calls API
+check_wiring( {
   local component="$1"
   local api_path="$2"
   grep -q "$api_path" "$component" && echo "WIRED: $component → $api_path" || echo "NOT_WIRED: $component → $api_path"
 }
 
-# 4. Check substantive (more than N lines, has expected patterns)
-check_substantive() {
+# 4. Check substantive (more than N lines, has expected patterns
+check_substantive( {
   local file="$1"
   local min_lines="$2"
   local pattern="$3"
-  local lines=$(wc -l < "$file" 2>/dev/null || echo 0)
-  local has_pattern=$(grep -c -E "$pattern" "$file" 2>/dev/null || echo 0)
-  [ "$lines" -ge "$min_lines" ] && [ "$has_pattern" -gt 0 ] && echo "SUBSTANTIVE: $file" || echo "THIN: $file ($lines lines, $has_pattern matches)"
+  local lines=$(wc -l < "$file" 2>/dev/null || echo 0
+  local has_pattern=$(grep -c -E "$pattern" "$file" 2>/dev/null || echo 0
+  [ "$lines" -ge "$min_lines" ] && [ "$has_pattern" -gt 0 ] && echo "SUBSTANTIVE: $file" || echo "THIN: $file ($lines lines, $has_pattern matches"
 }
 ```
 
@@ -563,12 +563,12 @@ Run these checks against each must-have artifact. Aggregate results into VERIFIC
 Some things can't be verified programmatically. Flag these for human testing:
 
 **Always human:**
-- Visual appearance (does it look right?)
-- User flow completion (can you actually do the thing?)
-- Real-time behavior (WebSocket, SSE)
-- External service integration (Stripe, email sending)
-- Error message clarity (is the message helpful?)
-- Performance feel (does it feel fast?)
+- Visual appearance (does it look right?
+- User flow completion (can you actually do the thing?
+- Real-time behavior (WebSocket, SSE
+- External service integration (Stripe, email sending
+- Error message clarity (is the message helpful?
+- Performance feel (does it feel fast?
 
 **Human if uncertain:**
 - Complex wiring that grep can't trace
@@ -593,3 +593,20 @@ Some things can't be verified programmatically. Flag these for human testing:
 ```
 
 </human_verification_triggers>
+
+<checkpoint_automation_reference>
+
+## Pre-Checkpoint Automation
+
+For automation-first checkpoint patterns, server lifecycle management, CLI installation handling, and error recovery protocols, see:
+
+**@~/.config/opencode/get-shit-done/references/checkpoints.md** → `<automation_reference>` section
+
+Key principles:
+- OpenCode sets up verification environment BEFORE presenting checkpoints
+- Users never run CLI commands (visit URLs only
+- Server lifecycle: start before checkpoint, handle port conflicts, keep running for duration
+- CLI installation: auto-install where safe, checkpoint for user choice otherwise
+- Error handling: fix broken environment before checkpoint, never present checkpoint with failed setup
+
+</checkpoint_automation_reference>

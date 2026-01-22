@@ -3,7 +3,7 @@ type: prompt
 name: gsd-complete-milestone
 description: Archive completed milestone and prepare for next version
 argument-hint: <version>
-tools:
+allowed-tools:
   - read
   - write
   - bash
@@ -12,15 +12,15 @@ tools:
 <objective>
 Mark milestone {{version}} complete, archive to milestones/, and update ROADMAP.md and REQUIREMENTS.md.
 
-Purpose: Create historical record of shipped version, archive milestone artifacts (roadmap + requirements), and prepare for next milestone.
-Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tagged.
+Purpose: Create historical record of shipped version, archive milestone artifacts (roadmap + requirements, and prepare for next milestone.
+Output: Milestone archived (roadmap + requirements, PROJECT.md evolved, git tagged.
 </objective>
 
 <execution_context>
-**Load these files NOW (before proceeding):**
+**Load these files NOW (before proceeding:**
 
-- @~/.config/opencode/get-shit-done/workflows/complete-milestone.md (main workflow)
-- @~/.config/opencode/get-shit-done/templates/milestone-archive.md (archive template)
+- @~/.config/opencode/get-shit-done/workflows/complete-milestone.md (main workflow
+- @~/.config/opencode/get-shit-done/templates/milestone-archive.md (archive template
   </execution_context>
 
 <context>
@@ -32,7 +32,7 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
 
 **User input:**
 
-- Version: {{version}} (e.g., "1.0", "1.1", "2.0")
+- Version: {{version}} (e.g., "1.0", "1.1", "2.0"
   </context>
 
 <process>
@@ -63,7 +63,7 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
 
 1. **Verify readiness:**
 
-   - Check all phases in milestone have completed plans (SUMMARY.md exists)
+   - Check all phases in milestone have completed plans (SUMMARY.md exists
    - Present milestone scope and stats
    - Wait for confirmation
 
@@ -76,7 +76,7 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
 
 3. **Extract accomplishments:**
 
-   - read all phase SUMMARY.md files in milestone range
+   - Read all phase SUMMARY.md files in milestone range
    - Extract 4-6 key accomplishments
    - Present for approval
 
@@ -90,15 +90,15 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
 5. **Archive requirements:**
 
    - Create `.planning/milestones/v{{version}}-REQUIREMENTS.md`
-   - Mark all v1 requirements as complete (checkboxes checked)
-   - Note requirement outcomes (validated, adjusted, dropped)
-   - Delete `.planning/REQUIREMENTS.md` (fresh one created for next milestone)
+   - Mark all v1 requirements as complete (checkboxes checked
+   - Note requirement outcomes (validated, adjusted, dropped
+   - Delete `.planning/REQUIREMENTS.md` (fresh one created for next milestone
 
 6. **Update PROJECT.md:**
 
    - Add "Current State" section with shipped version
    - Add "Next Milestone Goals" section
-   - Archive previous content in `<details>` (if v1.1+)
+   - Archive previous content in `<details>` (if v1.1+
 
 7. **Commit and tag:**
 
@@ -108,7 +108,7 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
    - Ask about pushing tag
 
 8. **Offer next steps:**
-   - `/gsd-new-milestone` — start next milestone (questioning → research → requirements → roadmap)
+   - `/gsd-new-milestone` — start next milestone (questioning → research → requirements → roadmap
 
 </process>
 
@@ -116,17 +116,17 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
 
 - Milestone archived to `.planning/milestones/v{{version}}-ROADMAP.md`
 - Requirements archived to `.planning/milestones/v{{version}}-REQUIREMENTS.md`
-- `.planning/REQUIREMENTS.md` deleted (fresh for next milestone)
+- `.planning/REQUIREMENTS.md` deleted (fresh for next milestone
 - ROADMAP.md collapsed to one-line entry
 - PROJECT.md updated with current state
 - Git tag v{{version}} created
 - Commit successful
-- User knows next steps (including need for fresh requirements)
+- User knows next steps (including need for fresh requirements
   </success_criteria>
 
 <critical_rules>
 
-- **Load workflow first:** read complete-milestone.md before executing
+- **Load workflow first:** Read complete-milestone.md before executing
 - **Verify completion:** All phases must have SUMMARY.md files
 - **User confirmation:** Wait for approval at verification gates
 - **Archive before deleting:** Always create archive files before updating/deleting originals

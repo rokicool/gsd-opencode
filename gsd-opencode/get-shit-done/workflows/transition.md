@@ -1,12 +1,12 @@
 <required_reading>
 
-**read these files NOW:**
+**Read these files NOW:**
 
 1. `.planning/STATE.md`
 2. `.planning/PROJECT.md`
 3. `.planning/ROADMAP.md`
-4. Current phase's plan files (`*-PLAN.md`)
-5. Current phase's summary files (`*-SUMMARY.md`)
+4. Current phase's plan files (`*-PLAN.md`
+5. Current phase's summary files (`*-SUMMARY.md`
 
 </required_reading>
 
@@ -94,11 +94,11 @@ Phase [X] has incomplete plans:
 - {phase}-02-SUMMARY.md ✗ Missing
 - {phase}-03-SUMMARY.md ✗ Missing
 
-⚠️ Safety rail: Skipping plans requires confirmation (destructive action)
+⚠️ Safety rail: Skipping plans requires confirmation (destructive action
 
 Options:
-1. Continue current phase (execute remaining plans)
-2. Mark complete anyway (skip remaining plans)
+1. Continue current phase (execute remaining plans
+2. Mark complete anyway (skip remaining plans
 3. Review what's left
 ```
 
@@ -130,7 +130,7 @@ Update the file:
 
 - Mark current phase: `[x] Complete`
 - Add completion date
-- Update plan count to final (e.g., "3/3 plans complete")
+- Update plan count to final (e.g., "3/3 plans complete"
 - Update Progress table
 - Keep next phase as `[ ] Not started`
 
@@ -139,7 +139,7 @@ Update the file:
 ```markdown
 ## Phases
 
-- [x] Phase 1: Foundation (completed 2025-01-15)
+- [x] Phase 1: Foundation (completed 2025-01-15
 - [ ] Phase 2: Authentication ← Next
 - [ ] Phase 3: Core Features
 
@@ -165,7 +165,7 @@ The `completed/` subfolder pattern from create-meta-prompts handles archival.
 
 Evolve PROJECT.md to reflect learnings from completed phase.
 
-**read phase summaries:**
+**Read phase summaries:**
 
 ```bash
 cat .planning/phases/XX-current/*-SUMMARY.md
@@ -218,7 +218,7 @@ Before:
 - OAuth2 — complexity not needed for v1
 ```
 
-After (Phase 2 shipped JWT auth, discovered rate limiting needed):
+After (Phase 2 shipped JWT auth, discovered rate limiting needed:
 
 ```markdown
 ### Validated
@@ -255,7 +255,7 @@ Update Current Position section in STATE.md to reflect phase completion and tran
 **Format:**
 
 ```markdown
-Phase: [next] of [total] ([Next phase name])
+Phase: [next] of [total] ([Next phase name]
 Plan: Not started
 Status: Ready to plan
 Last activity: [today] — Phase [X] complete, transitioned to Phase [X+1]
@@ -278,7 +278,7 @@ Before:
 ```markdown
 ## Current Position
 
-Phase: 2 of 4 (Authentication)
+Phase: 2 of 4 (Authentication
 Plan: 2 of 2 in current phase
 Status: Phase complete
 Last activity: 2025-01-20 — Completed 02-02-PLAN.md
@@ -291,7 +291,7 @@ After:
 ```markdown
 ## Current Position
 
-Phase: 3 of 4 (Core Features)
+Phase: 3 of 4 (Core Features
 Plan: Not started
 Status: Ready to plan
 Last activity: 2025-01-20 — Phase 2 complete, transitioned to Phase 3
@@ -316,7 +316,7 @@ Update Project Reference section in STATE.md.
 ```markdown
 ## Project Reference
 
-See: .planning/PROJECT.md (updated [today])
+See: .planning/PROJECT.md (updated [today]
 
 **Core value:** [Current core value from PROJECT.md]
 **Current focus:** [Next phase name]
@@ -332,7 +332,7 @@ Review and update Accumulated Context section in STATE.md.
 
 **Decisions:**
 
-- Note recent decisions from this phase (3-5 max)
+- Note recent decisions from this phase (3-5 max
 - Full log lives in PROJECT.md Key Decisions table
 
 **Blockers/Concerns:**
@@ -353,7 +353,7 @@ Before:
 - ⚠️ [Phase 2] WebSocket reconnection behavior on flaky networks unknown
 ```
 
-After (if database indexing was addressed in Phase 2):
+After (if database indexing was addressed in Phase 2:
 
 ```markdown
 ### Blockers/Concerns
@@ -363,7 +363,7 @@ After (if database indexing was addressed in Phase 2):
 
 **Step complete when:**
 
-- [ ] Recent decisions noted (full log in PROJECT.md)
+- [ ] Recent decisions noted (full log in PROJECT.md
 - [ ] Resolved blockers removed from list
 - [ ] Unresolved blockers kept with phase prefix
 - [ ] New concerns from completed phase added
@@ -386,7 +386,7 @@ Resume file: None
 
 - [ ] Last session timestamp updated to current date and time
 - [ ] Stopped at describes phase completion and next phase
-- [ ] Resume file confirmed as None (transitions don't use resume files)
+- [ ] Resume file confirmed as None (transitions don't use resume files
 
 </step>
 
@@ -394,10 +394,10 @@ Resume file: None
 
 **MANDATORY: Verify milestone status before presenting next steps.**
 
-**Step 1: read ROADMAP.md and identify phases in current milestone**
+**Step 1: Read ROADMAP.md and identify phases in current milestone**
 
-read the ROADMAP.md file and extract:
-1. Current phase number (the phase just transitioned from)
+Read the ROADMAP.md file and extract:
+1. Current phase number (the phase just transitioned from
 2. All phase numbers in the current milestone section
 
 To find phases, look for:
@@ -406,7 +406,7 @@ To find phases, look for:
 
 Count total phases and identify the highest phase number in the milestone.
 
-State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
+State: "Current phase is {X}. Milestone has {N} phases (highest: {Y}."
 
 **Step 2: Route based on milestone status**
 
@@ -419,7 +419,7 @@ State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
 
 **Route A: More phases remain in milestone**
 
-read ROADMAP.md to get the next phase's name and goal.
+Read ROADMAP.md to get the next phase's name and goal.
 
 **If next phase exists:**
 
@@ -466,7 +466,7 @@ Exit skill and invoke "/gsd-plan-phase [X+1]"
 
 ---
 
-**Route B: Milestone complete (all phases done)**
+**Route B: Milestone complete (all phases done**
 
 <if mode="yolo">
 
@@ -517,8 +517,8 @@ Exit skill and invoke "/gsd-complete-milestone {version}"
 
 Progress tracking is IMPLICIT:
 
-- "Plan phase 2" → Phase 1 must be done (or ask)
-- "Plan phase 3" → Phases 1-2 must be done (or ask)
+- "Plan phase 2" → Phase 1 must be done (or ask
+- "Plan phase 3" → Phases 1-2 must be done (or ask
 - Transition workflow makes it explicit in ROADMAP.md
 
 No separate "update progress" step. Forward motion IS progress.
@@ -531,11 +531,11 @@ If user wants to move on but phase isn't fully complete:
 
 ```
 Phase [X] has incomplete plans:
-- {phase}-02-PLAN.md (not executed)
-- {phase}-03-PLAN.md (not executed)
+- {phase}-02-PLAN.md (not executed
+- {phase}-03-PLAN.md (not executed
 
 Options:
-1. Mark complete anyway (plans weren't needed)
+1. Mark complete anyway (plans weren't needed
 2. Defer work to later phase
 3. Stay and finish current phase
 ```
@@ -544,7 +544,7 @@ Respect user judgment — they know if work matters.
 
 **If marking complete with incomplete plans:**
 
-- Update ROADMAP: "2/3 plans complete" (not "3/3")
+- Update ROADMAP: "2/3 plans complete" (not "3/3"
 - Note in transition message which plans were skipped
 
 </partial_completion>
@@ -553,11 +553,11 @@ Respect user judgment — they know if work matters.
 
 Transition is complete when:
 
-- [ ] Current phase plan summaries verified (all exist or user chose to skip)
+- [ ] Current phase plan summaries verified (all exist or user chose to skip
 - [ ] Any stale handoffs deleted
 - [ ] ROADMAP.md updated with completion status and plan count
-- [ ] PROJECT.md evolved (requirements, decisions, description if needed)
-- [ ] STATE.md updated (position, project reference, context, session)
+- [ ] PROJECT.md evolved (requirements, decisions, description if needed
+- [ ] STATE.md updated (position, project reference, context, session
 - [ ] Progress table updated
 - [ ] User knows next steps
 

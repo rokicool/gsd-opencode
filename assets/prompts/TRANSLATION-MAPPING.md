@@ -1,181 +1,129 @@
 # Translation Mapping: Claude Code → OpenCode
 
-This document maps all transformations from the original Claude Code get-shit-done system to the OpenCode adaptation.
-
-## Project Reference
-| Claude Code | OpenCode |
-|-------------|----------|
-| get-shit-done-cc | gsd-opencode |
-| glittercowboy | rokicool |
-| https://raw.githubusercontent.com/glittercowboy/get-shit-done | https://raw.githubusercontent.com/rokicool/gsd-opencode |
-
 ## Command Names
+
 | Claude Code | OpenCode |
 |-------------|----------|
-| gsd:new-project | gsd-new-project |
 | gsd:plan-phase | gsd-plan-phase |
 | gsd:execute-phase | gsd-execute-phase |
 | gsd:research-phase | gsd-research-phase |
+| gsd:verify-phase | gsd-verify-phase |
 | gsd:discuss-phase | gsd-discuss-phase |
-| gsd:verify-work | gsd-verify-work |
-| gsd:debug | gsd-debug |
-| gsd:map-codebase | gsd-map-codebase |
-| gsd:add-phase | gsd-add-phase |
-| gsd:remove-phase | gsd-remove-phase |
-| gsd:insert-phase | gsd-insert-phase |
+| gsd:new-project | gsd-new-project |
 | gsd:new-milestone | gsd-new-milestone |
 | gsd:complete-milestone | gsd-complete-milestone |
-| gsd:plan-milestone-gaps | gsd-plan-milestone-gaps |
-| gsd:audit-milestone | gsd-audit-milestone |
-| gsd:progress | gsd-progress |
-| gsd:pause-work | gsd-pause-work |
-| gsd:resume-work | gsd-resume-work |
+| gsd:add-phase | gsd-add-phase |
+| gsd:insert-phase | gsd-insert-phase |
+| gsd:remove-phase | gsd-remove-phase |
 | gsd:add-todo | gsd-add-todo |
 | gsd:check-todos | gsd-check-todos |
-| gsd:list-phase-assumptions | gsd-list-phase-assumptions |
-| gsd:whats-new | gsd-whats-new |
+| gsd:debug | gsd-debug |
+| gsd:map-codebase | gsd-map-codebase |
+| gsd:verify-work | gsd-verify-work |
+| gsd:progress | gsd-progress |
+| gsd:settings | gsd-settings |
+| gsd:set-profile | gsd-set-profile |
 | gsd:update | gsd-update |
+| gsd:pause-work | gsd-pause-work |
+| gsd:resume-work | gsd-resume-work |
+| gsd:quick | gsd-quick |
+| gsd:whats-new | gsd-whats-new |
+| gsd:help | gsd-help |
+| gsd:audit-milestone | gsd-audit-milestone |
+| gsd:plan-milestone-gaps | gsd-plan-milestone-gaps |
+| gsd:list-phase-assumptions | gsd-list-phase-assumptions |
 
 ## Tool Mapping
+
 | Claude Code Tool | OpenCode Tool |
 |------------------|---------------|
 | Read | read |
 | Write | write |
-| Edit | edit |
 | Bash | bash |
 | Glob | glob |
 | Grep | grep |
+| Edit | edit |
 | WebFetch | webfetch |
-| WebSearch | utilize webfetch with access to search engines |
-| AskUserQuestion | question |
+| Task | Use agents directly with @ mentions |
+| Patch | patch |
+| Skill | skill |
 | TodoWrite | todowrite |
-| SlashCommand | (invoke via direct /command execution) |
-| Task | (invoke via @agent mention) |
+| TodoRead | todoread |
+| Question | question |
 
 ## Agent Mapping
-| Claude Code Agent | OpenCode Agent |
-|-------------------|----------------|
-| gsd-planner | gsd-planner (custom) |
-| gsd-executor | gsd-executor (custom) |
-| gsd-verifier | gsd-verifier (custom) |
-| gsd-researcher | gsd-researcher (custom) |
-| gsd-phase-researcher | gsd-phase-researcher (custom) |
-| gsd-project-researcher | gsd-project-researcher (custom) |
-| gsd-debugger | gsd-debugger (custom) |
-| gsd-roadmapper | gsd-roadmapper (custom) |
-| gsd-plan-checker | gsd-plan-checker (custom) |
-| gsd-integration-checker | gsd-integration-checker (custom) |
-| gsd-codebase-mapper | gsd-codebase-mapper (custom) |
-| gsd-research-synthesizer | gsd-research-synthesizer (custom) |
 
-Example of the Custom Agent header:
-
-** Claude Code **
-
-``` yaml
----
-name: gsd-project-researcher
-description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd-new-project or /gsd-new-milestone orchestrators.
-tools: read, write, bash, grep, glob, webfetch, (optional MCP tool)
-color: cyan
----
-```
-
-** OpenCode ** 
-
-```yaml
----
-name: gsd-project-researcher
-description: Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd-new-project or /gsd-new-milestone orchestrators.
-tools:
-  read: true
-  write: true
-  bash: true
-  grep: true
-  glob: true
-  webfetch: true
-  (optional MCP tool): true
-color: "#00FFFF"
----
-```
-
-Note: These are custom OpenCode agents that need to be created in the agents/ directory. OpenCode's built-in agents (Build, Plan, General, Explore) can be referenced where appropriate.
+| Claude Code Agent | OpenCode Equivalent |
+|-------------------|---------------------|
+| gsd-planner | gsd-planner (subagent) |
+| gsd-executor | gsd-executor (subagent) |
+| gsd-verifier | gsd-verifier (subagent) |
+| gsd-researcher | gsd-researcher (subagent) |
+| gsd-phase-researcher | gsd-phase-researcher (subagent) |
+| gsd-plan-checker | gsd-plan-checker (subagent) |
+| gsd-codebase-mapper | gsd-codebase-mapper (subagent) |
+| gsd-debugger | gsd-debugger (subagent) |
+| gsd-integration-checker | gsd-integration-checker (subagent) |
+| gsd-project-researcher | gsd-project-researcher (subagent) |
+| gsd-research-synthesizer | gsd-research-synthesizer (subagent) |
+| gsd-roadmapper | gsd-roadmapper (subagent) |
 
 ## Path Transformations
+
 | Claude Code | OpenCode |
 |-------------|----------|
-| ~/.claude/ | ~/.config/opencode/ or .opencode/ |
-| ~/.claude/get-shit-done/ | ~/.config/opencode/get-shit-done/ or .opencode/get-shit-done/ |
-| ./commands/gsd/ | ./command/gsd/ |
-| ./get-shit-done/references/ | ./get-shit-done/references/ |
-| ./get-shit-done/templates/ | ./get-shit-done/templates/ |
-| ./get-shit-done/workflows/ | ./get-shit-done/workflows/ |
-| ./agents/ | ./agents/ |
+| ~/.claude/ | ~/.config/opencode/ |
+| ~/.claude/get-shit-done/ | ~/.config/opencode/get-shit-done/ |
+| ./original/get-shit-done/commands/gsd/ | ./gsd-opencode/command/gsd/ |
+| ./original/get-shit-done/get-shit-done/references/ | ./gsd-opencode/get-shit-done/references/ |
+| ./original/get-shit-done/get-shit-done/templates/ | ./gsd-opencode/get-shit-done/templates/ |
+| ./original/get-shit-done/get-shit-done/workflows/ | ./gsd-opencode/get-shit-done/workflows/ |
+| ./original/get-shit-done/agents/ | ./gsd-opencode/agents/ |
 
 ## Command Replacements
+
 | Claude Code | OpenCode |
 |-------------|----------|
 | /clear | /new |
-| /gsd:subcommand | /gsd-subcommand |
+| /gsd:command | /gsd-command |
 
 ## Tag Syntax
+
 | Claude Code | OpenCode |
 |-------------|----------|
-| <sub>text</sub> | *text* (single star) |
+| <sub>text</sub> | *text* |
 
-## Variable Syntax
+## URL Transformations
+
 | Claude Code | OpenCode |
 |-------------|----------|
-| "All arguments become $ARGUMENTS" | $ARGUMENTS |
+| https://raw.githubusercontent.com/glittercowboy/get-shit-done | https://raw.githubusercontent.com/rokicool/gsd-opencode |
+| https://github.com/glittercowboy/get-shit-done | https://github.com/rokicool/gsd-opencode |
 
-## Frontmatter Adjustments
+## Project References
 
-### Command files:
-- **name**: Must use `gsd-*` format (no colons)
-  - Before: `name: gsd:plan-phase`
-  - After: `name: gsd-plan-phase`
-
-### Agent files:
-- **tools**: Use OpenCode tool names (read, write, bash, glob, grep, webfetch, question)
-- **allowed-tools**: Same as tools
-- **mode**: "primary" or "subagent" (OpenCode terminology)
-
-## File Category Counts
-
-### Commands: 22 files
-### Agents: 11 files
-### References: 7 files
-### Templates: 21 files
-### Workflows: 12 files
-### Total: 73 files to translate
-
-## Special Notes
-
-1. **Frontmatter fields**:
-   - Commands use: `name`, `description`, `argument-hint`, `agent`, `allowed-tools`
-   - Agents use: `name`, `description`, `mode`, `tools` or `allowed-tools`
-
-2. **Subagent invocation**:
-   - Claude Code uses: `Task(prompt="...", subagent_type="agent-name", description="...")`
-   - OpenCode uses: Invoke via `@agent-name` in messages or use skill tool
-
-3. **Context file references**:
-   - Keep using `@path/to/file.md` syntax (works in OpenCode)
-
-4. **MCP server references**:
-   - Original uses: `mcp__context7__*`
-   - OpenCode supports MCP, but specific tool names may vary
-   - For now, remove or mark as optional
-
-5. **Bash command patterns**:
-   - Keep all bash commands as-is (they work in OpenCode)
-
-## Key Terminology Changes
-
-| Claude Code Term | OpenCode Term |
-|-----------------|---------------|
-| Claude | OpenCode |
 | Claude Code | OpenCode |
-| AskUserQuestion | question tool |
-| subagent_type | mode (primary/subagent) |
-| allowed-tools | tools |
+|-------------|----------|
+| get-shit-done-cc | gsd-opencode |
+| get-shit-done | get-shit-done (preserved in references as original name) |
+
+## Frontmatter Field Changes
+
+| Claude Code | OpenCode |
+|-------------|----------|
+| name: gsd:command | name: gsd-command |
+| agent: gsd-xxx | agent: gsd-xxx |
+| tools: Read, Write, ... | tools: read, write, ... (lowercase) |
+| allowed-tools: [Read, Write] | allowed-tools: [read, write] (lowercase) |
+
+## Variable Usage
+
+| Claude Code | OpenCode |
+|-------------|----------|
+| All arguments | $ARGUMENTS (preserved) |
+
+## Config File
+
+| Claude Code | OpenCode |
+|-------------|----------|
+| ~/.claude/config.json | ~/.config/opencode/opencode.json or .opencode/opencode.json |

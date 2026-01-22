@@ -98,8 +98,8 @@ Template for `.planning/codebase/STACK.md` - captures the technology foundation.
 ## Runtime
 
 **Environment:**
-- Node.js 20.x (LTS)
-- No browser runtime (CLI tool only)
+- Node.js 20.x (LTS
+- No browser runtime (CLI tool only
 
 **Package Manager:**
 - npm 10.x
@@ -108,7 +108,7 @@ Template for `.planning/codebase/STACK.md` - captures the technology foundation.
 ## Frameworks
 
 **Core:**
-- None (vanilla Node.js CLI)
+- None (vanilla Node.js CLI
 
 **Testing:**
 - Vitest 1.0 - Unit tests
@@ -141,7 +141,7 @@ Template for `.planning/codebase/STACK.md` - captures the technology foundation.
 ## Platform Requirements
 
 **Development:**
-- macOS/Linux/Windows (any platform with Node.js)
+- macOS/Linux/Windows (any platform with Node.js
 - No external dependencies
 
 **Production:**
@@ -159,28 +159,28 @@ Template for `.planning/codebase/STACK.md` - captures the technology foundation.
 <guidelines>
 **What belongs in STACK.md:**
 - Languages and versions
-- Runtime requirements (Node, Bun, Deno, browser)
+- Runtime requirements (Node, Bun, Deno, browser
 - Package manager and lockfile
 - Framework choices
-- Critical dependencies (limit to 5-10 most important)
+- Critical dependencies (limit to 5-10 most important
 - Build tooling
 - Platform/deployment requirements
 
 **What does NOT belong here:**
-- File structure (that's STRUCTURE.md)
-- Architectural patterns (that's ARCHITECTURE.md)
-- Every dependency in package.json (only critical ones)
-- Implementation details (defer to code)
+- File structure (that's STRUCTURE.md
+- Architectural patterns (that's ARCHITECTURE.md
+- Every dependency in package.json (only critical ones
+- Implementation details (defer to code
 
 **When filling this template:**
 - Check package.json for dependencies
 - Note runtime version from .nvmrc or package.json engines
-- Include only dependencies that affect understanding (not every utility)
-- Specify versions only when version matters (breaking changes, compatibility)
+- Include only dependencies that affect understanding (not every utility
+- Specify versions only when version matters (breaking changes, compatibility
 
 **Useful for phase planning when:**
-- Adding new dependencies (check compatibility)
-- Upgrading frameworks (know what's in use)
-- Choosing implementation approach (must work with existing stack)
+- Adding new dependencies (check compatibility
+- Upgrading frameworks (know what's in use
+- Choosing implementation approach (must work with existing stack
 - Understanding build requirements
 </guidelines>

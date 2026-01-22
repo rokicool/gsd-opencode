@@ -13,7 +13,7 @@ Template for `.planning/research/FEATURES.md` — feature landscape for the proj
 
 ## Feature Landscape
 
-### Table Stakes (Users Expect These)
+### Table Stakes (Users Expect These
 
 Features users assume exist. Missing these = product feels incomplete.
 
@@ -23,7 +23,7 @@ Features users assume exist. Missing these = product feels incomplete.
 | [feature] | [user expectation] | LOW/MEDIUM/HIGH | [implementation notes] |
 | [feature] | [user expectation] | LOW/MEDIUM/HIGH | [implementation notes] |
 
-### Differentiators (Competitive Advantage)
+### Differentiators (Competitive Advantage
 
 Features that set the product apart. Not required, but valuable.
 
@@ -33,7 +33,7 @@ Features that set the product apart. Not required, but valuable.
 | [feature] | [why it matters] | LOW/MEDIUM/HIGH | [implementation notes] |
 | [feature] | [why it matters] | LOW/MEDIUM/HIGH | [implementation notes] |
 
-### Anti-Features (Commonly Requested, Often Problematic)
+### Anti-Features (Commonly Requested, Often Problematic
 
 Features that seem good but create problems.
 
@@ -62,7 +62,7 @@ Features that seem good but create problems.
 
 ## MVP Definition
 
-### Launch With (v1)
+### Launch With (v1
 
 Minimum viable product — what's needed to validate the concept.
 
@@ -70,14 +70,14 @@ Minimum viable product — what's needed to validate the concept.
 - [ ] [Feature] — [why essential]
 - [ ] [Feature] — [why essential]
 
-### Add After Validation (v1.x)
+### Add After Validation (v1.x
 
 Features to add once core is working.
 
 - [ ] [Feature] — [trigger for adding]
 - [ ] [Feature] — [trigger for adding]
 
-### Future Consideration (v2+)
+### Future Consideration (v2+
 
 Features to defer until product-market fit is established.
 

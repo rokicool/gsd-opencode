@@ -9,13 +9,13 @@ Orchestrator stays lean: parse gaps, spawn agents, collect results, update UAT.
 <paths>
 DEBUG_DIR=.planning/debug
 
-Debug files use the `.planning/debug/` path (hidden directory with leading dot).
+Debug files use the `.planning/debug/` path (hidden directory with leading dot.
 </paths>
 
 <core_principle>
 **Diagnose before planning fixes.**
 
-UAT tells us WHAT is broken (symptoms). Debug agents find WHY (root cause). plan-phase --gaps then creates targeted fixes based on actual causes, not guesses.
+UAT tells us WHAT is broken (symptoms. Debug agents find WHY (root cause. plan-phase --gaps then creates targeted fixes based on actual causes, not guesses.
 
 Without diagnosis: "Comment doesn't refresh" → guess at fix → maybe wrong
 With diagnosis: "Comment doesn't refresh" → "useEffect missing dependency" → precise fix
@@ -26,7 +26,7 @@ With diagnosis: "Comment doesn't refresh" → "useEffect missing dependency" →
 <step name="parse_gaps">
 **Extract gaps from UAT.md:**
 
-read the "Gaps" section (YAML format):
+Read the "Gaps" section (YAML format:
 ```yaml
 - truth: "Comment appears immediately after submission"
   status: failed
@@ -57,7 +57,7 @@ gaps = [
 
 Spawning parallel debug agents to investigate root causes:
 
-| Gap (Truth) | Severity |
+| Gap (Truth | Severity |
 |-------------|----------|
 | Comment appears immediately after submission | major |
 | Reply button positioned correctly | minor |
@@ -65,7 +65,7 @@ Spawning parallel debug agents to investigate root causes:
 
 Each agent will:
 1. Create DEBUG-{slug}.md with symptoms pre-filled
-2. Investigate autonomously (read code, form hypotheses, test)
+2. Investigate autonomously (read code, form hypotheses, test
 3. Return root cause
 
 This runs in parallel - all gaps investigated simultaneously.
@@ -82,19 +82,19 @@ Task(
   prompt=filled_debug_subagent_prompt,
   subagent_type="general",
   description="Debug: {truth_short}"
-)
+
 ```
 
-**All agents spawn in single message** (parallel execution).
+**All agents spawn in single message** (parallel execution.
 
 Template placeholders:
 - `{truth}`: The expected behavior that failed
 - `{expected}`: From UAT test
 - `{actual}`: Verbatim user description from reason field
-- `{errors}`: Any error messages from UAT (or "None reported")
+- `{errors}`: Any error messages from UAT (or "None reported"
 - `{reproduction}`: "Test {test_num} in UAT"
 - `{timeline}`: "Discovered during UAT"
-- `{goal}`: `find_root_cause_only` (UAT flow - plan-phase --gaps handles fixes)
+- `{goal}`: `find_root_cause_only` (UAT flow - plan-phase --gaps handles fixes
 - `{slug}`: Generated from truth
 </step>
 
@@ -156,10 +156,21 @@ For each gap in the Gaps section, add artifacts and missing fields:
 
 Update status in frontmatter to "diagnosed".
 
+**Check planning config:**
+
+```bash
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true"
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
+
+**If `COMMIT_PLANNING_DOCS=true` (default:**
+
 Commit the updated UAT.md:
 ```bash
 git add ".planning/phases/XX-name/{phase}-UAT.md"
-git commit -m "docs({phase}): add root causes from diagnosis"
+git commit -m "docs({phase}: add root causes from diagnosis"
 ```
 </step>
 
@@ -172,7 +183,7 @@ Display:
  GSD ► DIAGNOSIS COMPLETE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-| Gap (Truth) | Root Cause | Files |
+| Gap (Truth | Root Cause | Files |
 |-------------|------------|-------|
 | Comment appears immediately | useEffect missing dependency | CommentList.tsx |
 | Reply button positioned correctly | CSS flex order incorrect | ReplyButton.tsx |
@@ -218,9 +229,9 @@ Do NOT offer manual next steps - verify-work handles the rest.
 - Can resume with /gsd-debug
 
 **All agents fail:**
-- Something systemic (permissions, git, etc.)
+- Something systemic (permissions, git, etc.
 - Report for manual investigation
-- Fall back to plan-phase --gaps without root causes (less precise)
+- Fall back to plan-phase --gaps without root causes (less precise
 </failure_handling>
 
 <success_criteria>
