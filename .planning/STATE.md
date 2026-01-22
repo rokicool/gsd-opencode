@@ -82,7 +82,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- 1 pending todo (see `.planning/todos/pending/`)
 
 ### Blockers/Concerns
 
