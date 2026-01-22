@@ -179,6 +179,68 @@ function install(isGlobal) {
       : "~/.config/opencode/"
     : "./.opencode/";
 
+  function scanForUnresolvedRepoLocalTokens(destRoot) {
+    const tokenRegex = /@gsd-opencode\/|\bgsd-opencode\//g;
+    const maxHits = 10;
+    const hits = [];
+
+    function walk(dir) {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (hits.length >= maxHits) return;
+
+        const filePath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          walk(filePath);
+          continue;
+        }
+
+        if (!entry.name.endsWith(".md")) continue;
+
+        const content = fs.readFileSync(filePath, "utf8");
+        tokenRegex.lastIndex = 0;
+        if (!tokenRegex.test(content)) continue;
+
+        // Capture a readable snippet (first matching line)
+        const lines = content.split(/\r?\n/);
+        for (let i = 0; i < lines.length; i++) {
+          tokenRegex.lastIndex = 0;
+          if (tokenRegex.test(lines[i])) {
+            hits.push({
+              file: filePath,
+              line: i + 1,
+              snippet: lines[i].trim().slice(0, 200),
+            });
+            break;
+          }
+        }
+      }
+    }
+
+    walk(destRoot);
+
+    if (hits.length > 0) {
+      console.log(
+        `\n  ${yellow}⚠️  Install sanity check: unresolved repo-local tokens found${reset}`,
+      );
+      console.log(
+        `  ${yellow}This may cause commands like /gsd-settings to fail in other repos (ENOENT).${reset}`,
+      );
+      console.log(`  ${dim}Showing up to ${maxHits} matches:${reset}`);
+
+      for (const hit of hits) {
+        const displayPath = isGlobal
+          ? hit.file.replace(os.homedir(), "~")
+          : hit.file.replace(process.cwd(), ".");
+        console.log(
+          `  - ${displayPath}:${hit.line}\n    ${dim}${hit.snippet}${reset}`,
+        );
+      }
+
+      console.log("");
+    }
+  }
+
   console.log(`  Installing to ${cyan}${locationLabel}${reset}\n`);
 
   // Create commands directory (singular "command" not "commands")
@@ -202,6 +264,9 @@ function install(isGlobal) {
   const skillDest = path.join(opencodeDir, "get-shit-done");
   copyWithPathReplacement(skillSrc, skillDest, pathPrefix);
   console.log(`  ${green}✓${reset} Installed get-shit-done`);
+
+  // Post-install diagnostic (do not fail install).
+  scanForUnresolvedRepoLocalTokens(opencodeDir);
 
   // Create VERSION file
   fs.writeFileSync(path.join(skillDest, "VERSION"), `v${pkg.version}`);
