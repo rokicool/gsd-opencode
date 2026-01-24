@@ -1,7 +1,6 @@
 ---
 name: gsd-set-profile
 description: Switch between model profiles with confirmation workflow
-argument-hint: "[quality|balanced|budget]"
 tools:
   question: true
 ---
@@ -170,13 +169,49 @@ Profile '{currentProfile}' is already active.
 ```
 Re-print current configuration table and stop.
 
+## Step 5.5: Validate selected models exist in OpenCode
+
+Before writing any files, validate that the effective models for `newProfile` are actually available in the current OpenCode installation.
+
+Run:
+
+```bash
+opencode models
+```
+
+Parse the output and extract valid model IDs in `provider/model` format.
+
+Validate that all three effective model IDs exist in that list:
+
+- `{new.planning}`
+- `{new.execution}`
+- `{new.verification}`
+
+If `opencode models` fails, or any model is missing:
+
+Print an error like:
+
+```text
+Error: One or more selected models are not available in OpenCode.
+
+Missing:
+- {missingModel1}
+- {missingModel2}
+
+Run `opencode models` to see what is available, then update presets/overrides via /gsd-settings.
+```
+
+Stop. Do NOT write `.planning/config.json` and do NOT update `opencode.json`.
+
 ## Step 6: Apply changes
 
 1. **Update .planning/config.json:**
-   - Set `config.profiles.active_profile` to `newProfile`
-   - Write the config file (preserve all other keys)
 
-2. **Update opencode.json:**
+    - Set `config.profiles.active_profile` to `newProfile`
+    - Also set `config.model_profile` to `newProfile` (for orchestrators that read this key)
+    - Write the config file (preserve all other keys)
+
+1. **Update opencode.json:**
 
 Build agent config from effective stage models for `newProfile`:
 
@@ -201,9 +236,9 @@ Build agent config from effective stage models for `newProfile`:
 
 If `opencode.json` already exists, merge the `agent` key (preserve other top-level keys).
 
-3. **Report success:**
+1. **Report success:**
 
-```
+```text
 ✓ Active profile set to: {newProfile}
 
 Current configuration:
