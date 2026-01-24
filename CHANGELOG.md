@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2026-01-23
+
+Standardized command naming conventions and improved documentation formatting across project files.
+
+### Fixed
+- Renamed set-profile command to gsd-set-profile in gsd-opencode/command/gsd/set-profile.md for consistency with gsd-* naming convention
+- Updated /gsd:whats-new to /gsd-whats-new in README.md to follow standardized command prefix format
+- Added forbidden string check in assets/antipatterns.toml to prevent gsd-set-profile old naming pattern
+
+### Changed
+- Enhanced gsd-insert-phase command description in gsd-opencode/command/gsd/insert-phase.md for clarity on usage scenarios
+- Improved code block formatting in gsd-opencode/command/gsd/set-profile.md with consistent blank line spacing
+- Removed duplicate verification line in README.md for cleaner documentation
+
 ## [1.9.0] - 2026-01-21
 
 Major upgrade introducing model profile system with quality/balanced/budget tiers, new quick mode for ad-hoc tasks, and comprehensive workflow agent configuration system.
