@@ -163,11 +163,11 @@ For finding what exists, community patterns, real-world usage.
 - "How do people solve Y?"
 - "Common mistakes with Z"
 
-**Query templates (use current year):**
+**Query templates:**
 ```
 Stack discovery:
-- "[technology] best practices 2025"
-- "[technology] recommended libraries 2025"
+- "[technology] best practices [current year]"
+- "[technology] recommended libraries [current year]"
 
 Pattern discovery:
 - "how to build [type of thing] with [technology]"
@@ -179,7 +179,7 @@ Problem discovery:
 ```
 
 **Best practices:**
-- Include current year for freshness
+- Always include the current year (check today's date) for freshness
 - Use multiple query variations
 - Cross-verify findings with authoritative sources
 - Mark webfetch-only findings as LOW confidence
@@ -188,6 +188,7 @@ Problem discovery:
 
 **CRITICAL:** webfetch findings must be verified.
 
+```
 For each webfetch finding:
 
 1. Can I verify with Context7?
@@ -455,6 +456,11 @@ PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE}-*
 
 # read CONTEXT.md if exists (from /gsd-discuss-phase)
 cat "${PHASE_DIR}"/*-CONTEXT.md 2>/dev/null
+
+# Check if planning docs should be committed (default: true)
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+# Auto-detect gitignored (overrides config)
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 **If CONTEXT.md exists**, it contains user decisions that MUST constrain your research:
@@ -530,6 +536,10 @@ write to: `${PHASE_DIR}/${PADDED_PHASE}-RESEARCH.md`
 Where `PHASE_DIR` is the full path (e.g., `.planning/phases/01-foundation`)
 
 ## Step 6: Commit Research
+
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Skipping planning docs commit (commit_docs: false)"
+
+**If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
 git add "${PHASE_DIR}/${PADDED_PHASE}-RESEARCH.md"

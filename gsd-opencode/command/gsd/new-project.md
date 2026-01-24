@@ -5,6 +5,7 @@ tools:
   - read
   - bash
   - write
+
   - question
 ---
 
@@ -236,7 +237,7 @@ EOF
 
 ## Phase 5: Workflow Preferences
 
-Ask all workflow preferences in a single question call (3 questions):
+**Round 1 — Core workflow settings (4 questions):**
 
 ```
 questions: [
@@ -267,95 +268,133 @@ questions: [
       { label: "Parallel (Recommended)", description: "Independent plans run simultaneously" },
       { label: "Sequential", description: "One plan at a time" }
     ]
+  },
+  {
+    header: "Git Tracking",
+    question: "Commit planning docs to git?",
+    multiSelect: false,
+    options: [
+      { label: "Yes (Recommended)", description: "Planning docs tracked in version control" },
+      { label: "No", description: "Keep .planning/ local-only (add to .gitignore)" }
+    ]
   }
 ]
 ```
 
-Create `.planning/config.json` with chosen mode, depth, parallelization, and the profiles schema:
+**Round 2 — Workflow agents:**
+
+These spawn additional agents during planning/execution. They add tokens and time but improve quality.
+
+| Agent | When it runs | What it does |
+|-------|--------------|--------------|
+| **Researcher** | Before planning each phase | Investigates domain, finds patterns, surfaces gotchas |
+| **Plan Checker** | After plan is created | Verifies plan actually achieves the phase goal |
+| **Verifier** | After phase execution | Confirms must-haves were delivered |
+
+All recommended for important projects. Skip for quick experiments.
+
+```
+questions: [
+  {
+    header: "Research",
+    question: "Research before planning each phase? (adds tokens/time)",
+    multiSelect: false,
+    options: [
+      { label: "Yes (Recommended)", description: "Investigate domain, find patterns, surface gotchas" },
+      { label: "No", description: "Plan directly from requirements" }
+    ]
+  },
+  {
+    header: "Plan Check",
+    question: "Verify plans will achieve their goals? (adds tokens/time)",
+    multiSelect: false,
+    options: [
+      { label: "Yes (Recommended)", description: "Catch gaps before execution starts" },
+      { label: "No", description: "Execute plans without verification" }
+    ]
+  },
+  {
+    header: "Verifier",
+    question: "Verify work satisfies requirements after each phase? (adds tokens/time)",
+    multiSelect: false,
+    options: [
+      { label: "Yes (Recommended)", description: "Confirm deliverables match phase goals" },
+      { label: "No", description: "Trust execution, skip verification" }
+    ]
+  },
+  {
+    header: "Model Profile",
+    question: "Which AI models for planning agents?",
+    multiSelect: false,
+    options: [
+      { label: "Balanced (Recommended)", description: "Sonnet for most agents — good quality/cost ratio" },
+      { label: "Quality", description: "Opus for research/roadmap — higher cost, deeper analysis" },
+      { label: "Budget", description: "Haiku where possible — fastest, lowest cost" }
+    ]
+  }
+]
+```
+
+Create `.planning/config.json` with all settings:
 
 ```json
 {
-  "mode": "[chosen mode]",
-  "depth": "[chosen depth]",
-  "parallelization": [true/false],
-  "profiles": {
-    "active_profile": "balanced",
-    "presets": {
-      "quality": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/glm-4.7-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "balanced": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/minimax-m2.1-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "budget": {
-        "planning": "opencode/minimax-m2.1-free",
-        "execution": "opencode/grok-code",
-        "verification": "opencode/minimax-m2.1-free"
-      }
-    },
-    "custom_overrides": {}
+  "mode": "yolo|interactive",
+  "depth": "quick|standard|comprehensive",
+  "parallelization": true|false,
+  "commit_docs": true|false,
+  "model_profile": "quality|balanced|budget",
+  "workflow": {
+    "research": true|false,
+    "plan_check": true|false,
+    "verifier": true|false
   }
 }
 ```
 
-This profiles schema enables `/gsd-settings` and `/gsd-set-profile` commands to manage model profiles immediately after project initialization.
+**If commit_docs = No:**
+- Set `commit_docs: false` in config.json
+- Add `.planning/` to `.gitignore` (create if needed)
 
-**Generate opencode.json from active profile:**
+**If commit_docs = Yes:**
+- No additional gitignore entries needed
 
-Create `opencode.json` in the project root. This file is **derived from** the active profile in `config.json` - it maps each GSD agent to its stage model.
-
-For the default "balanced" profile, read the stage models from `config.json`:
-- `profiles.presets.balanced.planning` → planning agents
-- `profiles.presets.balanced.execution` → execution agents  
-- `profiles.presets.balanced.verification` → verification agents
-
-Generate `opencode.json` with this structure:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "agent": {
-    "gsd-planner": { "model": "{planning model}" },
-    "gsd-plan-checker": { "model": "{planning model}" },
-    "gsd-phase-researcher": { "model": "{planning model}" },
-    "gsd-roadmapper": { "model": "{planning model}" },
-    "gsd-project-researcher": { "model": "{planning model}" },
-    "gsd-research-synthesizer": { "model": "{planning model}" },
-    "gsd-codebase-mapper": { "model": "{planning model}" },
-    "gsd-executor": { "model": "{execution model}" },
-    "gsd-debugger": { "model": "{execution model}" },
-    "gsd-verifier": { "model": "{verification model}" },
-    "gsd-integration-checker": { "model": "{verification model}" }
-  }
-}
-```
-
-**Stage-to-agent mapping:**
-| Stage | Agents |
-|-------|--------|
-| Planning | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
-| Execution | gsd-executor, gsd-debugger |
-| Verification | gsd-verifier, gsd-integration-checker |
-
-**Important:** `opencode.json` is regenerated whenever the profile changes via `/gsd-settings` or `/gsd-set-profile`. The source of truth is `config.json`; `opencode.json` is the derived OpenCode-native config.
-
-**Commit config.json and opencode.json:**
+**Commit config.json:**
 
 ```bash
-git add .planning/config.json opencode.json
+git add .planning/config.json
 git commit -m "$(cat <<'EOF'
 chore: add project config
 
 Mode: [chosen mode]
 Depth: [chosen depth]
 Parallelization: [enabled/disabled]
+Workflow agents: research=[on/off], plan_check=[on/off], verifier=[on/off]
 EOF
 )"
 ```
+
+**Note:** Run `/gsd-settings` anytime to update these preferences.
+
+## Phase 5.5: Resolve Model Profile
+
+read model profile for agent spawning:
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-project-researcher | opus | sonnet | haiku |
+| gsd-research-synthesizer | sonnet | sonnet | haiku |
+| gsd-roadmapper | opus | sonnet | sonnet |
+
+Store resolved models for use in Task calls below.
 
 ## Phase 6: Research Decision
 
@@ -437,7 +476,7 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 write to: .planning/research/STACK.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/STACK.md
 </output>
-", subagent_type="gsd-project-researcher", description="Stack research")
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Stack research")
 
 Task(prompt="
 <research_type>
@@ -476,7 +515,7 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 write to: .planning/research/FEATURES.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/FEATURES.md
 </output>
-", subagent_type="gsd-project-researcher", description="Features research")
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Features research")
 
 Task(prompt="
 <research_type>
@@ -515,7 +554,7 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 write to: .planning/research/ARCHITECTURE.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
-", subagent_type="gsd-project-researcher", description="Architecture research")
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Architecture research")
 
 Task(prompt="
 <research_type>
@@ -554,7 +593,7 @@ Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
 write to: .planning/research/PITFALLS.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/PITFALLS.md
 </output>
-", subagent_type="gsd-project-researcher", description="Pitfalls research")
+", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Pitfalls research")
 ```
 
 After all 4 agents complete, spawn synthesizer to create SUMMARY.md:
@@ -578,7 +617,7 @@ write to: .planning/research/SUMMARY.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 </output>
-", subagent_type="gsd-research-synthesizer", description="Synthesize research")
+", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
 ```
 
 Display research complete banner and key findings:
@@ -783,7 +822,7 @@ Create roadmap:
 
 write files first, then return. This ensures artifacts persist even if context is lost.
 </instructions>
-", subagent_type="gsd-roadmapper", description="Create roadmap")
+", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
 ```
 
 **Handle roadmapper return:**
@@ -859,7 +898,7 @@ Use question:
   Update the roadmap based on feedback. edit files in place.
   Return ROADMAP REVISED with changes made.
   </revision>
-  ", subagent_type="gsd-roadmapper", description="Revise roadmap")
+  ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Revise roadmap")
   ```
 - Present revised roadmap
 - Loop until user approves

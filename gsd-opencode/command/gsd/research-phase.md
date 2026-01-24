@@ -5,6 +5,7 @@ argument-hint: "[phase]"
 tools:
   - read
   - bash
+
 ---
 
 <objective>
@@ -29,6 +30,24 @@ Normalize phase input in step 1 before any directory lookups.
 </context>
 
 <process>
+
+## 0. Resolve Model Profile
+
+read model profile for agent spawning:
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-phase-researcher | opus | sonnet | haiku |
+
+Store resolved model for use in Task calls below.
 
 ## 1. Normalize and Validate Phase
 
@@ -68,7 +87,7 @@ grep -A30 "### Decisions Made" .planning/STATE.md 2>/dev/null
 
 Present summary with phase description, requirements, prior decisions.
 
-## 4. Spawn gsd-researcher Agent
+## 4. Spawn gsd-phase-researcher Agent
 
 Research modes: ecosystem (default), feasibility, implementation, comparison.
 
@@ -131,6 +150,7 @@ write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 Task(
   prompt=filled_prompt,
   subagent_type="gsd-phase-researcher",
+  model="{researcher_model}",
   description="Research Phase {phase}"
 )
 ```
@@ -164,6 +184,7 @@ Research file: @.planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 Task(
   prompt=continuation_prompt,
   subagent_type="gsd-phase-researcher",
+  model="{researcher_model}",
   description="Continue research Phase {phase}"
 )
 ```

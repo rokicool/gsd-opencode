@@ -1,6 +1,6 @@
 {
   "name": "gsd-opencode",
-  "version": "1.6.0",
+  "version": "1.9.0",
   "description": "A meta-prompting, context engineering and spec-driven development system for OpenCode by TÂCHES.",
   "keywords": [
     "opencode",

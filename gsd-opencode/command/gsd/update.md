@@ -43,7 +43,7 @@ npm view gsd-opencode version 2>/dev/null
 ```
 Couldn't check for updates (offline or npm unavailable).
 
-To update manually: `npx gsd-opencode --global`
+To update manually: `npx gsd-opencode@latest --global`
 ```
 
 STOP here if npm unavailable.

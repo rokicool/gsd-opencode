@@ -6,6 +6,7 @@ tools:
   - bash
   - write
   - question
+  - Command
 ---
 
 <objective>

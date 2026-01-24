@@ -20,6 +20,25 @@ No Pass/Fail buttons. No severity questions. Just: "Here's what should happen. D
 
 <process>
 
+<step name="resolve_model_profile" priority="first">
+read model profile for agent spawning:
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-planner | opus | opus | sonnet |
+| gsd-plan-checker | sonnet | sonnet | haiku |
+
+Store resolved models for use in Task calls below.
+</step>
+
 <step name="check_active_session">
 **First: Check for active UAT sessions**
 
@@ -285,6 +304,17 @@ Clear Current Test section:
 [testing complete]
 ```
 
+**Check planning config:**
+
+```bash
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
+
+**If `COMMIT_PLANNING_DOCS=true` (default):**
+
 Commit the UAT file:
 ```bash
 git add ".planning/phases/XX-name/{phase}-UAT.md"
@@ -378,6 +408,7 @@ Plans must be executable prompts.
 </downstream_consumer>
 """,
   subagent_type="gsd-planner",
+  model="{planner_model}",
   description="Plan gap fixes for Phase {phase}"
 )
 ```
@@ -423,6 +454,7 @@ Return one of:
 </expected_output>
 """,
   subagent_type="gsd-plan-checker",
+  model="{checker_model}",
   description="Verify Phase {phase} fix plans"
 )
 ```
@@ -463,6 +495,7 @@ Do NOT replan from scratch unless issues are fundamental.
 </instructions>
 """,
   subagent_type="gsd-planner",
+  model="{planner_model}",
   description="Revise Phase {phase} plans"
 )
 ```

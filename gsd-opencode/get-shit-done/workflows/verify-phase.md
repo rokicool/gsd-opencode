@@ -18,9 +18,8 @@ Then verify each level against the actual codebase.
 </core_principle>
 
 <required_reading>
-**Load these references:**
-- ~/.config/opencode/get-shit-done/references/verification-patterns.md (detection patterns)
-- ~/.config/opencode/get-shit-done/templates/verification-report.md (output format)
+@~/.config/opencode/get-shit-done/references/verification-patterns.md
+@~/.config/opencode/get-shit-done/templates/verification-report.md
 </required_reading>
 
 <process>

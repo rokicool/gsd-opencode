@@ -22,7 +22,25 @@ Documents are reference material for OpenCode when planning/executing. Always in
 
 <process>
 
-<step name="check_existing" priority="first">
+<step name="resolve_model_profile" priority="first">
+read model profile for agent spawning:
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-codebase-mapper | sonnet | haiku | haiku |
+
+Store resolved model for use in Task calls below.
+</step>
+
+<step name="check_existing">
 Check if .planning/codebase/ already exists:
 
 ```bash
@@ -73,7 +91,7 @@ Continue to spawn_agents.
 <step name="spawn_agents">
 Spawn 4 parallel gsd-codebase-mapper agents.
 
-Use Task tool with `subagent_type="gsd-codebase-mapper"` and `run_in_background=true` for parallel execution.
+Use Task tool with `subagent_type="gsd-codebase-mapper"`, `model="{mapper_model}"`, and `run_in_background=true` for parallel execution.
 
 **CRITICAL:** Use the dedicated `gsd-codebase-mapper` agent, NOT `Explore`. The mapper agent writes documents directly.
 
@@ -82,6 +100,7 @@ Use Task tool with `subagent_type="gsd-codebase-mapper"` and `run_in_background=
 Task tool parameters:
 ```
 subagent_type: "gsd-codebase-mapper"
+model: "{mapper_model}"
 run_in_background: true
 description: "Map codebase tech stack"
 ```
@@ -104,6 +123,7 @@ Explore thoroughly. write documents directly using templates. Return confirmatio
 Task tool parameters:
 ```
 subagent_type: "gsd-codebase-mapper"
+model: "{mapper_model}"
 run_in_background: true
 description: "Map codebase architecture"
 ```
@@ -126,6 +146,7 @@ Explore thoroughly. write documents directly using templates. Return confirmatio
 Task tool parameters:
 ```
 subagent_type: "gsd-codebase-mapper"
+model: "{mapper_model}"
 run_in_background: true
 description: "Map codebase conventions"
 ```
@@ -148,6 +169,7 @@ Explore thoroughly. write documents directly using templates. Return confirmatio
 Task tool parameters:
 ```
 subagent_type: "gsd-codebase-mapper"
+model: "{mapper_model}"
 run_in_background: true
 description: "Map codebase concerns"
 ```
@@ -210,6 +232,17 @@ Continue to commit_codebase_map.
 
 <step name="commit_codebase_map">
 Commit the codebase map:
+
+**Check planning config:**
+
+```bash
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
+
+**If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
 git add .planning/codebase/*.md

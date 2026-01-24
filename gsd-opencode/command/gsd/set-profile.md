@@ -1,232 +1,111 @@
 ---
 name: gsd-set-profile
-description: Switch between model profiles with confirmation workflow
-argument-hint: "[quality|balanced|budget]"
-tools:
-  question: true
+description: Switch model profile for GSD agents (quality/balanced/budget)
+arguments:
+  - name: profile
+    description: "Profile name: quality, balanced, or budget"
+    required: true
 ---
 
-<role>
-You are executing the `/gsd-set-profile` command. Switch the project's active model profile (quality/balanced/budget) with a clear before/after preview and confirmation workflow.
+<objective>
+Switch the model profile used by GSD agents. This controls which OpenCode model each agent uses, balancing quality vs token spend.
+</objective>
 
-This command reads/writes two files:
-- `.planning/config.json` — profile state (active_profile, presets, custom_overrides)
-- `opencode.json` — agent model assignments (OpenCode's native config)
+<profiles>
+| Profile | Description |
+|---------|-------------|
+| **quality** | Opus everywhere except read-only verification |
+| **balanced** | Opus for planning, Sonnet for execution/verification (default) |
+| **budget** | Sonnet for writing, Haiku for research/verification |
+</profiles>
 
-Do NOT modify agent .md files. Profile switching updates `opencode.json` in the project root.
-</role>
+<process>
 
-<context>
-**Invocation styles:**
+## 1. Validate argument
 
-1. No args (interactive picker): `/gsd-set-profile`
-2. Positional: `/gsd-set-profile quality` or `balanced` or `budget`
-3. Flags: `--quality` or `-q`, `--balanced` or `-b`, `--budget` or `-u`
+```
+if $ARGUMENTS.profile not in ["quality", "balanced", "budget"]:
+  Error: Invalid profile "$ARGUMENTS.profile"
+  Valid profiles: quality, balanced, budget
+  STOP
+```
 
-Precedence: Positional > Flags > Interactive picker
+## 2. Check for project
 
-**Stage-to-agent mapping (11 agents):**
+```bash
+ls .planning/config.json 2>/dev/null
+```
 
-| Stage        | Agents |
-|--------------|--------|
-| Planning     | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
-| Execution    | gsd-executor, gsd-debugger |
-| Verification | gsd-verifier, gsd-integration-checker |
+If no `.planning/` directory:
 
-**Profile presets:**
+```
+Error: No GSD project found.
+Run /gsd-new-project first to initialize a project.
+```
 
-| Profile  | Planning                   | Execution                    | Verification               |
-|----------|----------------------------|------------------------------|----------------------------|
-| quality  | opencode/glm-4.7-free      | opencode/glm-4.7-free        | opencode/glm-4.7-free      |
-| balanced | opencode/glm-4.7-free      | opencode/minimax-m2.1-free   | opencode/glm-4.7-free      |
-| budget   | opencode/minimax-m2.1-free | opencode/grok-code           | opencode/minimax-m2.1-free |
-</context>
+## 3. Update config.json
 
-<behavior>
+read current config:
 
-## Step 1: Read config file and migrate if needed
+```bash
+cat .planning/config.json
+```
 
-Read `.planning/config.json`. Handle these cases:
-
-**Case A: File missing or invalid**
-- Use defaults (see below)
-- Write the defaults to `.planning/config.json`
-- Print: `Created .planning/config.json with default profile settings`
-
-**Case B: File exists but missing `profiles` key (legacy config)**
-- This is an older GSD project that needs migration
-- Preserve all existing keys (`mode`, `depth`, `parallelization`, etc.)
-- Add the `profiles` structure with defaults
-- Write the merged config to `.planning/config.json`
-- Print: `Migrated config.json to support model profiles (GSD update)`
-
-**Case C: File exists with `profiles` key**
-- Use as-is, no migration needed
-
-**Also check `opencode.json`:**
-- If missing, it will be created when changes are saved
-- If exists, it will be merged (preserve non-agent keys)
-
-**Default profiles structure:**
+Update `model_profile` field (or add if missing):
 
 ```json
 {
-  "profiles": {
-    "active_profile": "balanced",
-    "presets": {
-      "quality": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/glm-4.7-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "balanced": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/minimax-m2.1-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "budget": {
-        "planning": "opencode/minimax-m2.1-free",
-        "execution": "opencode/grok-code",
-        "verification": "opencode/minimax-m2.1-free"
-      }
-    },
-    "custom_overrides": {}
-  }
+  "model_profile": "$ARGUMENTS.profile"
 }
 ```
 
-## Step 2: Compute effective models for current profile
+write updated config back to `.planning/config.json`.
 
-1. Get `currentProfile` = `config.profiles.active_profile` (default: "balanced")
-2. Get `preset` = `config.profiles.presets[currentProfile]`
-3. Get `overrides` = `config.profiles.custom_overrides[currentProfile]` (may be undefined)
-4. Compute effective models:
-   - `planning` = overrides?.planning || preset.planning
-   - `execution` = overrides?.execution || preset.execution
-   - `verification` = overrides?.verification || preset.verification
-
-## Step 3: Display current state
-
-Print:
+## 4. Confirm
 
 ```
-Active profile: {currentProfile}
+✓ Model profile set to: $ARGUMENTS.profile
 
-Current configuration:
-| Stage        | Model |
-|--------------|-------|
-| planning     | {current.planning} |
-| execution    | {current.execution} |
-| verification | {current.verification} |
+Agents will now use:
+[Show table from model-profiles.md for selected profile]
+
+Next spawned agents will use the new profile.
 ```
 
-## Step 4: Determine requested profile
+</process>
 
-**A) Check for positional argument:**
-- If user typed `/gsd-set-profile quality` (or balanced/budget), use that as `newProfile`
+<examples>
 
-**B) Check for flags:**
-- `--quality` or `-q` → quality
-- `--balanced` or `-b` → balanced
-- `--budget` or `-u` → budget
-
-**C) Interactive picker (no args/flags):**
-
-Use Question tool:
+**Switch to budget mode:**
 
 ```
-header: "Model profile"
-question: "Select a profile"
-options:
-  - label: "quality"
-    description: "All stages use opencode/glm-4.7-free"
-  - label: "balanced"
-    description: "Planning/verification use glm-4.7-free, execution uses minimax-m2.1-free"
-  - label: "budget"
-    description: "Planning/verification use minimax-m2.1-free, execution uses grok-code"
-  - label: "Cancel"
-    description: "Exit without changes"
+/gsd-set-profile budget
+
+✓ Model profile set to: budget
+
+Agents will now use:
+| Agent | Model |
+|-------|-------|
+| gsd-planner | sonnet |
+| gsd-executor | sonnet |
+| gsd-verifier | haiku |
+| ... | ... |
 ```
 
-If user selects Cancel, print the cancellation message (Step 5) and stop.
-
-**D) Invalid profile handling:**
-
-If an invalid profile name is provided:
-- Print: `Unknown profile '{name}'. Valid options: quality, balanced, budget`
-- Fall back to interactive picker
-
-## Step 5: Handle edge cases
-
-**If user selected Cancel:**
-```
-Profile change cancelled. Current profile: {currentProfile}
-```
-Stop.
-
-**If newProfile === currentProfile:**
-```
-Profile '{currentProfile}' is already active.
-```
-Re-print current configuration table and stop.
-
-## Step 6: Apply changes
-
-1. **Update .planning/config.json:**
-   - Set `config.profiles.active_profile` to `newProfile`
-   - Write the config file (preserve all other keys)
-
-2. **Update opencode.json:**
-
-Build agent config from effective stage models for `newProfile`:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "agent": {
-    "gsd-planner": { "model": "{new.planning}" },
-    "gsd-plan-checker": { "model": "{new.planning}" },
-    "gsd-phase-researcher": { "model": "{new.planning}" },
-    "gsd-roadmapper": { "model": "{new.planning}" },
-    "gsd-project-researcher": { "model": "{new.planning}" },
-    "gsd-research-synthesizer": { "model": "{new.planning}" },
-    "gsd-codebase-mapper": { "model": "{new.planning}" },
-    "gsd-executor": { "model": "{new.execution}" },
-    "gsd-debugger": { "model": "{new.execution}" },
-    "gsd-verifier": { "model": "{new.verification}" },
-    "gsd-integration-checker": { "model": "{new.verification}" }
-  }
-}
-```
-
-If `opencode.json` already exists, merge the `agent` key (preserve other top-level keys).
-
-3. **Report success:**
+**Switch to quality mode:**
 
 ```
-✓ Active profile set to: {newProfile}
+/gsd-set-profile quality
 
-Current configuration:
-| Stage        | Model |
-|--------------|-------|
-| planning     | {new.planning} |
-| execution    | {new.execution} |
-| verification | {new.verification} |
+✓ Model profile set to: quality
 
-Note: OpenCode loads `opencode.json` at startup and does not hot-reload model/agent assignments. Fully quit and relaunch OpenCode to apply this profile change.
+Agents will now use:
+| Agent | Model |
+|-------|-------|
+| gsd-planner | opus |
+| gsd-executor | opus |
+| gsd-verifier | sonnet |
+| ... | ... |
 ```
 
-Important: Do NOT print any tooling transcript (e.g., `python -m json.tool ...`) or a separate `Updated:` file list. The success message above is the complete user-facing output.
-
-</behavior>
-
-<notes>
-- Use the Question tool for ALL user input (never ask user to type numbers)
-- Always show full model IDs (e.g., `opencode/glm-4.7-free`)
-- Preserve all other config.json keys when writing (deep merge)
-- Do NOT rewrite agent .md files — only update opencode.json
-- If opencode.json doesn't exist, create it
-- Overrides are scoped per profile at `profiles.custom_overrides.{profile}.{stage}`
-- **Source of truth:** `config.json` stores profiles/presets/overrides; `opencode.json` is **derived** from the effective models
-- When regenerating `opencode.json`, read the new profile from `config.json`, compute effective models (preset + overrides), then write the agent mappings
-</notes>
+</examples>

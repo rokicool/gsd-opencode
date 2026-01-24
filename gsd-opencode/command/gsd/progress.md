@@ -6,6 +6,7 @@ tools:
   - bash
   - grep
   - glob
+  - Command
 ---
 
 <objective>
@@ -19,6 +20,12 @@ Provides situational awareness before continuing work.
 
 <step name="verify">
 **Verify planning structure exists:**
+
+Use bash (not glob) to check—glob respects .gitignore but .planning/ is often gitignored:
+
+```bash
+test -d .planning && echo "exists" || echo "missing"
+```
 
 If no `.planning/` directory:
 
@@ -45,6 +52,7 @@ If missing both ROADMAP.md and PROJECT.md: suggest `/gsd-new-project`.
 - read `.planning/STATE.md` for living memory (position, decisions, issues)
 - read `.planning/ROADMAP.md` for phase structure and objectives
 - read `.planning/PROJECT.md` for current state (What This Is, Core Value, Requirements)
+- read `.planning/config.json` for settings (model_profile, workflow toggles)
   </step>
 
 <step name="recent">
@@ -73,6 +81,7 @@ If missing both ROADMAP.md and PROJECT.md: suggest `/gsd-new-project`.
 # [Project Name]
 
 **Progress:** [████████░░] 8/10 plans complete
+**Profile:** [quality/balanced/budget]
 
 ## Recent Work
 - [Phase X, Plan Y]: [what was accomplished - 1 line]

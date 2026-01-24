@@ -9,6 +9,7 @@ tools:
   - bash
   - glob
   - grep
+
   - webfetch
   - (optional MCP tool)
 ---
@@ -41,13 +42,31 @@ Normalize phase input in step 2 before any directory lookups.
 
 <process>
 
-## 1. Validate Environment
+## 1. Validate Environment and Resolve Model Profile
 
 ```bash
 ls .planning/ 2>/dev/null
 ```
 
 **If not found:** Error - user should run `/gsd-new-project` first.
+
+**Resolve model profile for agent spawning:**
+
+```bash
+MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+```
+
+Default to "balanced" if not set.
+
+**Model lookup table:**
+
+| Agent | quality | balanced | budget |
+|-------|---------|----------|--------|
+| gsd-phase-researcher | opus | sonnet | haiku |
+| gsd-planner | opus | opus | sonnet |
+| gsd-plan-checker | sonnet | sonnet | haiku |
+
+Store resolved models for use in Task calls below.
 
 ## 2. Parse and Normalize Arguments
 
@@ -105,6 +124,14 @@ fi
 **If `--gaps` flag:** Skip research (gap closure uses VERIFICATION.md instead).
 
 **If `--skip-research` flag:** Skip to step 6.
+
+**Check config for research setting:**
+
+```bash
+WORKFLOW_RESEARCH=$(cat .planning/config.json 2>/dev/null | grep -o '"research"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+```
+
+**If `workflow.research` is `false` AND `--research` flag NOT set:** Skip to step 6.
 
 **Otherwise:**
 
@@ -181,6 +208,7 @@ write research findings to: {phase_dir}/{phase}-RESEARCH.md
 Task(
   prompt=research_prompt,
   subagent_type="gsd-phase-researcher",
+  model="{researcher_model}",
   description="Research Phase {phase}"
 )
 ```
@@ -204,21 +232,23 @@ ls "${PHASE_DIR}"/*-PLAN.md 2>/dev/null
 
 **If exists:** Offer: 1) Continue planning (add more plans), 2) View existing, 3) Replan from scratch. Wait for response.
 
-## 7. Gather Context Paths
+## 7. read Context Files
 
-Identify context files for the planner agent:
+read and store context file contents for the planner agent. The `@` syntax does not work across Task() boundaries - content must be inlined.
 
 ```bash
-# Required
-STATE=.planning/STATE.md
-ROADMAP=.planning/ROADMAP.md
-REQUIREMENTS=.planning/REQUIREMENTS.md
+# read required files
+STATE_CONTENT=$(cat .planning/STATE.md)
+ROADMAP_CONTENT=$(cat .planning/ROADMAP.md)
 
-# Optional (created by earlier steps or commands)
-CONTEXT="${PHASE_DIR}/${PHASE}-CONTEXT.md"
-RESEARCH="${PHASE_DIR}/${PHASE}-RESEARCH.md"
-VERIFICATION="${PHASE_DIR}/${PHASE}-VERIFICATION.md"
-UAT="${PHASE_DIR}/${PHASE}-UAT.md"
+# read optional files (empty string if missing)
+REQUIREMENTS_CONTENT=$(cat .planning/REQUIREMENTS.md 2>/dev/null)
+CONTEXT_CONTENT=$(cat "${PHASE_DIR}"/*-CONTEXT.md 2>/dev/null)
+RESEARCH_CONTENT=$(cat "${PHASE_DIR}"/*-RESEARCH.md 2>/dev/null)
+
+# Gap closure files (only if --gaps mode)
+VERIFICATION_CONTENT=$(cat "${PHASE_DIR}"/*-VERIFICATION.md 2>/dev/null)
+UAT_CONTENT=$(cat "${PHASE_DIR}"/*-UAT.md 2>/dev/null)
 ```
 
 ## 8. Spawn gsd-planner Agent
@@ -232,7 +262,7 @@ Display stage banner:
 ◆ Spawning planner...
 ```
 
-Fill prompt and spawn:
+Fill prompt with inlined content and spawn:
 
 ```markdown
 <planning_context>
@@ -241,23 +271,23 @@ Fill prompt and spawn:
 **Mode:** {standard | gap_closure}
 
 **Project State:**
-@.planning/STATE.md
+{state_content}
 
 **Roadmap:**
-@.planning/ROADMAP.md
+{roadmap_content}
 
 **Requirements (if exists):**
-@.planning/REQUIREMENTS.md
+{requirements_content}
 
 **Phase Context (if exists):**
-@.planning/phases/{phase_dir}/{phase}-CONTEXT.md
+{context_content}
 
 **Research (if exists):**
-@.planning/phases/{phase_dir}/{phase}-RESEARCH.md
+{research_content}
 
 **Gap Closure (if --gaps mode):**
-@.planning/phases/{phase_dir}/{phase}-VERIFICATION.md
-@.planning/phases/{phase_dir}/{phase}-UAT.md
+{verification_content}
+{uat_content}
 
 </planning_context>
 
@@ -287,6 +317,7 @@ Before returning PLANNING COMPLETE:
 Task(
   prompt=filled_prompt,
   subagent_type="gsd-planner",
+  model="{planner_model}",
   description="Plan Phase {phase}"
 )
 ```
@@ -298,6 +329,8 @@ Parse planner output:
 **`## PLANNING COMPLETE`:**
 - Display: `Planner created {N} plan(s). Files on disk.`
 - If `--skip-verify`: Skip to step 13
+- Check config: `WORKFLOW_PLAN_CHECK=$(cat .planning/config.json 2>/dev/null | grep -o '"plan_check"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")`
+- If `workflow.plan_check` is `false`: Skip to step 13
 - Otherwise: Proceed to step 10
 
 **`## CHECKPOINT REACHED`:**
@@ -319,7 +352,17 @@ Display:
 ◆ Spawning plan checker...
 ```
 
-Fill checker prompt and spawn:
+read plans and requirements for the checker:
+
+```bash
+# read all plans in phase directory
+PLANS_CONTENT=$(cat "${PHASE_DIR}"/*-PLAN.md 2>/dev/null)
+
+# read requirements (reuse from step 7 if available)
+REQUIREMENTS_CONTENT=$(cat .planning/REQUIREMENTS.md 2>/dev/null)
+```
+
+Fill checker prompt with inlined content and spawn:
 
 ```markdown
 <verification_context>
@@ -328,10 +371,10 @@ Fill checker prompt and spawn:
 **Phase Goal:** {goal from ROADMAP}
 
 **Plans to verify:**
-@.planning/phases/{phase_dir}/*-PLAN.md
+{plans_content}
 
 **Requirements (if exists):**
-@.planning/REQUIREMENTS.md
+{requirements_content}
 
 </verification_context>
 
@@ -346,6 +389,7 @@ Return one of:
 Task(
   prompt=checker_prompt,
   subagent_type="gsd-plan-checker",
+  model="{checker_model}",
   description="Verify Phase {phase} plans"
 )
 ```
@@ -370,6 +414,12 @@ Track: `iteration_count` (starts at 1 after initial plan + check)
 
 Display: `Sending back to planner for revision... (iteration {N}/3)`
 
+read current plans for revision context:
+
+```bash
+PLANS_CONTENT=$(cat "${PHASE_DIR}"/*-PLAN.md 2>/dev/null)
+```
+
 Spawn gsd-planner with revision prompt:
 
 ```markdown
@@ -379,7 +429,7 @@ Spawn gsd-planner with revision prompt:
 **Mode:** revision
 
 **Existing plans:**
-@.planning/phases/{phase_dir}/*-PLAN.md
+{plans_content}
 
 **Checker issues:**
 {structured_issues_from_checker}
@@ -387,7 +437,7 @@ Spawn gsd-planner with revision prompt:
 </revision_context>
 
 <instructions>
-read existing PLAN.md files. Make targeted updates to address checker issues.
+Make targeted updates to address checker issues.
 Do NOT replan from scratch unless issues are fundamental.
 Return what changed.
 </instructions>
@@ -397,6 +447,7 @@ Return what changed.
 Task(
   prompt=revision_prompt,
   subagent_type="gsd-planner",
+  model="{planner_model}",
   description="Revise Phase {phase} plans"
 )
 ```

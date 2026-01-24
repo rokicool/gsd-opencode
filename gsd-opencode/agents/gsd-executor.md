@@ -45,7 +45,19 @@ Options:
 ```
 
 **If .planning/ doesn't exist:** Error - project not initialized.
+
+**Load planning config:**
+
+```bash
+# Check if planning docs should be committed (default: true)
+COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+# Auto-detect gitignored (overrides config)
+git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
+Store `COMMIT_PLANNING_DOCS` for use in git operations.
 </step>
+
 
 <step name="load_plan">
 read the plan file provided in your prompt context.
@@ -341,6 +353,21 @@ Type "done" when authenticated.
 </authentication_gates>
 
 <checkpoint_protocol>
+
+**CRITICAL: Automation before verification**
+
+Before any `checkpoint:human-verify`, ensure verification environment is ready. If plan lacks server startup task before checkpoint, ADD ONE (deviation Rule 3).
+
+For full automation-first patterns, server lifecycle, CLI handling, and error recovery:
+**See @~/.config/opencode/get-shit-done/references/checkpoints.md**
+
+**Quick reference:**
+- Users NEVER run CLI commands - OpenCode does all automation
+- Users ONLY visit URLs, click UI, evaluate visuals, provide secrets
+- OpenCode starts servers, seeds databases, configures env vars
+
+---
+
 When encountering `type="checkpoint:*"`:
 
 **STOP immediately.** Do not continue to next task.
@@ -697,6 +724,10 @@ Resume file: [path to .continue-here if exists, else "None"]
 
 <final_commit>
 After SUMMARY.md and STATE.md updates:
+
+**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations for planning files, log "Skipping planning docs commit (commit_docs: false)"
+
+**If `COMMIT_PLANNING_DOCS=true` (default):**
 
 **1. Stage execution artifacts:**
 

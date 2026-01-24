@@ -107,16 +107,14 @@ For: Choosing between options, new external integration.
 
 5. **Cross-verify:** Any webfetch finding → confirm with Context7/official docs.
 
-6. **Quality check:** Before finalizing findings, consult the gsd-researcher agent's verification protocols to avoid common research gaps.
-
-7. **Create DISCOVERY.md** using ~/.config/opencode/get-shit-done/templates/discovery.md structure:
+6. **Create DISCOVERY.md** using ~/.config/opencode/get-shit-done/templates/discovery.md structure:
 
    - Summary with recommendation
    - Key findings per option
    - Code examples from Context7
    - Confidence level (should be MEDIUM-HIGH for Level 2)
 
-8. Return to plan-phase.md.
+7. Return to plan-phase.md.
 
 **Output:** `.planning/phases/XX-name/DISCOVERY.md`
 </step>
@@ -160,18 +158,16 @@ For: Architectural decisions, novel problems, high-risk choices.
    - Mark what's verified vs assumed
    - Flag contradictions
 
-6. **Quality check:** Before finalizing findings, consult the gsd-researcher agent's verification protocols to ensure comprehensive coverage and avoid common research gaps.
-
-7. **Create comprehensive DISCOVERY.md:**
+6. **Create comprehensive DISCOVERY.md:**
 
    - Full structure from ~/.config/opencode/get-shit-done/templates/discovery.md
    - Quality report with source attribution
    - Confidence by finding
    - If LOW confidence on any critical finding → add validation checkpoints
 
-8. **Confidence gate:** If overall confidence is LOW, present options before proceeding.
+7. **Confidence gate:** If overall confidence is LOW, present options before proceeding.
 
-9. Return to plan-phase.md.
+8. Return to plan-phase.md.
 
 **Output:** `.planning/phases/XX-name/DISCOVERY.md` (comprehensive)
 </step>
@@ -277,8 +273,13 @@ NOTE: DISCOVERY.md is NOT committed separately. It will be committed with phase 
 **Level 2 (Standard):**
 - Context7 consulted for all options
 - webfetch findings cross-verified
+- DISCOVERY.md created with recommendation
+- Confidence level MEDIUM or higher
+- Ready to inform PLAN.md creation
 
-7. Quality gate
+**Level 3 (Deep Dive):**
+- Discovery scope defined
+- Context7 exhaustively consulted
 - All webfetch findings verified against authoritative sources
 - DISCOVERY.md created with comprehensive analysis
 - Quality report with source attribution
