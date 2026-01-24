@@ -143,14 +143,12 @@ npx gsd-opencode
 
 That's it. Verify with `/gsd-help`.
 
-That's it. Verify with `/gsd:help` inside your Claude Code interface.
-
 ### Staying Updated
 
 GSD evolves fast. Check for updates periodically:
 
 ```
-/gsd:whats-new
+/gsd-whats-new
 ```
 
 Update with:

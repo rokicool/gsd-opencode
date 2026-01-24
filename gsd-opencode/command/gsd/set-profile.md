@@ -1,5 +1,5 @@
 ---
-name: set-profile
+name: gsd-set-profile
 description: Switch model profile for GSD agents (quality/balanced/budget)
 arguments:
   - name: profile
@@ -37,6 +37,7 @@ ls .planning/config.json 2>/dev/null
 ```
 
 If no `.planning/` directory:
+
 ```
 Error: No GSD project found.
 Run /gsd-new-project first to initialize a project.
@@ -45,11 +46,13 @@ Run /gsd-new-project first to initialize a project.
 ## 3. Update config.json
 
 read current config:
+
 ```bash
 cat .planning/config.json
 ```
 
 Update `model_profile` field (or add if missing):
+
 ```json
 {
   "model_profile": "$ARGUMENTS.profile"
@@ -74,6 +77,7 @@ Next spawned agents will use the new profile.
 <examples>
 
 **Switch to budget mode:**
+
 ```
 /gsd-set-profile budget
 
@@ -89,6 +93,7 @@ Agents will now use:
 ```
 
 **Switch to quality mode:**
+
 ```
 /gsd-set-profile quality
 
