@@ -1,136 +1,41 @@
 ---
 name: gsd-settings
-description: Configure GSD workflow toggles and model profile
+description: Configure GSD model profiles and workflow settings
+agent: gsd-settings
 tools:
   - read
   - write
+  - bash
   - question
 ---
 
 <objective>
-Allow users to toggle workflow agents on/off and select model profile via interactive settings.
+Open an interactive settings menu.
 
-Updates `.planning/config.json` with workflow preferences and model profile selection.
+This delegates the implementation to the `gsd-settings` agent, which manages `.planning/config.json` and regenerates `opencode.json` when needed.
 </objective>
 
 <process>
 
-## 1. Validate Environment
+Run the interactive settings flow using the `gsd-settings` agent.
 
-```bash
-ls .planning/config.json 2>/dev/null
-```
-
-**If not found:** Error - run `/gsd-new-project` first.
-
-## 2. read Current Config
-
-```bash
-cat .planning/config.json
-```
-
-Parse current values (default to `true` if not present):
-- `workflow.research` — spawn researcher during plan-phase
-- `workflow.plan_check` — spawn plan checker during plan-phase
-- `workflow.verifier` — spawn verifier during execute-phase
-- `model_profile` — which model each agent uses (default: `balanced`)
-
-## 3. Present Settings
-
-Use question with current values shown:
+After changes are saved:
 
 ```
-question([
-  {
-    question: "Which model profile for agents?",
-    header: "Model",
-    multiSelect: false,
-    options: [
-      { label: "Quality", description: "Opus everywhere except verification (highest cost)" },
-      { label: "Balanced (Recommended)", description: "Opus for planning, Sonnet for execution/verification" },
-      { label: "Budget", description: "Sonnet for writing, Haiku for research/verification (lowest cost)" }
-    ]
-  },
-  {
-    question: "Spawn Plan Researcher? (researches domain before planning)",
-    header: "Research",
-    multiSelect: false,
-    options: [
-      { label: "Yes", description: "Research phase goals before planning" },
-      { label: "No", description: "Skip research, plan directly" }
-    ]
-  },
-  {
-    question: "Spawn Plan Checker? (verifies plans before execution)",
-    header: "Plan Check",
-    multiSelect: false,
-    options: [
-      { label: "Yes", description: "Verify plans meet phase goals" },
-      { label: "No", description: "Skip plan verification" }
-    ]
-  },
-  {
-    question: "Spawn Execution Verifier? (verifies phase completion)",
-    header: "Verifier",
-    multiSelect: false,
-    options: [
-      { label: "Yes", description: "Verify must-haves after execution" },
-      { label: "No", description: "Skip post-execution verification" }
-    ]
-  }
-])
-```
-
-**Pre-select based on current config values.**
-
-## 4. Update Config
-
-Merge new settings into existing config.json:
-
-```json
-{
-  ...existing_config,
-  "model_profile": "quality" | "balanced" | "budget",
-  "workflow": {
-    "research": true/false,
-    "plan_check": true/false,
-    "verifier": true/false
-  }
-}
-```
-
-write updated config to `.planning/config.json`.
-
-## 5. Confirm Changes
-
-Display:
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- GSD ► SETTINGS UPDATED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-| Setting              | Value |
-|----------------------|-------|
-| Model Profile        | {quality/balanced/budget} |
-| Plan Researcher      | {On/Off} |
-| Plan Checker         | {On/Off} |
-| Execution Verifier   | {On/Off} |
-
-These settings apply to future /gsd-plan-phase and /gsd-execute-phase runs.
-
-Quick commands:
-- /gsd-set-profile <profile> — switch model profile
-- /gsd-plan-phase --research — force research
-- /gsd-plan-phase --skip-research — skip research
-- /gsd-plan-phase --skip-verify — skip plan check
+⚠️ OpenCode loads opencode.json at session start and does not hot-reload.
+Run `/new` (or fully restart OpenCode) to apply changes.
 ```
 
 </process>
 
 <success_criteria>
-- [ ] Current config read
-- [ ] User presented with 4 settings (profile + 3 toggles)
-- [ ] Config updated with model_profile and workflow section
-- [ ] Changes confirmed to user
+
+- [ ] `.planning/` is validated as an existing GSD project (or a clear error is shown)
+- [ ] Current settings are displayed (active profile, effective models, workflow toggles)
+- [ ] User can update profile and workflow toggles via interactive UI
+- [ ] Updates are persisted to `.planning/config.json`
+- [ ] `opencode.json` is regenerated/updated to reflect effective models
+- [ ] A clear confirmation is shown ("GSD ► SETTINGS UPDATED")
+- [ ] User is warned that `/new` (or restart) is required to apply changes in the current session
+
 </success_criteria>
