@@ -5,107 +5,55 @@ arguments:
   - name: profile
     description: "Profile name: quality, balanced, or budget"
     required: true
+agent: gsd-set-profile
+tools:
+  - read
+  - write
+  - bash
+  - question
 ---
 
 <objective>
-Switch the model profile used by GSD agents. This controls which OpenCode model each agent uses, balancing quality vs token spend.
-</objective>
+Switch the project’s active model profile (quality/balanced/budget).
 
-<profiles>
-| Profile | Description |
-|---------|-------------|
-| **quality** | Opus everywhere except read-only verification |
-| **balanced** | Opus for planning, Sonnet for execution/verification (default) |
-| **budget** | Sonnet for writing, Haiku for research/verification |
-</profiles>
+Implementation lives in the `gsd-set-profile` agent so we don’t duplicate the full switching/migration logic in multiple places.
+</objective>
 
 <process>
 
-## 1. Validate argument
+Run the profile switch using the `gsd-set-profile` agent.
+
+After the agent reports success:
 
 ```
-if $ARGUMENTS.profile not in ["quality", "balanced", "budget"]:
-  Error: Invalid profile "$ARGUMENTS.profile"
-  Valid profiles: quality, balanced, budget
-  STOP
-```
-
-## 2. Check for project
-
-```bash
-ls .planning/config.json 2>/dev/null
-```
-
-If no `.planning/` directory:
-
-```
-Error: No GSD project found.
-Run /gsd-new-project first to initialize a project.
-```
-
-## 3. Update config.json
-
-read current config:
-
-```bash
-cat .planning/config.json
-```
-
-Update `model_profile` field (or add if missing):
-
-```json
-{
-  "model_profile": "$ARGUMENTS.profile"
-}
-```
-
-write updated config back to `.planning/config.json`.
-
-## 4. Confirm
-
-```
-✓ Model profile set to: $ARGUMENTS.profile
-
-Agents will now use:
-[Show table from model-profiles.md for selected profile]
-
-Next spawned agents will use the new profile.
+⚠️ OpenCode loads opencode.json at session start and does not hot-reload.
+Run `/new` (or fully restart OpenCode) to apply this profile change.
 ```
 
 </process>
 
 <examples>
 
-**Switch to budget mode:**
+**Switch to budget profile:**
 
-```
+```text
 /gsd-set-profile budget
 
-✓ Model profile set to: budget
+✓ Active profile set to: budget
 
-Agents will now use:
-| Agent | Model |
-|-------|-------|
-| gsd-planner | sonnet |
-| gsd-executor | sonnet |
-| gsd-verifier | haiku |
-| ... | ... |
+⚠️ OpenCode loads opencode.json at session start and does not hot-reload.
+Run `/new` (or fully restart OpenCode) to apply this profile change.
 ```
 
-**Switch to quality mode:**
+**Switch to quality profile:**
 
-```
+```text
 /gsd-set-profile quality
 
-✓ Model profile set to: quality
+✓ Active profile set to: quality
 
-Agents will now use:
-| Agent | Model |
-|-------|-------|
-| gsd-planner | opus |
-| gsd-executor | opus |
-| gsd-verifier | sonnet |
-| ... | ... |
+⚠️ OpenCode loads opencode.json at session start and does not hot-reload.
+Run `/new` (or fully restart OpenCode) to apply this profile change.
 ```
 
 </examples>
