@@ -11,6 +11,21 @@
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/rokicool/gsd-opencode?style=for-the-badge&logo=github&color=181717)](https://github.com/rokicool/gsd-opencode)
 
+---
+
+# Breaking news
+
+TACHES decided to include support for OpenCode in his own product.
+
+There is no point in continuing working on this port anymore. 
+
+Thanks. It was fun.
+
+-- **Roman** (2026-01-23)
+
+
+---
+
 <br>
 
 ```bash
