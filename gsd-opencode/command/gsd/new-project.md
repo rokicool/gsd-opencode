@@ -344,6 +344,27 @@ Create `.planning/config.json` with all settings:
   "parallelization": true|false,
   "commit_docs": true|false,
   "model_profile": "quality|balanced|budget",
+  "profiles": {
+    "active_profile": "balanced",
+    "presets": {
+      "quality": {
+        "planning": "opencode/glm-4.7-free",
+        "execution": "opencode/glm-4.7-free",
+        "verification": "opencode/glm-4.7-free"
+      },
+      "balanced": {
+        "planning": "opencode/glm-4.7-free",
+        "execution": "opencode/minimax-m2.1-free",
+        "verification": "opencode/glm-4.7-free"
+      },
+      "budget": {
+        "planning": "opencode/minimax-m2.1-free",
+        "execution": "opencode/grok-code",
+        "verification": "opencode/minimax-m2.1-free"
+      }
+    },
+    "custom_overrides": {}
+  },
   "workflow": {
     "research": true|false,
     "plan_check": true|false,
@@ -373,6 +394,46 @@ Workflow agents: research=[on/off], plan_check=[on/off], verifier=[on/off]
 EOF
 )"
 ```
+
+**Generate opencode.json from active profile:**
+
+Create `opencode.json` in the project root. This is a derived config that assigns a model to each GSD agent.
+
+Use the effective stage models from `.planning/config.json`:
+
+- planning model = `profiles.presets.{active_profile}.planning` (unless overridden)
+- execution model = `profiles.presets.{active_profile}.execution` (unless overridden)
+- verification model = `profiles.presets.{active_profile}.verification` (unless overridden)
+
+Write `opencode.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "gsd-planner": { "model": "{planning model}" },
+    "gsd-plan-checker": { "model": "{planning model}" },
+    "gsd-phase-researcher": { "model": "{planning model}" },
+    "gsd-roadmapper": { "model": "{planning model}" },
+    "gsd-project-researcher": { "model": "{planning model}" },
+    "gsd-research-synthesizer": { "model": "{planning model}" },
+    "gsd-codebase-mapper": { "model": "{planning model}" },
+    "gsd-executor": { "model": "{execution model}" },
+    "gsd-debugger": { "model": "{execution model}" },
+    "gsd-verifier": { "model": "{verification model}" },
+    "gsd-integration-checker": { "model": "{verification model}" }
+  }
+}
+```
+
+**Commit opencode.json:**
+
+```bash
+git add opencode.json
+git commit -m "chore: configure opencode agent models"
+```
+
+**Important:** OpenCode loads `opencode.json` at session start and does not hot-reload. If you change profiles later via `/gsd-set-profile` or `/gsd-settings`, run `/new` (or restart OpenCode) for it to take effect.
 
 **Note:** Run `/gsd-settings` anytime to update these preferences.
 
