@@ -29,5 +29,5 @@ forbidden_strings = [
         "color: blue",
         "color: green",
         "color: purple",
-        "name: gsd-set-profile",
+        "name: set-profile",
         ]
