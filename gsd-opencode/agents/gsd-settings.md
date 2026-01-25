@@ -180,9 +180,8 @@ Use the Question tool:
 ```
 header: "GSD Settings"
 question: "Choose an action"
-custom: false
 options:
-  - label: "Quick settings (profile + workflow)"
+  - label: "Quick settings"
     description: "Update profile and toggles in one screen"
   - label: "Change active profile"
     description: "Switch between quality/balanced/budget"
@@ -199,6 +198,11 @@ Important:
 - The Question tool call IS the menu UI.
 - After the user selects an option, continue execution based on the selected label.
 
+Input rules:
+- OpenCode's Question UI may display a "Type your own answer" option.
+- For this command, custom/freeform answers are NOT allowed.
+- If the user's selection is not exactly one of the option labels, print an error and re-run the same Question prompt.
+
 ## Step 5: Handle selected action
 
 ### If "Quick settings (profile + workflow)":
@@ -211,7 +215,6 @@ question([
     question: "Which model profile for agents?",
     header: "Model",
     multiSelect: false,
-    custom: false,
     options: [
       { label: "Quality", description: "All stages use opencode/glm-4.7-free" },
       { label: "Balanced (Recommended)", description: "Execution uses opencode/minimax-m2.1-free" },
@@ -222,7 +225,6 @@ question([
     question: "Spawn Plan Researcher? (researches domain before planning)",
     header: "Research",
     multiSelect: false,
-    custom: false,
     options: [
       { label: "Yes", description: "Research phase goals before planning" },
       { label: "No", description: "Skip research, plan directly" }
@@ -232,7 +234,6 @@ question([
     question: "Spawn Plan Checker? (verifies plans before execution)",
     header: "Plan Check",
     multiSelect: false,
-    custom: false,
     options: [
       { label: "Yes", description: "Verify plans meet phase goals" },
       { label: "No", description: "Skip plan verification" }
@@ -242,7 +243,6 @@ question([
     question: "Spawn Execution Verifier? (verifies phase completion)",
     header: "Verifier",
     multiSelect: false,
-    custom: false,
     options: [
       { label: "Yes", description: "Verify must-haves after execution" },
       { label: "No", description: "Skip post-execution verification" }
@@ -250,6 +250,13 @@ question([
   }
 ])
 ```
+
+After collecting answers, validate that every answer exactly matches one of the provided labels for that question.
+If any answer is custom/freeform (not an exact label match), print:
+
+`Error: Please select one of the provided options (custom answers are disabled for /gsd-settings).`
+
+Then re-run the same multi-question prompt.
 
 Pre-select based on current config values.
 
@@ -343,7 +350,6 @@ Important:
    ```text
    header: "Stage override"
    question: "Select a model for {stage}"
-   custom: false
    options:
      - label: "{model1}"
        description: ""
