@@ -324,7 +324,7 @@ function getValidModels() {
 
   for (const line of lines) {
     const trimmed = line.trim();
-    // Match provider/model pattern (e.g., "opencode/glm-4.7-free", "github-copilot/gpt-5")
+    // Match provider/model pattern (e.g., "opencode/glm-4.7", "github-copilot/gpt-5-mini")
     if (trimmed.match(/^[\w-]+\/[\w.-]+$/)) {
       models.push(trimmed);
     }
@@ -342,7 +342,7 @@ function getValidModels() {
 ```
 
 **Example scenarios:**
-- **Success:** `{ ok: true, models: ["opencode/claude-sonnet-4", "opencode/glm-4.7-free", ...] }`
+- **Success:** `{ ok: true, models: ["opencode/claude-sonnet-4", "opencode/glm-4.7", ...] }`
 - **Command failed:** `{ ok: false, error: "Failed to run 'opencode models': command not found" }`
 - **No models parsed:** `{ ok: false, error: "No valid models found in 'opencode models' output" }`
 
@@ -376,7 +376,7 @@ function validateModelKey(modelValue, validModels) {
 ```
 
 **Example scenarios:**
-- **Valid model:** `validateModelKey("opencode/glm-4.7-free", [...])` → `{ valid: true }`
+- **Valid model:** `validateModelKey("opencode/glm-4.7", [...])` → `{ valid: true }`
 - **Invalid model:** `validateModelKey("invalid/model", [...])` → `{ valid: false, error: "Invalid model 'invalid/model'. Run 'opencode models' to see valid options." }`
 
 ---
@@ -674,7 +674,7 @@ This procedure is designed to be called by `applyProfile()` (Phase 05) after a *
 **Inputs:**
 
 - `agentInfo`: An `AgentInfo` from `validateAllAgents()`
-- `newModel`: The model string to insert/update (e.g., `"opencode/glm-4.7-free"`)
+- `newModel`: The model string to insert/update (e.g., `"opencode/glm-4.7"`)
 
 **Returns:**
 
@@ -717,7 +717,7 @@ function rewriteFrontmatter(agentInfo, newModel) {
 
 **Example scenarios:**
 
-- `rewriteFrontmatter(gsd-planner, "opencode/glm-4.7-free")` inserts/updates `model:` while keeping `tools:` and body unchanged.
+- `rewriteFrontmatter(gsd-planner, "opencode/glm-4.7")` inserts/updates `model:` while keeping `tools:` and body unchanged.
 
 ---
 

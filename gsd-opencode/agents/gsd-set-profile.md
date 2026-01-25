@@ -30,69 +30,27 @@ Precedence: Positional > Flags > Interactive picker
 |--------------|--------|
 | Planning     | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
 | Execution    | gsd-executor, gsd-debugger |
-| Verification | gsd-verifier, gsd-integration-checker |
+| Verification | gsd-verifier, gsd-integration-checker, gsd-set-profile, gsd-settings, gsd-set-model |
 
-**Profile presets:**
-
-| Profile  | Planning                   | Execution                    | Verification               |
-|----------|----------------------------|------------------------------|----------------------------|
-| quality  | opencode/glm-4.7-free      | opencode/glm-4.7-free        | opencode/glm-4.7-free      |
-| balanced | opencode/glm-4.7-free      | opencode/minimax-m2.1-free   | opencode/glm-4.7-free      |
-| budget   | opencode/minimax-m2.1-free | opencode/grok-code           | opencode/minimax-m2.1-free |
+**Profile presets:** Defined in `.planning/config.json` (user-configurable via `/gsd-settings`). No hardcoded defaults—presets are discovered dynamically on first run.
 </context>
 
 <behavior>
 
-## Step 1: Read config file and migrate if needed
+## Step 1: Read config file
 
 Read `.planning/config.json`. Handle these cases:
 
-**Case A: File missing or invalid**
-- Use defaults (see below)
-- Write the defaults to `.planning/config.json`
-- Print: `Created .planning/config.json with default profile settings`
+**Case A: File missing or no `profiles.presets` key**
+- Print: `Error: No model presets configured. Run /gsd-settings first to set up your profiles.`
+- Stop.
 
-**Case B: File exists but missing `profiles` key (legacy config)**
-- This is an older GSD project that needs migration
-- Preserve all existing keys (`mode`, `depth`, `parallelization`, etc.)
-- Add the `profiles` structure with defaults
-- Write the merged config to `.planning/config.json`
-- Print: `Migrated config.json to support model profiles (GSD update)`
-
-**Case C: File exists with `profiles` key**
-- Use as-is, no migration needed
+**Case B: File exists with `profiles.presets` key**
+- Use as-is
 
 **Also check `opencode.json`:**
 - If missing, it will be created when changes are saved
 - If exists, it will be merged (preserve non-agent keys)
-
-**Default profiles structure:**
-
-```json
-{
-  "profiles": {
-    "active_profile": "balanced",
-    "presets": {
-      "quality": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/glm-4.7-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "balanced": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/minimax-m2.1-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "budget": {
-        "planning": "opencode/minimax-m2.1-free",
-        "execution": "opencode/grok-code",
-        "verification": "opencode/minimax-m2.1-free"
-      }
-    },
-    "custom_overrides": {}
-  }
-}
-```
 
 ## Step 2: Compute effective models for current profile
 
@@ -131,21 +89,25 @@ Current configuration:
 
 **C) Interactive picker (no args/flags):**
 
+Build options dynamically from `config.profiles.presets`:
+
 Use Question tool:
 
 ```
 header: "Model profile"
 question: "Select a profile"
 options:
-  - label: "quality"
-    description: "All stages use opencode/glm-4.7-free"
-  - label: "balanced"
-    description: "Planning/verification use glm-4.7-free, execution uses minimax-m2.1-free"
-  - label: "budget"
-    description: "Planning/verification use minimax-m2.1-free, execution uses grok-code"
+  - label: "Quality"
+    description: "{preset.quality.planning} / {preset.quality.execution} / {preset.quality.verification}"
+  - label: "Balanced"
+    description: "{preset.balanced.planning} / {preset.balanced.execution} / {preset.balanced.verification}"
+  - label: "Budget"
+    description: "{preset.budget.planning} / {preset.budget.execution} / {preset.budget.verification}"
   - label: "Cancel"
     description: "Exit without changes"
 ```
+
+(Substitute actual model IDs from `config.profiles.presets` for each profile.)
 
 Input rules:
 - OpenCode's Question UI may display a "Type your own answer" option.
@@ -210,13 +172,15 @@ Stop. Do NOT write `.planning/config.json` and do NOT update `opencode.json`.
 
 ## Step 6: Apply changes
 
+Use the **write tool directly** to update both files. Do NOT use bash, python, or other scripts—use native file writing.
+
 1. **Update .planning/config.json:**
 
     - Set `config.profiles.active_profile` to `newProfile`
     - Also set `config.model_profile` to `newProfile` (for orchestrators that read this key)
     - Write the config file (preserve all other keys)
 
-1. **Update opencode.json:**
+2. **Update opencode.json:**
 
 Build agent config from effective stage models for `newProfile`:
 
@@ -234,14 +198,17 @@ Build agent config from effective stage models for `newProfile`:
     "gsd-executor": { "model": "{new.execution}" },
     "gsd-debugger": { "model": "{new.execution}" },
     "gsd-verifier": { "model": "{new.verification}" },
-    "gsd-integration-checker": { "model": "{new.verification}" }
+    "gsd-integration-checker": { "model": "{new.verification}" },
+    "gsd-set-profile": { "model": "{new.verification}" },
+    "gsd-settings": { "model": "{new.verification}" },
+    "gsd-set-model": { "model": "{new.verification}" }
   }
 }
 ```
 
 If `opencode.json` already exists, merge the `agent` key (preserve other top-level keys).
 
-1. **Report success:**
+3. **Report success:**
 
 ```text
 ✓ Active profile set to: {newProfile}

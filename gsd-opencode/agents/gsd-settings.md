@@ -11,395 +11,261 @@ tools:
 <role>
 You are executing the `/gsd-settings` command. Display current model profile settings and provide an interactive menu to manage them.
 
-This command reads/writes two files:
+Files managed:
 
-- `.planning/config.json` — profile state (active_profile, presets, custom_overrides) and workflow toggles
-- `opencode.json` — agent model assignments (OpenCode's native config)
+- `.planning/config.json` — profile state and workflow toggles (source of truth)
+- `opencode.json` — agent model assignments (derived from config.json)
 
-Do NOT modify agent .md files. Profile switching updates `opencode.json` in the project root.
+Do NOT modify agent .md files.
 </role>
 
 <context>
-**Stage-to-agent mapping (11 agents):**
+**Stage-to-agent mapping:**
 
-| Stage        | Agents |
-|--------------|--------|
-| Planning     | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
-| Execution    | gsd-executor, gsd-debugger |
-| Verification | gsd-verifier, gsd-integration-checker |
+- **Planning:** gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper
+- **Execution:** gsd-executor, gsd-debugger
+- **Verification:** gsd-verifier, gsd-integration-checker, gsd-set-profile, gsd-settings, gsd-set-model
 
-**Profile presets (hardcoded):**
-
-| Profile  | Planning                   | Execution                    | Verification               |
-|----------|----------------------------|------------------------------|----------------------------|
-| quality  | opencode/glm-4.7-free      | opencode/glm-4.7-free        | opencode/glm-4.7-free      |
-| balanced | opencode/glm-4.7-free      | opencode/minimax-m2.1-free   | opencode/glm-4.7-free      |
-| budget   | opencode/minimax-m2.1-free | opencode/grok-code           | opencode/minimax-m2.1-free |
+**Model discovery:** Presets are user-defined, not hardcoded. On first run (or reset), query `opencode models` to discover available models and prompt user to configure presets.
 </context>
+
+<rules>
+**UI Rules (apply throughout):**
+
+- Always use the Question tool for user input — never print menus as text
+- Custom/freeform answers are not allowed; re-prompt on invalid selection
+- Apply changes immediately without extra confirmation prompts
+- After any action except Exit, return to the main menu (Step 3 → Step 4)
+
+**Config Rules:**
+
+- Never overwrite existing presets — only create defaults for new/migrated projects
+- Keep `model_profile` in sync with `profiles.active_profile`
+- Merge into existing `opencode.json` (preserve non-agent keys)
+</rules>
 
 <behavior>
 
-## Step 1: Validate Environment
-
-First, confirm this directory is a GSD project.
+## Step 1: Load Config
 
 ```bash
 ls .planning/ 2>/dev/null
 ```
 
-**If not found:**
-
-```
-Error: No GSD project found.
-Run /gsd-new-project first to initialize a project.
-```
-
-Stop.
-
-Now read `.planning/config.json` and migrate/create it if needed.
+If `.planning/` not found: print `Error: No GSD project found. Run /gsd-new-project first.` and stop.
 
 ```bash
 cat .planning/config.json 2>/dev/null
 ```
 
-Read `.planning/config.json` (if it exists) and handle these cases:
+Handle config state:
 
-- If `.planning/` exists but `config.json` is missing, treat that as **Case A** (create defaults).
-- If `config.json` exists but is not valid JSON, treat that as **Case A** (reset to defaults).
+- **Missing/invalid:** Run **Preset Setup Wizard** (see below), then continue
+- **Legacy (no `profiles` key):** Run **Preset Setup Wizard**, preserve other existing keys
+- **Current:** Use as-is
 
-**Case A: config.json missing or invalid**
+Ensure `workflow` section exists (defaults: `research: true`, `plan_check: true`, `verifier: true`).
 
-- Use defaults (see below)
-- Write the defaults to `.planning/config.json`
-- Print: `Created .planning/config.json with default profile settings`
+### Preset Setup Wizard
 
-**Case B: File exists but missing `profiles` key (legacy config)**
-- This is an older GSD project that needs migration
-- Preserve all existing keys (`mode`, `depth`, `parallelization`, etc.)
-- Add the `profiles` structure with defaults
-- Write the merged config to `.planning/config.json`
-- Print: `Migrated config.json to support model profiles (GSD update)`
+This wizard runs on first use or when "Reset presets" is selected. It queries available models and lets the user configure all three profiles.
 
-**Workflow toggles (new):**
+**Step W1: Discover models**
 
-Ensure config has `workflow` section (defaults shown):
-
-```json
-{
-  "workflow": {
-    "research": true,
-    "plan_check": true,
-    "verifier": true
-  }
-}
+```bash
+opencode models 2>/dev/null
 ```
 
-Preserve existing values if present.
+Parse the output to extract model IDs. If command fails or returns no models, print `Error: Could not fetch available models. Check your OpenCode installation.` and stop.
 
-Also keep `model_profile` in sync for orchestrators that read it:
+**Step W2: Configure each profile**
 
-- `config.model_profile` should mirror `config.profiles.active_profile`.
+For each profile (quality, balanced, budget), use a multi-question call:
 
-**Case C: File exists with `profiles` key**
-- Use as-is, no migration needed
+```json
+[
+  { "header": "{Profile} Profile - Planning", "question": "Which model for planning agents?", "options": ["{model1}", "{model2}", ...] },
+  { "header": "{Profile} Profile - Execution", "question": "Which model for execution agents?", "options": ["{model1}", "{model2}", ...] },
+  { "header": "{Profile} Profile - Verification", "question": "Which model for verification agents?", "options": ["{model1}", "{model2}", ...] }
+]
+```
 
-**Also check `opencode.json`:**
-- If missing, it will be created when changes are saved
-- If exists, it will be merged (preserve non-agent keys)
+**Step W3: Save config**
 
-**Default profiles structure:**
+Create config with user selections:
 
 ```json
 {
   "profiles": {
     "active_profile": "balanced",
     "presets": {
-      "quality": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/glm-4.7-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "balanced": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/minimax-m2.1-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "budget": {
-        "planning": "opencode/minimax-m2.1-free",
-        "execution": "opencode/grok-code",
-        "verification": "opencode/minimax-m2.1-free"
-      }
+      "quality": { "planning": "{user_selection}", "execution": "{user_selection}", "verification": "{user_selection}" },
+      "balanced": { "planning": "{user_selection}", "execution": "{user_selection}", "verification": "{user_selection}" },
+      "budget": { "planning": "{user_selection}", "execution": "{user_selection}", "verification": "{user_selection}" }
     },
-    "custom_overrides": {}
-  }
+    "custom_overrides": { "quality": {}, "balanced": {}, "budget": {} }
+  },
+  "workflow": { "research": true, "plan_check": true, "verifier": true }
 }
 ```
 
-## Step 2: Compute effective models
+Print:
 
-1. Get `activeProfile` = `config.profiles.active_profile` (default: "balanced")
-2. Get `preset` = `config.profiles.presets[activeProfile]`
-3. Get `overrides` = `config.profiles.custom_overrides[activeProfile]` (may be undefined)
-4. Compute effective models:
-   - `planning` = overrides?.planning || preset.planning
-   - `execution` = overrides?.execution || preset.execution
-   - `verification` = overrides?.verification || preset.verification
-5. A stage is "overridden" if overrides[stage] exists and differs from preset[stage]
+```text
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► PRESETS CONFIGURED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## Step 3: Display current state
+Your model presets have been saved. Use "Reset presets" 
+from the settings menu if available models change.
 
-Print this output (substitute actual values):
-
+Note: Quit and relaunch OpenCode to apply model changes.
 ```
+
+## Step 2: Compute Effective Models
+
+```text
+activeProfile = config.profiles.active_profile
+preset = config.profiles.presets[activeProfile]
+overrides = config.profiles.custom_overrides[activeProfile] || {}
+
+effective.planning = overrides.planning || preset.planning
+effective.execution = overrides.execution || preset.execution
+effective.verification = overrides.verification || preset.verification
+```
+
+A stage is "overridden" if `overrides[stage]` exists and differs from `preset[stage]`.
+
+## Step 3: Display State
+
+**Print this as text output (do NOT use Question tool here):**
+
+```text
 Active profile: {activeProfile}
 
-| Stage        | Model |
-|--------------|-------|
-| planning     | {effective.planning}{* if overridden} |
-| execution    | {effective.execution}{* if overridden} |
-| verification | {effective.verification}{* if overridden} |
+| Stage        | Model                                    |
+|--------------|------------------------------------------|
+| planning     | {effective.planning}{* if overridden}   |
+| execution    | {effective.execution}{* if overridden}  |
+| verification | {effective.verification}{* if overridden}|
 
-* = overridden
-
-Config: .planning/config.json (editable)
+{if any overridden: "* = overridden" else: "No overrides"}
 
 Workflow:
-| Toggle | Value |
-|--------|-------|
-| research | {workflow.research} |
-| plan_check | {workflow.plan_check} |
-| verifier | {workflow.verifier} |
+| Toggle     | Value                  |
+|------------|------------------------|
+| research   | {workflow.research}    |
+| plan_check | {workflow.plan_check}  |
+| verifier   | {workflow.verifier}    |
 ```
 
-The `* = overridden` legend MUST always be printed, even if no stages are overridden.
+## Step 4: Show Menu
 
-## Step 4: Show action menu
-
-Use the Question tool:
+Use Question tool (single prompt, not multi-question):
 
 ```
 header: "GSD Settings"
 question: "Choose an action"
 options:
   - label: "Quick settings"
-    description: "Update profile and toggles in one screen"
-  - label: "Change active profile"
-    description: "Switch between quality/balanced/budget"
-  - label: "Edit stage override"
-    description: "Override a stage model for this profile"
+    description: "Update profile and workflow toggles"
+  - label: "Set stage override"
+    description: "Set a per-stage model override for the active profile"
   - label: "Clear stage override"
-    description: "Remove an override"
+    description: "Remove a per-stage override for the active profile"
+  - label: "Reset presets"
+    description: "Re-run model discovery and reconfigure all presets (clears overrides)"
   - label: "Exit"
-    description: "Quit settings"
+    description: "Save and quit"
 ```
 
-Important:
-- Do NOT print a plain-text list of options (no "Choose an action..." bullets).
-- The Question tool call IS the menu UI.
-- After the user selects an option, continue execution based on the selected label.
+## Step 5: Handle Actions
 
-Input rules:
-- OpenCode's Question UI may display a "Type your own answer" option.
-- For this command, custom/freeform answers are NOT allowed.
-- If the user's selection is not exactly one of the option labels, print an error and re-run the same Question prompt.
+### Quick settings
 
-## Step 5: Handle selected action
+Use multi-question call with pre-selected current values:
 
-### If "Quick settings (profile + workflow)":
-
-Use a single multi-question call (recommended UX):
-
-```
-question([
-  {
-    question: "Which model profile for agents?",
-    header: "Model",
-    multiSelect: false,
-    options: [
-      { label: "Quality", description: "All stages use opencode/glm-4.7-free" },
-      { label: "Balanced (Recommended)", description: "Execution uses opencode/minimax-m2.1-free" },
-      { label: "Budget", description: "Execution uses opencode/grok-code" }
-    ]
-  },
-  {
-    question: "Spawn Plan Researcher? (researches domain before planning)",
-    header: "Research",
-    multiSelect: false,
-    options: [
-      { label: "Yes", description: "Research phase goals before planning" },
-      { label: "No", description: "Skip research, plan directly" }
-    ]
-  },
-  {
-    question: "Spawn Plan Checker? (verifies plans before execution)",
-    header: "Plan Check",
-    multiSelect: false,
-    options: [
-      { label: "Yes", description: "Verify plans meet phase goals" },
-      { label: "No", description: "Skip plan verification" }
-    ]
-  },
-  {
-    question: "Spawn Execution Verifier? (verifies phase completion)",
-    header: "Verifier",
-    multiSelect: false,
-    options: [
-      { label: "Yes", description: "Verify must-haves after execution" },
-      { label: "No", description: "Skip post-execution verification" }
-    ]
-  }
-])
+```json
+[
+  { "header": "Model", "question": "Which model profile?", "options": ["Quality", "Balanced", "Budget"] },
+  { "header": "Research", "question": "Spawn Plan Researcher?", "options": ["Yes", "No"] },
+  { "header": "Plan Check", "question": "Spawn Plan Checker?", "options": ["Yes", "No"] },
+  { "header": "Verifier", "question": "Spawn Execution Verifier?", "options": ["Yes", "No"] }
+]
 ```
 
-After collecting answers, validate that every answer exactly matches one of the provided labels for that question.
-If any answer is custom/freeform (not an exact label match), print:
+On selection:
 
-`Error: Please select one of the provided options (custom answers are disabled for /gsd-settings).`
+- Map: Quality→`quality`, Balanced→`balanced`, Budget→`budget`
+- Set `profiles.active_profile`, `model_profile`, and `workflow.*` accordingly
+- Quick settings does NOT modify `presets` or `custom_overrides`
+- If nothing changed, print `No changes.` and return to menu
+- Otherwise save and print confirmation banner:
 
-Then re-run the same multi-question prompt.
-
-Pre-select based on current config values.
-
-Apply immediately (no extra confirm prompt):
-
-- Map model choice:
-  - "Quality" → `quality`
-  - "Balanced (Recommended)" → `balanced`
-  - "Budget" → `budget`
-- Set:
-  - `config.profiles.active_profile` = selected
-  - `config.model_profile` = selected
-  - `config.workflow.research` = Yes/No
-  - `config.workflow.plan_check` = Yes/No
-  - `config.workflow.verifier` = Yes/No
-- Write `.planning/config.json`
-- Update `opencode.json`
-- Print the confirmation banner:
-
-```
+```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  GSD ► SETTINGS UPDATED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-| Setting              | Value |
-|----------------------|-------|
-| Model Profile        | {quality|balanced|budget} |
-| Plan Researcher      | {On/Off} |
-| Plan Checker         | {On/Off} |
-| Execution Verifier   | {On/Off} |
+| Setting            | Value                     |
+|--------------------|---------------------------|
+| Model Profile      | {quality|balanced|budget} |
+| Plan Researcher    | {On/Off}                  |
+| Plan Checker       | {On/Off}                  |
+| Execution Verifier | {On/Off}                  |
 
-These settings apply to future /gsd-plan-phase and /gsd-execute-phase runs.
+Note: Quit and relaunch OpenCode to apply model changes.
 
 Quick commands:
-- /gsd-set-profile <profile> — switch model profile
-- /gsd-plan-phase --research — force research
-- /gsd-plan-phase --skip-research — skip research
-- /gsd-plan-phase --skip-verify — skip plan check
+- /gsd-set-profile <profile>
+- /gsd-plan-phase --research | --skip-research | --skip-verify
 ```
 
-Where:
-- Model Profile is the selected profile (quality/balanced/budget)
-- Plan Researcher maps to `config.workflow.research`
-- Plan Checker maps to `config.workflow.plan_check`
-- Execution Verifier maps to `config.workflow.verifier`
-- Return to Step 3
+### Set stage override
 
-### If "Change active profile":
+1. Pick stage: Planning / Execution / Verification / Cancel
+2. If Cancel, return to menu
+3. Fetch models via `opencode models` command
+4. If command fails: print error and stop
+5. Pick model from list (include Cancel option)
+6. Set `custom_overrides[activeProfile][stage]` = model
+7. Save, print "Saved", return to menu
 
-1. Use Question tool to pick: quality / balanced / budget / Cancel
-2. If Cancel, return to Step 3
-3. Apply the change immediately (no preview table, no extra confirm prompt):
-  - Update `config.profiles.active_profile` to the selected profile
-  - Also set `config.model_profile` to the selected profile
-  - Write `.planning/config.json`
-  - Update `opencode.json` (see Agent Config Update section)
-  - Print the same confirmation banner as in "Quick settings (profile + workflow)", using the current workflow toggle values.
-4. Return to Step 3 (show updated state and menu)
+### Clear stage override
 
-Important:
-- Use the Question tool for the profile picker.
-- Do NOT ask the user to type the option text manually.
-- After saving, immediately show the action menu again using the Question tool. Do NOT print "Next: choose an action" text.
+If no overrides exist for current profile, print `No overrides set for {activeProfile} profile.` and return to menu immediately.
 
-### If "Edit stage override":
+Otherwise:
 
-1. Use Question tool to pick stage: planning / execution / verification / Cancel
-2. If Cancel, return to Step 3
-3. Show current value for that stage
-4. Fetch the list of valid models from OpenCode, then let the user pick from that list (no freeform entry).
+1. Print current overrides:
 
-   Run:
+```text
+Current overrides for {activeProfile} profile:
+- planning: {model} (or omit if not overridden)
+- execution: {model} (or omit if not overridden)
+- verification: {model} (or omit if not overridden)
+```
 
-   ```bash
-   opencode models
-   ```
+2. Pick stage: Planning / Execution / Verification / Cancel (only show stages that have overrides)
+3. If Cancel, return to menu
+4. Delete `custom_overrides[activeProfile][stage]`
+5. Save, print "Cleared {stage} override.", return to menu
 
-   Parse the output and extract model identifiers in `provider/model` format (examples: `opencode/glm-4.7-free`, `github-copilot/gpt-5`).
+### Reset presets
 
-  If the command fails or yields no models, print:
+Run the **Preset Setup Wizard** (see Step 1). This re-queries available models and lets the user reconfigure all three profiles from scratch. Existing `custom_overrides` are cleared. After completion, return to menu.
 
-  ```text
-   Error: Unable to load available models from OpenCode.
-   Run `opencode models` in your terminal to confirm OpenCode is installed and providers are configured.
-   ```
-
-   Stop (do not allow manual model entry).
-
-   Otherwise, use Question tool:
-
-   ```text
-   header: "Stage override"
-   question: "Select a model for {stage}"
-   options:
-     - label: "{model1}"
-       description: ""
-     - label: "{model2}"
-       description: ""
-     - label: "{model3}"
-       description: ""
-     - label: "Cancel"
-       description: "Return without changes"
-   ```
-
-  If Cancel, return to Step 3.
-
-Apply immediately (no extra confirm prompt):
-
-- Set `config.profiles.custom_overrides[activeProfile][stage]` = selected model id
-- Write `.planning/config.json`
-- Update `opencode.json`
-- Print "Saved"
-
-Return to Step 3.
-
-Important:
-- Use the Question tool for stage selection and model selection.
-- Do NOT print a bullet list and ask the user to type the choice.
-
-### If "Clear stage override":
-
-1. Use Question tool to pick stage: planning / execution / verification / Cancel
-2. If Cancel, return to Step 3
-3. Apply immediately (no extra confirm prompt):
-    - Delete `config.profiles.custom_overrides[activeProfile][stage]`
-    - Write `.planning/config.json`
-    - Update `opencode.json`
-    - Print "Saved"
-4. Return to Step 3
-
-Important:
-- Use the Question tool for stage selection.
-- Do NOT print a bullet list and ask the user to type the choice.
-
-### If "Exit":
+### Exit
 
 Print "Settings saved." and stop.
 
-## Agent Config Update
+## Save Changes
 
-After any confirmed change, update `opencode.json` in the project root.
+After any change, use the **write tool directly** to update both files. Do NOT use bash, python, or other scripts—use native file writing.
 
-Build the agent config from effective stage models:
+1. Read existing `opencode.json` (if it exists) to preserve non-agent keys
+2. Write `.planning/config.json` with updated config
+3. Write `opencode.json` with merged agent mappings:
 
 ```json
 {
@@ -415,22 +281,23 @@ Build the agent config from effective stage models:
     "gsd-executor": { "model": "{effective.execution}" },
     "gsd-debugger": { "model": "{effective.execution}" },
     "gsd-verifier": { "model": "{effective.verification}" },
-    "gsd-integration-checker": { "model": "{effective.verification}" }
+    "gsd-integration-checker": { "model": "{effective.verification}" },
+    "gsd-set-profile": { "model": "{effective.verification}" },
+    "gsd-settings": { "model": "{effective.verification}" },
+    "gsd-set-model": { "model": "{effective.verification}" }
   }
 }
 ```
 
-If `opencode.json` already exists, merge the `agent` key (preserve other top-level keys).
+Preserve existing non-agent keys in `opencode.json`.
 
 </behavior>
 
 <notes>
-- This is a menu loop — keep showing the menu until user selects Exit
-- Use the Question tool for ALL user input (never ask user to type numbers)
-- The `* = overridden` legend is REQUIRED output
-- Persist changes immediately after each confirmation (don't batch)
-- Do NOT rewrite agent .md files — only update opencode.json
-- Overrides are scoped per profile at `profiles.custom_overrides.{profile}.{stage}`
-- **Source of truth:** `config.json` stores profiles/presets/overrides; `opencode.json` is **derived** from the effective models
-- When regenerating `opencode.json`, read the active profile from `config.json`, compute effective models (preset + overrides), then write the agent mappings
+
+- Menu loop until Exit — always return to Step 3 after actions
+- Overrides are profile-scoped: `custom_overrides.{profile}.{stage}`
+- Source of truth: `config.json`; `opencode.json` is derived
+- OpenCode does not hot-reload model assignments; user must quit and relaunch to apply changes
+
 </notes>

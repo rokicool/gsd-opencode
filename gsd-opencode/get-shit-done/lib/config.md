@@ -8,6 +8,11 @@
 > - Use direct Read/Write/Question tool instructions
 > - No external library references
 >
+> **Note (v1.7+):** Model presets are now **user-configured**, not hardcoded.
+> On first run, `/gsd-settings` discovers available models via `opencode models`
+> and prompts the user to configure presets. The examples below show placeholder
+> model IDs for illustration only.
+>
 > This file is kept for historical reference only. Do not use in new commands.
 
 ---
@@ -36,7 +41,11 @@ It manages the project's config file at:
 
     // Phase 06: per-profile per-stage overrides (canonical)
     // profiles.custom_overrides.{profile}.{stage} = modelId
-    "custom_overrides": {}
+    "custom_overrides": {
+      "quality": {},
+      "balanced": {},
+      "budget": {}
+    }
   }
 }
 ```
@@ -487,7 +496,11 @@ Presets are semantic, user-editable stage-to-model mappings stored under `profil
         "verification": "opencode/minimax-m2.1-free"
       }
     },
-    "custom_overrides": {}
+    "custom_overrides": {
+      "quality": {},
+      "balanced": {},
+      "budget": {}
+    }
   }
 }
 ```

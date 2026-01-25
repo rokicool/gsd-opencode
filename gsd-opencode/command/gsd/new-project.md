@@ -327,9 +327,9 @@ questions: [
     question: "Which AI models for planning agents?",
     multiSelect: false,
     options: [
-      { label: "Balanced (Recommended)", description: "Sonnet for most agents — good quality/cost ratio" },
-      { label: "Quality", description: "Opus for research/roadmap — higher cost, deeper analysis" },
-      { label: "Budget", description: "Haiku where possible — fastest, lowest cost" }
+      { label: "Balanced", description: "planning/verifier: opencode/glm-4.7-free, execution: opencode/minimax-m2.1-free" },
+      { label: "Quality", description: "All stages: opencode/glm-4.7-free" },
+      { label: "Budget", description: "planning/verifier: opencode/minimax-m2.1-free, execution: opencode/grok-code" }
     ]
   }
 ]
@@ -363,7 +363,11 @@ Create `.planning/config.json` with all settings:
         "verification": "opencode/minimax-m2.1-free"
       }
     },
-    "custom_overrides": {}
+    "custom_overrides": {
+      "quality": {},
+      "balanced": {},
+      "budget": {}
+    }
   },
   "workflow": {
     "research": true|false,
