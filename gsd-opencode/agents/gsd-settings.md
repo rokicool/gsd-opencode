@@ -180,6 +180,7 @@ Use the Question tool:
 ```
 header: "GSD Settings"
 question: "Choose an action"
+custom: false
 options:
   - label: "Quick settings (profile + workflow)"
     description: "Update profile and toggles in one screen"
@@ -210,6 +211,7 @@ question([
     question: "Which model profile for agents?",
     header: "Model",
     multiSelect: false,
+    custom: false,
     options: [
       { label: "Quality", description: "All stages use opencode/glm-4.7-free" },
       { label: "Balanced (Recommended)", description: "Execution uses opencode/minimax-m2.1-free" },
@@ -220,6 +222,7 @@ question([
     question: "Spawn Plan Researcher? (researches domain before planning)",
     header: "Research",
     multiSelect: false,
+    custom: false,
     options: [
       { label: "Yes", description: "Research phase goals before planning" },
       { label: "No", description: "Skip research, plan directly" }
@@ -229,6 +232,7 @@ question([
     question: "Spawn Plan Checker? (verifies plans before execution)",
     header: "Plan Check",
     multiSelect: false,
+    custom: false,
     options: [
       { label: "Yes", description: "Verify plans meet phase goals" },
       { label: "No", description: "Skip plan verification" }
@@ -238,6 +242,7 @@ question([
     question: "Spawn Execution Verifier? (verifies phase completion)",
     header: "Verifier",
     multiSelect: false,
+    custom: false,
     options: [
       { label: "Yes", description: "Verify must-haves after execution" },
       { label: "No", description: "Skip post-execution verification" }
@@ -338,6 +343,7 @@ Important:
    ```text
    header: "Stage override"
    question: "Select a model for {stage}"
+   custom: false
    options:
      - label: "{model1}"
        description: ""

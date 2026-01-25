@@ -136,6 +136,7 @@ Use Question tool:
 ```
 header: "Model profile"
 question: "Select a profile"
+custom: false
 options:
   - label: "quality"
     description: "All stages use opencode/glm-4.7-free"
