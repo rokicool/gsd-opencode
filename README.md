@@ -88,16 +88,14 @@ I just love both GSD and OpenCode. I felt like having GSD available only for Cla
 
 You can find all the changes that TACHES made in the [original CHANGELOG.md v1.6.4 -> v1.9.4](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md).
 
-Unfortunately, OpenCode does not allow dynamically switch between the models. So, 
+### Model Profile Management
 
-```
-/gsd-set-profile 
-```
-or 
-```
-/gsd-settings 
-```
-are not fully supported. Yet... (Mr [dpearson2699](https://github.com/dpearson2699) is working on [workaround](https://github.com/rokicool/gsd-opencode/issues/44).)
+OpenCode now supports full model profile management via:
+- `/gsd-settings` — Interactive settings menu for profiles, stage overrides, and workflow toggles
+- `/gsd-set-profile <profile>` — Quick switch between quality/balanced/budget profiles
+- `/gsd-set-model <profile>` — Configure which models each profile uses
+
+These commands manage `.planning/config.json` and generate `opencode.json` with agent-to-model mappings. Note: Quit and relaunch OpenCode after changing profiles for changes to take effect.
 
 ## Version 1.6.0 - We started using git submodules
 
@@ -514,8 +512,9 @@ You're never locked in. The system adapts.
 
 | Command | What it does |
 |---------|--------------|
-| `/gsd-settings` | Configure model profile and workflow agents |
+| `/gsd-settings` | Interactive settings: profiles, stage overrides, workflow toggles |
 | `/gsd-set-profile <profile>` | Switch model profile (quality/balanced/budget) |
+| `/gsd-set-model [profile]` | Configure models for a profile's stages |
 | `/gsd-add-todo [desc]` | Capture idea for later |
 | `/gsd-check-todos` | List pending todos |
 | `/gsd-debug [desc]` | Systematic debugging with persistent state |
@@ -540,18 +539,107 @@ GSD stores project settings in `.planning/config.json`. Configure during `/gsd-n
 
 Control which OpenCode model each agent uses. Balance quality vs token spend.
 
-| Profile | Planning | Execution | Verification |
-|---------|----------|-----------|--------------|
-| `quality` | Opus | Opus | Sonnet |
-| `balanced` (default) | Opus | Sonnet | Sonnet |
-| `budget` | Sonnet | Sonnet | Haiku |
+#### How It Works
 
-Switch profiles:
+GSD uses a **stage-based model assignment** system. Instead of configuring each agent individually, you assign models to three stages:
+
+| Stage | Agents | Purpose |
+|-------|--------|---------|
+| **Planning** | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper | Architecture decisions, research, task design |
+| **Execution** | gsd-executor, gsd-debugger | Code implementation following explicit plans |
+| **Verification** | gsd-verifier, gsd-integration-checker | Checking deliverables against goals |
+
+#### Configuration Files
+
+Two files manage model assignments:
+
+| File | Purpose |
+|------|---------|
+| `.planning/config.json` | **Source of truth** — stores profiles, presets, and overrides |
+| `opencode.json` | **Derived config** — agent-to-model mappings read by OpenCode |
+
+When you change profiles or models, GSD updates both files. OpenCode reads `opencode.json` at startup.
+
+#### Presets vs Overrides
+
+**Presets** define the base models for each profile:
+
+```json
+{
+  "profiles": {
+    "presets": {
+      "quality": { "planning": "anthropic/claude-sonnet-4", "execution": "anthropic/claude-sonnet-4", "verification": "anthropic/claude-sonnet-4" },
+      "balanced": { "planning": "anthropic/claude-sonnet-4", "execution": "openai/gpt-4o-mini", "verification": "openai/gpt-4o-mini" },
+      "budget": { "planning": "openai/gpt-4o-mini", "execution": "openai/gpt-4o-mini", "verification": "openai/gpt-4o-mini" }
+    }
+  }
+}
 ```
+
+**Overrides** let you customize a single stage without changing the preset:
+
+```json
+{
+  "profiles": {
+    "custom_overrides": {
+      "balanced": {
+        "planning": "anthropic/claude-opus-4"  // Override just planning stage
+      }
+    }
+  }
+}
+```
+
+The **effective model** = override (if set) || preset.
+
+#### First-Run Setup
+
+On first use (or when running `/gsd-settings` → Reset presets), the **Preset Setup Wizard** runs:
+
+1. Queries `opencode models` to discover available models
+2. Prompts you to select models for each profile/stage (9 selections total)
+3. Saves configuration to `.planning/config.json`
+4. Generates `opencode.json` with agent mappings
+
+This ensures your presets use models actually available in your OpenCode installation.
+
+#### Commands
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd-settings` | Full interactive menu: switch profiles, set/clear overrides, reset presets, toggle workflow agents |
+| `/gsd-set-profile <profile>` | Quick switch between quality/balanced/budget profiles |
+| `/gsd-set-model [profile]` | Configure which models a profile's presets use |
+
+**Examples:**
+
+```bash
+# Switch to budget profile
 /gsd-set-profile budget
+
+# Configure balanced profile's models interactively
+/gsd-set-model balanced
+
+# Open full settings menu
+/gsd-settings
 ```
 
-Or configure via `/gsd-settings`.
+#### Profile Philosophy
+
+When configuring your presets:
+
+- **quality** — Use your most capable model for all stages. Best for critical architecture work.
+- **balanced** — Strong model for planning (decisions matter), mid-tier for execution/verification (follows instructions).
+- **budget** — Mid-tier for code writing, lightweight for research/verification. Best for high-volume work.
+
+#### Important: Restart Required
+
+OpenCode loads `opencode.json` at startup and **does not hot-reload** model assignments. After changing profiles or models:
+
+1. Fully quit OpenCode
+2. Relaunch OpenCode
+
+Your new model assignments will then be active.
 
 ### Workflow Agents
 
