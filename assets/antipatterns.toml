@@ -3,7 +3,7 @@ title = "Checks"
 [checklist]
 folder = "./gsd-opencode/"
 file = "*.md"
-exclude_dir = ""
+exclude_dir = "node_modules"
 forbidden_strings = [
         "Claude",
         "Claude Code",
