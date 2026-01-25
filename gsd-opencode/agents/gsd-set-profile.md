@@ -136,7 +136,6 @@ Use Question tool:
 ```
 header: "Model profile"
 question: "Select a profile"
-custom: false
 options:
   - label: "quality"
     description: "All stages use opencode/glm-4.7-free"
@@ -147,6 +146,11 @@ options:
   - label: "Cancel"
     description: "Exit without changes"
 ```
+
+Input rules:
+- OpenCode's Question UI may display a "Type your own answer" option.
+- For this command, custom/freeform answers are NOT allowed.
+- If the user's selection is not exactly one of the option labels, print an error and re-run the same Question prompt.
 
 If user selects Cancel, print the cancellation message (Step 5) and stop.
 
