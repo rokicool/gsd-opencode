@@ -23,13 +23,6 @@ Implementation lives in the `gsd-set-profile` agent so we don’t duplicate the 
 
 Run the profile switch using the `gsd-set-profile` agent.
 
-After the agent reports success:
-
-```
-⚠️ OpenCode loads opencode.json at session start and does not hot-reload.
-Run `/new` (or fully restart OpenCode) to apply this profile change.
-```
-
 </process>
 
 <examples>
@@ -40,9 +33,6 @@ Run `/new` (or fully restart OpenCode) to apply this profile change.
 /gsd-set-profile budget
 
 ✓ Active profile set to: budget
-
-⚠️ OpenCode loads opencode.json at session start and does not hot-reload.
-Run `/new` (or fully restart OpenCode) to apply this profile change.
 ```
 
 **Switch to quality profile:**
@@ -51,9 +41,6 @@ Run `/new` (or fully restart OpenCode) to apply this profile change.
 /gsd-set-profile quality
 
 ✓ Active profile set to: quality
-
-⚠️ OpenCode loads opencode.json at session start and does not hot-reload.
-Run `/new` (or fully restart OpenCode) to apply this profile change.
 ```
 
 </examples>
