@@ -17,7 +17,7 @@
 
 TACHES decided to include support for OpenCode in his own product. That is great news. 
 
-However, with all due respect, his adaptation for OpenCode is not perfect. So will continue working on this project and will try to fill the gaps. Unfortunately, I can not keep the same pace as it was initially but I will try to keep up and address issues (if there are). 
+However, with all due respect, his adaptation for OpenCode is not perfect. So I will continue working on this project and will try to fill the gaps.
 
 Thanks to @dpearson2699 we have much better adaptation of /gsd-settings command and (almost)dynamical switch between different LLMs for subagents.
 
