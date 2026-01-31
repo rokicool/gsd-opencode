@@ -33,7 +33,7 @@ This is the brownfield equivalent of new-project. The project exists, PROJECT.md
 </execution_context>
 
 <context>
-Milestone name: $ARGUMENTS (optional - will prompt if not provided)
+Milestone name: `$ARGUMENTS` (optional - will prompt if not provided)
 
 **Load project context:**
 @.planning/PROJECT.md

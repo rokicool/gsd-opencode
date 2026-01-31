@@ -26,7 +26,7 @@ Output: {phase}-UAT.md tracking all test results. If issues found: diagnosed gap
 </execution_context>
 
 <context>
-Phase: $ARGUMENTS (optional)
+Phase: `$ARGUMENTS` (optional)
 - If provided: Test specific phase (e.g., "4")
 - If not provided: Check for active sessions or prompt for phase
 

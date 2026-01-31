@@ -18,7 +18,7 @@ Debug issues using scientific method with subagent isolation.
 </objective>
 
 <context>
-User's issue: $ARGUMENTS
+User's issue: `$ARGUMENTS`
 
 Check for active sessions:
 ```bash
@@ -48,11 +48,11 @@ Store resolved model for use in Task calls below.
 
 ## 1. Check Active Sessions
 
-If active sessions exist AND no $ARGUMENTS:
+If active sessions exist AND no `$ARGUMENTS`:
 - List sessions with status, hypothesis, next action
 - User picks number to resume OR describes new issue
 
-If $ARGUMENTS provided OR user describes new issue:
+If `$ARGUMENTS` provided OR user describes new issue:
 - Continue to symptom gathering
 
 ## 2. Gather Symptoms (if new issue)

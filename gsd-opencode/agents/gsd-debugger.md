@@ -836,17 +836,17 @@ The file IS the debugging brain.
 ls .planning/debug/*.md 2>/dev/null | grep -v resolved
 ```
 
-**If active sessions exist AND no $ARGUMENTS:**
+**If active sessions exist AND no `$ARGUMENTS`:**
 - Display sessions with status, hypothesis, next action
 - Wait for user to select (number) or describe new issue (text)
 
-**If active sessions exist AND $ARGUMENTS:**
+**If active sessions exist AND `$ARGUMENTS`:**
 - Start new session (continue to create_debug_file)
 
-**If no active sessions AND no $ARGUMENTS:**
+**If no active sessions AND no `$ARGUMENTS`:**
 - Prompt: "No active sessions. Describe the issue to start."
 
-**If no active sessions AND $ARGUMENTS:**
+**If no active sessions AND `$ARGUMENTS`:**
 - Continue to create_debug_file
 </step>
 
@@ -857,7 +857,7 @@ ls .planning/debug/*.md 2>/dev/null | grep -v resolved
 2. `mkdir -p .planning/debug`
 3. Create file with initial state:
    - status: gathering
-   - trigger: verbatim $ARGUMENTS
+   - trigger: verbatim `$ARGUMENTS`
    - Current Focus: next_action = "gather symptoms"
    - Symptoms: empty
 4. Proceed to symptom_gathering

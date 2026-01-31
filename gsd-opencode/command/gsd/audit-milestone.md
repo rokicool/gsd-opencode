@@ -22,7 +22,7 @@ Verify milestone achieved its definition of done. Check requirements coverage, c
 </execution_context>
 
 <context>
-Version: $ARGUMENTS (optional — defaults to current milestone)
+Version: `$ARGUMENTS` (optional — defaults to current milestone)
 
 **Original Intent:**
 @.planning/PROJECT.md

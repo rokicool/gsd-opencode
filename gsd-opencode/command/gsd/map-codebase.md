@@ -24,7 +24,7 @@ Output: .planning/codebase/ folder with 7 structured documents about the codebas
 </execution_context>
 
 <context>
-Focus area: $ARGUMENTS (optional - if provided, tells agents to focus on specific subsystem)
+Focus area: `$ARGUMENTS` (optional - if provided, tells agents to focus on specific subsystem)
 
 **Load project state if exists:**
 Check for .planning/STATE.md - loads context if project already initialized

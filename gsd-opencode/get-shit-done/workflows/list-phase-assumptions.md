@@ -7,7 +7,7 @@ Key difference from discuss-phase: This is ANALYSIS of what OpenCode thinks, not
 <process>
 
 <step name="validate_phase" priority="first">
-Phase number: $ARGUMENTS (required)
+Phase number: `$ARGUMENTS` (required)
 
 **If argument missing:**
 

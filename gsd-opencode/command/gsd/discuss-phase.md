@@ -29,7 +29,7 @@ Extract implementation decisions that downstream agents need — researcher and 
 </execution_context>
 
 <context>
-Phase number: $ARGUMENTS (required)
+Phase number: `$ARGUMENTS` (required)
 
 **Load project state:**
 @.planning/STATE.md

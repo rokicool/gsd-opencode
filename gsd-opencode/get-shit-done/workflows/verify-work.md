@@ -46,7 +46,7 @@ Store resolved models for use in Task calls below.
 find .planning/phases -name "*-UAT.md" -type f 2>/dev/null | head -5
 ```
 
-**If active sessions exist AND no $ARGUMENTS provided:**
+**If active sessions exist AND no `$ARGUMENTS` provided:**
 
 read each file's frontmatter (status, phase) and Current Test section.
 
@@ -68,12 +68,12 @@ Wait for user response.
 - If user replies with number (1, 2) → Load that file, go to `resume_from_file`
 - If user replies with phase number → Treat as new session, go to `create_uat_file`
 
-**If active sessions exist AND $ARGUMENTS provided:**
+**If active sessions exist AND `$ARGUMENTS` provided:**
 
 Check if session exists for that phase. If yes, offer to resume or restart.
 If no, continue to `create_uat_file`.
 
-**If no active sessions AND no $ARGUMENTS:**
+**If no active sessions AND no `$ARGUMENTS`:**
 
 ```
 No active UAT sessions.
@@ -81,7 +81,7 @@ No active UAT sessions.
 Provide a phase number to start testing (e.g., /gsd-verify-work 4)
 ```
 
-**If no active sessions AND $ARGUMENTS provided:**
+**If no active sessions AND `$ARGUMENTS` provided:**
 
 Continue to `create_uat_file`.
 </step>
@@ -89,7 +89,7 @@ Continue to `create_uat_file`.
 <step name="find_summaries">
 **Find what to test:**
 
-Parse $ARGUMENTS as phase number (e.g., "4") or plan number (e.g., "04-02").
+Parse `$ARGUMENTS` as phase number (e.g., "4") or plan number (e.g., "04-02").
 
 ```bash
 # Find phase directory (match both zero-padded and unpadded)

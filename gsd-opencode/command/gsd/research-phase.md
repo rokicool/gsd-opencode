@@ -24,7 +24,7 @@ Research how to implement a phase. Spawns gsd-phase-researcher agent with phase 
 </objective>
 
 <context>
-Phase number: $ARGUMENTS (required)
+Phase number: `$ARGUMENTS` (required)
 
 Normalize phase input in step 1 before any directory lookups.
 </context>

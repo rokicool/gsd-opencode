@@ -29,7 +29,7 @@ Create executable phase prompts (PLAN.md files) for a roadmap phase with integra
 </objective>
 
 <context>
-Phase number: $ARGUMENTS (optional - auto-detects next unplanned phase if not provided)
+Phase number: `$ARGUMENTS` (optional - auto-detects next unplanned phase if not provided)
 
 **Flags:**
 - `--research` — Force re-research even if RESEARCH.md exists
@@ -70,7 +70,7 @@ Store resolved models for use in Task calls below.
 
 ## 2. Parse and Normalize Arguments
 
-Extract from $ARGUMENTS:
+Extract from `$ARGUMENTS`:
 
 - Phase number (integer or decimal like `2.1`)
 - `--research` flag to force re-research

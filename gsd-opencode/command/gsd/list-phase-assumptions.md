@@ -21,7 +21,7 @@ Output: Conversational output only (no file creation) - ends with "What do you t
 </execution_context>
 
 <context>
-Phase number: $ARGUMENTS (required)
+Phase number: `$ARGUMENTS` (required)
 
 **Load project state first:**
 @.planning/STATE.md
