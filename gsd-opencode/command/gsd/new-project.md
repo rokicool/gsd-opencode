@@ -1014,14 +1014,14 @@ Present completion with next steps:
 
 **Phase 1: [Phase Name]** — [Goal from ROADMAP.md]
 
-`/gsd-discuss-phase 1` — gather context and clarify approach
+/gsd-discuss-phase 1 — gather context and clarify approach
 
-*`/new` first → fresh context window*
+*/new first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd-plan-phase 1` — skip discussion, plan directly
+- /gsd-plan-phase 1 — skip discussion, plan directly
 
 ───────────────────────────────────────────────────────────────
 ```
