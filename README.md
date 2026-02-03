@@ -190,6 +190,7 @@ Clone the repository and run the installer locally:
 ```bash
 git clone https://github.com/rokicool/gsd-opencode.git
 cd gsd-opencode
+git submodule update --init --recursive 
 node bin/install.js --local
 ```
 
