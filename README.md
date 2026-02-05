@@ -24,6 +24,9 @@ Thanks to @dpearson2699 we have much better adaptation of /gsd-settings command 
 
 -- **Roman** (2026-01-31)
 
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/zRJ0UWHBjCY/0.jpg)](https://www.youtube.com/watch?v=zRJ0UWHBjCY)
+
 ---
 
 <br>
