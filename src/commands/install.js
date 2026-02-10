@@ -68,9 +68,9 @@ function getSourceDirectory() {
   const __dirname = path.dirname(__filename);
   const packageRoot = path.resolve(__dirname, '../..');
 
-  // Source is the get-shit-done directory at package root
-  // During development/distribution, this is where the files live
-  return path.join(packageRoot, 'get-shit-done');
+  // Source is the gsd-opencode directory at package root
+  // This contains the distribution files (agents, command, get-shit-done)
+  return path.join(packageRoot, 'gsd-opencode');
 }
 
 /**
@@ -109,8 +109,8 @@ function handleError(error, verbose) {
       logger.error(`File or directory not found: ${error.message}`);
       logger.dim('');
       logger.dim('Suggestion: Check that the source directory exists and is accessible.');
-      if (error.message.includes('get-shit-done')) {
-        logger.dim('The get-shit-done directory may be missing from the package.');
+      if (error.message.includes('gsd-opencode')) {
+        logger.dim('The gsd-opencode directory may be missing from the package.');
       }
       return ERROR_CODES.GENERAL_ERROR;
 
@@ -177,7 +177,7 @@ async function preflightChecks(sourceDir, targetDir) {
     if (error.code === 'ENOENT') {
       throw new Error(
         `Source directory not found: ${sourceDir}\n` +
-        'The get-shit-done directory may be missing from the package installation.'
+        'The gsd-opencode directory may be missing from the package installation.'
       );
     }
     throw error;
