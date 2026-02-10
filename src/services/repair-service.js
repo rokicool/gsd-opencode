@@ -1,0 +1,297 @@
+/**
+ * Repair service for detecting and fixing installation issues.
+ *
+ * This module provides the core repair logic that detects issues and fixes them
+ * safely with backups and progress reporting. It orchestrates detection, backup,
+ * and repair operations for broken GSD-OpenCode installations.
+ *
+ * Works in conjunction with HealthChecker for issue detection, BackupManager for
+ * safe backups before destructive operations, and FileOperations for file reinstall.
+ *
+ * @module repair-service
+ */
+
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { ScopeManager } from './scope-manager.js';
+import { BackupManager } from './backup-manager.js';
+import { FileOperations } from './file-ops.js';
+import { PATH_PATTERNS } from '../../lib/constants.js';
+
+// Get the directory of the current module for resolving source paths
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * Manages repair operations for GSD-OpenCode installations.
+ *
+ * This class provides methods to detect installation issues (missing files,
+ * corrupted files, path issues) and repair them safely with backup creation
+ * and progress reporting. It uses a two-phase repair strategy: first fixing
+ * non-destructive issues (missing files), then destructive issues (corrupted
+ * files, path issues) with proper backups.
+ *
+ * @class RepairService
+ * @example
+ * const scope = new ScopeManager({ scope: 'global' });
+ * const backupManager = new BackupManager(scope, logger);
+ * const fileOps = new FileOperations(scope, logger);
+ * const repairService = new RepairService({
+ *   scopeManager: scope,
+ *   backupManager: backupManager,
+ *   fileOps: fileOps,
+ *   logger: logger,
+ *   expectedVersion: '1.0.0'
+ * });
+ *
+ * // Detect issues
+ * const issues = await repairService.detectIssues();
+ * if (issues.hasIssues) {
+ *   console.log(repairService.generateSummary(issues));
+ *
+ *   // Repair with progress tracking
+ *   const result = await repairService.repair(issues, {
+ *     onProgress: ({ current, total, operation, file }) => {
+ *       console.log(`${operation}: ${current}/${total} - ${file}`);
+ *     }
+ *   });
+ *
+ *   console.log(`Repairs: ${result.stats.succeeded}/${result.stats.total} succeeded`);
+ * }
+ */
+export class RepairService {
+  /**
+   * Creates a new RepairService instance.
+   *
+   * @param {Object} dependencies - Required dependencies
+   * @param {ScopeManager} dependencies.scopeManager - ScopeManager instance for path resolution
+   * @param {BackupManager} dependencies.backupManager - BackupManager instance for creating backups
+   * @param {FileOperations} dependencies.fileOps - FileOperations instance for file reinstall
+   * @param {Object} dependencies.logger - Logger instance for output
+   * @param {string} dependencies.expectedVersion - Expected version string for version checks
+   * @throws {Error} If any required dependency is missing or invalid
+   *
+   * @example
+   * const repairService = new RepairService({
+   *   scopeManager: scope,
+   *   backupManager: backupManager,
+   *   fileOps: fileOps,
+   *   logger: logger,
+   *   expectedVersion: '1.0.0'
+   * });
+   */
+  constructor(dependencies) {
+    // Validate all required dependencies
+    if (!dependencies) {
+      throw new Error('Dependencies object is required');
+    }
+
+    const { scopeManager, backupManager, fileOps, logger, expectedVersion } = dependencies;
+
+    // Validate scopeManager
+    if (!scopeManager) {
+      throw new Error('ScopeManager instance is required');
+    }
+    if (typeof scopeManager.getTargetDir !== 'function') {
+      throw new Error('Invalid ScopeManager: missing getTargetDir method');
+    }
+
+    // Validate backupManager
+    if (!backupManager) {
+      throw new Error('BackupManager instance is required');
+    }
+    if (typeof backupManager.backupFile !== 'function') {
+      throw new Error('Invalid BackupManager: missing backupFile method');
+    }
+
+    // Validate fileOps
+    if (!fileOps) {
+      throw new Error('FileOperations instance is required');
+    }
+    if (typeof fileOps._copyFile !== 'function') {
+      throw new Error('Invalid FileOperations: missing _copyFile method');
+    }
+
+    // Validate logger
+    if (!logger) {
+      throw new Error('Logger instance is required');
+    }
+    if (typeof logger.info !== 'function' || typeof logger.error !== 'function') {
+      throw new Error('Invalid Logger: missing required methods (info, error)');
+    }
+
+    // Validate expectedVersion
+    if (!expectedVersion || typeof expectedVersion !== 'string') {
+      throw new Error('Expected version must be a non-empty string');
+    }
+
+    // Store dependencies
+    this.scopeManager = scopeManager;
+    this.backupManager = backupManager;
+    this.fileOps = fileOps;
+    this.logger = logger;
+    this.expectedVersion = expectedVersion;
+
+    // Lazy-load HealthChecker to avoid circular dependencies
+    this._healthChecker = null;
+
+    this.logger.debug('RepairService initialized');
+  }
+
+  /**
+   * Gets or creates the HealthChecker instance.
+   *
+   * @returns {Promise<Object>} HealthChecker instance
+   * @private
+   */
+  async _getHealthChecker() {
+    if (!this._healthChecker) {
+      const { HealthChecker } = await import('./health-checker.js');
+      this._healthChecker = new HealthChecker(this.scopeManager);
+    }
+    return this._healthChecker;
+  }
+
+  /**
+   * Detects installation issues by running health checks.
+   *
+   * Uses HealthChecker to verify file existence, version matching, and file
+   * integrity. Categorizes issues into missing files, corrupted files, and
+   * path issues. Does not modify any files during detection.
+   *
+   * @returns {Promise<Object>} Categorized issues
+   * @property {boolean} hasIssues - True if any issues were found
+   * @property {Array} missingFiles - Files/directories that don't exist
+   * @property {Array} corruptedFiles - Files that failed integrity checks
+   * @property {Array} pathIssues - .md files with incorrect @gsd-opencode/ references
+   * @property {number} totalIssues - Total count of all issues
+   *
+   * @example
+   * const issues = await repairService.detectIssues();
+   * console.log(issues.hasIssues); // true/false
+   * console.log(issues.missingFiles); // [{ path, type }]
+   * console.log(issues.corruptedFiles); // [{ path, relative, error }]
+   * console.log(issues.pathIssues); // [{ path, relative, currentContent }]
+   */
+  async detectIssues() {
+    this.logger.info('Detecting installation issues...');
+
+    const healthChecker = await this._getHealthChecker();
+    const targetDir = this.scopeManager.getTargetDir();
+
+    // Run all health checks
+    const checkResult = await healthChecker.checkAll({
+      expectedVersion: this.expectedVersion
+    });
+
+    // Categorize issues
+    const missingFiles = [];
+    const corruptedFiles = [];
+
+    // Parse file existence checks
+    if (checkResult.categories.files && !checkResult.categories.files.passed) {
+      for (const check of checkResult.categories.files.checks) {
+        if (!check.passed) {
+          const isDirectory = check.name.includes('directory');
+          missingFiles.push({
+            path: check.path,
+            type: isDirectory ? 'directory' : 'file',
+            name: check.name
+          });
+        }
+      }
+    }
+
+    // Parse integrity checks for corrupted files
+    if (checkResult.categories.integrity && !checkResult.categories.integrity.passed) {
+      for (const check of checkResult.categories.integrity.checks) {
+        if (!check.passed && check.error) {
+          // Only include actual file errors, not missing files (those go in missingFiles)
+          if (!check.error.includes('not found')) {
+            corruptedFiles.push({
+              path: check.file,
+              relative: check.relative,
+              error: check.error
+            });
+          }
+        }
+      }
+    }
+
+    // Detect path issues in .md files
+    const pathIssues = await this._detectPathIssues(targetDir);
+
+    const totalIssues = missingFiles.length + corruptedFiles.length + pathIssues.length;
+    const hasIssues = totalIssues > 0;
+
+    this.logger.info(`Found ${totalIssues} issue(s): ${missingFiles.length} missing, ${corruptedFiles.length} corrupted, ${pathIssues.length} path issues`);
+
+    return {
+      hasIssues,
+      missingFiles,
+      corruptedFiles,
+      pathIssues,
+      totalIssues
+    };
+  }
+
+  /**
+   * Detects path issues in .md files.
+   *
+   * Reads .md files and checks for @gsd-opencode/ pattern references.
+   * Compares expected path (targetDir + '/') with actual references.
+   *
+   * @param {string} targetDir - Target installation directory
+   * @returns {Promise<Array>} Array of path issues
+   * @private
+   */
+  async _detectPathIssues(targetDir) {
+    const pathIssues = [];
+
+    // Sample files to check for path issues (same as integrity check samples)
+    const sampleFiles = [
+      { dir: 'agents', file: 'gsd-executor.md' },
+      { dir: 'command', file: 'gsd/help.md' },
+      { dir: 'get-shit-done', file: 'templates/summary.md' }
+    ];
+
+    const expectedPrefix = targetDir + '/';
+
+    for (const { dir, file } of sampleFiles) {
+      const filePath = path.join(targetDir, dir, file);
+      const relativePath = path.join(dir, file);
+
+      try {
+        const content = await fs.readFile(filePath, 'utf-8');
+
+        // Check for @gsd-opencode/ references that haven't been replaced
+        const hasWrongReferences = PATH_PATTERNS.gsdReference.test(content);
+
+        if (hasWrongReferences) {
+          pathIssues.push({
+            path: filePath,
+            relative: relativePath,
+            currentContent: content
+          });
+        }
+      } catch (error) {
+        // File doesn't exist or can't be read - this is a missing file issue, not a path issue
+        this.logger.debug(`Could not check path issues for ${relativePath}: ${error.message}`);
+      }
+    }
+
+    return pathIssues;
+  }
+}
+
+/**
+ * Default export for the repair-service module.
+ *
+ * @example
+ * import { RepairService } from './services/repair-service.js';
+ * const repairService = new RepairService({ scopeManager, backupManager, fileOps, logger, expectedVersion });
+ */
+export default {
+  RepairService
+};
