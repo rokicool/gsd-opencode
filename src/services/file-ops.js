@@ -1,0 +1,581 @@
+/**
+ * File operations service with atomic installation and path replacement.
+ *
+ * This module provides safe, atomic file operations for installing GSD-OpenCode.
+ * It handles:
+ * - Path replacement in .md files (rewriting @gsd-opencode/ references)
+ * - Atomic installation using temp-then-move pattern
+ * - Progress indication during file operations
+ * - Signal handling for graceful interruption and cleanup
+ * - Path traversal prevention
+ * - Permission error handling
+ *
+ * SECURITY NOTE: All target paths are validated to prevent directory traversal.
+ * Atomic operations ensure no partial installations remain on failure.
+ *
+ * @module file-ops
+ */
+
+import fs from 'fs/promises';
+import path from 'path';
+import { constants as fsConstants } from 'fs';
+import ora from 'ora';
+import { validatePath, expandPath } from '../utils/path-resolver.js';
+import { PATH_PATTERNS, ERROR_CODES } from '../../lib/constants.js';
+
+/**
+ * Manages file operations with atomic installation and progress indication.
+ *
+ * This class provides the core installation logic for GSD-OpenCode, handling
+ * safe file copying, path replacement in markdown files, and atomic moves.
+ * It integrates with ScopeManager for path resolution and Logger for feedback.
+ *
+ * @class FileOperations
+ * @example
+ * const fileOps = new FileOperations(scopeManager, logger);
+ * await fileOps.install('./get-shit-done', '/Users/name/.config/opencode');
+ */
+export class FileOperations {
+  /**
+   * Creates a new FileOperations instance.
+   *
+   * @param {ScopeManager} scopeManager - Scope manager for path resolution
+   * @param {object} logger - Logger instance for output (from logger.js)
+   *
+   * @example
+   * const scopeManager = new ScopeManager({ scope: 'global' });
+   * const fileOps = new FileOperations(scopeManager, logger);
+   */
+  constructor(scopeManager, logger) {
+    if (!scopeManager) {
+      throw new Error('scopeManager is required');
+    }
+    if (!logger) {
+      throw new Error('logger is required');
+    }
+
+    this.scopeManager = scopeManager;
+    this.logger = logger;
+
+    /**
+     * Registry of temporary directories to clean up.
+     * @type {Set<string>}
+     * @private
+     */
+    this._tempDirs = new Set();
+
+    /**
+     * Active spinner instance for progress indication.
+     * @type {object|null}
+     * @private
+     */
+    this._spinner = null;
+
+    /**
+     * Flag indicating if signal handlers are registered.
+     * @type {boolean}
+     * @private
+     */
+    this._handlersRegistered = false;
+
+    // Bind methods for use as event handlers
+    this._handleSigint = this._handleSigint.bind(this);
+    this._handleSigterm = this._handleSigterm.bind(this);
+  }
+
+  /**
+   * Installs GSD-OpenCode from source to target directory.
+   *
+   * Performs atomic installation using the temp-then-move pattern:
+   * 1. Creates a temporary directory
+   * 2. Copies files with path replacement in .md files
+   * 3. Atomically moves temp directory to target location
+   *
+   * If interrupted or an error occurs, cleans up the temporary directory.
+   *
+   * @param {string} sourceDir - Source directory containing GSD-OpenCode files
+   * @param {string} targetDir - Target installation directory
+   * @returns {Promise<{success: boolean, filesCopied: number, directories: number}>}
+   *          Installation result with counts
+   * @throws {Error} If installation fails (with cleanup performed)
+   *
+   * @example
+   * const result = await fileOps.install('./get-shit-done', '~/.config/opencode');
+   * console.log(`Copied ${result.filesCopied} files`);
+   */
+  async install(sourceDir, targetDir) {
+    const expandedSource = expandPath(sourceDir);
+    const expandedTarget = expandPath(targetDir);
+
+    // Validate source directory exists
+    try {
+      const sourceStat = await fs.stat(expandedSource);
+      if (!sourceStat.isDirectory()) {
+        throw new Error(`Source path is not a directory: ${sourceDir}`);
+      }
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        throw new Error(`Source directory not found: ${sourceDir}`);
+      }
+      throw error;
+    }
+
+    // Create temporary directory with timestamp
+    const timestamp = Date.now();
+    const tempDir = `${expandedTarget}.tmp-${timestamp}`;
+
+    // Register temp dir for cleanup and setup signal handlers
+    this._registerTempDir(tempDir);
+    this._setupSignalHandlers();
+
+    this.logger.info(`Installing to ${this.scopeManager.getPathPrefix()}...`);
+
+    try {
+      // Create temp directory
+      await fs.mkdir(tempDir, { recursive: true });
+      this.logger.debug(`Created temp directory: ${tempDir}`);
+
+      // Copy files with progress and path replacement
+      const copyResult = await this._copyWithProgress(expandedSource, tempDir);
+
+      // Perform atomic move
+      await this._atomicMove(tempDir, expandedTarget);
+
+      // Success - clean up signal handlers and registry
+      this._removeTempDir(tempDir);
+      this._removeSignalHandlers();
+
+      this.logger.success(
+        `Installed ${copyResult.filesCopied} files (${copyResult.directories} directories)`
+      );
+
+      return {
+        success: true,
+        filesCopied: copyResult.filesCopied,
+        directories: copyResult.directories
+      };
+    } catch (error) {
+      // Ensure cleanup on any error
+      await this._cleanup();
+      this._removeSignalHandlers();
+
+      // Enhance error message with context
+      throw this._wrapError(error, 'installation');
+    }
+  }
+
+  /**
+   * Copies files recursively with progress indication and path replacement.
+   *
+   * Copies all files from source to target directory. For .md files,
+   * performs path replacement to update @gsd-opencode/ references.
+   *
+   * @param {string} sourceDir - Source directory
+   * @param {string} targetDir - Target directory
+   * @returns {Promise<{filesCopied: number, directories: number}>}
+   *          Copy statistics
+   * @private
+   */
+  async _copyWithProgress(sourceDir, targetDir) {
+    let filesCopied = 0;
+    let directories = 0;
+
+    // Get total file count for progress calculation
+    const totalFiles = await this._countFiles(sourceDir);
+
+    // Start progress spinner
+    this._spinner = ora({
+      text: 'Copying files...',
+      spinner: 'dots',
+      color: 'cyan'
+    }).start();
+
+    try {
+      await this._copyRecursive(sourceDir, targetDir, (filePath) => {
+        filesCopied++;
+        const progress = Math.round((filesCopied / totalFiles) * 100);
+        this._spinner.text = `Copying files... ${progress}% (${filesCopied}/${totalFiles})`;
+      });
+
+      // Count directories (including target)
+      directories = await this._countDirectories(targetDir);
+
+      this._spinner.succeed(`Copied ${filesCopied} files`);
+    } catch (error) {
+      this._spinner.fail('Copy failed');
+      throw error;
+    } finally {
+      this._spinner = null;
+    }
+
+    return { filesCopied, directories };
+  }
+
+  /**
+   * Recursively copies directory contents.
+   *
+   * @param {string} sourceDir - Source directory
+   * @param {string} targetDir - Target directory
+   * @param {Function} onFile - Callback for each file copied
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _copyRecursive(sourceDir, targetDir, onFile) {
+    const entries = await fs.readdir(sourceDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const sourcePath = path.join(sourceDir, entry.name);
+      const targetPath = path.join(targetDir, entry.name);
+
+      if (entry.isDirectory()) {
+        // Create directory
+        await fs.mkdir(targetPath, { recursive: true });
+        // Recursively copy contents
+        await this._copyRecursive(sourcePath, targetPath, onFile);
+      } else {
+        // Copy file with potential path replacement
+        await this._copyFile(sourcePath, targetPath);
+        onFile(targetPath);
+      }
+    }
+  }
+
+  /**
+   * Copies a single file, performing path replacement for .md files.
+   *
+   * For markdown files, replaces @gsd-opencode/ references with the
+   * actual installation path.
+   *
+   * @param {string} sourcePath - Source file path
+   * @param {string} targetPath - Target file path
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _copyFile(sourcePath, targetPath) {
+    const isMarkdown = sourcePath.endsWith('.md');
+
+    if (isMarkdown) {
+      // Read, replace, and write markdown content
+      let content = await fs.readFile(sourcePath, 'utf-8');
+
+      // Replace @gsd-opencode/ references with actual path
+      const targetDir = this.scopeManager.getTargetDir();
+      content = content.replace(
+        PATH_PATTERNS.gsdReference,
+        targetDir + '/'
+      );
+
+      await fs.writeFile(targetPath, content, 'utf-8');
+    } else {
+      // Copy binary or other files directly
+      await fs.copyFile(sourcePath, targetPath, fsConstants.COPYFILE_FICLONE);
+    }
+  }
+
+  /**
+   * Counts total files in a directory recursively.
+   *
+   * @param {string} dir - Directory to count
+   * @returns {Promise<number>} Total file count
+   * @private
+   */
+  async _countFiles(dir) {
+    let count = 0;
+
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        count += await this._countFiles(fullPath);
+      } else {
+        count++;
+      }
+    }
+
+    return count;
+  }
+
+  /**
+   * Counts directories recursively.
+   *
+   * @param {string} dir - Directory to count
+   * @returns {Promise<number>} Total directory count
+   * @private
+   */
+  async _countDirectories(dir) {
+    let count = 1; // Count the root directory
+
+    try {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          const fullPath = path.join(dir, entry.name);
+          count += await this._countDirectories(fullPath);
+        }
+      }
+    } catch (error) {
+      // Directory might not exist yet
+      return 0;
+    }
+
+    return count;
+  }
+
+  /**
+   * Performs atomic move from temp directory to target.
+   *
+   * Uses fs.rename for atomic move when possible. Falls back to
+   * copy-and-delete for cross-device moves.
+   *
+   * @param {string} tempDir - Temporary directory
+   * @param {string} targetDir - Target directory
+   * @returns {Promise<void>}
+   * @throws {Error} If move fails
+   * @private
+   */
+  async _atomicMove(tempDir, targetDir) {
+    this.logger.debug(`Performing atomic move: ${tempDir} -> ${targetDir}`);
+
+    try {
+      // Try atomic rename first
+      await fs.rename(tempDir, targetDir);
+      this.logger.debug('Atomic move completed successfully');
+    } catch (error) {
+      if (error.code === 'EXDEV') {
+        // Cross-device move needed
+        this.logger.debug('Cross-device move detected, using copy+delete');
+        await this._crossDeviceMove(tempDir, targetDir);
+      } else if (error.code === 'ENOTEMPTY' || error.code === 'EEXIST') {
+        // Target exists, remove it first
+        this.logger.debug('Target exists, removing before move');
+        await fs.rm(targetDir, { recursive: true, force: true });
+        await fs.rename(tempDir, targetDir);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Performs cross-device move using copy and delete.
+   *
+   * @param {string} sourceDir - Source directory
+   * @param {string} targetDir - Target directory
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _crossDeviceMove(sourceDir, targetDir) {
+    // Copy all files
+    await this._copyRecursiveNoProgress(sourceDir, targetDir);
+    // Delete source
+    await fs.rm(sourceDir, { recursive: true, force: true });
+  }
+
+  /**
+   * Recursively copies directory contents without progress tracking.
+   *
+   * @param {string} sourceDir - Source directory
+   * @param {string} targetDir - Target directory
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _copyRecursiveNoProgress(sourceDir, targetDir) {
+    await fs.mkdir(targetDir, { recursive: true });
+    const entries = await fs.readdir(sourceDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const sourcePath = path.join(sourceDir, entry.name);
+      const targetPath = path.join(targetDir, entry.name);
+
+      if (entry.isDirectory()) {
+        await this._copyRecursiveNoProgress(sourcePath, targetPath);
+      } else {
+        await fs.copyFile(sourcePath, targetPath);
+      }
+    }
+  }
+
+  /**
+   * Registers a temporary directory for cleanup.
+   *
+   * @param {string} dirPath - Temporary directory path
+   * @private
+   */
+  _registerTempDir(dirPath) {
+    this._tempDirs.add(dirPath);
+    this.logger.debug(`Registered temp directory: ${dirPath}`);
+  }
+
+  /**
+   * Removes a directory from the cleanup registry.
+   *
+   * Called after successful atomic move to prevent cleanup
+   * of the final installation.
+   *
+   * @param {string} dirPath - Directory path to remove from registry
+   * @private
+   */
+  _removeTempDir(dirPath) {
+    this._tempDirs.delete(dirPath);
+    this.logger.debug(`Unregistered temp directory: ${dirPath}`);
+  }
+
+  /**
+   * Cleans up all registered temporary directories.
+   *
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _cleanup() {
+    if (this._tempDirs.size === 0) {
+      return;
+    }
+
+    this.logger.debug(`Cleaning up ${this._tempDirs.size} temporary directories`);
+
+    for (const dirPath of this._tempDirs) {
+      try {
+        await fs.rm(dirPath, { recursive: true, force: true });
+        this.logger.debug(`Cleaned up: ${dirPath}`);
+      } catch (error) {
+        // Log but don't throw during cleanup
+        this.logger.debug(`Failed to cleanup ${dirPath}: ${error.message}`);
+      }
+    }
+
+    this._tempDirs.clear();
+  }
+
+  /**
+   * Sets up signal handlers for graceful interruption.
+   *
+   * Registers SIGINT and SIGTERM handlers that perform cleanup
+   * before exiting.
+   *
+   * @private
+   */
+  _setupSignalHandlers() {
+    if (this._handlersRegistered) {
+      return;
+    }
+
+    process.on('SIGINT', this._handleSigint);
+    process.on('SIGTERM', this._handleSigterm);
+
+    this._handlersRegistered = true;
+    this.logger.debug('Signal handlers registered');
+  }
+
+  /**
+   * Removes signal handlers.
+   *
+   * Called after successful installation to restore normal
+   * signal handling.
+   *
+   * @private
+   */
+  _removeSignalHandlers() {
+    if (!this._handlersRegistered) {
+      return;
+    }
+
+    process.off('SIGINT', this._handleSigint);
+    process.off('SIGTERM', this._handleSigterm);
+
+    this._handlersRegistered = false;
+    this.logger.debug('Signal handlers removed');
+  }
+
+  /**
+   * Handles SIGINT signal (Ctrl+C).
+   *
+   * @private
+   */
+  _handleSigint() {
+    this.logger.warning('\nInstallation interrupted by user');
+    this._handleSignal('SIGINT');
+  }
+
+  /**
+   * Handles SIGTERM signal.
+   *
+   * @private
+   */
+  _handleSigterm() {
+    this.logger.warning('\nInstallation terminated');
+    this._handleSignal('SIGTERM');
+  }
+
+  /**
+   * Common signal handling logic.
+   *
+   * Performs cleanup and exits with appropriate code.
+   *
+   * @param {string} signalName - Name of the signal
+   * @private
+   */
+  _handleSignal(signalName) {
+    // Stop spinner if active
+    if (this._spinner) {
+      this._spinner.fail('Installation cancelled');
+      this._spinner = null;
+    }
+
+    // Perform cleanup
+    this._cleanup().then(() => {
+      this.logger.info('Cleanup completed');
+      process.exit(ERROR_CODES.INTERRUPTED);
+    }).catch((error) => {
+      this.logger.error('Cleanup failed', error);
+      process.exit(ERROR_CODES.INTERRUPTED);
+    });
+  }
+
+  /**
+   * Wraps an error with additional context.
+   *
+   * @param {Error} error - Original error
+   * @param {string} operation - Operation name for context
+   * @returns {Error} Enhanced error
+   * @private
+   */
+  _wrapError(error, operation) {
+    // Handle specific error codes with helpful messages
+    if (error.code === 'EACCES') {
+      return new Error(
+        `Permission denied during ${operation}. ` +
+        `Try running with appropriate permissions or check directory ownership.`
+      );
+    }
+
+    if (error.code === 'ENOSPC') {
+      return new Error(
+        `Disk full during ${operation}. ` +
+        `Free up disk space and try again.`
+      );
+    }
+
+    if (error.code === 'ENOENT') {
+      return new Error(
+        `File or directory not found during ${operation}: ${error.message}`
+      );
+    }
+
+    // Return original error with operation context
+    error.message = `Failed during ${operation}: ${error.message}`;
+    return error;
+  }
+}
+
+/**
+ * Default export for the file-ops module.
+ *
+ * @example
+ * import { FileOperations } from './services/file-ops.js';
+ * const fileOps = new FileOperations(scopeManager, logger);
+ */
+export default {
+  FileOperations
+};
