@@ -25,6 +25,7 @@ import { listCommand } from '../src/commands/list.js';
 import { uninstallCommand } from '../src/commands/uninstall.js';
 import { configGetCommand, configSetCommand, configResetCommand, configListCommand } from '../src/commands/config.js';
 import { checkCommand } from '../src/commands/check.js';
+import { repairCommand } from '../src/commands/repair.js';
 import { logger, setVerbose } from '../src/utils/logger.js';
 import { ERROR_CODES } from '../lib/constants.js';
 import { readFileSync } from 'fs';
@@ -199,6 +200,23 @@ async function main() {
       };
 
       const exitCode = await checkCommand(fullOptions);
+      process.exit(exitCode);
+    });
+
+  // Repair command
+  program
+    .command('repair')
+    .description('Repair broken GSD-OpenCode installation')
+    .option('-g, --global', 'Repair global installation only')
+    .option('-l, --local', 'Repair local installation only')
+    .action(async (options, command) => {
+      const globalOptions = command.parent.opts();
+      const fullOptions = {
+        ...options,
+        verbose: globalOptions.verbose || options.verbose
+      };
+
+      const exitCode = await repairCommand(fullOptions);
       process.exit(exitCode);
     });
 
