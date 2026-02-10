@@ -26,6 +26,7 @@ import { uninstallCommand } from '../src/commands/uninstall.js';
 import { configGetCommand, configSetCommand, configResetCommand, configListCommand } from '../src/commands/config.js';
 import { checkCommand } from '../src/commands/check.js';
 import { repairCommand } from '../src/commands/repair.js';
+import { updateCommand } from '../src/commands/update.js';
 import { logger, setVerbose } from '../src/utils/logger.js';
 import { ERROR_CODES } from '../lib/constants.js';
 import { readFileSync } from 'fs';
@@ -75,7 +76,7 @@ function isLegacyArgs(args) {
   const userArgs = args.slice(2);
 
   // Check for any known command
-  const knownCommands = ['install', 'list', 'uninstall', 'config', '--help', '-h', '--version', '-V'];
+  const knownCommands = ['install', 'list', 'uninstall', 'config', 'check', 'repair', 'update', '--help', '-h', '--version', '-V'];
   const hasKnownCommand = knownCommands.some(cmd => userArgs.includes(cmd));
 
   if (hasKnownCommand) {
@@ -217,6 +218,26 @@ async function main() {
       };
 
       const exitCode = await repairCommand(fullOptions);
+      process.exit(exitCode);
+    });
+
+  // Update command
+  program
+    .command('update [version]')
+    .description('Update GSD-OpenCode to latest or specified version')
+    .option('-g, --global', 'Update global installation only')
+    .option('-l, --local', 'Update local installation only')
+    .option('--beta', 'Update to beta version from @rokicool/gsd-opencode')
+    .option('-f, --force', 'Skip confirmation prompt')
+    .action(async (version, options, command) => {
+      const globalOptions = command.parent.opts();
+      const fullOptions = {
+        ...options,
+        version,
+        verbose: globalOptions.verbose || options.verbose
+      };
+
+      const exitCode = await updateCommand(fullOptions);
       process.exit(exitCode);
     });
 
