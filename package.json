@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "@inquirer/prompts": "^8.2.0",
