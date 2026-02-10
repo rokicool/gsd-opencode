@@ -283,6 +283,390 @@ export class RepairService {
 
     return pathIssues;
   }
+
+  /**
+   * Repairs detected issues with backup and progress reporting.
+   *
+   * Uses a two-phase repair strategy:
+   * - Phase 1: Fix non-destructive issues (missing files) - auto, no backup needed
+   * - Phase 2: Fix destructive issues (corrupted files, path issues) - backup first
+   *
+   * Continues with remaining repairs if one fails, collecting all results.
+   *
+   * @param {Object} issues - Issues object from detectIssues()
+   * @param {Array} issues.missingFiles - Missing files/directories to create
+   * @param {Array} issues.corruptedFiles - Corrupted files to replace
+   * @param {Array} issues.pathIssues - Files with path reference issues
+   * @param {Object} [options={}] - Repair options
+   * @param {Function} [options.onProgress] - Progress callback ({ current, total, operation, file })
+   * @param {Function} [options.onBackup] - Backup callback ({ file, backupPath })
+   * @returns {Promise<Object>} Repair results
+   * @property {boolean} success - True only if ALL repairs succeeded
+   * @property {Object} results - Detailed results by category
+   * @property {Object} stats - Summary statistics
+   *
+   * @example
+   * const result = await repairService.repair(issues, {
+   *   onProgress: ({ current, total, operation, file }) => {
+   *     console.log(`${operation}: ${current}/${total} - ${file}`);
+   *   }
+   * });
+   *
+   * console.log(result.success); // true/false
+   * console.log(result.stats.succeeded + '/' + result.stats.total);
+   */
+  async repair(issues, options = {}) {
+    const { onProgress, onBackup } = options;
+
+    this.logger.info('Starting repair process...');
+
+    // Initialize results structure
+    const results = {
+      missing: [],
+      corrupted: [],
+      paths: []
+    };
+
+    // Calculate total operations
+    const totalOperations =
+      (issues.missingFiles?.length || 0) +
+      (issues.corruptedFiles?.length || 0) +
+      (issues.pathIssues?.length || 0);
+
+    if (totalOperations === 0) {
+      this.logger.info('No repairs needed');
+      return {
+        success: true,
+        results,
+        stats: {
+          total: 0,
+          succeeded: 0,
+          failed: 0,
+          byCategory: { missing: { succeeded: 0, failed: 0 }, corrupted: { succeeded: 0, failed: 0 }, paths: { succeeded: 0, failed: 0 } }
+        }
+      };
+    }
+
+    let currentOperation = 0;
+    let succeededCount = 0;
+    let failedCount = 0;
+
+    // Phase 1: Fix missing files (non-destructive)
+    for (const missingFile of (issues.missingFiles || [])) {
+      currentOperation++;
+
+      try {
+        await this._repairMissingFile(missingFile);
+        succeededCount++;
+        results.missing.push({
+          file: missingFile.path,
+          success: true
+        });
+        this.logger.info(`Fixed missing ${missingFile.type}: ${missingFile.name}`);
+      } catch (error) {
+        failedCount++;
+        results.missing.push({
+          file: missingFile.path,
+          success: false,
+          error: error.message
+        });
+        this.logger.error(`Failed to fix missing ${missingFile.type}: ${missingFile.name}`, error);
+      }
+
+      if (onProgress) {
+        onProgress({
+          current: currentOperation,
+          total: totalOperations,
+          operation: 'installing',
+          file: missingFile.name
+        });
+      }
+    }
+
+    // Phase 2: Fix corrupted files (destructive - backup first)
+    for (const corruptedFile of (issues.corruptedFiles || [])) {
+      currentOperation++;
+
+      try {
+        // Backup before replacing
+        const backupResult = await this.backupManager.backupFile(
+          corruptedFile.path,
+          corruptedFile.relative
+        );
+
+        if (onBackup && backupResult.backupPath) {
+          onBackup({
+            file: corruptedFile.relative,
+            backupPath: backupResult.backupPath
+          });
+        }
+
+        // Reinstall the file
+        const sourcePath = this._getSourcePath(corruptedFile.relative);
+        const targetPath = corruptedFile.path;
+        await this.fileOps._copyFile(sourcePath, targetPath);
+
+        succeededCount++;
+        results.corrupted.push({
+          file: corruptedFile.path,
+          success: true
+        });
+        this.logger.info(`Fixed corrupted file: ${corruptedFile.relative}`);
+      } catch (error) {
+        failedCount++;
+        results.corrupted.push({
+          file: corruptedFile.path,
+          success: false,
+          error: error.message
+        });
+        this.logger.error(`Failed to fix corrupted file: ${corruptedFile.relative}`, error);
+      }
+
+      if (onProgress) {
+        onProgress({
+          current: currentOperation,
+          total: totalOperations,
+          operation: 'replacing',
+          file: corruptedFile.relative
+        });
+      }
+    }
+
+    // Phase 3: Fix path issues (destructive - backup first)
+    for (const pathIssue of (issues.pathIssues || [])) {
+      currentOperation++;
+
+      try {
+        // Backup before modifying
+        const backupResult = await this.backupManager.backupFile(
+          pathIssue.path,
+          pathIssue.relative
+        );
+
+        if (onBackup && backupResult.backupPath) {
+          onBackup({
+            file: pathIssue.relative,
+            backupPath: backupResult.backupPath
+          });
+        }
+
+        // Fix path references
+        const targetDir = this.scopeManager.getTargetDir();
+        const updatedContent = pathIssue.currentContent.replace(
+          PATH_PATTERNS.gsdReference,
+          targetDir + '/'
+        );
+
+        await fs.writeFile(pathIssue.path, updatedContent, 'utf-8');
+
+        succeededCount++;
+        results.paths.push({
+          file: pathIssue.path,
+          success: true
+        });
+        this.logger.info(`Fixed path issues in: ${pathIssue.relative}`);
+      } catch (error) {
+        failedCount++;
+        results.paths.push({
+          file: pathIssue.path,
+          success: false,
+          error: error.message
+        });
+        this.logger.error(`Failed to fix path issues in: ${pathIssue.relative}`, error);
+      }
+
+      if (onProgress) {
+        onProgress({
+          current: currentOperation,
+          total: totalOperations,
+          operation: 'updating-paths',
+          file: pathIssue.relative
+        });
+      }
+    }
+
+    const success = failedCount === 0;
+
+    this.logger.info(`Repair complete: ${succeededCount}/${totalOperations} succeeded`);
+
+    return {
+      success,
+      results,
+      stats: {
+        total: totalOperations,
+        succeeded: succeededCount,
+        failed: failedCount,
+        byCategory: {
+          missing: {
+            succeeded: results.missing.filter(r => r.success).length,
+            failed: results.missing.filter(r => !r.success).length
+          },
+          corrupted: {
+            succeeded: results.corrupted.filter(r => r.success).length,
+            failed: results.corrupted.filter(r => !r.success).length
+          },
+          paths: {
+            succeeded: results.paths.filter(r => r.success).length,
+            failed: results.paths.filter(r => !r.success).length
+          }
+        }
+      }
+    };
+  }
+
+  /**
+   * Repairs a missing file or directory.
+   *
+   * For directories, recreates the entire directory structure from source.
+   * For files, copies from the package source.
+   *
+   * @param {Object} missingFile - Missing file descriptor
+   * @param {string} missingFile.path - Absolute path to the missing file/directory
+   * @param {string} missingFile.type - 'directory' or 'file'
+   * @param {string} missingFile.name - Display name for logging
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _repairMissingFile(missingFile) {
+    const targetDir = this.scopeManager.getTargetDir();
+
+    if (missingFile.type === 'directory') {
+      // Recreate directory from source
+      const dirName = path.basename(missingFile.path);
+      const sourceDir = this._getSourcePath(dirName);
+      const targetPath = path.join(targetDir, dirName);
+
+      // Use fileOps._copyFile for each file in the directory
+      await this._copyDirectory(sourceDir, targetPath);
+    } else {
+      // Recreate single file
+      const relativePath = path.relative(targetDir, missingFile.path);
+      const sourcePath = this._getSourcePath(relativePath);
+      await this.fileOps._copyFile(sourcePath, missingFile.path);
+    }
+  }
+
+  /**
+   * Recursively copies a directory.
+   *
+   * @param {string} sourceDir - Source directory
+   * @param {string} targetDir - Target directory
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _copyDirectory(sourceDir, targetDir) {
+    const entries = await fs.readdir(sourceDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const sourcePath = path.join(sourceDir, entry.name);
+      const targetPath = path.join(targetDir, entry.name);
+
+      if (entry.isDirectory()) {
+        await fs.mkdir(targetPath, { recursive: true });
+        await this._copyDirectory(sourcePath, targetPath);
+      } else {
+        await this.fileOps._copyFile(sourcePath, targetPath);
+      }
+    }
+  }
+
+  /**
+   * Resolves source file path from package installation.
+   *
+   * Uses __dirname to find the source file in the package.
+   *
+   * @param {string} relativePath - Path relative to installation root
+   * @returns {string} Absolute path to source file
+   * @throws {Error} If source file doesn't exist
+   * @private
+   */
+  _getSourcePath(relativePath) {
+    // Resolve from the package root (parent of src/services)
+    const packageRoot = path.resolve(__dirname, '../..');
+    const sourcePath = path.join(packageRoot, 'gsd-opencode', relativePath);
+
+    return sourcePath;
+  }
+
+  /**
+   * Generates a human-readable summary of issues.
+   *
+   * @param {Object} issues - Issues object from detectIssues()
+   * @returns {string} Formatted summary string
+   *
+   * @example
+   * const summary = repairService.generateSummary(issues);
+   * console.log(summary);
+   * // Missing Files (2):
+   * //   - agents directory
+   * //   - command/gsd/help.md
+   * //
+   * // Corrupted Files (1):
+   * //   - agents/ro-commit.md
+   */
+  generateSummary(issues) {
+    const lines = [];
+
+    // Missing Files
+    if (issues.missingFiles && issues.missingFiles.length > 0) {
+      lines.push(`Missing Files (${issues.missingFiles.length}):`);
+      for (const file of issues.missingFiles) {
+        lines.push(`  - ${file.name}`);
+      }
+      lines.push('');
+    }
+
+    // Corrupted Files
+    if (issues.corruptedFiles && issues.corruptedFiles.length > 0) {
+      lines.push(`Corrupted Files (${issues.corruptedFiles.length}):`);
+      for (const file of issues.corruptedFiles) {
+        lines.push(`  - ${file.relative}`);
+      }
+      lines.push('');
+    }
+
+    // Path Issues
+    if (issues.pathIssues && issues.pathIssues.length > 0) {
+      lines.push(`Path Issues (${issues.pathIssues.length}):`);
+      for (const file of issues.pathIssues) {
+        lines.push(`  - ${file.relative}`);
+      }
+      lines.push('');
+    }
+
+    return lines.join('\n').trim();
+  }
+
+  /**
+   * Validates the repair results structure.
+   *
+   * @param {Object} results - Repair results from repair()
+   * @returns {boolean} True if results structure is valid
+   * @private
+   */
+  _validateRepairResults(results) {
+    if (!results || typeof results !== 'object') {
+      this.logger.warning('Invalid repair results: not an object');
+      return false;
+    }
+
+    if (typeof results.success !== 'boolean') {
+      this.logger.warning('Invalid repair results: missing success boolean');
+      return false;
+    }
+
+    if (!results.results || typeof results.results !== 'object') {
+      this.logger.warning('Invalid repair results: missing results object');
+      return false;
+    }
+
+    if (!results.stats || typeof results.stats !== 'object') {
+      this.logger.warning('Invalid repair results: missing stats object');
+      return false;
+    }
+
+    return true;
+  }
 }
 
 /**
