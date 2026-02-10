@@ -22,6 +22,8 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { installCommand } from '../src/commands/install.js';
 import { listCommand } from '../src/commands/list.js';
+import { uninstallCommand } from '../src/commands/uninstall.js';
+import { configGetCommand, configSetCommand, configResetCommand, configListCommand } from '../src/commands/config.js';
 import { logger, setVerbose } from '../src/utils/logger.js';
 import { ERROR_CODES } from '../lib/constants.js';
 import { readFileSync } from 'fs';
@@ -71,7 +73,7 @@ function isLegacyArgs(args) {
   const userArgs = args.slice(2);
 
   // Check for any known command
-  const knownCommands = ['install', 'list', '--help', '-h', '--version', '-V'];
+  const knownCommands = ['install', 'list', 'uninstall', 'config', '--help', '-h', '--version', '-V'];
   const hasKnownCommand = knownCommands.some(cmd => userArgs.includes(cmd));
 
   if (hasKnownCommand) {
@@ -178,6 +180,87 @@ async function main() {
       };
 
       const exitCode = await listCommand(fullOptions);
+      process.exit(exitCode);
+    });
+
+  // Uninstall command
+  program
+    .command('uninstall')
+    .alias('rm')
+    .description('Remove GSD-OpenCode installation')
+    .option('-g, --global', 'Remove global installation')
+    .option('-l, --local', 'Remove local installation')
+    .option('-f, --force', 'Skip confirmation prompt')
+    .action(async (options, command) => {
+      const globalOptions = command.parent.opts();
+      const fullOptions = {
+        ...options,
+        verbose: globalOptions.verbose || options.verbose
+      };
+
+      const exitCode = await uninstallCommand(fullOptions);
+      process.exit(exitCode);
+    });
+
+  // Config command with subcommands
+  const configCmd = program
+    .command('config')
+    .description('Manage GSD-OpenCode configuration');
+
+  configCmd
+    .command('get <key>')
+    .description('Get a configuration value')
+    .action(async (key, options, command) => {
+      const globalOptions = command.parent.parent.opts();
+      const fullOptions = {
+        verbose: globalOptions.verbose || options.verbose
+      };
+
+      const exitCode = await configGetCommand(key, fullOptions);
+      process.exit(exitCode);
+    });
+
+  configCmd
+    .command('set <key> <value>')
+    .description('Set a configuration value')
+    .action(async (key, value, options, command) => {
+      const globalOptions = command.parent.parent.opts();
+      const fullOptions = {
+        verbose: globalOptions.verbose || options.verbose
+      };
+
+      const exitCode = await configSetCommand(key, value, fullOptions);
+      process.exit(exitCode);
+    });
+
+  configCmd
+    .command('reset [key]')
+    .description('Reset configuration to defaults')
+    .option('--all', 'Reset all settings')
+    .action(async (key, options, command) => {
+      const globalOptions = command.parent.parent.opts();
+      const fullOptions = {
+        ...options,
+        verbose: globalOptions.verbose || options.verbose
+      };
+
+      const exitCode = await configResetCommand(key, fullOptions);
+      process.exit(exitCode);
+    });
+
+  configCmd
+    .command('list')
+    .alias('ls')
+    .description('List all configuration settings')
+    .option('--json', 'Output as JSON')
+    .action(async (options, command) => {
+      const globalOptions = command.parent.parent.opts();
+      const fullOptions = {
+        ...options,
+        verbose: globalOptions.verbose || options.verbose
+      };
+
+      const exitCode = await configListCommand(fullOptions);
       process.exit(exitCode);
     });
 
