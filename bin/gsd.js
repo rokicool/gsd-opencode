@@ -249,6 +249,8 @@ async function main() {
     .option('-g, --global', 'Remove global installation')
     .option('-l, --local', 'Remove local installation')
     .option('-f, --force', 'Skip confirmation prompt')
+    .option('--dry-run', 'Show what would be removed without removing')
+    .option('--no-backup', 'Skip backup creation before removal')
     .action(async (options, command) => {
       const globalOptions = command.parent.opts();
       const fullOptions = {
