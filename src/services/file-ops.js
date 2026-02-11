@@ -19,9 +19,11 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { constants as fsConstants } from 'fs';
+import { createHash } from 'crypto';
 import ora from 'ora';
 import { validatePath, expandPath } from '../utils/path-resolver.js';
-import { PATH_PATTERNS, ERROR_CODES } from '../../lib/constants.js';
+import { PATH_PATTERNS, ERROR_CODES, MANIFEST_FILENAME } from '../../lib/constants.js';
+import { ManifestManager } from './manifest-manager.js';
 
 /**
  * Manages file operations with atomic installation and progress indication.
@@ -128,6 +130,9 @@ export class FileOperations {
     this._registerTempDir(tempDir);
     this._setupSignalHandlers();
 
+    // Create manifest manager to track installed files
+    const manifestManager = new ManifestManager(expandedTarget);
+
     this.logger.info(`Installing to ${this.scopeManager.getPathPrefix()}...`);
 
     try {
@@ -136,7 +141,11 @@ export class FileOperations {
       this.logger.debug(`Created temp directory: ${tempDir}`);
 
       // Copy files with progress and path replacement
-      const copyResult = await this._copyWithProgress(expandedSource, tempDir);
+      const copyResult = await this._copyWithProgress(expandedSource, tempDir, manifestManager);
+
+      // Save manifest to temp directory (will be moved with atomic move)
+      const manifestPath = await manifestManager.save();
+      this.logger.debug(`Manifest saved to: ${manifestPath}`);
 
       // Perform atomic move
       await this._atomicMove(tempDir, expandedTarget);
@@ -152,7 +161,8 @@ export class FileOperations {
       return {
         success: true,
         filesCopied: copyResult.filesCopied,
-        directories: copyResult.directories
+        directories: copyResult.directories,
+        manifestPath: path.join(expandedTarget, MANIFEST_FILENAME)
       };
     } catch (error) {
       // Ensure cleanup on any error
@@ -176,7 +186,7 @@ export class FileOperations {
    *          Copy statistics
    * @private
    */
-  async _copyWithProgress(sourceDir, targetDir) {
+  async _copyWithProgress(sourceDir, targetDir, manifestManager) {
     let filesCopied = 0;
     let directories = 0;
 
@@ -191,11 +201,16 @@ export class FileOperations {
     }).start();
 
     try {
-      await this._copyRecursive(sourceDir, targetDir, (filePath) => {
+      await this._copyRecursive(sourceDir, targetDir, (filePath, relativePath, size, hash) => {
         filesCopied++;
         const progress = Math.round((filesCopied / totalFiles) * 100);
         this._spinner.text = `Copying files... ${progress}% (${filesCopied}/${totalFiles})`;
-      });
+
+        // Add file to manifest
+        if (manifestManager) {
+          manifestManager.addFile(filePath, relativePath, size, hash);
+        }
+      }, manifestManager);
 
       // Count directories (including target)
       directories = await this._countDirectories(targetDir);
@@ -220,7 +235,8 @@ export class FileOperations {
    * @returns {Promise<void>}
    * @private
    */
-  async _copyRecursive(sourceDir, targetDir, onFile) {
+  async _copyRecursive(sourceDir, targetDir, onFile, manifestManager, baseSourceDir = null) {
+    const baseDir = baseSourceDir || sourceDir;
     const entries = await fs.readdir(sourceDir, { withFileTypes: true });
 
     for (const entry of entries) {
@@ -231,13 +247,33 @@ export class FileOperations {
         // Create directory
         await fs.mkdir(targetPath, { recursive: true });
         // Recursively copy contents
-        await this._copyRecursive(sourcePath, targetPath, onFile);
+        await this._copyRecursive(sourcePath, targetPath, onFile, manifestManager, baseDir);
       } else {
         // Copy file with potential path replacement
         await this._copyFile(sourcePath, targetPath);
-        onFile(targetPath);
+
+        // Calculate file metadata for manifest
+        const stats = await fs.stat(targetPath);
+        const size = stats.size;
+        const hash = await this._calculateFileHash(targetPath);
+        const relativePath = path.relative(baseDir, sourcePath).replace(/\\/g, '/');
+
+        onFile(targetPath, relativePath, size, hash);
       }
     }
+  }
+
+  /**
+   * Calculates SHA256 hash of a file.
+   *
+   * @param {string} filePath - Path to file
+   * @returns {Promise<string>} SHA256 hash with 'sha256:' prefix
+   * @private
+   */
+  async _calculateFileHash(filePath) {
+    const content = await fs.readFile(filePath);
+    const hash = createHash('sha256').update(content).digest('hex');
+    return `sha256:${hash}`;
   }
 
   /**
