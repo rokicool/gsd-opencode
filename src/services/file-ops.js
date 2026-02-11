@@ -131,7 +131,8 @@ export class FileOperations {
     this._setupSignalHandlers();
 
     // Create manifest manager to track installed files
-    const manifestManager = new ManifestManager(expandedTarget);
+    // Use tempDir initially, will update paths after atomic move
+    const manifestManager = new ManifestManager(tempDir);
 
     this.logger.info(`Installing to ${this.scopeManager.getPathPrefix()}...`);
 
@@ -144,8 +145,8 @@ export class FileOperations {
       const copyResult = await this._copyWithProgress(expandedSource, tempDir, manifestManager);
 
       // Save manifest to temp directory (will be moved with atomic move)
-      const manifestPath = await manifestManager.save();
-      this.logger.debug(`Manifest saved to: ${manifestPath}`);
+      const tempManifestPath = await manifestManager.save();
+      this.logger.debug(`Manifest saved to temp: ${tempManifestPath}`);
 
       // Perform atomic move
       await this._atomicMove(tempDir, expandedTarget);
@@ -158,6 +159,7 @@ export class FileOperations {
         `Installed ${copyResult.filesCopied} files (${copyResult.directories} directories)`
       );
 
+      // After atomic move, manifest is at the target location
       return {
         success: true,
         filesCopied: copyResult.filesCopied,
