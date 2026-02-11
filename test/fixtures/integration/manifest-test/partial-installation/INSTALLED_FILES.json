@@ -1,0 +1,26 @@
+[
+  {
+    "path": "/test/agents/gsd-debugger/SKILL.md",
+    "relativePath": "agents/gsd-debugger/SKILL.md",
+    "size": 32,
+    "hash": "sha256:abc123"
+  },
+  {
+    "path": "/test/agents/gsd-planner/SKILL.md",
+    "relativePath": "agents/gsd-planner/SKILL.md",
+    "size": 50,
+    "hash": "sha256:def456"
+  },
+  {
+    "path": "/test/command/gsd/install.js",
+    "relativePath": "command/gsd/install.js",
+    "size": 100,
+    "hash": "sha256:ghi789"
+  },
+  {
+    "path": "/test/VERSION",
+    "relativePath": "VERSION",
+    "size": 6,
+    "hash": "sha256:jkl012"
+  }
+]
