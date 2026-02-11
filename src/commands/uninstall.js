@@ -1,241 +1,165 @@
 /**
- * Uninstall command for GSD-OpenCode CLI.
+ * Uninstall command for GSD-OpenCode CLI with manifest-based safety.
  *
- * This module provides safe removal of GSD-OpenCode installations with automatic
- * scope detection, pre-deletion summary, interactive confirmation, and --force flag
- * for non-interactive use.
+ * This module provides safe removal of GSD-OpenCode installations with:
+ * - Manifest-based tracking (INSTALLED_FILES.json)
+ * - Namespace protection (only removes files in gsd-* namespaces)
+ * --dry-run mode for previewing what will be removed
+ * - Typed confirmation requiring user to type 'uninstall'
+ * - Backup creation before deletion
+ * - Directory preservation when containing non-gsd-opencode files
  *
- * Implements requirements:
- * - CLI-02: User can run gsd-opencode uninstall to remove the system
- * - UNIN-01: Uninstall removes all installed files (agents/, command/, get-shit-done/)
- * - UNIN-02: Uninstall removes VERSION file
- * - UNIN-03: Uninstall shows interactive confirmation before deleting
- * - UNIN-04: Uninstall supports --force flag to skip confirmation
- * - UNIN-05: Uninstall shows summary of what will be removed before confirmation
- * - ERROR-01: All commands handle permission errors (EACCES) with exit code 2
- * - ERROR-02: All commands handle signal interrupts (SIGINT/SIGTERM) gracefully
- * - ERROR-03: All commands support --verbose flag for detailed debugging output
+ * Safety Principles:
+ * - Only delete files in allowed namespaces (agents/gsd-*, command/gsd/*, skills/gsd-*, get-shit-done/*)
+ * - Never delete files outside these namespaces, even if tracked in manifest
+ * - Preserve directories that would become non-empty after file removal
+ * - Create backup before any destructive operation
+ * - Require typed confirmation for extra safety
  *
  * @module commands/uninstall
- * @description Uninstall command for removing GSD-OpenCode installations
- * @example
- * // Remove global installation with confirmation
- * await uninstallCommand({ global: true });
- *
- * // Remove local installation without confirmation (scripting)
- * await uninstallCommand({ local: true, force: true });
- *
- * // Auto-detect scope and remove with verbose output
- * await uninstallCommand({ verbose: true });
+ * @description Safe uninstall command with namespace protection
  */
 
 import { ScopeManager } from '../services/scope-manager.js';
+import { BackupManager } from '../services/backup-manager.js';
+import { ManifestManager } from '../services/manifest-manager.js';
 import { logger, setVerbose } from '../utils/logger.js';
-import { promptConfirmation } from '../utils/interactive.js';
-import { ERROR_CODES, DIRECTORIES_TO_COPY } from '../../lib/constants.js';
+import { promptTypedConfirmation } from '../utils/interactive.js';
+import { ERROR_CODES, ALLOWED_NAMESPACES, UNINSTALL_BACKUP_DIR } from '../../lib/constants.js';
 import fs from 'fs/promises';
 import path from 'path';
 
 /**
- * Main uninstall command function.
+ * Main uninstall command function with safety-first design.
  *
- * Orchestrates the uninstallation process:
- * 1. Parse options and set verbose mode
- * 2. Determine installation scope (auto-detect if not specified)
- * 3. Identify all files and directories to be removed
- * 4. Display summary of items to be removed
- * 5. Request interactive confirmation (unless --force flag provided)
- * 6. Perform removal of all installation files
- * 7. Show success summary
- *
- * The function implements safety-first design:
- * - Confirmation defaults to false (user must explicitly confirm)
- * --force flag skips confirmation for scripting environments
- * - Graceful handling of permission errors and interrupts
- * - Clear communication of what will be removed before action
+ * Orchestrates safe uninstallation with manifest loading, namespace filtering,
+ * backup creation, typed confirmation, and directory preservation.
  *
  * @param {Object} options - Command options
  * @param {boolean} [options.global] - Remove global installation
  * @param {boolean} [options.local] - Remove local installation
- * @param {boolean} [options.force] - Skip confirmation prompt (for scripting)
- * @param {boolean} [options.verbose] - Enable verbose logging for debugging
+ * @param {boolean} [options.force] - Skip typed confirmation (still shows summary)
+ * @param {boolean} [options.dryRun] - Show preview without removing files
+ * @param {boolean} [options.backup=true] - Create backup before removal (use --no-backup to skip)
+ * @param {boolean} [options.verbose] - Enable verbose logging
  * @returns {Promise<number>} Exit code (0=success, 1=error, 2=permission, 130=interrupted)
  * @async
  *
  * @example
- * // Remove global installation with confirmation
+ * // Remove global installation with typed confirmation
  * const exitCode = await uninstallCommand({ global: true });
  *
- * // Remove local installation without confirmation
- * const exitCode = await uninstallCommand({ local: true, force: true });
+ * // Preview what would be removed (dry run)
+ * const exitCode = await uninstallCommand({ local: true, dryRun: true });
  *
- * // Auto-detect scope (removes whichever exists, errors if both exist)
- * const exitCode = await uninstallCommand({});
+ * // Remove without backup (user takes responsibility)
+ * const exitCode = await uninstallCommand({ global: true, backup: false, force: true });
  */
 export async function uninstallCommand(options = {}) {
   // Set verbose mode early for consistent logging
   setVerbose(options.verbose);
 
   logger.debug('Starting uninstall command');
-  logger.debug(`Options: global=${options.global}, local=${options.local}, force=${options.force}, verbose=${options.verbose}`);
+  logger.debug(`Options: global=${options.global}, local=${options.local}, force=${options.force}, dryRun=${options.dryRun}, backup=${options.backup}, verbose=${options.verbose}`);
 
   try {
-    // Step 1: Determine scope - explicit flag, auto-detect, or error
-    let scope;
-
-    if (options.global) {
-      scope = 'global';
-      logger.debug('Scope determined by --global flag');
-    } else if (options.local) {
-      scope = 'local';
-      logger.debug('Scope determined by --local flag');
-    } else {
-      // Auto-detect: check both global and local installations
-      logger.debug('No scope flags provided, auto-detecting...');
-
-      const globalScope = new ScopeManager({ scope: 'global' });
-      const localScope = new ScopeManager({ scope: 'local' });
-
-      const globalInstalled = globalScope.isInstalled();
-      const localInstalled = localScope.isInstalled();
-
-      logger.debug(`Global installed: ${globalInstalled}, Local installed: ${localInstalled}`);
-
-      // If both exist, user must specify which to remove (safety measure)
-      if (globalInstalled && localInstalled) {
-        logger.warning('Both global and local installations found');
-        logger.info('Use --global or --local to specify which to remove');
-        return ERROR_CODES.GENERAL_ERROR;
-      }
-
-      // If neither exists, nothing to uninstall
-      if (!globalInstalled && !localInstalled) {
-        logger.warning('No GSD-OpenCode installation found');
-        return ERROR_CODES.GENERAL_ERROR;
-      }
-
-      // Use whichever one exists
-      scope = globalInstalled ? 'global' : 'local';
-      logger.debug(`Auto-detected scope: ${scope}`);
+    // Step 1: Determine scope
+    const scope = await determineScope(options);
+    if (scope === null) {
+      return ERROR_CODES.GENERAL_ERROR;
     }
 
-    // Step 2: Create ScopeManager for the determined scope
+    // Step 2: Create ScopeManager and verify installation exists
     const scopeManager = new ScopeManager({ scope });
     const targetDir = scopeManager.getTargetDir();
 
-    // Double-check installation exists before proceeding
     if (!scopeManager.isInstalled()) {
       logger.warning(`No ${scope} installation found at ${scopeManager.getPathPrefix()}`);
       return ERROR_CODES.GENERAL_ERROR;
     }
 
-    // Step 3: Identify items to remove
-    // We check each item individually to handle partial installations gracefully
-    const itemsToRemove = [];
+    // Step 3: Load manifest or use fallback mode
+    const manifestManager = new ManifestManager(targetDir);
+    let manifestEntries = await manifestManager.load();
+    const usingFallback = manifestEntries === null;
 
-    // Check for VERSION file (primary indicator of installation)
-    const versionPath = path.join(targetDir, 'VERSION');
-    try {
-      await fs.access(versionPath);
-      itemsToRemove.push({ type: 'file', path: versionPath, name: 'VERSION' });
-      logger.debug(`Found VERSION file: ${versionPath}`);
-    } catch {
-      logger.debug(`VERSION file not found at ${versionPath}`);
+    if (usingFallback) {
+      logger.warning('Manifest not found - using fallback mode (namespace-based detection)');
+      manifestEntries = await buildFallbackManifest(targetDir);
+    } else {
+      logger.debug(`Loaded manifest with ${manifestEntries.length} tracked files`);
     }
 
-    // Check for each directory in DIRECTORIES_TO_COPY
-    // This ensures we only try to remove directories that actually exist
-    for (const dirName of DIRECTORIES_TO_COPY) {
-      const dirPath = path.join(targetDir, dirName);
-      try {
-        const stat = await fs.stat(dirPath);
-        if (stat.isDirectory()) {
-          itemsToRemove.push({ type: 'directory', path: dirPath, name: dirName });
-          logger.debug(`Found directory: ${dirPath}`);
-        }
-      } catch {
-        logger.debug(`Directory not found: ${dirPath}`);
-      }
+    // Step 4: Filter files by allowed namespaces
+    const filesToRemove = manifestEntries.filter(entry =>
+      isInAllowedNamespace(entry.relativePath)
+    );
+
+    logger.debug(`${filesToRemove.length} files in allowed namespaces (out of ${manifestEntries.length} total)`);
+
+    // Step 5: Categorize files and directories
+    const categorized = await categorizeItems(filesToRemove, targetDir);
+
+    if (categorized.toRemove.length === 0) {
+      logger.warning('No GSD-OpenCode files found to remove (all files outside allowed namespaces)');
+      return ERROR_CODES.SUCCESS;
     }
 
-    // If no items found, nothing to uninstall
-    if (itemsToRemove.length === 0) {
-      logger.warning('No GSD-OpenCode files found in ' + scopeManager.getPathPrefix());
-      return ERROR_CODES.GENERAL_ERROR;
+    // Step 6: Display warning and summary
+    displayWarningHeader(scope, scopeManager.getPathPrefix());
+    displayCategorizedItems(categorized, targetDir);
+    displaySafetySummary(categorized, options.backup !== false);
+
+    // Step 7: Dry run mode - exit here without removing
+    if (options.dryRun) {
+      logger.info('\n📋 Dry run complete - no files were removed');
+      return ERROR_CODES.SUCCESS;
     }
 
-    // Step 4: Display summary of what will be removed
-    logger.heading('Uninstall GSD-OpenCode');
-    logger.info(`Scope: ${scope}`);
-    logger.info(`Location: ${scopeManager.getPathPrefix()}`);
-    logger.dim('');
-    logger.info('The following items will be removed:');
-
-    // List each item with appropriate icon
-    itemsToRemove.forEach(item => {
-      const icon = item.type === 'directory' ? '📁' : '📄';
-      logger.dim(`  ${icon} ${item.name}`);
-    });
-
-    logger.dim('');
-
-    // Step 5: Interactive confirmation (unless --force flag provided)
-    // Default is false for safety - user must explicitly confirm
+    // Step 8: Typed confirmation (unless --force)
     if (!options.force) {
-      logger.debug('Requesting user confirmation...');
+      logger.debug('Requesting typed confirmation...');
 
-      const confirmed = await promptConfirmation('Are you sure you want to proceed?', false);
+      const confirmed = await promptTypedConfirmation(
+        '\n⚠️  This will permanently remove the files listed above',
+        'uninstall'
+      );
 
-      // Handle SIGINT (Ctrl+C) - user cancelled with interrupt
       if (confirmed === null) {
         logger.info('Uninstall cancelled');
         return ERROR_CODES.INTERRUPTED;
       }
 
-      // Handle explicit "no" response
       if (!confirmed) {
-        logger.info('Uninstall cancelled');
+        logger.info('Uninstall cancelled - confirmation word did not match');
         return ERROR_CODES.SUCCESS;
       }
 
       logger.debug('User confirmed uninstallation');
     } else {
-      logger.debug('--force flag provided, skipping confirmation');
+      logger.debug('--force flag provided, skipping typed confirmation');
     }
 
-    // Step 6: Perform removal
-    logger.info('Removing files...');
-
-    for (const item of itemsToRemove) {
-      try {
-        // Use force: true to avoid errors if file was already removed
-        // Use recursive: true for directories
-        await fs.rm(item.path, { recursive: true, force: true });
-        logger.debug(`Removed: ${item.path}`);
-      } catch (error) {
-        // Log but continue - we want to remove as much as possible
-        logger.debug(`Warning: Could not remove ${item.path}: ${error.message}`);
-      }
+    // Step 9: Create backup (unless --no-backup)
+    let backupResult = null;
+    if (options.backup !== false) {
+      backupResult = await createBackup(categorized.toRemove, targetDir, scopeManager);
     }
 
-    // Try to remove parent directory if it's now empty
-    // This is a cleanup step - if other files exist, we leave them
-    try {
-      await fs.rmdir(targetDir);
-      logger.debug(`Removed empty directory: ${targetDir}`);
-    } catch {
-      // Directory not empty or other error - this is expected and fine
-      logger.debug(`Parent directory not empty, leaving in place: ${targetDir}`);
-    }
+    // Step 10: Remove files
+    logger.info('\n🗑️  Removing files...');
+    const removalResult = await removeFiles(categorized.toRemove, targetDir);
 
-    // Step 7: Success message
-    logger.success('GSD-OpenCode has been successfully uninstalled');
-    logger.dim(`Removed ${itemsToRemove.length} item(s) from ${scopeManager.getPathPrefix()}`);
+    // Step 11: Clean up empty directories
+    const dirResult = await cleanupDirectories(categorized, targetDir);
+
+    // Step 12: Success message with recovery instructions
+    displaySuccessMessage(removalResult, dirResult, backupResult);
 
     return ERROR_CODES.SUCCESS;
 
   } catch (error) {
-    // Handle Ctrl+C during async operations (AbortPromptError from @inquirer/prompts)
+    // Handle Ctrl+C during async operations
     if (error.name === 'AbortPromptError') {
       logger.info('Uninstall cancelled');
       return ERROR_CODES.INTERRUPTED;
@@ -257,6 +181,435 @@ export async function uninstallCommand(options = {}) {
     }
 
     return ERROR_CODES.GENERAL_ERROR;
+  }
+}
+
+/**
+ * Determines installation scope based on options.
+ *
+ * @param {Object} options - Command options
+ * @returns {Promise<string|null>} 'global', 'local', or null if error
+ * @private
+ */
+async function determineScope(options) {
+  if (options.global) {
+    logger.debug('Scope determined by --global flag');
+    return 'global';
+  }
+
+  if (options.local) {
+    logger.debug('Scope determined by --local flag');
+    return 'local';
+  }
+
+  // Auto-detect: check both global and local installations
+  logger.debug('No scope flags provided, auto-detecting...');
+
+  const globalScope = new ScopeManager({ scope: 'global' });
+  const localScope = new ScopeManager({ scope: 'local' });
+
+  const globalInstalled = globalScope.isInstalled();
+  const localInstalled = localScope.isInstalled();
+
+  logger.debug(`Global installed: ${globalInstalled}, Local installed: ${localInstalled}`);
+
+  // If both exist, user must specify which to remove
+  if (globalInstalled && localInstalled) {
+    logger.warning('Both global and local installations found');
+    logger.info('Use --global or --local to specify which to remove');
+    return null;
+  }
+
+  // If neither exists, nothing to uninstall
+  if (!globalInstalled && !localInstalled) {
+    logger.warning('No GSD-OpenCode installation found');
+    return null;
+  }
+
+  // Use whichever one exists
+  const scope = globalInstalled ? 'global' : 'local';
+  logger.debug(`Auto-detected scope: ${scope}`);
+  return scope;
+}
+
+/**
+ * Builds a fallback manifest by scanning allowed namespace directories.
+ *
+ * Used when INSTALLED_FILES.json is missing.
+ *
+ * @param {string} targetDir - Installation directory
+ * @returns {Promise<Array>} Array of manifest entry objects
+ * @private
+ */
+async function buildFallbackManifest(targetDir) {
+  const entries = [];
+
+  // Scan allowed namespace directories
+  const dirsToScan = ['agents', 'command/gsd', 'skills', 'get-shit-done'];
+
+  for (const dir of dirsToScan) {
+    const fullPath = path.join(targetDir, dir);
+    try {
+      await scanDirectory(fullPath, targetDir, entries, dir);
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        logger.debug(`Error scanning ${dir}: ${error.message}`);
+      }
+    }
+  }
+
+  return entries;
+}
+
+/**
+ * Recursively scans a directory and adds files to entries array.
+ *
+ * @param {string} dirPath - Directory to scan
+ * @param {string} baseDir - Base installation directory
+ * @param {Array} entries - Array to populate with entries
+ * @param {string} relativePrefix - Relative path prefix
+ * @private
+ */
+async function scanDirectory(dirPath, baseDir, entries, relativePrefix) {
+  try {
+    const stats = await fs.stat(dirPath);
+    if (!stats.isDirectory()) {
+      return;
+    }
+  } catch {
+    return;
+  }
+
+  const items = await fs.readdir(dirPath, { withFileTypes: true });
+
+  for (const item of items) {
+    const itemPath = path.join(dirPath, item.name);
+    const relativePath = path.relative(baseDir, itemPath).replace(/\\/g, '/');
+
+    if (item.isDirectory()) {
+      // Only recurse into gsd-* directories (except get-shit-done which is fully owned)
+      if (relativePrefix === 'get-shit-done' || item.name.startsWith('gsd-')) {
+        await scanDirectory(itemPath, baseDir, entries, relativePath);
+      }
+    } else {
+      // Add file entry
+      const fileStats = await fs.stat(itemPath);
+      entries.push({
+        path: itemPath,
+        relativePath: relativePath,
+        size: fileStats.size,
+        hash: null // Cannot calculate without reading file
+      });
+    }
+  }
+}
+
+/**
+ * Checks if a relative path is in an allowed namespace.
+ *
+ * @param {string} relativePath - Path relative to installation root
+ * @returns {boolean} True if in allowed namespace
+ * @private
+ */
+function isInAllowedNamespace(relativePath) {
+  const normalizedPath = relativePath.replace(/\\/g, '/');
+  return ALLOWED_NAMESPACES.some(pattern => pattern.test(normalizedPath));
+}
+
+/**
+ * Categorizes files into toRemove, missing, and preserved.
+ *
+ * @param {Array} files - Files from manifest
+ * @param {string} targetDir - Installation directory
+ * @returns {Object} Categorized items
+ * @private
+ */
+async function categorizeItems(files, targetDir) {
+  const toRemove = [];
+  const missing = [];
+  const directories = new Set();
+
+  for (const file of files) {
+    // Use the stored path or construct from relativePath
+    const filePath = file.path || path.join(targetDir, file.relativePath);
+
+    try {
+      await fs.access(filePath);
+      toRemove.push({
+        ...file,
+        path: filePath
+      });
+
+      // Track parent directory
+      const parentDir = path.dirname(file.relativePath);
+      if (parentDir && parentDir !== '.') {
+        directories.add(parentDir);
+      }
+    } catch {
+      missing.push(file);
+    }
+  }
+
+  return { toRemove, missing, directories: Array.from(directories) };
+}
+
+/**
+ * Displays the warning header.
+ *
+ * @param {string} scope - Installation scope
+ * @param {string} location - Installation location
+ * @private
+ */
+function displayWarningHeader(scope, location) {
+  logger.error('╔══════════════════════════════════════════════════════════════╗');
+  logger.error('║  ⚠️  WARNING: DESTRUCTIVE OPERATION                           ║');
+  logger.error('╚══════════════════════════════════════════════════════════════╝');
+  logger.dim('');
+  logger.info(`Scope: ${scope}`);
+  logger.info(`Location: ${location}`);
+  logger.dim('');
+  logger.warning('Only removing files in gsd-opencode namespaces (gsd-*)');
+  logger.dim('User files in other directories will be preserved');
+  logger.dim('');
+}
+
+/**
+ * Displays categorized items (to remove, missing, preserved directories).
+ *
+ * @param {Object} categorized - Categorized items
+ * @param {string} targetDir - Installation directory
+ * @private
+ */
+function displayCategorizedItems(categorized, targetDir) {
+  // Files to remove
+  if (categorized.toRemove.length > 0) {
+    logger.info(`📋 Files that will be removed (${categorized.toRemove.length}):`);
+
+    const displayCount = Math.min(categorized.toRemove.length, 10);
+    for (let i = 0; i < displayCount; i++) {
+      const file = categorized.toRemove[i];
+      logger.dim(`  ✓ ${file.relativePath}`);
+    }
+
+    if (categorized.toRemove.length > 10) {
+      logger.dim(`  ... and ${categorized.toRemove.length - 10} more files`);
+    }
+
+    logger.dim('');
+  }
+
+  // Files already missing
+  if (categorized.missing.length > 0) {
+    logger.info(`⚠️  Files already missing (${categorized.missing.length}):`);
+    const displayCount = Math.min(categorized.missing.length, 5);
+    for (let i = 0; i < displayCount; i++) {
+      logger.dim(`  - ${categorized.missing[i].relativePath}`);
+    }
+    if (categorized.missing.length > 5) {
+      logger.dim(`  ... and ${categorized.missing.length - 5} more`);
+    }
+    logger.dim('');
+  }
+}
+
+/**
+ * Displays the safety summary before confirmation.
+ *
+ * @param {Object} categorized - Categorized items
+ * @param {boolean} willCreateBackup - Whether backup will be created
+ * @private
+ */
+function displaySafetySummary(categorized, willCreateBackup) {
+  const totalSize = categorized.toRemove.reduce((sum, file) => sum + (file.size || 0), 0);
+  const sizeInKB = (totalSize / 1024).toFixed(1);
+
+  logger.info('📊 Safety Summary:');
+  logger.info(`  • ${categorized.toRemove.length} files will be removed (${sizeInKB} KB)`);
+  logger.info(`  • ${categorized.directories.length} directories will be checked for cleanup`);
+
+  if (categorized.missing.length > 0) {
+    logger.info(`  • ${categorized.missing.length} files already missing (will be skipped)`);
+  }
+
+  if (willCreateBackup) {
+    logger.info(`  • Backup will be created in: ${UNINSTALL_BACKUP_DIR}/`);
+  } else {
+    logger.warning(`  • ⚠️  No backup will be created (--no-backup specified)`);
+  }
+
+  logger.dim('');
+}
+
+/**
+ * Creates a backup of files before removal.
+ *
+ * @param {Array} files - Files to backup
+ * @param {string} targetDir - Installation directory
+ * @param {ScopeManager} scopeManager - ScopeManager instance
+ * @returns {Promise<Object>} Backup result
+ * @private
+ */
+async function createBackup(files, targetDir, scopeManager) {
+  logger.info('\n📦 Creating backup...');
+
+  try {
+    const backupManager = new BackupManager(scopeManager, logger, {
+      maxBackups: 5
+    });
+
+    // Override backup directory to use uninstall-specific location
+    const backupDir = path.join(targetDir, UNINSTALL_BACKUP_DIR);
+    await fs.mkdir(backupDir, { recursive: true });
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const backedUpFiles = [];
+    let totalSize = 0;
+
+    for (const file of files) {
+      try {
+        const fileName = path.basename(file.relativePath);
+        const backupFileName = `${timestamp}_${fileName}`;
+        const backupPath = path.join(backupDir, backupFileName);
+
+        await fs.copyFile(file.path, backupPath);
+        backedUpFiles.push({
+          original: file.relativePath,
+          backup: backupFileName
+        });
+        totalSize += file.size || 0;
+      } catch (error) {
+        logger.debug(`Failed to backup ${file.relativePath}: ${error.message}`);
+      }
+    }
+
+    logger.info(`✓ Backed up ${backedUpFiles.length} files (${(totalSize / 1024).toFixed(1)} KB)`);
+
+    return {
+      success: true,
+      backupDir,
+      timestamp,
+      fileCount: backedUpFiles.length,
+      totalSize
+    };
+  } catch (error) {
+    logger.warning(`⚠️  Backup creation failed: ${error.message} - continuing without backup`);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+/**
+ * Removes files one by one.
+ *
+ * @param {Array} files - Files to remove
+ * @param {string} targetDir - Installation directory
+ * @returns {Promise<Object>} Removal result
+ * @private
+ */
+async function removeFiles(files, targetDir) {
+  let removed = 0;
+  let failed = 0;
+
+  for (const file of files) {
+    try {
+      await fs.unlink(file.path);
+      removed++;
+      logger.debug(`Removed: ${file.relativePath}`);
+    } catch (error) {
+      failed++;
+      logger.debug(`Failed to remove ${file.relativePath}: ${error.message}`);
+    }
+  }
+
+  return { removed, failed };
+}
+
+/**
+ * Cleans up empty directories while preserving non-empty ones.
+ *
+ * @param {Object} categorized - Categorized items with directories
+ * @param {string} targetDir - Installation directory
+ * @returns {Promise<Object>} Directory cleanup result
+ * @private
+ */
+async function cleanupDirectories(categorized, targetDir) {
+  const removed = [];
+  const preserved = [];
+
+  // Sort directories by depth (deepest first) so we remove children before parents
+  const sortedDirs = [...categorized.directories].sort((a, b) => {
+    const depthA = a.split('/').length;
+    const depthB = b.split('/').length;
+    return depthB - depthA;
+  });
+
+  for (const dir of sortedDirs) {
+    const fullPath = path.join(targetDir, dir);
+
+    try {
+      // Check if directory exists and is empty
+      const entries = await fs.readdir(fullPath);
+
+      if (entries.length === 0) {
+        // Directory is empty, safe to remove
+        await fs.rmdir(fullPath);
+        removed.push(dir);
+        logger.debug(`Removed empty directory: ${dir}`);
+      } else {
+        // Directory has contents, preserve it
+        preserved.push({ dir, entryCount: entries.length });
+        logger.dim(`📁 Preserved: ${dir} (contains ${entries.length} non-gsd-opencode files)`);
+      }
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        // Directory already gone
+        removed.push(dir);
+      } else {
+        logger.debug(`Could not process directory ${dir}: ${error.message}`);
+        preserved.push({ dir, error: error.message });
+      }
+    }
+  }
+
+  return { removed, preserved };
+}
+
+/**
+ * Displays success message with recovery instructions.
+ *
+ * @param {Object} removalResult - File removal result
+ * @param {Object} dirResult - Directory cleanup result
+ * @param {Object} backupResult - Backup creation result
+ * @private
+ */
+function displaySuccessMessage(removalResult, dirResult, backupResult) {
+  logger.dim('');
+  logger.success('✓ GSD-OpenCode has been successfully uninstalled');
+  logger.dim('');
+
+  // Summary
+  logger.info('Summary:');
+  logger.info(`  • ${removalResult.removed} files removed`);
+  if (removalResult.failed > 0) {
+    logger.warning(`  • ${removalResult.failed} files could not be removed`);
+  }
+  logger.info(`  • ${dirResult.removed.length} directories removed`);
+  logger.info(`  • ${dirResult.preserved.length} directories preserved`);
+
+  logger.dim('');
+
+  // Backup info
+  if (backupResult && backupResult.success) {
+    logger.info('📦 Backup Information:');
+    logger.info(`  • Location: ${backupResult.backupDir}`);
+    logger.info(`  • Timestamp: ${backupResult.timestamp}`);
+    logger.info(`  • Files: ${backupResult.fileCount} (${(backupResult.totalSize / 1024).toFixed(1)} KB)`);
+    logger.dim('');
+    logger.dim('Recovery:');
+    logger.dim(`  cp -r "${backupResult.backupDir}/${backupResult.timestamp}_*" <target-dir>/`);
+    logger.dim('');
   }
 }
 
