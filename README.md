@@ -58,7 +58,7 @@ $ npx gsd-opencode@latest
 
 **Trusted by engineers at Amazon, Google, Shopify, and Webflow.**
 
-[Why I Built This](#why-i-built-this) · [How It Works](#how-it-works) · [Commands](#commands) · [Why It Works](#why-it-works)
+[Why I Built This](#why-i-built-this) · [Distribution System](#distribution-system) · [How It Works](#how-it-works) · [Commands](#commands) · [Why It Works](#why-it-works)
 
 </div>
 
@@ -224,6 +224,359 @@ If you prefer not to use that flag, add this to your project's `.opencode/settin
 </details>
 
 ---
+
+## Distribution System
+
+GSD-OpenCode includes a comprehensive package manager for installing, maintaining, and updating the GSD system. Once installed via npm, you have access to a full CLI for managing your GSD installation.
+
+### Installation Overview
+
+The distribution system supports two installation scopes:
+
+| Scope | Location | Best For |
+|-------|----------|----------|
+| **Global** | `~/.config/opencode/` | System-wide availability across all projects |
+| **Local** | `./.opencode/` | Project-specific installation, version control |
+
+### Available Commands
+
+After running `npx gsd-opencode` or installing globally, you have access to these commands:
+
+#### Core Distribution Commands
+
+```bash
+# Install GSD (interactive - prompts for global/local)
+gsd-opencode install
+
+# Install globally (system-wide)
+gsd-opencode install --global
+gsd-opencode install -g
+
+# Install locally (current project only)
+gsd-opencode install --local
+gsd-opencode install -l
+
+# Show installation status
+gsd-opencode list
+
+# Check installation health
+gsd-opencode check
+
+# Repair broken installation
+gsd-opencode repair
+
+# Update to latest version
+gsd-opencode update
+
+# Remove installation
+gsd-opencode uninstall
+```
+
+#### Configuration Commands
+
+```bash
+# View current settings
+gsd-opencode config
+
+# Get specific setting value
+gsd-opencode config get <key>
+
+# Set configuration value
+gsd-opencode config set <key> <value>
+
+# Reset to defaults
+gsd-opencode config reset
+
+# List all settings
+gsd-opencode config list
+```
+
+### Detailed Usage Examples
+
+#### Install Command
+
+**Interactive installation** (recommended for first-time users):
+```bash
+gsd-opencode install
+# Prompts: Where would you like to install?
+# → Global (~/.config/opencode/) - Install globally for all projects
+# → Local (./.opencode/) - Install locally in current directory
+```
+
+**Non-interactive installation** (perfect for CI/CD, Docker, scripts):
+```bash
+# Install globally without prompts
+gsd-opencode install --global
+
+# Install locally without prompts
+gsd-opencode install --local
+
+# With verbose output for debugging
+gsd-opencode install --local --verbose
+
+# Specify custom config directory
+gsd-opencode install --global --config-dir /custom/path
+```
+
+**What happens during install:**
+1. Copies agents/, command/, and get-shit-done/ directories
+2. Replaces `@gsd-opencode/` references in .md files with actual paths
+3. Creates a VERSION file to track installed version
+4. Shows progress indicators during file operations
+5. Uses atomic operations (temp-then-move) to prevent partial installations
+
+#### List Command
+
+```bash
+# Show all installations
+gsd-opencode list
+# Output:
+# GSD-OpenCode Installation Status
+# ========================================
+# Global: ~/.config/opencode/
+#   Version: 1.9.4
+#   Status: Healthy
+# 
+# Local: ./.opencode/
+#   Version: 1.9.4
+#   Status: Healthy
+
+# Show only global installation
+gsd-opencode list --global
+
+# Show only local installation
+gsd-opencode list --local
+
+# JSON output for scripting
+gsd-opencode list --json
+```
+
+#### Check Command
+
+```bash
+# Verify installation health
+gsd-opencode check
+# Output:
+# Checking installation health...
+#
+# Files
+#   ✓ agents/ro-commit/SKILL.md
+#   ✓ agents/ro-commit/agent.js
+#   ✓ command/gsd/new-project.js
+#   ...
+#
+# Version
+#   ✓ VERSION file exists: 1.9.4
+#
+# Integrity
+#   ✓ All files verified
+#
+# Overall: HEALTHY ✓
+
+# Check specific scope
+gsd-opencode check --global
+gsd-opencode check --local
+```
+
+**Exit codes:**
+- `0` - Installation is healthy
+- `1` - Issues detected (missing files, version mismatch, corruption)
+
+#### Repair Command
+
+```bash
+# Detect and fix issues (shows summary first, asks for confirmation)
+gsd-opencode repair
+# Output:
+# Issues Detected:
+#   Missing Files: 2
+#   Path Issues: 1
+# 
+# Do you want to proceed with repairs? (y/N)
+
+# Repair specific scope
+gsd-opencode repair --global
+gsd-opencode repair --local
+```
+
+**What repair fixes:**
+- Missing files (reinstalls from source)
+- Corrupted/modified files (replaces with fresh copies)
+- Path reference issues (re-applies path replacement in .md files)
+- Creates backup before making destructive changes
+
+#### Update Command
+
+```bash
+# Check for updates and install latest version
+gsd-opencode update
+# Output:
+# Current version: 1.9.4
+# Latest version: 1.9.5
+# 
+# Do you want to update? (y/N)
+
+# Update from beta channel
+gsd-opencode update --beta
+
+# Update to specific version
+gsd-opencode update 1.9.5
+
+# Update specific scope
+gsd-opencode update --global
+gsd-opencode update --local
+```
+
+**Update features:**
+- Checks npm registry for latest version
+- Preserves installation scope (global stays global, local stays local)
+- Creates backup before updating
+- Performs full install procedure including path replacement
+- Shows progress during update
+
+#### Uninstall Command
+
+```bash
+# Remove installation (shows summary, asks for confirmation)
+gsd-opencode uninstall
+# Output:
+# The following will be removed:
+#   ~/.config/opencode/agents/
+#   ~/.config/opencode/command/
+#   ~/.config/opencode/get-shit-done/
+#   ~/.config/opencode/VERSION
+# 
+# Are you sure? (y/N)
+
+# Force uninstall without confirmation (scripting)
+gsd-opencode uninstall --force
+
+# Uninstall specific scope
+gsd-opencode uninstall --global
+gsd-opencode uninstall --local
+```
+
+#### Config Command
+
+```bash
+# View all settings
+gsd-opencode config
+
+# Get a specific value
+gsd-opencode config get mode
+# Output: interactive
+
+# Set a value
+gsd-opencode config set mode yolo
+
+# Reset to defaults
+gsd-opencode config reset
+
+# List all settings
+gsd-opencode config list
+# Output:
+# Setting              Value
+# -------------------  -----------
+# mode                 interactive
+# depth                standard
+# commit_docs          true
+```
+
+### Path Replacement Explained
+
+GSD uses `@gsd-opencode/` as a placeholder in .md files that gets replaced during installation:
+
+**Before installation (in source files):**
+```markdown
+See @gsd-opencode/workflows/execute-plan.md for details.
+```
+
+**After global installation:**
+```markdown
+See ~/.config/opencode/workflows/execute-plan.md for details.
+```
+
+**After local installation:**
+```markdown
+See /path/to/your/project/.opencode/workflows/execute-plan.md for details.
+```
+
+This allows GSD files to reference each other correctly regardless of where they're installed.
+
+### Global vs Local: When to Use Each
+
+**Use Global when:**
+- You want GSD available in all projects
+- You work on many different codebases
+- You want a single installation to maintain
+
+**Use Local when:**
+- You want GSD version-controlled with your project
+- Different projects need different GSD versions
+- You're working in a shared/reproducible environment (Docker, CI)
+- You want to customize GSD for a specific project
+
+**Can I use both?** Yes! You can have global for most work and local for specific projects. Use `--global` or `--local` flags to target the specific installation.
+
+### Troubleshooting Installation Issues
+
+**Permission denied during global install:**
+```bash
+# Option 1: Use local install instead
+gsd-opencode install --local
+
+# Option 2: Fix permissions
+sudo chown -R $(whoami) ~/.config
+```
+
+**Commands not found after install:**
+```bash
+# Verify installation
+gsd-opencode list
+
+# Check that files exist
+ls ~/.config/opencode/command/gsd/  # global
+ls ./.opencode/command/gsd/          # local
+
+# Restart OpenCode to reload commands
+```
+
+**Path issues after moving project (local install):**
+```bash
+# Reinstall to fix paths
+cd /new/project/path
+gsd-opencode install --local --force
+# Or use repair
+gsd-opencode repair --local
+```
+
+**"Already installed" when you want to reinstall:**
+```bash
+# Uninstall first, then reinstall
+gsd-opencode uninstall --force
+gsd-opencode install --local
+```
+
+### Docker/Container Usage
+
+For containerized environments, use absolute paths:
+
+```dockerfile
+# Set config directory explicitly
+ENV OPENCODE_CONFIG_DIR=/home/appuser/.config/opencode
+
+# Install globally in Dockerfile
+RUN npx gsd-opencode --global
+```
+
+Or use local install for project-specific setup:
+```bash
+# In your project directory inside container
+gsd-opencode install --local
+```
+
+---
+
 ## How It Works
 
 > **Already have code?** Run `/gsd-map-codebase` first. It spawns parallel agents to analyze your stack, architecture, conventions, and concerns. Then `/gsd-new-project` knows your codebase — questions focus on what you're adding, and planning automatically loads your patterns.
@@ -671,19 +1024,25 @@ Use `/gsd-settings` to toggle these, or override per-invocation:
 ## Troubleshooting
 
 **Commands not found after install?**
+- See the [Distribution System Troubleshooting](#troubleshooting-installation-issues) section for detailed help
+- Verify installation: `gsd-opencode list`
 - Restart OpenCode to reload slash commands
-- Verify files exist in `~/.config/opencode/command/gsd/` (global) or `./.opencode/command/gsd/` (local)
 
-**Commands not working as expected?**
-- Run `/gsd-help` to verify installation
-- Re-run `npx gsd-opencode` to reinstall
+**Permission denied during installation?**
+- See [Troubleshooting Installation Issues](#troubleshooting-installation-issues) for solutions
 
 **Updating to the latest version?**
 ```bash
+# Use the built-in update command
+gsd-opencode update
+
+# Or reinstall via npm
 npx gsd-opencode@latest
 ```
 
 **Using Docker or containerized environments?**
+
+See the [Docker/Container Usage](#dockercontainer-usage) section for detailed instructions.
 
 If file reads fail with tilde paths (`~/.config/opencode/...`), set `OPENCODE_CONFIG_DIR` before installing:
 ```bash
