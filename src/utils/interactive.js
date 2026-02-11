@@ -8,7 +8,7 @@
  * @module interactive
  */
 
-import { select, confirm } from '@inquirer/prompts';
+import { select, confirm, input } from '@inquirer/prompts';
 
 /**
  * Prompts user to select installation scope
@@ -140,6 +140,70 @@ export async function promptRepairOrFresh() {
     // Re-throw unexpected errors
     throw error;
   }
+}
+
+/**
+ * Prompts user to type a specific confirmation word for extra safety.
+ *
+ * Used for destructive operations where extra confirmation is required.
+ * User must type the exact word (case-insensitive) to proceed.
+ *
+ * @param {string} message - The message to display before the prompt
+ * @param {string} confirmWord - The word user must type to confirm
+ * @param {number} [maxAttempts=3] - Maximum number of attempts allowed
+ * @returns {Promise<boolean|null>} true if confirmed, false if rejected, null if cancelled
+ * @example
+ * const confirmed = await promptTypedConfirmation(
+ *   'This will uninstall GSD-OpenCode. Type "uninstall" to confirm',
+ *   'uninstall'
+ * );
+ * if (confirmed === null) {
+ *   console.log('Operation cancelled');
+ *   process.exit(130);
+ * }
+ * if (!confirmed) {
+ *   console.log('Confirmation word did not match');
+ *   process.exit(0);
+ * }
+ */
+export async function promptTypedConfirmation(message, confirmWord, maxAttempts = 3) {
+  const normalizedConfirmWord = confirmWord.toLowerCase();
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const answer = await input({
+        message: `${message} (type "${confirmWord}")`,
+        validate: (value) => {
+          if (!value || value.trim() === '') {
+            return 'Please enter the confirmation word';
+          }
+          return true;
+        }
+      });
+
+      const normalizedAnswer = answer.trim().toLowerCase();
+
+      if (normalizedAnswer === normalizedConfirmWord) {
+        return true;
+      }
+
+      // Wrong word entered
+      if (attempt < maxAttempts) {
+        console.log(`\n❌ That doesn't match. Please try again (${attempt}/${maxAttempts} attempts)`);
+      }
+    } catch (error) {
+      // Handle Ctrl+C (SIGINT) - user cancelled
+      if (error.name === 'AbortPromptError' || error.message?.includes('cancel')) {
+        return null;
+      }
+      // Re-throw unexpected errors
+      throw error;
+    }
+  }
+
+  // All attempts exhausted
+  console.log(`\n❌ Confirmation word did not match after ${maxAttempts} attempts`);
+  return false;
 }
 
 /**
