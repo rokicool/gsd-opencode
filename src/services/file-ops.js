@@ -151,6 +151,21 @@ export class FileOperations {
       // Perform atomic move
       await this._atomicMove(tempDir, expandedTarget);
 
+      // Update manifest entries to use final target paths instead of temp paths
+      const finalManifestManager = new ManifestManager(expandedTarget);
+      const entries = manifestManager.getAllEntries().map(entry => ({
+        ...entry,
+        path: entry.path.replace(tempDir, expandedTarget)
+      }));
+
+      // Clear and re-add entries with updated paths, then save
+      finalManifestManager.clear();
+      for (const entry of entries) {
+        finalManifestManager.addFile(entry.path, entry.relativePath, entry.size, entry.hash);
+      }
+      await finalManifestManager.save();
+      this.logger.debug('Manifest updated with final paths');
+
       // Success - clean up signal handlers and registry
       this._removeTempDir(tempDir);
       this._removeSignalHandlers();
