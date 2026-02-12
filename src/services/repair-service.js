@@ -17,6 +17,8 @@ import { fileURLToPath } from 'url';
 import { ScopeManager } from './scope-manager.js';
 import { BackupManager } from './backup-manager.js';
 import { FileOperations } from './file-ops.js';
+import { MigrationService } from './migration-service.js';
+import { StructureDetector, STRUCTURE_TYPES } from './structure-detector.js';
 import { PATH_PATTERNS } from '../../lib/constants.js';
 
 // Get the directory of the current module for resolving source paths
@@ -133,10 +135,173 @@ export class RepairService {
     this.logger = logger;
     this.expectedVersion = expectedVersion;
 
+    // Initialize structure detector for migration support
+    this.structureDetector = new StructureDetector(this.scopeManager.getTargetDir());
+
     // Lazy-load HealthChecker to avoid circular dependencies
     this._healthChecker = null;
 
     this.logger.debug('RepairService initialized');
+  }
+
+  /**
+   * Checks the directory structure status.
+   *
+   * Detects which command directory structure is present (old/new/dual/none)
+   * and determines if repair is needed.
+   *
+   * @returns {Promise<Object>} Structure check results
+   * @property {string} type - One of STRUCTURE_TYPES values
+   * @property {boolean} canRepair - True if structure can be repaired
+   * @property {string|null} repairCommand - Command to run for repair, or null
+   * @property {boolean} needsMigration - True if migration is recommended
+   *
+   * @example
+   * const structureCheck = await repairService.checkStructure();
+   * if (structureCheck.needsMigration) {
+   *   console.log(`Run: ${structureCheck.repairCommand}`);
+   * }
+   */
+  async checkStructure() {
+    const structure = await this.structureDetector.detect();
+    const details = await this.structureDetector.getDetails();
+
+    const canRepair = structure === STRUCTURE_TYPES.OLD ||
+                      structure === STRUCTURE_TYPES.DUAL;
+
+    return {
+      type: structure,
+      canRepair,
+      repairCommand: canRepair ? 'gsd-opencode repair --fix-structure' : null,
+      needsMigration: canRepair,
+      details: {
+        oldExists: details.oldExists,
+        newExists: details.newExists,
+        recommendedAction: details.recommendedAction
+      }
+    };
+  }
+
+  /**
+   * Repairs the directory structure by migrating to new format.
+   *
+   * Uses MigrationService to perform atomic migration from old to new
+   * structure with full backup and rollback capability.
+   *
+   * @returns {Promise<Object>} Repair result
+   * @property {boolean} repaired - True if structure was repaired
+   * @property {string} message - Human-readable status message
+   * @property {string} [backup] - Path to backup if repair performed
+   * @property {Error} [error] - Error if repair failed
+   *
+   * @example
+   * const result = await repairService.repairStructure();
+   * if (result.repaired) {
+   *   console.log('Structure repaired successfully');
+   *   console.log(`Backup: ${result.backup}`);
+   * } else {
+   *   console.log(`No repair needed: ${result.message}`);
+   * }
+   */
+  async repairStructure() {
+    const structure = await this.structureDetector.detect();
+
+    if (structure === STRUCTURE_TYPES.NEW) {
+      return {
+        repaired: false,
+        message: 'Already using new structure (commands/gsd/)'
+      };
+    }
+
+    if (structure === STRUCTURE_TYPES.NONE) {
+      return {
+        repaired: false,
+        message: 'No structure to repair - fresh installation needed'
+      };
+    }
+
+    // Use MigrationService to fix structure
+    const migrationService = new MigrationService(this.scopeManager, this.logger);
+
+    try {
+      const result = await migrationService.migrate();
+
+      if (result.migrated) {
+        return {
+          repaired: true,
+          message: 'Structure repaired successfully - migrated to commands/gsd/',
+          backup: result.backup
+        };
+      } else {
+        return {
+          repaired: false,
+          message: `No repair needed: ${result.reason}`
+        };
+      }
+    } catch (error) {
+      return {
+        repaired: false,
+        message: `Repair failed: ${error.message}`,
+        error
+      };
+    }
+  }
+
+  /**
+   * Fixes dual structure state (both old and new exist).
+   *
+   * This handles interrupted migrations by consolidating to new structure.
+   * Verifies new structure is complete, then removes old structure.
+   *
+   * @returns {Promise<Object>} Fix result
+   * @property {boolean} fixed - True if dual structure was fixed
+   * @property {string} message - Status message
+   * @property {string} [backup] - Backup path if created
+   * @property {Error} [error] - Error if fix failed
+   *
+   * @example
+   * const result = await repairService.fixDualStructure();
+   * if (result.fixed) {
+   *   console.log('Dual structure fixed');
+   * }
+   */
+  async fixDualStructure() {
+    const structure = await this.structureDetector.detect();
+
+    if (structure !== STRUCTURE_TYPES.DUAL) {
+      return {
+        fixed: false,
+        message: `Not in dual structure state (current: ${structure})`
+      };
+    }
+
+    this.logger.info('Fixing dual structure - consolidating to new structure...');
+
+    // Delegate to migration service which handles dual state
+    const migrationService = new MigrationService(this.scopeManager, this.logger);
+
+    try {
+      const result = await migrationService.migrate();
+
+      if (result.migrated) {
+        return {
+          fixed: true,
+          message: 'Dual structure fixed - removed old command/gsd/ directory',
+          backup: result.backup
+        };
+      } else {
+        return {
+          fixed: false,
+          message: 'Could not fix dual structure: migration returned no changes'
+        };
+      }
+    } catch (error) {
+      return {
+        fixed: false,
+        message: `Failed to fix dual structure: ${error.message}`,
+        error
+      };
+    }
   }
 
   /**

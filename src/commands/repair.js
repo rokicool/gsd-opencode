@@ -33,6 +33,7 @@ import { ScopeManager } from '../services/scope-manager.js';
 import { BackupManager } from '../services/backup-manager.js';
 import { FileOperations } from '../services/file-ops.js';
 import { RepairService } from '../services/repair-service.js';
+import { STRUCTURE_TYPES } from '../services/structure-detector.js';
 import { promptConfirmation } from '../utils/interactive.js';
 import { logger, setVerbose } from '../utils/logger.js';
 import { ERROR_CODES } from '../../lib/constants.js';
@@ -190,6 +191,8 @@ function displayRepairResults(results, scopeLabel) {
  * @param {string} scope - 'global' or 'local'
  * @param {Object} options - Options
  * @param {boolean} options.verbose - Enable verbose output
+ * @param {boolean} options.fixStructure - Fix structure issues
+ * @param {boolean} options.fixAll - Fix all issues including structure
  * @returns {Promise<Object>} Check results with installed flag, issues, and scopeLabel
  * @private
  */
@@ -224,6 +227,30 @@ async function checkScope(scope, options = {}) {
   });
 
   try {
+    // Check structure first
+    const structureCheck = await repairService.checkStructure();
+
+    // Handle structure issues if requested
+    if ((options.fixStructure || options.fixAll) && structureCheck.canRepair) {
+      logger.info(`Repairing ${scope} structure (${structureCheck.type})...`);
+
+      const structureResult = structureCheck.type === STRUCTURE_TYPES.DUAL
+        ? await repairService.fixDualStructure()
+        : await repairService.repairStructure();
+
+      if (structureResult.repaired || structureResult.fixed) {
+        logger.success(`Structure repaired: ${structureResult.message}`);
+        if (structureResult.backup) {
+          logger.dim(`Backup created: ${structureResult.backup}`);
+        }
+      } else {
+        logger.warning(`Structure repair: ${structureResult.message}`);
+      }
+
+      logger.dim('');
+    }
+
+    // Detect file issues
     const issues = await repairService.detectIssues();
 
     return {
@@ -232,7 +259,8 @@ async function checkScope(scope, options = {}) {
       scopeLabel,
       issues,
       repairService,
-      backupManager
+      backupManager,
+      structureCheck
     };
   } catch (error) {
     logger.debug(`Error during issue detection: ${error.message}`);
@@ -254,6 +282,8 @@ async function checkScope(scope, options = {}) {
  * 2. Determine scopes to check (global, local, or both)
  * 3. For each scope:
  *    - Detect installation issues using RepairService
+ *    - Check for structure issues (dual/old structure)
+ *    - Repair structure if --fix-structure or --fix-all flag provided
  *    - Display summary of issues found
  *    - Prompt for user confirmation
  *    - Perform repairs with progress indication
@@ -264,6 +294,8 @@ async function checkScope(scope, options = {}) {
  * @param {boolean} [options.global] - Repair global installation only
  * @param {boolean} [options.local] - Repair local installation only
  * @param {boolean} [options.verbose] - Enable verbose output for debugging
+ * @param {boolean} [options.fixStructure] - Fix structure issues (migrate old to new)
+ * @param {boolean} [options.fixAll] - Fix all issues including structure
  * @returns {Promise<number>} Exit code (0=success, 1=error, 2=permission, 130=interrupted)
  * @async
  *
@@ -276,13 +308,21 @@ async function checkScope(scope, options = {}) {
  *
  * // Repair with verbose output
  * const exitCode = await repairCommand({ verbose: true });
+ *
+ * // Fix structure issues only
+ * const exitCode = await repairCommand({ fixStructure: true });
+ *
+ * // Fix all issues including structure
+ * const exitCode = await repairCommand({ fixAll: true });
  */
 export async function repairCommand(options = {}) {
   const verbose = options.verbose || false;
+  const fixStructure = options.fixStructure || false;
+  const fixAll = options.fixAll || false;
   setVerbose(verbose);
 
   logger.debug('Starting repair command');
-  logger.debug(`Options: global=${options.global}, local=${options.local}, verbose=${verbose}`);
+  logger.debug(`Options: global=${options.global}, local=${options.local}, verbose=${verbose}, fixStructure=${fixStructure}, fixAll=${fixAll}`);
 
   try {
     logger.heading('GSD-OpenCode Installation Repair');
@@ -321,9 +361,30 @@ export async function repairCommand(options = {}) {
           continue;
         }
 
-        if (!result.issues.hasIssues) {
-          logger.success(`No issues detected at ${result.scopeLabel.toLowerCase()} scope`);
-          logger.dim('');
+        // Check if there are structure issues to report
+        const hasStructureIssues = result.structureCheck &&
+                                   (result.structureCheck.type === STRUCTURE_TYPES.OLD ||
+                                    result.structureCheck.type === STRUCTURE_TYPES.DUAL);
+
+        // Handle structure-only repair mode
+        if (fixStructure || fixAll) {
+          // Structure was already repaired in checkScope
+          if (!result.issues.hasIssues && !hasStructureIssues) {
+            logger.success(`No issues detected at ${result.scopeLabel.toLowerCase()} scope`);
+            logger.dim('');
+            continue;
+          }
+        } else if (!result.issues.hasIssues) {
+          // No file issues - but check for structure issues to report
+          if (hasStructureIssues) {
+            logger.warning(`No file issues, but structure requires attention`);
+            logger.info(`  Current structure: ${result.structureCheck.type}`);
+            logger.info(`  Run with --fix-structure to repair`);
+            logger.dim('');
+          } else {
+            logger.success(`No issues detected at ${result.scopeLabel.toLowerCase()} scope`);
+            logger.dim('');
+          }
           continue;
         }
 
