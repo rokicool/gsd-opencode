@@ -114,6 +114,30 @@ function displayCheckResults(results, scopeLabel) {
     }
   }
 
+  // Structure check section (NEW)
+  if (categories.structure) {
+    logger.dim('');
+    logger.info('Directory Structure');
+    const structure = categories.structure;
+    const statusText = structure.label;
+
+    if (structure.type === 'dual') {
+      logger.error(`${statusText} - Action required`);
+      logger.dim('  Both old (command/gsd/) and new (commands/gsd/) structures detected.');
+      logger.dim('  This can happen if an update was interrupted.');
+      logger.dim("  Run 'gsd-opencode update' to complete migration");
+    } else if (structure.needsMigration) {
+      logger.warning(`${statusText} - Migration recommended`);
+      logger.dim("  Run 'gsd-opencode update' to migrate to new structure");
+    } else if (structure.type === 'new') {
+      logger.success(`${statusText} - OK`);
+    } else if (structure.type === 'none') {
+      logger.info(`${statusText}`);
+    } else {
+      logger.info(statusText);
+    }
+  }
+
   // Overall status
   logger.dim('');
   if (results.passed) {
