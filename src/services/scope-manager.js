@@ -17,7 +17,7 @@ import os from 'os';
 import path from 'path';
 import fs from 'fs';
 import { expandPath, validatePath } from '../utils/path-resolver.js';
-import { DEFAULT_CONFIG_DIR } from '../../lib/constants.js';
+import { DEFAULT_CONFIG_DIR, VERSION_FILE } from '../../lib/constants.js';
 
 /**
  * Manages installation scope (global vs local) and path resolution.
@@ -159,7 +159,7 @@ export class ScopeManager {
    */
   isInstalled() {
     try {
-      const versionPath = path.join(this.getTargetDir(), 'VERSION');
+      const versionPath = path.join(this.getTargetDir(), VERSION_FILE);
       return fs.existsSync(versionPath);
     } catch (error) {
       return false;
@@ -181,7 +181,7 @@ export class ScopeManager {
    */
   getInstalledVersion() {
     try {
-      const versionPath = path.join(this.getTargetDir(), 'VERSION');
+      const versionPath = path.join(this.getTargetDir(), VERSION_FILE);
       if (!fs.existsSync(versionPath)) {
         return null;
       }
