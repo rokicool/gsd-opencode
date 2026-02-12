@@ -308,6 +308,269 @@ export class BackupManager {
   getRetentionCount() {
     return this._retentionCount;
   }
+
+  /**
+   * Creates a migration backup of the entire installation.
+   *
+   * Creates a timestamped backup of the installation before migration,
+   * including manifest, command/gsd/ directory, and all tracked files.
+   * Stores backup in .migration-backups/ subdirectory.
+   *
+   * @param {Object} options - Backup options
+   * @param {string} options.targetDir - Path to the installation directory
+   * @param {string} options.originalStructure - Structure type ('old', 'new', 'dual', 'none')
+   * @param {number} options.timestamp - Timestamp for the backup
+   * @returns {Promise<Object>} Backup metadata
+   * @property {string} path - Path to the backup directory
+   * @property {number} timestamp - Backup timestamp
+   * @property {string} originalStructure - Original structure type
+   * @property {string[]} affectedFiles - List of files that will be affected
+   * @property {Object|null} originalManifest - Original manifest content (if exists)
+   *
+   * @example
+   * const backup = await backupManager.createMigrationBackup({
+   *   targetDir: '/home/user/.config/opencode',
+   *   originalStructure: 'old',
+   *   timestamp: Date.now()
+   * });
+   * // Returns: { path: '/.../.migration-backups/backup-1234567890', ... }
+   */
+  async createMigrationBackup({ targetDir, originalStructure, timestamp }) {
+    const backupDirName = `backup-${timestamp}`;
+    const migrationBackupDir = path.join(targetDir, '.migration-backups', backupDirName);
+
+    this.logger.info('Creating migration backup...');
+
+    try {
+      // Ensure migration backup directory exists
+      await fs.mkdir(migrationBackupDir, { recursive: true });
+
+      // Determine files to backup based on structure type
+      const affectedFiles = [];
+      const oldPath = path.join(targetDir, 'command', 'gsd');
+      const newPath = path.join(targetDir, 'commands', 'gsd');
+      const manifestPath = path.join(targetDir, 'get-shit-done', 'INSTALLED_FILES.json');
+
+      // Check and add old structure files
+      try {
+        await fs.access(oldPath);
+        const oldFiles = await this._collectFilesRecursively(oldPath);
+        for (const file of oldFiles) {
+          const relativePath = path.relative(targetDir, file);
+          affectedFiles.push(relativePath);
+          await this._copyToBackup(file, migrationBackupDir, relativePath);
+        }
+      } catch (error) {
+        if (error.code !== 'ENOENT') {
+          throw error;
+        }
+      }
+
+      // Check and add new structure files
+      try {
+        await fs.access(newPath);
+        const newFiles = await this._collectFilesRecursively(newPath);
+        for (const file of newFiles) {
+          const relativePath = path.relative(targetDir, file);
+          if (!affectedFiles.includes(relativePath)) {
+            affectedFiles.push(relativePath);
+            await this._copyToBackup(file, migrationBackupDir, relativePath);
+          }
+        }
+      } catch (error) {
+        if (error.code !== 'ENOENT') {
+          throw error;
+        }
+      }
+
+      // Backup manifest if it exists
+      let originalManifest = null;
+      try {
+        await fs.access(manifestPath);
+        const manifestContent = await fs.readFile(manifestPath, 'utf-8');
+        originalManifest = JSON.parse(manifestContent);
+        await fs.writeFile(
+          path.join(migrationBackupDir, 'manifest.json'),
+          manifestContent,
+          'utf-8'
+        );
+        affectedFiles.push('get-shit-done/INSTALLED_FILES.json');
+      } catch (error) {
+        if (error.code !== 'ENOENT') {
+          throw error;
+        }
+        this.logger.debug('No manifest found, skipping manifest backup');
+      }
+
+      // Create backup metadata file
+      const metadata = {
+        timestamp,
+        originalStructure,
+        affectedFiles,
+        backupPath: migrationBackupDir,
+        created: new Date(timestamp).toISOString()
+      };
+      await fs.writeFile(
+        path.join(migrationBackupDir, 'metadata.json'),
+        JSON.stringify(metadata, null, 2),
+        'utf-8'
+      );
+
+      this.logger.info(`Migration backup created at ${migrationBackupDir}`);
+      this.logger.info(`Backed up ${affectedFiles.length} files`);
+
+      return {
+        path: migrationBackupDir,
+        timestamp,
+        originalStructure,
+        affectedFiles,
+        originalManifest
+      };
+    } catch (error) {
+      // Clean up partial backup on failure
+      try {
+        await fs.rm(migrationBackupDir, { recursive: true, force: true });
+      } catch {
+        // Ignore cleanup errors
+      }
+      throw new Error(`Failed to create migration backup: ${error.message}`);
+    }
+  }
+
+  /**
+   * Restores original structure from migration backup.
+   *
+   * Handles rollback of failed migrations by restoring files from backup
+   * and cleaning up any partial migration artifacts.
+   *
+   * @param {Object} backup - Backup metadata object from createMigrationBackup
+   * @returns {Promise<boolean>} True if restore succeeded
+   *
+   * @example
+   * const success = await backupManager.restoreFromMigrationBackup(backup);
+   * if (success) {
+   *   console.log('Rollback completed successfully');
+   * }
+   */
+  async restoreFromMigrationBackup(backup) {
+    if (!backup || !backup.path) {
+      throw new Error('Invalid backup metadata: path is required');
+    }
+
+    this.logger.info('Restoring from migration backup...');
+
+    try {
+      const backupDir = backup.path;
+      const targetDir = this.scopeManager.getTargetDir();
+
+      // Verify backup directory exists
+      try {
+        await fs.access(backupDir);
+      } catch (error) {
+        throw new Error(`Backup directory not found: ${backupDir}`);
+      }
+
+      // Load metadata
+      let metadata;
+      try {
+        const metadataContent = await fs.readFile(
+          path.join(backupDir, 'metadata.json'),
+          'utf-8'
+        );
+        metadata = JSON.parse(metadataContent);
+      } catch (error) {
+        this.logger.warning('Could not load backup metadata, proceeding with file restoration');
+        metadata = { affectedFiles: [] };
+      }
+
+      // Restore manifest if backed up
+      const manifestBackupPath = path.join(backupDir, 'manifest.json');
+      const manifestTargetPath = path.join(targetDir, 'get-shit-done', 'INSTALLED_FILES.json');
+      try {
+        await fs.access(manifestBackupPath);
+        await fs.mkdir(path.dirname(manifestTargetPath), { recursive: true });
+        await fs.copyFile(manifestBackupPath, manifestTargetPath);
+        this.logger.debug('Restored manifest');
+      } catch (error) {
+        if (error.code !== 'ENOENT') {
+          throw error;
+        }
+      }
+
+      // Restore files from backup
+      for (const relativePath of metadata.affectedFiles || []) {
+        if (relativePath === 'get-shit-done/INSTALLED_FILES.json') {
+          continue; // Already handled above
+        }
+
+        const backupFilePath = path.join(backupDir, relativePath);
+        const targetFilePath = path.join(targetDir, relativePath);
+
+        try {
+          await fs.access(backupFilePath);
+          await fs.mkdir(path.dirname(targetFilePath), { recursive: true });
+          await fs.copyFile(backupFilePath, targetFilePath);
+          this.logger.debug(`Restored: ${relativePath}`);
+        } catch (error) {
+          if (error.code !== 'ENOENT') {
+            this.logger.error(`Failed to restore ${relativePath}: ${error.message}`);
+          }
+        }
+      }
+
+      this.logger.success('Migration rollback completed');
+      return true;
+    } catch (error) {
+      this.logger.error(`Migration rollback failed: ${error.message}`);
+      return false;
+    }
+  }
+
+  /**
+   * Collects all files recursively in a directory.
+   *
+   * @param {string} dirPath - Directory to scan
+   * @returns {Promise<string[]>} Array of file paths
+   * @private
+   */
+  async _collectFilesRecursively(dirPath) {
+    const files = [];
+
+    try {
+      const entries = await fs.readdir(dirPath, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const fullPath = path.join(dirPath, entry.name);
+        if (entry.isDirectory()) {
+          const subFiles = await this._collectFilesRecursively(fullPath);
+          files.push(...subFiles);
+        } else {
+          files.push(fullPath);
+        }
+      }
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
+    return files;
+  }
+
+  /**
+   * Copies a file to the backup directory maintaining relative path structure.
+   *
+   * @param {string} sourcePath - Source file path
+   * @param {string} backupDir - Backup directory root
+   * @param {string} relativePath - Relative path from target dir
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _copyToBackup(sourcePath, backupDir, relativePath) {
+    const targetPath = path.join(backupDir, relativePath);
+    await fs.mkdir(path.dirname(targetPath), { recursive: true });
+    await fs.copyFile(sourcePath, targetPath);
+  }
 }
 
 /**
