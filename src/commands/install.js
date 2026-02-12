@@ -25,12 +25,49 @@
 import { ScopeManager } from '../services/scope-manager.js';
 import { ConfigManager } from '../services/config.js';
 import { FileOperations } from '../services/file-ops.js';
+import { ManifestManager } from '../services/manifest-manager.js';
 import { logger, setVerbose } from '../utils/logger.js';
 import { promptInstallScope, promptRepairOrFresh } from '../utils/interactive.js';
-import { ERROR_CODES, DIRECTORIES_TO_COPY } from '../../lib/constants.js';
+import { ERROR_CODES, DIRECTORIES_TO_COPY, ALLOWED_NAMESPACES } from '../../lib/constants.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+// Colors for banner
+const cyan = "\x1b[36m";
+const green = "\x1b[32m";
+const yellow = "\x1b[33m";
+const dim = "\x1b[2m";
+const gray = "\x1b[90m";
+const white = "\x1b[37m";
+const reset = "\x1b[0m";
+
+/**
+ * ASCII art banner for GSD-OpenCode
+ * @param {string} version - Package version
+ * @returns {string} Formatted banner string
+ */
+function getBanner(version) {
+  return `
+${cyan}   ██████╗ ███████╗██████╗
+  ██╔════╝ ██╔════╝██╔══██╗
+  ██║  ███╗███████╗██║  ██║
+  ██║   ██║╚════██║██║  ██║
+  ╚██████╔╝███████║██████╔╝
+   ╚═════╝ ╚══════╝╚═════╝${reset}
+
+                                   ${white}▄${reset}
+  ${gray}█▀▀█${reset} ${gray}█▀▀█${reset} ${gray}█▀▀█${reset} ${gray}█▀▀▄${reset} ${white}█▀▀▀${reset} ${white}█▀▀█${reset} ${white}█▀▀█${reset} ${white}█▀▀█${reset}
+  ${gray}█░░█${reset} ${gray}█░░█${reset} ${gray}█▀▀▀${reset} ${gray}█░░█${reset} ${white}█░░░${reset} ${white}█░░█${reset} ${white}█░░█${reset} ${white}█▀▀▀${reset}
+  ${gray}▀▀▀▀${reset} ${gray}█▀▀▀${reset} ${gray}▀▀▀▀${reset} ${gray}▀  ▀${reset} ${white}▀▀▀▀${reset} ${white}▀▀▀▀${reset} ${white}▀▀▀▀${reset} ${white}▀▀▀▀${reset}
+
+  Get Shit Done ${dim}v${version}${reset}
+  A meta-prompting, context engineering and spec-driven
+  development system for Cloude Code by TÂCHES
+  (adopted for OpenCode by rokicool and GLM4.7)
+
+`;
+}
 
 /**
  * Gets the package version from the source directory package.json.
@@ -228,6 +265,79 @@ async function preflightChecks(sourceDir, targetDir) {
 }
 
 /**
+ * Cleans up empty directories in allowed namespaces.
+ * Only removes directories that are empty and within gsd-opencode namespaces.
+ *
+ * @param {string} targetDir - Target installation directory
+ * @param {RegExp[]} namespaces - Allowed namespace patterns
+ * @param {object} logger - Logger instance
+ * @returns {Promise<void>}
+ * @private
+ */
+async function cleanupEmptyDirectories(targetDir, namespaces, logger) {
+  // Directories to check (in reverse order to remove deepest first)
+  const dirsToCheck = [
+    'get-shit-done',
+    'command/gsd',
+    'agents/gsd-debugger',
+    'agents/gsd-executor',
+    'agents/gsd-integration-checker',
+    'agents/gsd-phase-researcher',
+    'agents/gsd-plan-checker',
+    'agents/gsd-planner',
+    'agents/gsd-project-researcher',
+    'agents/gsd-research-synthesizer',
+    'agents/gsd-roadmapper',
+    'agents/gsd-set-model',
+    'agents/gsd-verifier'
+  ];
+
+  for (const dir of dirsToCheck) {
+    const fullPath = path.join(targetDir, dir);
+    try {
+      const entries = await fs.readdir(fullPath);
+      if (entries.length === 0) {
+        await fs.rmdir(fullPath);
+        logger.debug(`Removed empty directory: ${dir}`);
+      }
+    } catch (error) {
+      // Directory doesn't exist or can't be removed, ignore
+    }
+  }
+}
+
+/**
+ * Conservative cleanup for when no manifest exists.
+ * Only removes known gsd-opencode files, never the entire directory.
+ *
+ * @param {string} targetDir - Target installation directory
+ * @param {object} logger - Logger instance
+ * @returns {Promise<void>}
+ * @private
+ */
+async function conservativeCleanup(targetDir, logger) {
+  // Only remove specific files we know belong to gsd-opencode
+  const filesToRemove = [
+    'get-shit-done/VERSION',
+    'get-shit-done/INSTALLED_FILES.json'
+  ];
+
+  for (const file of filesToRemove) {
+    try {
+      await fs.unlink(path.join(targetDir, file));
+      logger.debug(`Removed: ${file}`);
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        logger.debug(`Could not remove ${file}: ${error.message}`);
+      }
+    }
+  }
+
+  // Clean up empty directories
+  await cleanupEmptyDirectories(targetDir, ALLOWED_NAMESPACES, logger);
+}
+
+/**
  * Main install command function.
  *
  * Orchestrates the installation process:
@@ -264,6 +374,11 @@ export async function installCommand(options = {}) {
   logger.debug(`Options: global=${options.global}, local=${options.local}, configDir=${options.configDir}, verbose=${verbose}`);
 
   try {
+    // Display banner
+    const sourceDir = getSourceDirectory();
+    const version = await getPackageVersion(sourceDir);
+    console.log(getBanner(version));
+
     // Step 1: Determine scope
     let scope;
     if (options.global) {
@@ -312,14 +427,45 @@ export async function installCommand(options = {}) {
         // For now, treat as fresh install
         logger.info('Repair selected - performing fresh install (repair functionality coming in Phase 4)');
       } else {
-        logger.info('Fresh install selected - removing existing installation');
+        logger.info('Fresh install selected - removing existing gsd-opencode files');
       }
 
-      // Fresh install: remove existing directory
+      // Fresh install: remove only gsd-opencode files (not entire directory)
+      // This preserves other opencode configuration and files
       const targetDir = scopeManager.getTargetDir();
       try {
-        await fs.rm(targetDir, { recursive: true, force: true });
-        logger.debug('Removed existing installation');
+        const manifestManager = new ManifestManager(targetDir);
+        const manifestEntries = await manifestManager.load();
+
+        if (manifestEntries && manifestEntries.length > 0) {
+          // Filter to only files in allowed namespaces
+          const filesToRemove = manifestEntries.filter(entry =>
+            manifestManager.isInAllowedNamespace(entry.relativePath, ALLOWED_NAMESPACES)
+          );
+
+          logger.debug(`Removing ${filesToRemove.length} tracked files in allowed namespaces`);
+
+          // Remove files only (directories will be cleaned up later if empty)
+          for (const entry of filesToRemove) {
+            try {
+              await fs.unlink(entry.path);
+              logger.debug(`Removed: ${entry.relativePath}`);
+            } catch (error) {
+              if (error.code !== 'ENOENT') {
+                logger.debug(`Could not remove ${entry.relativePath}: ${error.message}`);
+              }
+            }
+          }
+
+          // Clean up empty directories in allowed namespaces
+          await cleanupEmptyDirectories(targetDir, ALLOWED_NAMESPACES, logger);
+
+          logger.debug('Removed existing gsd-opencode files while preserving other config');
+        } else {
+          // No manifest found - use conservative fallback
+          logger.debug('No manifest found, using conservative fallback cleanup');
+          await conservativeCleanup(targetDir, logger);
+        }
       } catch (error) {
         logger.warning(`Could not remove existing installation: ${error.message}`);
         // Continue anyway - file-ops will handle conflicts
@@ -333,7 +479,6 @@ export async function installCommand(options = {}) {
     logger.info(`Installing to ${pathPrefix}...`);
 
     // Step 5: Pre-flight checks
-    const sourceDir = getSourceDirectory();
     const targetDir = scopeManager.getTargetDir();
 
     logger.debug(`Source directory: ${sourceDir}`);
@@ -346,7 +491,6 @@ export async function installCommand(options = {}) {
     const result = await fileOps.install(sourceDir, targetDir);
 
     // Step 7: Create VERSION file
-    const version = await getPackageVersion(sourceDir);
     await config.setVersion(version);
     logger.debug(`Created VERSION file with version: ${version}`);
 

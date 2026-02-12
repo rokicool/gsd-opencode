@@ -3,14 +3,14 @@
 **Project:** GSD-OpenCode Package Manager  
 **Core Value:** Users can reliably install, verify, and maintain their GSD-OpenCode installation through a simple, consistent CLI interface  
 **Depth:** Standard  
-**Phases:** 7  
+**Phases:** 8  
 **Coverage:** 52/52 v1 requirements ✓
 
 ---
 
 ## Overview
 
-This roadmap delivers a comprehensive CLI package manager for GSD-OpenCode artifacts. The seven phases progress from foundational installation capabilities through verification, repair, and lifecycle management, ending with integration polish and enhanced safety features. Each phase delivers a coherent, verifiable capability that builds upon previous phases.
+This roadmap delivers a comprehensive CLI package manager for GSD-OpenCode artifacts. The eight phases progress from foundational installation capabilities through verification, repair, and lifecycle management, ending with integration polish, enhanced safety features, and support for alternative directory structures. Each phase delivers a coherent, verifiable capability that builds upon previous phases.
 
 **Phase ordering rationale:**
 - Install must come first (foundation for everything)
@@ -332,6 +332,22 @@ Plans:
 
 ---
 
+## Phase 8: Support for opencode/commands/ Directory Structure
+
+**Goal:** [To be planned]
+
+**Depends on:** Phase 7
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 8 to break down)
+
+**Details:**
+[To be added during planning]
+
+---
+
 ## Progress
 
 | Phase | Goal | Requirements | Status | Started | Completed |
@@ -343,6 +359,7 @@ Plans:
 | 5 | Lifecycle Management | 6 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
 | 6 | Integration & Polish | 2 | 🟢 Completed | 2026-02-10 | 2026-02-11 |
 | 7 | Make Uninstall Safe and User-Friendly | 5 | 🟢 Completed | 2026-02-11 | 2026-02-11 |
+| 8 | Support for opencode/commands/ Directory Structure | TBD | 🔵 Planned | — | — |
 
 **Legend:** 🔵 Planned | 🟡 In Progress | 🟢 Completed | ⭕ Blocked
 
@@ -365,8 +382,9 @@ Plans:
 | Phase 5 | CLI-05, UPDATE-01-06 | 6 |
 | Phase 6 | INST-04 (comprehensive testing) | 2 |
 | Phase 7 | UNIN-06 to UNIN-10 (safety enhancements) | 5 |
+| Phase 8 | TBD (support opencode/commands/ directory) | TBD |
 
 ---
 
 *Roadmap created: 2026-02-09*  
-*Last updated: 2026-02-11 (Phase 7 completed with 5 requirements)*
+*Last updated: 2026-02-11 (Phase 8 added — support for opencode/commands/ directory)*

@@ -11,6 +11,7 @@
 **Current Plan:** 3 of 3 in current phase (complete)
 **Status:** 🟢 Phase 7 complete — Safe uninstall with comprehensive integration test coverage
 **Overall Progress:** 52/52 requirements complete (100%), Phase 7 complete
+**Next Phase:** Phase 8 — Support for opencode/commands/ directory structure (not planned yet)
 
 ```
 [████████████████████████████████████████] 100% (52/52 requirements)
@@ -30,6 +31,7 @@
 | Phase 5: Lifecycle Management | 🟢 Complete | 6/6 | None |
 | Phase 6: Integration & Polish | 🟢 Completed | 2/2 | None |
 | Phase 7: Make Uninstall Safe and User-Friendly | 🟢 Completed | 2/2 plans complete | None |
+| Phase 8: Support for opencode/commands/ Directory Structure | 🔵 Planned | 0/0 | Waiting for planning |
 
 ---
 
@@ -126,6 +128,7 @@ None currently.
 | Date | Change | Details |
 |------|--------|---------|
 | 2026-02-11 | Phase 7 added | Make uninstall safe and user-friendly — identified during v1 completion review |
+| 2026-02-11 | Phase 8 added | Support for opencode/commands/ directory structure — support for commands folder naming |
 
 ---
 
@@ -134,8 +137,8 @@ None currently.
 **Last Session:** 2026-02-10
 **Stopped at:** Completed 07-01-PLAN.md (Safe uninstall with manifest-based tracking)
 **Resume file:** None
-**Current Focus:** Phase 7 complete - Safe uninstall implemented
-**Next Action:** Phase 7 complete. Ready for final v1 release preparation or additional phase 7 plans
+**Current Focus:** Phase 8 planning — Support for opencode/commands/ directory structure
+**Next Action:** Run `/gsd-plan-phase 8` to create detailed plans for Phase 8
 
 ### Recently Completed
 
@@ -251,4 +254,4 @@ v1 is successful when:
 ---
 
 *State initialized: 2026-02-09*  
-*Last updated: 2026-02-11 (Phase 7 added to roadmap)*
+*Last updated: 2026-02-11 (Phase 8 added — support for opencode/commands/ directory)*

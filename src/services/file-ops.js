@@ -527,12 +527,45 @@ export class FileOperations {
         this.logger.debug('Cross-device move detected, using copy+delete');
         await this._crossDeviceMove(tempDir, targetDir);
       } else if (error.code === 'ENOTEMPTY' || error.code === 'EEXIST') {
-        // Target exists, remove it first
-        this.logger.debug('Target exists, removing before move');
-        await fs.rm(targetDir, { recursive: true, force: true });
-        await fs.rename(tempDir, targetDir);
+        // Target exists with other files - MERGE instead of replace
+        // This preserves existing opencode configuration
+        this.logger.debug('Target exists with existing files, merging contents');
+        await this._mergeDirectories(tempDir, targetDir);
+        // Clean up temp directory after merge
+        await fs.rm(tempDir, { recursive: true, force: true });
       } else {
         throw error;
+      }
+    }
+  }
+
+  /**
+   * Merges temp directory contents into target directory.
+   * Preserves existing files and only overwrites gsd-opencode files.
+   *
+   * @param {string} sourceDir - Source (temp) directory
+   * @param {string} targetDir - Target directory
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _mergeDirectories(sourceDir, targetDir) {
+    this.logger.debug(`Merging ${sourceDir} into ${targetDir}`);
+
+    const entries = await fs.readdir(sourceDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const sourcePath = path.join(sourceDir, entry.name);
+      const targetPath = path.join(targetDir, entry.name);
+
+      if (entry.isDirectory()) {
+        // Create target directory if it doesn't exist
+        await fs.mkdir(targetPath, { recursive: true });
+        // Recursively merge
+        await this._mergeDirectories(sourcePath, targetPath);
+      } else {
+        // Copy file (overwrites if exists)
+        await fs.copyFile(sourcePath, targetPath);
+        this.logger.debug(`Merged file: ${entry.name}`);
       }
     }
   }
