@@ -1,6 +1,6 @@
 {
   "name": "gsd-opencode",
-  "version": "1.0.0",
+  "version": "1.10.0",
   "description": "GSD-OpenCode distribution manager - install, verify, and maintain your GSD-OpenCode installation",
   "type": "module",
   "main": "bin/gsd.js",

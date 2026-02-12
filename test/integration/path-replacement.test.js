@@ -25,13 +25,13 @@ import {
   createMockSourceDir,
   createMockLogger,
   assertNoGsdReferences
-} from '../helpers/test-utils.js';
+} from '../helpers/path-replacement-helpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Fixture paths
-const FIXTURE_SOURCE = path.join(__dirname, '../fixtures/integration-source');
+const FIXTURE_SOURCE = path.join(__dirname, '../fixtures/path-replacement/integration-source');
 
 describe('path replacement integration', () => {
   let tempDir;

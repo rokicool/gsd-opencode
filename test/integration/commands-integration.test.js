@@ -25,13 +25,13 @@ import {
   validateMarkdownFile,
   extractFileReferences,
   assertNoGsdReferences
-} from '../helpers/test-utils.js';
+} from '../helpers/path-replacement-helpers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Fixture path
-const FIXTURE_SOURCE = path.join(__dirname, '../fixtures/integration-source');
+const FIXTURE_SOURCE = path.join(__dirname, '../fixtures/path-replacement/integration-source');
 
 describe('commands integration', () => {
   let tempDir;
