@@ -334,17 +334,43 @@ Plans:
 
 ## Phase 8: Support for opencode/commands/ Directory Structure
 
-**Goal:** [To be planned]
+**Goal:** Support the new `commands/gsd/` directory structure with automatic migration from legacy `command/gsd/`
 
 **Depends on:** Phase 7
 
-**Plans:** 0 plans
+**Requirements:**
+| ID | Requirement |
+|----|-------------|
+| INST-11 | Install uses `commands/gsd/` directory structure (new default) |
+| UPDATE-07 | Update migrates from old structure to new structure |
+| CHECK-06 | Check detects dual structure state (both old and new exist) |
+| MIGRATE-01 | Migration creates backup before changing structure |
+| MIGRATE-02 | Migration is atomic with rollback capability |
+| MIGRATE-03 | Migration updates manifest paths |
+
+**Success Criteria:**
+1. Fresh installations use `commands/gsd/` directory structure
+2. Existing installations with `command/gsd/` are automatically migrated during update
+3. Check command detects and reports structure type (old/new/dual/none)
+4. Dual structure state is flagged as unhealthy (requires repair)
+5. Migration creates backup before making changes
+6. Failed migrations automatically rollback to original state
+7. All lifecycle commands (install, update, check, repair, uninstall) work with both structures
+
+**Plans:** 5 plans in 3 waves
+
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 08-01 | Foundation: Constants and StructureDetector service |
+| 2 | 08-02, 08-03 | Migration service and install to new structure |
+| 3 | 08-04, 08-05 | Check/update integration and lifecycle command support |
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 8 to break down)
-
-**Details:**
-[To be added during planning]
+- [ ] 08-01-PLAN.md — Foundation: Update constants and create StructureDetector
+- [ ] 08-02-PLAN.md — MigrationService: Atomic migration with rollback
+- [ ] 08-03-PLAN.md — Install update: Use new commands/ structure
+- [ ] 08-04-PLAN.md — Check/update integration: Detect and migrate structures
+- [ ] 08-05-PLAN.md — Lifecycle support: Uninstall and repair for both structures
 
 ---
 
@@ -359,7 +385,7 @@ Plans:
 | 5 | Lifecycle Management | 6 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
 | 6 | Integration & Polish | 2 | 🟢 Completed | 2026-02-10 | 2026-02-11 |
 | 7 | Make Uninstall Safe and User-Friendly | 5 | 🟢 Completed | 2026-02-11 | 2026-02-11 |
-| 8 | Support for opencode/commands/ Directory Structure | TBD | 🔵 Planned | — | — |
+| 8 | Support for opencode/commands/ Directory Structure | 6 | 🔵 Planned | — | — |
 
 **Legend:** 🔵 Planned | 🟡 In Progress | 🟢 Completed | ⭕ Blocked
 
@@ -368,7 +394,9 @@ Plans:
 ## Coverage
 
 **v1 Requirements:** 52 total
-**Mapped to Phases:** 52
+**Phase 8 Requirements:** 6 new
+**Total Requirements:** 58
+**Mapped to Phases:** 58
 **Unmapped:** 0 ✓
 
 ### By Phase
@@ -382,6 +410,7 @@ Plans:
 | Phase 5 | CLI-05, UPDATE-01-06 | 6 |
 | Phase 6 | INST-04 (comprehensive testing) | 2 |
 | Phase 7 | UNIN-06 to UNIN-10 (safety enhancements) | 5 |
+| Phase 8 | INST-11, UPDATE-07, CHECK-06, MIGRATE-01-03 | 6 |
 | Phase 8 | TBD (support opencode/commands/ directory) | TBD |
 
 ---
