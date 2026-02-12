@@ -22,6 +22,7 @@ import { ScopeManager } from './scope-manager.js';
 import { BackupManager } from './backup-manager.js';
 import { FileOperations } from './file-ops.js';
 import { NpmRegistry } from '../utils/npm-registry.js';
+import { StructureDetector, STRUCTURE_TYPES } from './structure-detector.js';
 
 const execAsync = promisify(exec);
 
@@ -156,6 +157,9 @@ export class UpdateService {
 
     // Lazy-load HealthChecker to avoid circular dependencies
     this._healthChecker = null;
+
+    // Structure detection for migration support
+    this.structureDetector = new StructureDetector(this.scopeManager.getTargetDir());
 
     this.logger.debug('UpdateService initialized');
   }
@@ -485,11 +489,13 @@ export class UpdateService {
    * }
    */
   async performUpdate(targetVersion = null, options = {}) {
-    const { onProgress } = options;
+    const { onProgress, dryRun, skipMigration } = options;
     const errors = [];
     const stats = {
       preUpdateChecksPassed: false,
       backupCreated: false,
+      structureMigrated: false,
+      migrationBackup: null,
       installSucceeded: false,
       postUpdateChecksPassed: false,
       startTime: Date.now(),
@@ -498,12 +504,14 @@ export class UpdateService {
 
     this.logger.info('Starting update process...');
 
-    // Define progress phases
+    // Define progress phases (includes structure check and migration)
     const phases = [
+      { id: 'structure-check', name: 'Checking structure', weight: 5 },
       { id: 'pre-check', name: 'Pre-update health check', weight: 10 },
-      { id: 'backup', name: 'Creating backup', weight: 20 },
-      { id: 'install', name: 'Installing new version', weight: 50 },
-      { id: 'post-check', name: 'Post-update verification', weight: 20 }
+      { id: 'migration', name: 'Migrating structure', weight: 15 },
+      { id: 'backup', name: 'Creating backup', weight: 15 },
+      { id: 'install', name: 'Installing new version', weight: 40 },
+      { id: 'post-check', name: 'Post-update verification', weight: 15 }
     ];
 
     const totalWeight = phases.reduce((sum, p) => sum + p.weight, 0);
@@ -526,14 +534,62 @@ export class UpdateService {
     };
 
     try {
-      // Phase 1: Pre-update health check
+      // Phase 1: Check current structure
+      reportProgress('structure-check', 0, 1, 'Detecting directory structure');
+      const structure = await this.structureDetector.detect();
+      reportProgress('structure-check', 1, 1, 'Structure detection complete');
+      currentWeight += phases[0].weight;
+
+      // Phase 2: Pre-update health check
       reportProgress('pre-check', 0, 1, 'Running pre-update health check');
       const preCheckResult = await this._performPreUpdateCheck();
       stats.preUpdateChecksPassed = preCheckResult.passed;
       reportProgress('pre-check', 1, 1, 'Pre-update health check complete');
-      currentWeight += phases[0].weight;
+      currentWeight += phases[1].weight;
 
-      // Phase 2: Create backup (if installed)
+      // Phase 3: Migrate if needed (before downloading new version)
+      if (!skipMigration && (structure === STRUCTURE_TYPES.OLD || structure === STRUCTURE_TYPES.DUAL)) {
+        if (dryRun) {
+          this.logger.info('Would migrate from old structure to new structure');
+          stats.structureMigrated = false;
+        } else {
+          reportProgress('migration', 0, 1, 'Converting to new directory structure');
+
+          // Lazy-load MigrationService to avoid circular dependencies
+          const { MigrationService } = await import('./migration-service.js');
+          const migrationService = new MigrationService(this.scopeManager, this.logger);
+
+          try {
+            const migrationResult = await migrationService.migrate();
+
+            if (migrationResult.migrated) {
+              this.logger.success('Structure migration completed successfully');
+              stats.structureMigrated = true;
+              stats.migrationBackup = migrationResult.backup;
+            } else {
+              this.logger.info(`Migration skipped: ${migrationResult.reason}`);
+              stats.structureMigrated = false;
+            }
+          } catch (error) {
+            this.logger.error(`Migration failed: ${error.message}`);
+            stats.structureMigrated = false;
+
+            return {
+              success: false,
+              version: targetVersion,
+              stats,
+              errors: [`Migration failed: ${error.message}`]
+            };
+          }
+
+          reportProgress('migration', 1, 1, 'Structure migration complete');
+        }
+      } else {
+        reportProgress('migration', 1, 1, 'No migration needed');
+      }
+      currentWeight += phases[2].weight;
+
+      // Phase 4: Create backup (if installed)
       reportProgress('backup', 0, 1, 'Creating backup');
       if (this.scopeManager.isInstalled()) {
         const targetDir = this.scopeManager.getTargetDir();
@@ -549,7 +605,7 @@ export class UpdateService {
         }
       }
       reportProgress('backup', 1, 1, 'Backup complete');
-      currentWeight += phases[1].weight;
+      currentWeight += phases[3].weight;
 
       // Determine target version
       let versionToInstall = targetVersion;
@@ -562,7 +618,7 @@ export class UpdateService {
         throw new Error('Could not determine version to install');
       }
 
-      // Phase 3: Install new version
+      // Phase 5: Install new version
       reportProgress('install', 0, 3, 'Downloading package');
       const installResult = await this._installVersion(versionToInstall);
 
@@ -588,9 +644,9 @@ export class UpdateService {
 
       reportProgress('install', 3, 3, 'Installation complete');
       stats.installSucceeded = true;
-      currentWeight += phases[2].weight;
+      currentWeight += phases[4].weight;
 
-      // Phase 4: Post-update verification
+      // Phase 6: Post-update verification
       reportProgress('post-check', 0, 1, 'Running post-update verification');
       const postCheckResult = await this._performPostUpdateCheck(versionToInstall);
       stats.postUpdateChecksPassed = postCheckResult.passed;
@@ -600,7 +656,7 @@ export class UpdateService {
       }
 
       reportProgress('post-check', 1, 1, 'Post-update verification complete');
-      currentWeight += phases[3].weight;
+      currentWeight += phases[5].weight;
 
       stats.endTime = Date.now();
 
