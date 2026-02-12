@@ -118,9 +118,9 @@ describe('path replacement integration', () => {
 
       await fileOps.install(sourceDir, targetDir);
 
-      // Verify directory structure is preserved
+      // Verify directory structure is preserved (using new 'commands/' structure)
       const agentsDir = path.join(targetDir, 'agents', 'test-agent');
-      const commandDir = path.join(targetDir, 'command', 'gsd');
+      const commandDir = path.join(targetDir, 'commands', 'gsd');
       const templatesDir = path.join(targetDir, 'get-shit-done', 'templates');
       const workflowsDir = path.join(targetDir, 'get-shit-done', 'workflows');
 
@@ -390,13 +390,14 @@ This file references:
       await fs.cp(FIXTURE_SOURCE, newSourceDir, { recursive: true });
 
       // Add a new .md file with @gsd-opencode/ references
+      // Place it in get-shit-done/ directory since that's in DIRECTORIES_TO_COPY
       const newFileContent = `# New File
 
 This is a new file added during update.
 It references @gsd-opencode/templates/summary.md
 And @gsd-opencode/agents/test-agent/SKILL.md
 `;
-      const newFileDir = path.join(newSourceDir, 'new-feature');
+      const newFileDir = path.join(newSourceDir, 'get-shit-done', 'new-feature');
       await fs.mkdir(newFileDir, { recursive: true });
       await fs.writeFile(path.join(newFileDir, 'new-file.md'), newFileContent, 'utf-8');
 
@@ -405,7 +406,7 @@ And @gsd-opencode/agents/test-agent/SKILL.md
       await fileOps.install(newSourceDir, targetDir);
 
       // Verify new file has paths replaced
-      const newFilePath = path.join(targetDir, 'new-feature', 'new-file.md');
+      const newFilePath = path.join(targetDir, 'get-shit-done', 'new-feature', 'new-file.md');
       const content = await fs.readFile(newFilePath, 'utf-8');
 
       expect(content).not.toContain('@gsd-opencode/');

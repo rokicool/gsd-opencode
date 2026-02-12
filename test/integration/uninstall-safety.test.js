@@ -225,9 +225,10 @@ describe('Uninstall Safety Features', () => {
       await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest with one existing and one non-existing file
+      // Note: Non-existent file must be in a gsd-* namespace to be tracked
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 7, hash: 'sha256:test' },
-        { path: path.join(installDir, 'agents/non-existent/file.txt'), relativePath: 'agents/non-existent/file.txt', size: 0, hash: 'sha256:test2' },
+        { path: path.join(installDir, 'agents/gsd-missing/file.txt'), relativePath: 'agents/gsd-missing/file.txt', size: 0, hash: 'sha256:test2' },
         { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test3' }
       ];
       await fs.writeFile(
