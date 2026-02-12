@@ -90,21 +90,45 @@ function displayUpdateInfo(current, target, scopeLabel) {
 /**
  * Displays update results after completion.
  *
- * Shows success/failure status, backup location, and next steps.
+ * Shows success/failure status, backup location, migration status, and next steps.
  *
  * @param {Object} result - Update result from performUpdate()
  * @param {string} scopeLabel - Label for scope (Global/Local)
+ * @param {boolean} isDryRun - Whether this was a dry run
  * @private
  */
-function displayUpdateResults(result, scopeLabel) {
-  logger.heading(`Update Results for ${scopeLabel} Installation`);
-  logger.dim('=====================================');
-  logger.dim('');
+function displayUpdateResults(result, scopeLabel, isDryRun = false) {
+  if (isDryRun) {
+    logger.heading(`Dry Run Results for ${scopeLabel} Installation`);
+    logger.dim('=====================================');
+    logger.dim('');
+    logger.info('No changes were made (dry run mode)');
+  } else {
+    logger.heading(`Update Results for ${scopeLabel} Installation`);
+    logger.dim('=====================================');
+    logger.dim('');
+  }
 
   if (result.success) {
-    logger.success(`Updated to version ${result.version}`);
+    if (isDryRun) {
+      logger.success(`Would update to version ${result.version}`);
+    } else {
+      logger.success(`Updated to version ${result.version}`);
+    }
   } else {
     logger.error('Update failed');
+  }
+
+  // Display migration status if applicable
+  if (result.stats.structureMigrated) {
+    logger.dim('');
+    logger.success('Structure migrated: Old (command/gsd/) → New (commands/gsd/)');
+    if (result.stats.migrationBackup) {
+      logger.dim(`  Migration backup: ${result.stats.migrationBackup}`);
+    }
+  } else if (result.stats.migrationSkipped) {
+    logger.dim('');
+    logger.warning('Structure migration was skipped (--skip-migration flag)');
   }
 
   if (result.errors && result.errors.length > 0) {
@@ -116,9 +140,13 @@ function displayUpdateResults(result, scopeLabel) {
   }
 
   logger.dim('');
-  logger.dim('Next steps:');
-  logger.dim("  Run 'gsd-opencode list' to verify the installation");
-  logger.dim("  Run 'gsd-opencode check' to verify installation health");
+  if (isDryRun) {
+    logger.dim('To perform the actual update, run without --dry-run');
+  } else {
+    logger.dim('Next steps:');
+    logger.dim("  Run 'gsd-opencode list' to verify the installation");
+    logger.dim("  Run 'gsd-opencode check' to verify installation health");
+  }
 }
 
 /**
@@ -144,6 +172,8 @@ function displayUpdateResults(result, scopeLabel) {
  * @param {boolean} [options.verbose] - Enable verbose output for debugging
  * @param {string} [options.version] - Specific version to install
  * @param {boolean} [options.force] - Skip confirmation prompt
+ * @param {boolean} [options.dryRun] - Show what would be done without making changes
+ * @param {boolean} [options.skipMigration] - Skip structure migration (not recommended)
  * @returns {Promise<number>} Exit code (0=success, 1=error, 2=permission, 130=interrupted)
  * @async
  *
@@ -165,7 +195,7 @@ export async function updateCommand(options = {}) {
   setVerbose(verbose);
 
   logger.debug('Starting update command');
-  logger.debug(`Options: global=${options.global}, local=${options.local}, beta=${options.beta}, version=${options.version}, force=${options.force}, verbose=${verbose}`);
+  logger.debug(`Options: global=${options.global}, local=${options.local}, beta=${options.beta}, version=${options.version}, force=${options.force}, verbose=${verbose}, dryRun=${options.dryRun}, skipMigration=${options.skipMigration}`);
 
   try {
     logger.heading('GSD-OpenCode Update');
@@ -294,7 +324,9 @@ export async function updateCommand(options = {}) {
         const updateResult = await updateService.performUpdate(targetVersion, {
           onProgress: ({ phase, current, total, message, overallProgress }) => {
             spinner.text = `${phase}: ${message} (${overallProgress}%)`;
-          }
+          },
+          dryRun: options.dryRun,
+          skipMigration: options.skipMigration
         });
 
         if (updateResult.success) {
@@ -306,12 +338,19 @@ export async function updateCommand(options = {}) {
         logger.dim('');
 
         // Display results
-        displayUpdateResults(updateResult, scopeLabel);
+        displayUpdateResults(updateResult, scopeLabel, options.dryRun);
 
         // Show backup location if created
-        if (updateResult.stats.backupCreated) {
+        if (updateResult.stats.backupCreated && !options.dryRun) {
           const backupDir = backupManager.getBackupDir();
           logger.dim(`Backup saved to: ${backupDir}`);
+          logger.dim('');
+        }
+
+        // Show warning if skipMigration was used
+        if (options.skipMigration) {
+          logger.warning('Structure migration was skipped. Old structure may cause issues.');
+          logger.dim('  Run "gsd-opencode update" without --skip-migration to migrate.');
           logger.dim('');
         }
 
