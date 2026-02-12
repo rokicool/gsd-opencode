@@ -229,6 +229,8 @@ async function main() {
     .option('-l, --local', 'Update local installation only')
     .option('--beta', 'Update to beta version from @rokicool/gsd-opencode')
     .option('-f, --force', 'Skip confirmation prompt')
+    .option('--dry-run', 'Show what would be updated without making changes')
+    .option('--skip-migration', 'Skip automatic structure migration (not recommended)')
     .action(async (version, options, command) => {
       const globalOptions = command.parent.opts();
       const fullOptions = {

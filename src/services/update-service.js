@@ -495,6 +495,7 @@ export class UpdateService {
       preUpdateChecksPassed: false,
       backupCreated: false,
       structureMigrated: false,
+      migrationSkipped: false,
       migrationBackup: null,
       installSucceeded: false,
       postUpdateChecksPassed: false,
@@ -574,17 +575,25 @@ export class UpdateService {
             this.logger.error(`Migration failed: ${error.message}`);
             stats.structureMigrated = false;
 
+            // Enhanced error handling for specific failure scenarios
+            const errorMessage = this._formatMigrationError(error, structure);
+
             return {
               success: false,
               version: targetVersion,
               stats,
-              errors: [`Migration failed: ${error.message}`]
+              errors: [errorMessage]
             };
           }
 
           reportProgress('migration', 1, 1, 'Structure migration complete');
         }
       } else {
+        // Check if migration was skipped due to flag
+        if (skipMigration && (structure === STRUCTURE_TYPES.OLD || structure === STRUCTURE_TYPES.DUAL)) {
+          this.logger.warning('Skipping structure migration (--skip-migration flag)');
+          stats.migrationSkipped = true;
+        }
         reportProgress('migration', 1, 1, 'No migration needed');
       }
       currentWeight += phases[2].weight;
@@ -714,6 +723,98 @@ export class UpdateService {
         await this.fileOps._copyFile(sourcePath, targetPath);
       }
     }
+  }
+
+  /**
+   * Verifies that the directory structure is correct after update.
+   *
+   * Checks that the installation uses the new structure after a successful
+   * update. If not, shows a warning suggesting repair.
+   *
+   * @returns {Promise<boolean>} True if structure is correct
+   * @private
+   */
+  async _verifyPostUpdateStructure() {
+    try {
+      const structure = await this.structureDetector.detect();
+
+      if (structure === STRUCTURE_TYPES.OLD) {
+        this.logger.warning('Post-update check: Installation still uses old structure');
+        this.logger.dim("  Run 'gsd-opencode update' again to complete migration");
+        return false;
+      }
+
+      if (structure === STRUCTURE_TYPES.DUAL) {
+        this.logger.warning('Post-update check: Both old and new structures detected');
+        this.logger.dim("  Run 'gsd-opencode repair' to fix the installation");
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      this.logger.debug(`Could not verify post-update structure: ${error.message}`);
+      return true; // Don't fail update for verification errors
+    }
+  }
+
+  /**
+   * Formats migration error messages with helpful suggestions.
+   *
+   * Provides specific error messages and recovery suggestions based on
+   * the type of error encountered during migration.
+   *
+   * @param {Error} error - The error that occurred
+   * @param {string} structureType - The structure type being migrated
+   * @returns {string} Formatted error message with suggestions
+   * @private
+   */
+  _formatMigrationError(error, structureType) {
+    const baseMessage = `Migration failed: ${error.message}`;
+
+    // Disk space errors
+    if (error.code === 'ENOSPC' || error.message.includes('no space left')) {
+      return `${baseMessage}\n\n` +
+        'Insufficient disk space for migration.\n' +
+        'Migration requires approximately 2x the current installation size.\n' +
+        'Suggestions:\n' +
+        '  - Free up disk space and try again\n' +
+        '  - Run with --skip-migration to update without migrating (not recommended)';
+    }
+
+    // Permission errors
+    if (error.code === 'EACCES' || error.code === 'EPERM') {
+      return `${baseMessage}\n\n` +
+        'Permission denied during migration.\n' +
+        'Suggestions:\n' +
+        '  - Check that you have write access to the installation directory\n' +
+        '  - On Unix systems, you may need to use sudo for global installations\n' +
+        '  - Ensure no other processes are using the files';
+    }
+
+    // File busy errors (open file handles)
+    if (error.code === 'EBUSY' || error.message.includes('resource busy')) {
+      return `${baseMessage}\n\n` +
+        'Some files are currently in use and cannot be moved.\n' +
+        'Suggestions:\n' +
+        '  - Close any editors or terminals with files open in the installation\n' +
+        '  - Close any running GSD-OpenCode commands\n' +
+        '  - Try again after closing conflicting applications';
+    }
+
+    // Interrupted migration (dual structure)
+    if (structureType === STRUCTURE_TYPES.DUAL) {
+      return `${baseMessage}\n\n` +
+        'Previous migration may have been interrupted.\n' +
+        'Suggestions:\n' +
+        '  - Run "gsd-opencode repair" to fix the installation\n' +
+        '  - Or manually remove the old structure and run update again\n' +
+        '  - Migration backup may be available for rollback';
+    }
+
+    // Default error with rollback info
+    return `${baseMessage}\n\n` +
+      'The migration was automatically rolled back to prevent data loss.\n' +
+      'You can try again or use --skip-migration (not recommended).';
   }
 
   /**
