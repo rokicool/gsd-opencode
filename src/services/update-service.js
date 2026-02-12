@@ -665,6 +665,15 @@ export class UpdateService {
       }
 
       reportProgress('post-check', 1, 1, 'Post-update verification complete');
+
+      // Verify structure is correct after update
+      if (!dryRun) {
+        const structureOk = await this._verifyPostUpdateStructure();
+        if (!structureOk) {
+          errors.push('Post-update structure verification failed');
+        }
+      }
+
       currentWeight += phases[5].weight;
 
       stats.endTime = Date.now();
