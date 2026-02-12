@@ -14,6 +14,7 @@ import path from 'path';
 import { ScopeManager } from './scope-manager.js';
 import { hashFile } from '../utils/hash.js';
 import { DIRECTORIES_TO_COPY, VERSION_FILE } from '../../lib/constants.js';
+import { StructureDetector, STRUCTURE_TYPES } from './structure-detector.js';
 
 /**
  * Manages health verification for GSD-OpenCode installations.
@@ -58,6 +59,55 @@ export class HealthChecker {
 
     this.scopeManager = scopeManager;
     this.targetDir = scopeManager.getTargetDir();
+    this.structureDetector = new StructureDetector(this.targetDir);
+  }
+
+  /**
+   * Detects the directory structure and returns status information.
+   *
+   * Uses StructureDetector to determine if the installation uses the old
+   * (command/gsd/), new (commands/gsd/), dual (both), or no structure.
+   *
+   * @returns {Promise<Object>} Structure detection results
+   * @property {string} type - One of STRUCTURE_TYPES (old, new, dual, none)
+   * @property {string} label - Human-readable label for the structure
+   * @property {boolean} needsMigration - True if migration is recommended
+   * @property {boolean} isHealthy - True if structure is valid (new or none)
+   *
+   * @example
+   * const structure = await health.detectStructure();
+   * if (structure.needsMigration) {
+   *   console.log(`Migration needed: ${structure.label}`);
+   * }
+   */
+  async detectStructure() {
+    const structure = await this.structureDetector.detect();
+
+    const status = {
+      type: structure,
+      label: this._getStructureLabel(structure),
+      needsMigration: structure === STRUCTURE_TYPES.OLD || structure === STRUCTURE_TYPES.DUAL,
+      isHealthy: structure === STRUCTURE_TYPES.NEW || structure === STRUCTURE_TYPES.NONE
+    };
+
+    return status;
+  }
+
+  /**
+   * Gets a human-readable label for a structure type.
+   *
+   * @private
+   * @param {string} type - One of STRUCTURE_TYPES values
+   * @returns {string} Human-readable label
+   */
+  _getStructureLabel(type) {
+    const labels = {
+      [STRUCTURE_TYPES.OLD]: 'Legacy (command/gsd/)',
+      [STRUCTURE_TYPES.NEW]: 'Current (commands/gsd/)',
+      [STRUCTURE_TYPES.DUAL]: 'Dual (both structures)',
+      [STRUCTURE_TYPES.NONE]: 'No command structure'
+    };
+    return labels[type] || 'Unknown';
   }
 
   /**
@@ -301,10 +351,11 @@ export class HealthChecker {
   async checkAll(options = {}) {
     const { expectedVersion, verbose = false } = options;
 
-    // Run all checks in parallel
-    const [filesResult, integrityResult] = await Promise.all([
+    // Run all checks in parallel including structure detection
+    const [filesResult, integrityResult, structureResult] = await Promise.all([
       this.verifyFiles(),
-      this.verifyIntegrity()
+      this.verifyIntegrity(),
+      this.detectStructure()
     ]);
 
     // Version check only if expectedVersion provided
@@ -314,10 +365,20 @@ export class HealthChecker {
     }
 
     // Determine overall status
+    // Dual structure is considered unhealthy (requires action)
     const allResults = [filesResult.passed, integrityResult.passed];
     if (versionResult) {
       allResults.push(versionResult.passed);
     }
+
+    // Structure check: NEW and NONE are healthy, OLD and DUAL need attention
+    // DUAL structure causes failure (non-zero exit code)
+    const structureHealthy = structureResult.type === STRUCTURE_TYPES.NEW ||
+                             structureResult.type === STRUCTURE_TYPES.NONE;
+    if (!structureHealthy) {
+      allResults.push(false);
+    }
+
     const allPassed = allResults.every(r => r);
 
     return {
@@ -326,7 +387,8 @@ export class HealthChecker {
       categories: {
         files: filesResult,
         version: versionResult,
-        integrity: integrityResult
+        integrity: integrityResult,
+        structure: structureResult
       }
     };
   }

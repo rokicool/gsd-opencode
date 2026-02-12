@@ -8,14 +8,14 @@
 ## Current Position
 
 **Current Phase:** Phase 8 (in progress)
-**Current Plan:** 1 of 5 in current phase
-**Status:** 🟡 Phase 8 in progress — Foundation complete (StructureDetector, dual-structure constants)
-**Overall Progress:** 52/52 requirements complete (100%), Phase 8 plan 1/5 complete
-**Next Phase:** Continue Phase 8 — Plan 2 (MigrationService)
+**Current Plan:** 3 of 5 in current phase
+**Status:** 🟡 Phase 8 in progress — Install updated for new structure (commands/gsd/)
+**Overall Progress:** 52/52 requirements complete (100%), Phase 8 plan 3/5 complete
+**Next Phase:** Continue Phase 8 — Plan 4 (Check/Update Integration)
 
 ```
 [████████████████████████████████████████] 100% (52/52 requirements)
-[███████████████████░░░░░░░░░░░░░░░░░░░░░] 20% (Phase 8: 1/5 plans)
+[████████████████████████████░░░░░░░░░░░░] 60% (Phase 8: 3/5 plans)
 ```
 
 ---
@@ -31,7 +31,7 @@
 | Phase 5: Lifecycle Management | 🟢 Complete | 6/6 | None |
 | Phase 6: Integration & Polish | 🟢 Completed | 2/2 | None |
 | Phase 7: Make Uninstall Safe and User-Friendly | 🟢 Completed | 2/2 plans complete | None |
-| Phase 8: Support for opencode/commands/ Directory Structure | 🟡 In Progress | 1/5 | Plan 08-01 complete |
+| Phase 8: Support for opencode/commands/ Directory Structure | 🟡 In Progress | 3/5 | Plan 08-03 complete |
 
 ---
 
@@ -41,7 +41,7 @@
 |--------|---------|-------|
 | Requirements Complete | 52/52 | ✓ |
 | Phases Complete | 6/7 active | → |
-| Plans Complete (Phase 8) | 1/5 | → |
+| Plans Complete (Phase 8) | 3/5 | → |
 | Blockers | 0 | — |
 | Known Issues | 0 | — |
 
@@ -114,6 +114,9 @@
 | STRUCTURE_TYPES enum for structure detection | Four-state type system (old/new/dual/none) for directory layout detection | 2026-02-11 |
 | Maintain backward compatibility in DIRECTORIES_TO_COPY | Keep 'command' as default until plan 08-03 implements migration | 2026-02-11 |
 | Re-export STRUCTURE_TYPES from structure-detector.js | Convenience import for code using StructureDetector | 2026-02-11 |
+| Source package maintains old structure | Source uses 'command/', install transforms to 'commands/' during copy | 2026-02-11 |
+| Install blocks over existing structure | Forces use of 'update' command for migration instead of overwrite | 2026-02-11 |
+| COMMAND_DIR_MAPPING constant | Maps destination dir names to source dir names for path transformation | 2026-02-11 |
 
 ### Open Questions
 
@@ -139,10 +142,10 @@ None currently.
 ## Session Continuity
 
 **Last Session:** 2026-02-11
-**Stopped at:** Completed 08-01-PLAN.md (Foundation: Constants and StructureDetector)
+**Stopped at:** Completed 08-03-PLAN.md (Install: New commands/ structure)
 **Resume file:** None
-**Current Focus:** Phase 8 execution — Plan 2 (MigrationService)
-**Next Action:** Execute `/gsd-execute-phase 08 02` for MigrationService implementation
+**Current Focus:** Phase 8 execution — Plan 4 (Check/Update Integration)
+**Next Action:** Execute `/gsd-execute-phase 08 04` for Check/Update Integration
 
 ### Recently Completed
 
@@ -222,6 +225,14 @@ None currently.
   - All tests pass: 20/20 (100% pass rate)
   - Backward compatibility maintained
 
+- ✓ **PHASE 8 PLAN 03 COMPLETE** — Install Update: Use New commands/ Structure
+  - Updated DIRECTORIES_TO_COPY to use 'commands' (plural) for fresh installs
+  - Added COMMAND_DIR_MAPPING for source-to-destination path transformation
+  - Install blocks over existing structure (old/new/dual) with helpful messages
+  - Path transformation: source/command/gsd/ → target/commands/gsd/
+  - Manifest entries use new path format for correct uninstall
+  - All 175 tests pass (100% pass rate)
+
 ### Upcoming Work
 
 1. **v1 Release Preparation**
@@ -267,4 +278,4 @@ v1 is successful when:
 ---
 
 *State initialized: 2026-02-09*  
-*Last updated: 2026-02-11 (Phase 8 added — support for opencode/commands/ directory)*
+*Last updated: 2026-02-11 (Phase 8 Plan 3 complete — install uses commands/ structure)*
