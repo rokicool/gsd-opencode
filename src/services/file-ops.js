@@ -22,8 +22,9 @@ import { constants as fsConstants } from 'fs';
 import { createHash } from 'crypto';
 import ora from 'ora';
 import { validatePath, expandPath } from '../utils/path-resolver.js';
-import { PATH_PATTERNS, ERROR_CODES, MANIFEST_FILENAME, DIRECTORIES_TO_COPY } from '../../lib/constants.js';
+import { PATH_PATTERNS, ERROR_CODES, MANIFEST_FILENAME, DIRECTORIES_TO_COPY, COMMAND_DIR_MAPPING } from '../../lib/constants.js';
 import { ManifestManager } from './manifest-manager.js';
+import { StructureDetector, detectStructure, STRUCTURE_TYPES } from './structure-detector.js';
 
 /**
  * Manages file operations with atomic installation and progress indication.
@@ -120,6 +121,36 @@ export class FileOperations {
         throw new Error(`Source directory not found: ${sourceDir}`);
       }
       throw error;
+    }
+
+    // Check for existing installation structure
+    const existingStructure = await detectStructure(expandedTarget);
+    
+    if (existingStructure === STRUCTURE_TYPES.OLD) {
+      this.logger.warning('Existing installation with old structure detected (command/gsd/).');
+      this.logger.info('Run "gsd-opencode update" to migrate to the new structure (commands/gsd/).');
+      throw new Error(
+        'Existing installation uses old directory structure. ' +
+        'Use "gsd-opencode update" to migrate instead of install.'
+      );
+    }
+    
+    if (existingStructure === STRUCTURE_TYPES.DUAL) {
+      this.logger.warning('Dual structure detected (both command/gsd/ and commands/gsd/ exist).');
+      this.logger.info('Run "gsd-opencode update" to complete migration.');
+      throw new Error(
+        'Installation has dual structure state. ' +
+        'Use "gsd-opencode update" to fix this issue.'
+      );
+    }
+    
+    if (existingStructure === STRUCTURE_TYPES.NEW) {
+      this.logger.warning('Existing installation with new structure detected (commands/gsd/).');
+      this.logger.info('Run "gsd-opencode update" to update to the latest version.');
+      throw new Error(
+        'Already installed with new structure. ' +
+        'Use "gsd-opencode update" to update instead of install.'
+      );
     }
 
     // Create temporary directory with timestamp
@@ -263,9 +294,12 @@ export class FileOperations {
     let directories = 0;
 
     // Count total files in allowed directories only
+    // Note: We count using the source directory names (with mapping applied)
     let totalFiles = 0;
     for (const dirName of DIRECTORIES_TO_COPY) {
-      const dirPath = path.join(sourceDir, dirName);
+      // Transform destination directory name to source directory name
+      const sourceDirName = COMMAND_DIR_MAPPING[dirName] || dirName;
+      const dirPath = path.join(sourceDir, sourceDirName);
       try {
         totalFiles += await this._countFiles(dirPath);
       } catch (error) {
@@ -283,7 +317,10 @@ export class FileOperations {
 
     try {
       for (const dirName of DIRECTORIES_TO_COPY) {
-        const sourceSubDir = path.join(sourceDir, dirName);
+        // Transform destination directory name to source directory name
+        // e.g., 'commands' -> 'command' for source lookup
+        const sourceDirName = COMMAND_DIR_MAPPING[dirName] || dirName;
+        const sourceSubDir = path.join(sourceDir, sourceDirName);
         const targetSubDir = path.join(targetDir, dirName);
 
         try {
@@ -303,7 +340,7 @@ export class FileOperations {
             const progress = Math.round((filesCopied / totalFiles) * 100);
             this._spinner.text = `Copying files... ${progress}% (${filesCopied}/${totalFiles})`;
 
-            // Add file to manifest with correct relative path
+            // Add file to manifest with correct relative path (using destination dirName)
             if (manifestManager) {
               const fullRelativePath = path.join(dirName, relativePath).replace(/\\/g, '/');
               manifestManager.addFile(filePath, fullRelativePath, size, hash);
@@ -314,7 +351,7 @@ export class FileOperations {
             throw error;
           }
           // Directory doesn't exist, skip
-          this.logger.debug(`Skipping missing directory: ${dirName}`);
+          this.logger.debug(`Skipping missing directory: ${sourceDirName} (maps to ${dirName})`);
         }
       }
 
