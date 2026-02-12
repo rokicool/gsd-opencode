@@ -154,7 +154,7 @@ export async function uninstallCommand(options = {}) {
     const dirResult = await cleanupDirectories(categorized, targetDir);
 
     // Step 12: Success message with recovery instructions
-    displaySuccessMessage(removalResult, dirResult, backupResult);
+    displaySuccessMessage(removalResult, dirResult, backupResult, targetDir);
 
     return ERROR_CODES.SUCCESS;
 
@@ -609,9 +609,10 @@ async function cleanupDirectories(categorized, targetDir) {
  * @param {Object} removalResult - File removal result
  * @param {Object} dirResult - Directory cleanup result
  * @param {Object} backupResult - Backup creation result
+ * @param {string} targetDir - Target directory where files were installed
  * @private
  */
-function displaySuccessMessage(removalResult, dirResult, backupResult) {
+function displaySuccessMessage(removalResult, dirResult, backupResult, targetDir) {
   logger.dim('');
   logger.success('✓ GSD-OpenCode has been successfully uninstalled');
   logger.dim('');
@@ -635,7 +636,7 @@ function displaySuccessMessage(removalResult, dirResult, backupResult) {
     logger.info(`  • Files: ${backupResult.fileCount} (${(backupResult.totalSize / 1024).toFixed(1)} KB)`);
     logger.dim('');
     logger.dim('Recovery:');
-    logger.dim(`  cp -r "${backupResult.backupDir}/." <target-dir>/`);
+    logger.dim(`  cp -r "${backupResult.backupDir}/." ${targetDir}/`);
     logger.dim('');
   }
 }
