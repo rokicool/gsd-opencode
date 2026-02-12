@@ -143,67 +143,58 @@ export async function promptRepairOrFresh() {
 }
 
 /**
- * Prompts user to type a specific confirmation word for extra safety.
+ * Prompts the user to type a confirmation word to proceed.
  *
- * Used for destructive operations where extra confirmation is required.
- * User must type the exact word (case-insensitive) to proceed.
+ * The user must type the exact confirmation word to proceed. No retries - if the
+ * user enters anything else, the function immediately returns false.
  *
  * @param {string} message - The message to display before the prompt
  * @param {string} confirmWord - The word user must type to confirm
- * @param {number} [maxAttempts=3] - Maximum number of attempts allowed
  * @returns {Promise<boolean|null>} true if confirmed, false if rejected, null if cancelled
  * @example
  * const confirmed = await promptTypedConfirmation(
- *   'This will uninstall GSD-OpenCode. Type "uninstall" to confirm',
- *   'uninstall'
+ *   'This will uninstall GSD-OpenCode. Type "yes" to confirm',
+ *   'yes'
  * );
  * if (confirmed === null) {
  *   console.log('Operation cancelled');
  *   process.exit(130);
  * }
  * if (!confirmed) {
- *   console.log('Confirmation word did not match');
+ *   console.log('Confirmation failed');
  *   process.exit(0);
  * }
  */
-export async function promptTypedConfirmation(message, confirmWord, maxAttempts = 3) {
+export async function promptTypedConfirmation(message, confirmWord) {
   const normalizedConfirmWord = confirmWord.toLowerCase();
 
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      const answer = await input({
-        message: `${message} (type "${confirmWord}")`,
-        validate: (value) => {
-          if (!value || value.trim() === '') {
-            return 'Please enter the confirmation word';
-          }
-          return true;
+  try {
+    const answer = await input({
+      message: `${message} (type "${confirmWord}")`,
+      validate: (value) => {
+        if (!value || value.trim() === '') {
+          return 'Please enter the confirmation word';
         }
-      });
-
-      const normalizedAnswer = answer.trim().toLowerCase();
-
-      if (normalizedAnswer === normalizedConfirmWord) {
         return true;
       }
+    });
 
-      // Wrong word entered
-      if (attempt < maxAttempts) {
-        console.log(`\n❌ That doesn't match. Please try again (${attempt}/${maxAttempts} attempts)`);
-      }
-    } catch (error) {
-      // Handle Ctrl+C (SIGINT) - user cancelled
-      if (error.name === 'AbortPromptError' || error.message?.includes('cancel')) {
-        return null;
-      }
-      // Re-throw unexpected errors
-      throw error;
+    const normalizedAnswer = answer.trim().toLowerCase();
+
+    if (normalizedAnswer === normalizedConfirmWord) {
+      return true;
     }
-  }
 
-  // All attempts exhausted
-  console.log(`\n❌ Confirmation word did not match after ${maxAttempts} attempts`);
-  return false;
+    // Wrong word entered - immediately return false
+    return false;
+  } catch (error) {
+    // Handle Ctrl+C (SIGINT) - user cancelled
+    if (error.name === 'AbortPromptError' || error.message?.includes('cancel')) {
+      return null;
+    }
+    // Re-throw unexpected errors
+    throw error;
+  }
 }
 
 /**

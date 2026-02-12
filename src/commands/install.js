@@ -33,26 +33,22 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 /**
- * Gets the package version from package.json.
+ * Gets the package version from the source directory package.json.
  *
+ * @param {string} sourceDir - Source directory containing the distribution
  * @returns {Promise<string>} The package version
  * @private
  */
-async function getPackageVersion() {
+async function getPackageVersion(sourceDir) {
   try {
-    // Get the directory of this file
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-
-    // Navigate up to package root (from src/commands/ to package root)
-    const packageRoot = path.resolve(__dirname, '../..');
-    const packageJsonPath = path.join(packageRoot, 'package.json');
+    // Read from the source directory's package.json
+    const packageJsonPath = path.join(sourceDir, 'package.json');
 
     const content = await fs.readFile(packageJsonPath, 'utf-8');
     const pkg = JSON.parse(content);
     return pkg.version || '1.0.0';
   } catch (error) {
-    logger.warning('Could not read package version, using 1.0.0');
+    logger.warning('Could not read package version from source, using 1.0.0');
     return '1.0.0';
   }
 }
@@ -350,7 +346,7 @@ export async function installCommand(options = {}) {
     const result = await fileOps.install(sourceDir, targetDir);
 
     // Step 7: Create VERSION file
-    const version = await getPackageVersion();
+    const version = await getPackageVersion(sourceDir);
     await config.setVersion(version);
     logger.debug(`Created VERSION file with version: ${version}`);
 

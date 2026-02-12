@@ -37,6 +37,11 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **UNIN-03**: Uninstall shows interactive confirmation before deleting
 - [x] **UNIN-04**: Uninstall supports `--force` flag to skip confirmation
 - [x] **UNIN-05**: Uninstall shows summary of what will be removed before confirmation
+- [x] **UNIN-06**: Uninstall creates backup before deletion for potential recovery
+- [x] **UNIN-07**: Uninstall supports `--dry-run` flag to preview what will be removed
+- [x] **UNIN-08**: Uninstall requires typed confirmation (type 'uninstall') for extra safety
+- [x] **UNIN-09**: Uninstall shows enhanced warnings with file counts, sizes, and path
+- [x] **UNIN-10**: Uninstall provides recovery instructions after completion
 
 ### Check Command
 

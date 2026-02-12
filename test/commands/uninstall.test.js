@@ -92,7 +92,7 @@ describe('uninstall command with safety features', () => {
     ];
 
     await fs.writeFile(
-      path.join(baseDir, 'INSTALLED_FILES.json'),
+      path.join(baseDir, 'get-shit-done', 'INSTALLED_FILES.json'),
       JSON.stringify(manifest, null, 2),
       'utf-8'
     );
@@ -159,7 +159,7 @@ describe('uninstall command with safety features', () => {
       manifestManager.addFile(path.join(tempDir, 'test.txt'), 'test.txt', 100, 'sha256:test');
       
       const savedPath = await manifestManager.save();
-      expect(savedPath).toBe(path.join(tempDir, 'INSTALLED_FILES.json'));
+      expect(savedPath).toBe(path.join(tempDir, 'get-shit-done', 'INSTALLED_FILES.json'));
       
       const newManager = new ManifestManager(tempDir);
       const loaded = await newManager.load();
@@ -175,7 +175,8 @@ describe('uninstall command with safety features', () => {
     });
 
     it('handles corrupted manifest JSON', async () => {
-      await fs.writeFile(path.join(tempDir, 'INSTALLED_FILES.json'), 'not valid json {', 'utf-8');
+      await fs.mkdir(path.join(tempDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(tempDir, 'get-shit-done', 'INSTALLED_FILES.json'), 'not valid json {', 'utf-8');
       
       const manifestManager = new ManifestManager(tempDir);
       await expect(manifestManager.load()).rejects.toThrow();

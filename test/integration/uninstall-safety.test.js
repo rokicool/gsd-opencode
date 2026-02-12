@@ -117,16 +117,17 @@ describe('Uninstall Safety Features', () => {
       await fs.mkdir(path.join(globalConfigDir, 'agents', 'user-custom'), { recursive: true });
       await fs.writeFile(path.join(globalConfigDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'gsd content');
       await fs.writeFile(path.join(globalConfigDir, 'agents', 'user-custom', 'config.json'), 'user content');
-      await fs.writeFile(path.join(globalConfigDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(globalConfigDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(globalConfigDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(globalConfigDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 11, hash: 'sha256:test' },
         { path: path.join(globalConfigDir, 'agents/user-custom/config.json'), relativePath: 'agents/user-custom/config.json', size: 13, hash: 'sha256:test2' },
-        { path: path.join(globalConfigDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test3' }
+        { path: path.join(globalConfigDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test3' }
       ];
       await fs.writeFile(
-        path.join(globalConfigDir, 'INSTALLED_FILES.json'),
+        path.join(globalConfigDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -152,15 +153,16 @@ describe('Uninstall Safety Features', () => {
       await fs.mkdir(path.join(globalConfigDir, 'command', 'other-tool'), { recursive: true });
       await fs.writeFile(path.join(globalConfigDir, 'command', 'gsd', 'install.js'), '// gsd');
       await fs.writeFile(path.join(globalConfigDir, 'command', 'other-tool', 'script.js'), '// other');
-      await fs.writeFile(path.join(globalConfigDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(globalConfigDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(globalConfigDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(globalConfigDir, 'command/gsd/install.js'), relativePath: 'command/gsd/install.js', size: 6, hash: 'sha256:test' },
-        { path: path.join(globalConfigDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(globalConfigDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(globalConfigDir, 'INSTALLED_FILES.json'),
+        path.join(globalConfigDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -187,15 +189,16 @@ describe('Uninstall Safety Features', () => {
       const installDir = globalConfigDir;
       await fs.mkdir(path.join(installDir, 'agents', 'gsd-debugger'), { recursive: true });
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'content');
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest with specific files
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 7, hash: 'sha256:test' },
-        { path: path.join(installDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -209,7 +212,7 @@ describe('Uninstall Safety Features', () => {
       // Files should be removed
       await expect(fs.access(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md')))
         .rejects.toThrow();
-      await expect(fs.access(path.join(installDir, 'VERSION')))
+      await expect(fs.access(path.join(installDir, 'get-shit-done', 'VERSION')))
         .rejects.toThrow();
     });
 
@@ -218,16 +221,17 @@ describe('Uninstall Safety Features', () => {
       const installDir = globalConfigDir;
       await fs.mkdir(path.join(installDir, 'agents', 'gsd-debugger'), { recursive: true });
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'content');
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest with one existing and one non-existing file
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 7, hash: 'sha256:test' },
         { path: path.join(installDir, 'agents/non-existent/file.txt'), relativePath: 'agents/non-existent/file.txt', size: 0, hash: 'sha256:test2' },
-        { path: path.join(installDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test3' }
+        { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test3' }
       ];
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -248,7 +252,8 @@ describe('Uninstall Safety Features', () => {
       const installDir = globalConfigDir;
       await fs.mkdir(path.join(installDir, 'agents', 'gsd-debugger'), { recursive: true });
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'content');
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Run uninstall - no manifest present
       const result = await runCli(['uninstall', '--global', '--force'], {
@@ -273,15 +278,16 @@ describe('Uninstall Safety Features', () => {
       await fs.mkdir(path.join(installDir, 'agents', 'user-custom'), { recursive: true });
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'gsd');
       await fs.writeFile(path.join(installDir, 'agents', 'user-custom', 'config.json'), 'user');
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 3, hash: 'sha256:test' },
-        { path: path.join(installDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -306,15 +312,16 @@ describe('Uninstall Safety Features', () => {
       const installDir = globalConfigDir;
       await fs.mkdir(path.join(installDir, 'agents', 'gsd-debugger'), { recursive: true });
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'gsd');
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 3, hash: 'sha256:test' },
-        { path: path.join(installDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -337,15 +344,16 @@ describe('Uninstall Safety Features', () => {
       const installDir = globalConfigDir;
       await fs.mkdir(path.join(installDir, 'agents', 'gsd-debugger'), { recursive: true });
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'content');
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 7, hash: 'sha256:test' },
-        { path: path.join(installDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -361,7 +369,7 @@ describe('Uninstall Safety Features', () => {
       // Files should still exist
       await expect(fs.access(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md')))
         .resolves.not.toThrow();
-      await expect(fs.access(path.join(installDir, 'VERSION')))
+      await expect(fs.access(path.join(installDir, 'get-shit-done', 'VERSION')))
         .resolves.not.toThrow();
     });
 
@@ -402,8 +410,8 @@ describe('Uninstall Safety Features', () => {
                          file.startsWith('command/gsd/') ||
                          file.startsWith('skills/gsd-') ||
                          file.startsWith('get-shit-done/') ||
-                         file === 'VERSION' ||
-                         file === 'INSTALLED_FILES.json';
+                         file === 'get-shit-done/VERSION' ||
+                         file === 'get-shit-done/INSTALLED_FILES.json';
         expect(isGsdFile).toBe(true);
       }
     });
@@ -415,15 +423,16 @@ describe('Uninstall Safety Features', () => {
       const installDir = globalConfigDir;
       await fs.mkdir(path.join(installDir, 'agents', 'gsd-debugger'), { recursive: true });
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'backup test content');
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 19, hash: 'sha256:test' },
-        { path: path.join(installDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -449,15 +458,16 @@ describe('Uninstall Safety Features', () => {
       const installDir = globalConfigDir;
       await fs.mkdir(path.join(installDir, 'agents', 'gsd-debugger'), { recursive: true });
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'content');
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 7, hash: 'sha256:test' },
-        { path: path.join(installDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -479,15 +489,16 @@ describe('Uninstall Safety Features', () => {
       await fs.mkdir(path.join(installDir, 'agents', 'gsd-debugger'), { recursive: true });
       const originalContent = 'This is the original content for backup test';
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), originalContent);
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: originalContent.length, hash: 'sha256:test' },
-        { path: path.join(installDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -498,11 +509,16 @@ describe('Uninstall Safety Features', () => {
 
       // Read backup content
       const backupDir = path.join(installDir, '.uninstall-backups');
-      const backupFiles = await fs.readdir(backupDir);
+      const timestampDirs = await fs.readdir(backupDir);
+      expect(timestampDirs.length).toBeGreaterThan(0);
+      
+      const timestampDir = timestampDirs[0];
+      const actualBackupDir = path.join(backupDir, timestampDir);
+      const backupFiles = await fs.readdir(actualBackupDir, { recursive: true });
       const skillBackup = backupFiles.find(f => f.includes('SKILL'));
       expect(skillBackup).toBeDefined();
 
-      const backupContent = await fs.readFile(path.join(backupDir, skillBackup), 'utf-8');
+      const backupContent = await fs.readFile(path.join(actualBackupDir, skillBackup), 'utf-8');
       expect(backupContent).toBe(originalContent);
     });
 
@@ -511,15 +527,17 @@ describe('Uninstall Safety Features', () => {
       const installDir = globalConfigDir;
       await fs.mkdir(path.join(installDir, 'agents', 'gsd-debugger'), { recursive: true });
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'restorable content');
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 18, hash: 'sha256:test' },
-        { path: path.join(installDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -552,15 +570,17 @@ describe('Uninstall Safety Features', () => {
       const installDir = globalConfigDir;
       await fs.mkdir(path.join(installDir, 'agents', 'gsd-debugger'), { recursive: true });
       await fs.writeFile(path.join(installDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'content');
-      await fs.writeFile(path.join(installDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(installDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 7, hash: 'sha256:test' },
-        { path: path.join(installDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(installDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -582,15 +602,17 @@ describe('Uninstall Safety Features', () => {
       // Create global installation only
       await fs.mkdir(path.join(globalConfigDir, 'agents', 'gsd-debugger'), { recursive: true });
       await fs.writeFile(path.join(globalConfigDir, 'agents', 'gsd-debugger', 'SKILL.md'), 'content');
-      await fs.writeFile(path.join(globalConfigDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(globalConfigDir, 'get-shit-done'), { recursive: true });
+      await fs.mkdir(path.join(globalConfigDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(globalConfigDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifest
       const manifestEntries = [
         { path: path.join(globalConfigDir, 'agents/gsd-debugger/SKILL.md'), relativePath: 'agents/gsd-debugger/SKILL.md', size: 7, hash: 'sha256:test' },
-        { path: path.join(globalConfigDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test2' }
+        { path: path.join(globalConfigDir, 'get-shit-done/VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test2' }
       ];
       await fs.writeFile(
-        path.join(globalConfigDir, 'INSTALLED_FILES.json'),
+        path.join(globalConfigDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -606,26 +628,29 @@ describe('Uninstall Safety Features', () => {
     it('should show error when both global and local exist without scope flag', async () => {
       // Create both global and local installations
       await fs.mkdir(path.join(globalConfigDir, 'agents', 'gsd-debugger'), { recursive: true });
-      await fs.writeFile(path.join(globalConfigDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(globalConfigDir, 'get-shit-done'), { recursive: true });
+      await fs.mkdir(path.join(globalConfigDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(globalConfigDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       const localDir = path.join(tempDir, 'project', '.opencode');
       await fs.mkdir(path.join(localDir, 'agents', 'gsd-debugger'), { recursive: true });
-      await fs.writeFile(path.join(localDir, 'VERSION'), '1.0.0');
+      await fs.mkdir(path.join(localDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(localDir, 'get-shit-done', 'VERSION'), '1.0.0');
 
       // Create manifests
       const globalManifest = [
-        { path: path.join(globalConfigDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test' }
+        { path: path.join(globalConfigDir, 'get-shit-done', 'VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test' }
       ];
       await fs.writeFile(
-        path.join(globalConfigDir, 'INSTALLED_FILES.json'),
+        path.join(globalConfigDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(globalManifest, null, 2)
       );
 
       const localManifest = [
-        { path: path.join(localDir, 'VERSION'), relativePath: 'VERSION', size: 5, hash: 'sha256:test' }
+        { path: path.join(localDir, 'get-shit-done', 'VERSION'), relativePath: 'get-shit-done/VERSION', size: 5, hash: 'sha256:test' }
       ];
       await fs.writeFile(
-        path.join(localDir, 'INSTALLED_FILES.json'),
+        path.join(localDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(localManifest, null, 2)
       );
 
@@ -662,8 +687,13 @@ describe('Uninstall Safety Features', () => {
         });
       }
 
+      // Create VERSION file in get-shit-done directory
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.mkdir(path.join(installDir, 'get-shit-done'), { recursive: true });
+      await fs.writeFile(path.join(installDir, 'get-shit-done', 'VERSION'), '1.0.0');
+
       await fs.writeFile(
-        path.join(installDir, 'INSTALLED_FILES.json'),
+        path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json'),
         JSON.stringify(manifestEntries, null, 2)
       );
 
@@ -689,7 +719,7 @@ describe('Uninstall Safety Features', () => {
       });
 
       // Should indicate nothing to uninstall
-      expect(result.combined.toLowerCase()).toContain('not');
+      expect(result.combined.toLowerCase()).toContain('no');
     });
 
     it('should handle installation with only user files', async () => {
@@ -703,7 +733,7 @@ describe('Uninstall Safety Features', () => {
       });
 
       // Should indicate not installed
-      expect(result.combined.toLowerCase()).toContain('not');
+      expect(result.combined.toLowerCase()).toContain('no');
     });
   });
 });

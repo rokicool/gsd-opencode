@@ -43,7 +43,7 @@ describe('ManifestManager', () => {
     });
 
     it('sets manifest path correctly', () => {
-      const expectedPath = path.join(tempDir, 'INSTALLED_FILES.json');
+      const expectedPath = path.join(tempDir, 'get-shit-done', 'INSTALLED_FILES.json');
       expect(manifestManager.getManifestPath()).toBe(expectedPath);
     });
   });
@@ -154,6 +154,7 @@ describe('ManifestManager', () => {
         }
       ];
 
+      await fs.mkdir(path.dirname(manifestManager.getManifestPath()), { recursive: true });
       await fs.writeFile(
         manifestManager.getManifestPath(),
         JSON.stringify(testData, null, 2),
@@ -173,6 +174,7 @@ describe('ManifestManager', () => {
     });
 
     it('throws error if manifest has corrupted JSON', async () => {
+      await fs.mkdir(path.dirname(manifestManager.getManifestPath()), { recursive: true });
       await fs.writeFile(
         manifestManager.getManifestPath(),
         'this is not valid json {',
@@ -184,6 +186,7 @@ describe('ManifestManager', () => {
 
     it('updates internal entries array when loading', async () => {
       const testData = [{ path: '/test', relativePath: 'test.txt', size: 42, hash: 'hash' }];
+      await fs.mkdir(path.dirname(manifestManager.getManifestPath()), { recursive: true });
       await fs.writeFile(
         manifestManager.getManifestPath(),
         JSON.stringify(testData),

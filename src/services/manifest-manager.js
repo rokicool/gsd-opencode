@@ -141,6 +141,9 @@ export class ManifestManager {
    */
   async save() {
     const data = JSON.stringify(this._entries, null, 2);
+    // Ensure parent directory exists (for get-shit-done/INSTALLED_FILES.json)
+    const parentDir = path.dirname(this._manifestPath);
+    await fs.mkdir(parentDir, { recursive: true });
     await fs.writeFile(this._manifestPath, data, 'utf-8');
     return this._manifestPath;
   }

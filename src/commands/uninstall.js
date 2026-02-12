@@ -122,7 +122,7 @@ export async function uninstallCommand(options = {}) {
 
       const confirmed = await promptTypedConfirmation(
         '\n⚠️  This will permanently remove the files listed above',
-        'uninstall'
+        'yes'
       );
 
       if (confirmed === null) {
@@ -350,6 +350,19 @@ async function categorizeItems(files, targetDir) {
     }
   }
 
+  // Ensure top-level directories in allowed namespaces are tracked for cleanup
+  // This includes get-shit-done, agents, command, skills
+  const topLevelDirs = ['agents', 'command', 'skills', 'get-shit-done'];
+  for (const dir of topLevelDirs) {
+    try {
+      const fullPath = path.join(targetDir, dir);
+      await fs.access(fullPath);
+      directories.add(dir);
+    } catch {
+      // Directory doesn't exist, skip
+    }
+  }
+
   return { toRemove, missing, directories: Array.from(directories) };
 }
 
@@ -443,6 +456,9 @@ function displaySafetySummary(categorized, willCreateBackup) {
 /**
  * Creates a backup of files before removal.
  *
+ * Creates a timestamped backup directory and replicates the folder structure
+ * for all files being backed up.
+ *
  * @param {Array} files - Files to backup
  * @param {string} targetDir - Installation directory
  * @param {ScopeManager} scopeManager - ScopeManager instance
@@ -453,28 +469,29 @@ async function createBackup(files, targetDir, scopeManager) {
   logger.info('\n📦 Creating backup...');
 
   try {
-    const backupManager = new BackupManager(scopeManager, logger, {
-      maxBackups: 5
-    });
-
-    // Override backup directory to use uninstall-specific location
-    const backupDir = path.join(targetDir, UNINSTALL_BACKUP_DIR);
+    // Create backup directory with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const backupDir = path.join(targetDir, UNINSTALL_BACKUP_DIR, timestamp);
     await fs.mkdir(backupDir, { recursive: true });
 
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const backedUpFiles = [];
     let totalSize = 0;
 
     for (const file of files) {
       try {
-        const fileName = path.basename(file.relativePath);
-        const backupFileName = `${timestamp}_${fileName}`;
-        const backupPath = path.join(backupDir, backupFileName);
+        // Determine backup path with replicated structure
+        const relativePath = file.relativePath;
+        const backupFilePath = path.join(backupDir, relativePath);
+        const backupFileDir = path.dirname(backupFilePath);
 
-        await fs.copyFile(file.path, backupPath);
+        // Ensure the directory structure exists in backup
+        await fs.mkdir(backupFileDir, { recursive: true });
+
+        // Copy file to backup location
+        await fs.copyFile(file.path, backupFilePath);
         backedUpFiles.push({
           original: file.relativePath,
-          backup: backupFileName
+          backup: path.join(timestamp, relativePath)
         });
         totalSize += file.size || 0;
       } catch (error) {
@@ -483,6 +500,7 @@ async function createBackup(files, targetDir, scopeManager) {
     }
 
     logger.info(`✓ Backed up ${backedUpFiles.length} files (${(totalSize / 1024).toFixed(1)} KB)`);
+    logger.debug(`Backup location: ${backupDir}`);
 
     return {
       success: true,
@@ -528,6 +546,7 @@ async function removeFiles(files, targetDir) {
 
 /**
  * Cleans up empty directories while preserving non-empty ones.
+ * get-shit-done directory is always removed (forcefully).
  *
  * @param {Object} categorized - Categorized items with directories
  * @param {string} targetDir - Installation directory
@@ -549,6 +568,14 @@ async function cleanupDirectories(categorized, targetDir) {
     const fullPath = path.join(targetDir, dir);
 
     try {
+      // get-shit-done directory is always forcefully removed
+      if (dir === 'get-shit-done' || dir.startsWith('get-shit-done/')) {
+        await fs.rm(fullPath, { recursive: true, force: true });
+        removed.push(dir);
+        logger.debug(`Forcefully removed get-shit-done directory: ${dir}`);
+        continue;
+      }
+
       // Check if directory exists and is empty
       const entries = await fs.readdir(fullPath);
 
@@ -608,7 +635,7 @@ function displaySuccessMessage(removalResult, dirResult, backupResult) {
     logger.info(`  • Files: ${backupResult.fileCount} (${(backupResult.totalSize / 1024).toFixed(1)} KB)`);
     logger.dim('');
     logger.dim('Recovery:');
-    logger.dim(`  cp -r "${backupResult.backupDir}/${backupResult.timestamp}_*" <target-dir>/`);
+    logger.dim(`  cp -r "${backupResult.backupDir}/." <target-dir>/`);
     logger.dim('');
   }
 }

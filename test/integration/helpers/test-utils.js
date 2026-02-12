@@ -50,7 +50,7 @@ export async function createMockInstallWithMixedFiles(installDir) {
     'command/gsd/uninstall.js': '// Uninstall command',
     'get-shit-done/workflows/execute.md': 'Workflow content',
     'skills/gsd-helper/SKILL.md': 'Helper skill',
-    'VERSION': '1.0.0',
+    'get-shit-done/VERSION': '1.0.0',
 
     // User files (should be preserved)
     'agents/user-custom/config.json': '{"custom": true}',
@@ -80,16 +80,15 @@ export async function createMockInstallWithMixedFiles(installDir) {
     if (relativePath.startsWith('agents/gsd-') ||
         relativePath.startsWith('command/gsd/') ||
         relativePath.startsWith('skills/gsd-') ||
-        relativePath.startsWith('get-shit-done/') ||
-        relativePath === 'VERSION') {
+        relativePath.startsWith('get-shit-done/')) {
       removedFiles.push(relativePath);
     } else {
       preservedFiles.push(relativePath);
     }
   }
 
-  // Create manifest
-  const manifestPath = path.join(installDir, 'INSTALLED_FILES.json');
+  // Create manifest in get-shit-done subdirectory
+  const manifestPath = path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json');
   await fs.writeFile(manifestPath, JSON.stringify(manifestEntries, null, 2), 'utf-8');
 
   return { removedFiles, preservedFiles, manifestEntries };
@@ -232,39 +231,46 @@ export async function restoreFromBackup(backupDir, targetDir) {
   const restoredFiles = [];
 
   try {
-    const backupFiles = await fs.readdir(backupDir);
+    // Find the timestamped subdirectory within backupDir
+    const entries = await fs.readdir(backupDir, { withFileTypes: true });
+    const timestampDirs = entries.filter(entry => entry.isDirectory());
+    
+    if (timestampDirs.length === 0) {
+      throw new Error(`No timestamped backup directory found in ${backupDir}`);
+    }
+    
+    // Use the first (most recent) timestamped directory
+    const timestampDir = timestampDirs[0].name;
+    const actualBackupDir = path.join(backupDir, timestampDir);
 
-    for (const backupFile of backupFiles) {
-      const backupPath = path.join(backupDir, backupFile);
-      const stats = await fs.stat(backupPath);
+    // Recursively restore files maintaining directory structure
+    async function restoreRecursive(currentBackupDir, currentRelativePath = '') {
+      const items = await fs.readdir(currentBackupDir, { withFileTypes: true });
 
-      if (stats.isFile()) {
-        // Extract original relative path from backup filename
-        // Format: timestamp_original-filename.ext
-        const originalFileName = backupFile.replace(/^\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}_/, '');
+      for (const item of items) {
+        const backupPath = path.join(currentBackupDir, item.name);
+        const relativePath = currentRelativePath 
+          ? path.join(currentRelativePath, item.name)
+          : item.name;
 
-        // Determine target path based on file type
-        let relativePath;
-        if (originalFileName === 'SKILL.md' && backupFile.includes('debugger')) {
-          relativePath = 'agents/gsd-debugger/SKILL.md';
-        } else if (originalFileName === 'install.js') {
-          relativePath = 'command/gsd/install.js';
-        } else if (originalFileName === 'VERSION') {
-          relativePath = 'VERSION';
+        if (item.isDirectory()) {
+          // Recurse into subdirectory
+          await restoreRecursive(backupPath, relativePath);
         } else {
-          relativePath = originalFileName;
+          // Restore file to target location maintaining structure
+          const targetPath = path.join(targetDir, relativePath);
+          
+          // Ensure directory exists
+          await fs.mkdir(path.dirname(targetPath), { recursive: true });
+          
+          // Copy file
+          await fs.copyFile(backupPath, targetPath);
+          restoredFiles.push(relativePath);
         }
-
-        const targetPath = path.join(targetDir, relativePath);
-
-        // Ensure directory exists
-        await fs.mkdir(path.dirname(targetPath), { recursive: true });
-
-        // Copy file
-        await fs.copyFile(backupPath, targetPath);
-        restoredFiles.push(relativePath);
       }
     }
+
+    await restoreRecursive(actualBackupDir);
   } catch (error) {
     console.error('Error restoring from backup:', error);
     throw error;
@@ -287,19 +293,34 @@ export async function verifyBackupIntegrity(backupDir, originalFiles) {
   let matchCount = 0;
 
   try {
-    const backupFiles = await fs.readdir(backupDir);
+    // Find the timestamped subdirectory within backupDir
+    const entries = await fs.readdir(backupDir, { withFileTypes: true });
+    const timestampDirs = entries.filter(entry => entry.isDirectory());
+    
+    if (timestampDirs.length === 0) {
+      return {
+        matches: false,
+        differences: [`No timestamped backup directory found in ${backupDir}`]
+      };
+    }
+    
+    // Use the first (most recent) timestamped directory
+    const timestampDir = timestampDirs[0].name;
+    const actualBackupDir = path.join(backupDir, timestampDir);
 
     for (const originalFile of originalFiles) {
-      const fileName = path.basename(originalFile.relativePath);
-      // Find matching backup file (with timestamp prefix)
-      const backupFile = backupFiles.find(bf => bf.endsWith(fileName));
+      // Backup file path mirrors original structure
+      const backupPath = path.join(actualBackupDir, originalFile.relativePath);
 
-      if (!backupFile) {
-        differences.push(`Missing backup for: ${originalFile.relativePath}`);
-        continue;
+      try {
+        await fs.access(backupPath);
+      } catch (error) {
+        if (error.code === 'ENOENT') {
+          differences.push(`Missing backup for: ${originalFile.relativePath}`);
+          continue;
+        }
+        throw error;
       }
-
-      const backupPath = path.join(backupDir, backupFile);
 
       // Compare hashes if original has hash
       if (originalFile.hash) {
@@ -367,8 +388,8 @@ export async function createManifest(installDir, filePaths) {
     }
   }
 
-  // Save manifest
-  const manifestPath = path.join(installDir, 'INSTALLED_FILES.json');
+  // Save manifest in get-shit-done subdirectory
+  const manifestPath = path.join(installDir, 'get-shit-done', 'INSTALLED_FILES.json');
   await fs.writeFile(manifestPath, JSON.stringify(entries, null, 2), 'utf-8');
 
   return entries;

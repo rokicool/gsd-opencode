@@ -54,22 +54,16 @@ describe('promptTypedConfirmation', () => {
     });
 
     it('returns false when user types incorrect word', async () => {
-      inquirer.input
-        .mockResolvedValueOnce('wrong')
-        .mockResolvedValueOnce('still wrong')
-        .mockResolvedValueOnce('not matching');
+      inquirer.input.mockResolvedValueOnce('wrong');
 
       const result = await promptTypedConfirmation('Test message', 'uninstall');
 
       expect(result).toBe(false);
-      expect(inquirer.input).toHaveBeenCalledTimes(3);
+      expect(inquirer.input).toHaveBeenCalledTimes(1);
     });
 
-    it('returns false after 3 failed attempts', async () => {
-      inquirer.input
-        .mockResolvedValueOnce('attempt1')
-        .mockResolvedValueOnce('attempt2')
-        .mockResolvedValueOnce('attempt3');
+    it('returns false after incorrect input (no retries)', async () => {
+      inquirer.input.mockResolvedValueOnce('attempt1');
 
       const result = await promptTypedConfirmation('Test message', 'uninstall');
 
@@ -89,22 +83,16 @@ describe('promptTypedConfirmation', () => {
     });
 
     it('handles empty string input (counts as failure)', async () => {
-      inquirer.input
-        .mockResolvedValueOnce('')
-        .mockResolvedValueOnce('')
-        .mockResolvedValueOnce('');
+      inquirer.input.mockResolvedValueOnce('');
 
       const result = await promptTypedConfirmation('Test message', 'uninstall');
 
       expect(result).toBe(false);
-      expect(inquirer.input).toHaveBeenCalledTimes(3);
+      expect(inquirer.input).toHaveBeenCalledTimes(1);
     });
 
     it('handles whitespace-only input (counts as failure)', async () => {
-      inquirer.input
-        .mockResolvedValueOnce('   ')
-        .mockResolvedValueOnce('\t')
-        .mockResolvedValueOnce('\n');
+      inquirer.input.mockResolvedValueOnce('   ');
 
       const result = await promptTypedConfirmation('Test message', 'uninstall');
 
@@ -129,52 +117,43 @@ describe('promptTypedConfirmation', () => {
   });
 
   describe('retry logic', () => {
-    it('shows retry prompt after incorrect input', async () => {
+    it('does not show retry prompt after incorrect input', async () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-      inquirer.input
-        .mockResolvedValueOnce('wrong')
-        .mockResolvedValueOnce('uninstall');
+      inquirer.input.mockResolvedValueOnce('wrong');
 
       await promptTypedConfirmation('Test message', 'uninstall');
 
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("doesn't match"));
+      expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
 
-    it('allows exactly 3 attempts before giving up', async () => {
-      inquirer.input
-        .mockResolvedValueOnce('wrong1')
-        .mockResolvedValueOnce('wrong2')
-        .mockResolvedValueOnce('wrong3');
+    it('allows exactly 1 attempt before giving up', async () => {
+      inquirer.input.mockResolvedValueOnce('wrong');
 
       const result = await promptTypedConfirmation('Test message', 'uninstall');
 
       expect(result).toBe(false);
-      expect(inquirer.input).toHaveBeenCalledTimes(3);
+      expect(inquirer.input).toHaveBeenCalledTimes(1);
     });
 
-    it('returns true on successful attempt before hitting limit', async () => {
-      inquirer.input
-        .mockResolvedValueOnce('wrong')
-        .mockResolvedValueOnce('UNINSTALL');
+    it('returns true on correct input', async () => {
+      inquirer.input.mockResolvedValueOnce('uninstall');
 
       const result = await promptTypedConfirmation('Test message', 'uninstall');
 
       expect(result).toBe(true);
-      expect(inquirer.input).toHaveBeenCalledTimes(2);
+      expect(inquirer.input).toHaveBeenCalledTimes(1);
     });
 
-    it('shows attempt count in retry message', async () => {
+    it('does not show attempt count', async () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-      inquirer.input
-        .mockResolvedValueOnce('wrong')
-        .mockResolvedValueOnce('uninstall');
+      inquirer.input.mockResolvedValueOnce('wrong');
 
       await promptTypedConfirmation('Test message', 'uninstall');
 
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('1/3'));
+      expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining('/'));
       consoleSpy.mockRestore();
     });
   });
@@ -196,28 +175,12 @@ describe('promptTypedConfirmation', () => {
       expect(result).toBe(true);
     });
 
-    it('uses default max attempts of 3', async () => {
-      inquirer.input
-        .mockResolvedValueOnce('1')
-        .mockResolvedValueOnce('2')
-        .mockResolvedValueOnce('3');
+    it('uses single attempt only', async () => {
+      inquirer.input.mockResolvedValueOnce('wrong');
 
       await promptTypedConfirmation('Test', 'uninstall');
 
-      expect(inquirer.input).toHaveBeenCalledTimes(3);
-    });
-
-    it('respects custom max attempts', async () => {
-      inquirer.input
-        .mockResolvedValueOnce('1')
-        .mockResolvedValueOnce('2')
-        .mockResolvedValueOnce('3')
-        .mockResolvedValueOnce('4')
-        .mockResolvedValueOnce('5');
-
-      await promptTypedConfirmation('Test', 'uninstall', 5);
-
-      expect(inquirer.input).toHaveBeenCalledTimes(5);
+      expect(inquirer.input).toHaveBeenCalledTimes(1);
     });
   });
 

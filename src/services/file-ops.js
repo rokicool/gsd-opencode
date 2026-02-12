@@ -22,7 +22,7 @@ import { constants as fsConstants } from 'fs';
 import { createHash } from 'crypto';
 import ora from 'ora';
 import { validatePath, expandPath } from '../utils/path-resolver.js';
-import { PATH_PATTERNS, ERROR_CODES, MANIFEST_FILENAME } from '../../lib/constants.js';
+import { PATH_PATTERNS, ERROR_CODES, MANIFEST_FILENAME, DIRECTORIES_TO_COPY } from '../../lib/constants.js';
 import { ManifestManager } from './manifest-manager.js';
 
 /**
@@ -141,8 +141,11 @@ export class FileOperations {
       await fs.mkdir(tempDir, { recursive: true });
       this.logger.debug(`Created temp directory: ${tempDir}`);
 
-      // Copy files with progress and path replacement
-      const copyResult = await this._copyWithProgress(expandedSource, tempDir, manifestManager);
+      // Copy only specific directories (not everything in source)
+      const copyResult = await this._copySpecificDirectories(expandedSource, tempDir, manifestManager);
+
+      // Copy package.json to get-shit-done/ subdirectory
+      await this._copyPackageJson(expandedSource, tempDir, manifestManager);
 
       // Save manifest to temp directory (will be moved with atomic move)
       const tempManifestPath = await manifestManager.save();
@@ -241,6 +244,129 @@ export class FileOperations {
     }
 
     return { filesCopied, directories };
+  }
+
+  /**
+   * Copies only specific directories from source to target.
+   *
+   * Only copies directories listed in DIRECTORIES_TO_COPY constant,
+   * ignoring other files/directories like bin/, package.json, etc.
+   *
+   * @param {string} sourceDir - Source directory
+   * @param {string} targetDir - Target directory
+   * @param {ManifestManager} manifestManager - Manifest manager for tracking
+   * @returns {Promise<{filesCopied: number, directories: number}>}
+   * @private
+   */
+  async _copySpecificDirectories(sourceDir, targetDir, manifestManager) {
+    let filesCopied = 0;
+    let directories = 0;
+
+    // Count total files in allowed directories only
+    let totalFiles = 0;
+    for (const dirName of DIRECTORIES_TO_COPY) {
+      const dirPath = path.join(sourceDir, dirName);
+      try {
+        totalFiles += await this._countFiles(dirPath);
+      } catch (error) {
+        // Directory might not exist, skip
+        this.logger.debug(`Directory not found: ${dirPath}`);
+      }
+    }
+
+    // Start progress spinner
+    this._spinner = ora({
+      text: 'Copying files...',
+      spinner: 'dots',
+      color: 'cyan'
+    }).start();
+
+    try {
+      for (const dirName of DIRECTORIES_TO_COPY) {
+        const sourceSubDir = path.join(sourceDir, dirName);
+        const targetSubDir = path.join(targetDir, dirName);
+
+        try {
+          // Check if source subdirectory exists
+          const stats = await fs.stat(sourceSubDir);
+          if (!stats.isDirectory()) {
+            continue;
+          }
+
+          // Create target subdirectory
+          await fs.mkdir(targetSubDir, { recursive: true });
+          directories++;
+
+          // Copy contents recursively
+          await this._copyRecursive(sourceSubDir, targetSubDir, (filePath, relativePath, size, hash) => {
+            filesCopied++;
+            const progress = Math.round((filesCopied / totalFiles) * 100);
+            this._spinner.text = `Copying files... ${progress}% (${filesCopied}/${totalFiles})`;
+
+            // Add file to manifest with correct relative path
+            if (manifestManager) {
+              const fullRelativePath = path.join(dirName, relativePath).replace(/\\/g, '/');
+              manifestManager.addFile(filePath, fullRelativePath, size, hash);
+            }
+          }, manifestManager, sourceSubDir);
+        } catch (error) {
+          if (error.code !== 'ENOENT') {
+            throw error;
+          }
+          // Directory doesn't exist, skip
+          this.logger.debug(`Skipping missing directory: ${dirName}`);
+        }
+      }
+
+      this._spinner.succeed(`Copied ${filesCopied} files`);
+    } catch (error) {
+      this._spinner.fail('Copy failed');
+      throw error;
+    } finally {
+      this._spinner = null;
+    }
+
+    return { filesCopied, directories };
+  }
+
+  /**
+   * Copies package.json to get-shit-done/ subdirectory.
+   *
+   * @param {string} sourceDir - Source directory
+   * @param {string} targetDir - Target directory
+   * @param {ManifestManager} manifestManager - Manifest manager for tracking
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _copyPackageJson(sourceDir, targetDir, manifestManager) {
+    const sourcePackageJson = path.join(sourceDir, 'package.json');
+    const targetGetShitDoneDir = path.join(targetDir, 'get-shit-done');
+    const targetPackageJson = path.join(targetGetShitDoneDir, 'package.json');
+
+    try {
+      await fs.access(sourcePackageJson);
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        this.logger.debug('package.json not found in source, skipping');
+        return;
+      }
+      throw error;
+    }
+
+    // Ensure get-shit-done directory exists
+    await fs.mkdir(targetGetShitDoneDir, { recursive: true });
+
+    // Copy package.json
+    await fs.copyFile(sourcePackageJson, targetPackageJson);
+
+    // Add to manifest
+    if (manifestManager) {
+      const stats = await fs.stat(targetPackageJson);
+      const hash = await this._calculateFileHash(targetPackageJson);
+      manifestManager.addFile(targetPackageJson, 'get-shit-done/package.json', stats.size, hash);
+    }
+
+    this.logger.debug('Copied package.json to get-shit-done/package.json');
   }
 
   /**
