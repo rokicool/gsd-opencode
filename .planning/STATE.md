@@ -7,15 +7,15 @@
 
 ## Current Position
 
-**Current Phase:** Phase 7 (complete)
-**Current Plan:** 3 of 3 in current phase (complete)
-**Status:** 🟢 Phase 7 complete — Safe uninstall with comprehensive integration test coverage
-**Overall Progress:** 52/52 requirements complete (100%), Phase 7 complete
-**Next Phase:** Phase 8 — Support for opencode/commands/ directory structure (not planned yet)
+**Current Phase:** Phase 8 (in progress)
+**Current Plan:** 1 of 5 in current phase
+**Status:** 🟡 Phase 8 in progress — Foundation complete (StructureDetector, dual-structure constants)
+**Overall Progress:** 52/52 requirements complete (100%), Phase 8 plan 1/5 complete
+**Next Phase:** Continue Phase 8 — Plan 2 (MigrationService)
 
 ```
 [████████████████████████████████████████] 100% (52/52 requirements)
-[████████████████████████████████████████] 100% (Phase 7 all plans complete)
+[███████████████████░░░░░░░░░░░░░░░░░░░░░] 20% (Phase 8: 1/5 plans)
 ```
 
 ---
@@ -31,7 +31,7 @@
 | Phase 5: Lifecycle Management | 🟢 Complete | 6/6 | None |
 | Phase 6: Integration & Polish | 🟢 Completed | 2/2 | None |
 | Phase 7: Make Uninstall Safe and User-Friendly | 🟢 Completed | 2/2 plans complete | None |
-| Phase 8: Support for opencode/commands/ Directory Structure | 🔵 Planned | 0/0 | Waiting for planning |
+| Phase 8: Support for opencode/commands/ Directory Structure | 🟡 In Progress | 1/5 | Plan 08-01 complete |
 
 ---
 
@@ -40,7 +40,8 @@
 | Metric | Current | Trend |
 |--------|---------|-------|
 | Requirements Complete | 52/52 | ✓ |
-| Phases Complete | 6/6 | ✓ |
+| Phases Complete | 6/7 active | → |
+| Plans Complete (Phase 8) | 1/5 | → |
 | Blockers | 0 | — |
 | Known Issues | 0 | — |
 
@@ -110,6 +111,9 @@
 | Automatic backup before uninstall | Date-stamped backups in .uninstall-backups/ directory | 2026-02-10 |
 | Directory preservation logic | Only remove empty directories after file removal | 2026-02-10 |
 | Manifest path transformation | Update paths after atomic move from temp to target | 2026-02-10 |
+| STRUCTURE_TYPES enum for structure detection | Four-state type system (old/new/dual/none) for directory layout detection | 2026-02-11 |
+| Maintain backward compatibility in DIRECTORIES_TO_COPY | Keep 'command' as default until plan 08-03 implements migration | 2026-02-11 |
+| Re-export STRUCTURE_TYPES from structure-detector.js | Convenience import for code using StructureDetector | 2026-02-11 |
 
 ### Open Questions
 
@@ -134,11 +138,11 @@ None currently.
 
 ## Session Continuity
 
-**Last Session:** 2026-02-10
-**Stopped at:** Completed 07-01-PLAN.md (Safe uninstall with manifest-based tracking)
+**Last Session:** 2026-02-11
+**Stopped at:** Completed 08-01-PLAN.md (Foundation: Constants and StructureDetector)
 **Resume file:** None
-**Current Focus:** Phase 8 planning — Support for opencode/commands/ directory structure
-**Next Action:** Run `/gsd-plan-phase 8` to create detailed plans for Phase 8
+**Current Focus:** Phase 8 execution — Plan 2 (MigrationService)
+**Next Action:** Execute `/gsd-execute-phase 08 02` for MigrationService implementation
 
 ### Recently Completed
 
@@ -208,6 +212,15 @@ None currently.
   - All tests pass: 133/133 (100% pass rate)
   - No regressions in existing tests
   - Test coverage >80% for new functionality
+
+- ✓ **PHASE 8 PLAN 01 COMPLETE** — Foundation: Constants and StructureDetector
+  - STRUCTURE_TYPES enum with four states (old, new, dual, none)
+  - OLD_COMMAND_DIR and NEW_COMMAND_DIR constants
+  - ALLOWED_NAMESPACES expanded with both /^command/gsd/ and /^commands/gsd/ patterns
+  - StructureDetector service with detect(), getCommandDir(), getDetails()
+  - 20 unit tests covering all structure states and edge cases
+  - All tests pass: 20/20 (100% pass rate)
+  - Backward compatibility maintained
 
 ### Upcoming Work
 
