@@ -324,6 +324,62 @@ export class HealthChecker {
   }
 
   /**
+   * Checks if a structure type can be repaired.
+   *
+   * Determines if the given structure type can be automatically repaired
+   * (migrated from old to new structure).
+   *
+   * @param {string} structureType - One of STRUCTURE_TYPES values
+   * @returns {boolean} True if structure can be repaired
+   *
+   * @example
+   * const canRepair = healthChecker.canRepairStructure(STRUCTURE_TYPES.OLD);
+   * // Returns true
+   */
+  canRepairStructure(structureType) {
+    return structureType === STRUCTURE_TYPES.OLD ||
+           structureType === STRUCTURE_TYPES.DUAL;
+  }
+
+  /**
+   * Gets repair recommendation for structure issues.
+   *
+   * Returns appropriate repair command and message based on structure state.
+   *
+   * @param {string} structureType - One of STRUCTURE_TYPES values
+   * @returns {Object} Repair recommendation
+   * @property {boolean} canRepair - True if repair is possible
+   * @property {string|null} command - Repair command to run
+   * @property {string} message - Human-readable recommendation
+   *
+   * @example
+   * const recommendation = healthChecker.getStructureRecommendation(STRUCTURE_TYPES.DUAL);
+   * console.log(recommendation.command); // 'gsd-opencode repair --fix-structure'
+   */
+  getStructureRecommendation(structureType) {
+    const canRepair = this.canRepairStructure(structureType);
+
+    if (!canRepair) {
+      return {
+        canRepair: false,
+        command: null,
+        message: structureType === STRUCTURE_TYPES.NEW
+          ? 'Structure is up to date'
+          : 'No structure detected'
+      };
+    }
+
+    const isDual = structureType === STRUCTURE_TYPES.DUAL;
+    return {
+      canRepair: true,
+      command: 'gsd-opencode repair --fix-structure',
+      message: isDual
+        ? 'Dual structure detected (both old and new exist). Run repair --fix-structure to consolidate.'
+        : 'Old structure detected (command/gsd/). Run repair --fix-structure to migrate.'
+    };
+  }
+
+  /**
    * Runs all health checks and returns aggregated results.
    *
    * This is the main entry point for health verification. It runs
@@ -341,12 +397,14 @@ export class HealthChecker {
    * @property {Object} categories.files - File existence check results
    * @property {Object} categories.version - Version match check results
    * @property {Object} categories.integrity - Integrity check results
+   * @property {Object} categories.structure - Structure check results with repair info
    *
    * @example
    * const result = await health.checkAll({ expectedVersion: '1.0.0' });
    * console.log(result.passed); // true/false
    * console.log(result.exitCode); // 0 or 1
    * console.log(result.categories.files.passed); // etc.
+   * console.log(result.categories.structure.repairCommand); // 'gsd-opencode repair --fix-structure'
    */
   async checkAll(options = {}) {
     const { expectedVersion, verbose = false } = options;
@@ -379,6 +437,15 @@ export class HealthChecker {
       allResults.push(false);
     }
 
+    // Add repair information to structure result
+    const repairRecommendation = this.getStructureRecommendation(structureResult.type);
+    const enhancedStructureResult = {
+      ...structureResult,
+      canRepair: repairRecommendation.canRepair,
+      repairCommand: repairRecommendation.command,
+      repairMessage: repairRecommendation.message
+    };
+
     const allPassed = allResults.every(r => r);
 
     return {
@@ -388,7 +455,7 @@ export class HealthChecker {
         files: filesResult,
         version: versionResult,
         integrity: integrityResult,
-        structure: structureResult
+        structure: enhancedStructureResult
       }
     };
   }
