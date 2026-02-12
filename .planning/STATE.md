@@ -8,14 +8,14 @@
 ## Current Position
 
 **Current Phase:** Phase 8 (in progress)
-**Current Plan:** 3 of 5 in current phase
-**Status:** 🟡 Phase 8 in progress — Install updated for new structure (commands/gsd/)
-**Overall Progress:** 52/52 requirements complete (100%), Phase 8 plan 3/5 complete
-**Next Phase:** Continue Phase 8 — Plan 4 (Check/Update Integration)
+**Current Plan:** 4 of 5 in current phase
+**Status:** 🟡 Phase 8 in progress — Check/Update integration with migration support
+**Overall Progress:** 52/52 requirements complete (100%), Phase 8 plan 4/5 complete
+**Next Phase:** Continue Phase 8 — Plan 5 (Lifecycle Support)
 
 ```
 [████████████████████████████████████████] 100% (52/52 requirements)
-[████████████████████████████░░░░░░░░░░░░] 60% (Phase 8: 3/5 plans)
+[████████████████████████████████░░░░░░░░] 80% (Phase 8: 4/5 plans)
 ```
 
 ---
@@ -31,7 +31,7 @@
 | Phase 5: Lifecycle Management | 🟢 Complete | 6/6 | None |
 | Phase 6: Integration & Polish | 🟢 Completed | 2/2 | None |
 | Phase 7: Make Uninstall Safe and User-Friendly | 🟢 Completed | 2/2 plans complete | None |
-| Phase 8: Support for opencode/commands/ Directory Structure | 🟡 In Progress | 3/5 | Plan 08-03 complete |
+| Phase 8: Support for opencode/commands/ Directory Structure | 🟡 In Progress | 4/5 | Plan 08-04 complete |
 
 ---
 
@@ -41,7 +41,7 @@
 |--------|---------|-------|
 | Requirements Complete | 52/52 | ✓ |
 | Phases Complete | 6/7 active | → |
-| Plans Complete (Phase 8) | 3/5 | → |
+| Plans Complete (Phase 8) | 4/5 | → |
 | Blockers | 0 | — |
 | Known Issues | 0 | — |
 
@@ -117,6 +117,11 @@
 | Source package maintains old structure | Source uses 'command/', install transforms to 'commands/' during copy | 2026-02-11 |
 | Install blocks over existing structure | Forces use of 'update' command for migration instead of overwrite | 2026-02-11 |
 | COMMAND_DIR_MAPPING constant | Maps destination dir names to source dir names for path transformation | 2026-02-11 |
+| Migration before download in update | Prevents mixing old/new structures in partial updates | 2026-02-12 |
+| Dual structure flagged as unhealthy | Requires user action to resolve inconsistent state | 2026-02-12 |
+| Old structure shows warning not failure | Backward compatibility during transition period | 2026-02-12 |
+| --dry-run shows migration preview | Users can preview actions without committing changes | 2026-02-12 |
+| --skip-migration for advanced users | Allows override of automatic migration (not recommended) | 2026-02-12 |
 
 ### Open Questions
 
@@ -141,11 +146,11 @@ None currently.
 
 ## Session Continuity
 
-**Last Session:** 2026-02-11
-**Stopped at:** Completed 08-03-PLAN.md (Install: New commands/ structure)
+**Last Session:** 2026-02-12
+**Stopped at:** Completed 08-04-PLAN.md (Check/Update Integration)
 **Resume file:** None
-**Current Focus:** Phase 8 execution — Plan 4 (Check/Update Integration)
-**Next Action:** Execute `/gsd-execute-phase 08 04` for Check/Update Integration
+**Current Focus:** Phase 8 execution — Plan 5 (Lifecycle Support)
+**Next Action:** Execute `/gsd-execute-phase 08 05` for Lifecycle Support
 
 ### Recently Completed
 
@@ -231,6 +236,17 @@ None currently.
   - Install blocks over existing structure (old/new/dual) with helpful messages
   - Path transformation: source/command/gsd/ → target/commands/gsd/
   - Manifest entries use new path format for correct uninstall
+  - All 175 tests pass (100% pass rate)
+
+- ✓ **PHASE 8 PLAN 04 COMPLETE** — Check/Update Integration: Structure Detection and Migration
+  - HealthChecker.detectStructure() detects old/new/dual/none structure states
+  - Check command displays structure status with appropriate warnings
+  - Dual structure flagged as unhealthy (requires action)
+  - Old structure shows migration recommendation (warning)
+  - Update service triggers automatic migration before download
+  - --dry-run flag shows migration preview without changes
+  - --skip-migration flag for advanced users (not recommended)
+  - Repair command supports --fix-structure and --fix-all flags
   - All 175 tests pass (100% pass rate)
 
 ### Upcoming Work
