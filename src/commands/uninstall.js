@@ -23,6 +23,7 @@
 import { ScopeManager } from '../services/scope-manager.js';
 import { BackupManager } from '../services/backup-manager.js';
 import { ManifestManager } from '../services/manifest-manager.js';
+import { detectStructure, STRUCTURE_TYPES } from '../services/structure-detector.js';
 import { logger, setVerbose } from '../utils/logger.js';
 import { promptTypedConfirmation } from '../utils/interactive.js';
 import { ERROR_CODES, ALLOWED_NAMESPACES, UNINSTALL_BACKUP_DIR } from '../../lib/constants.js';
@@ -77,6 +78,10 @@ export async function uninstallCommand(options = {}) {
       logger.warning(`No ${scope} installation found at ${scopeManager.getPathPrefix()}`);
       return ERROR_CODES.GENERAL_ERROR;
     }
+
+    // Detect and log structure type
+    const structureType = await detectStructure(targetDir);
+    logger.debug(`Detected structure: ${structureType}`);
 
     // Step 3: Load manifest or use fallback mode
     const manifestManager = new ManifestManager(targetDir);
@@ -236,6 +241,7 @@ async function determineScope(options) {
  * Builds a fallback manifest by scanning allowed namespace directories.
  *
  * Used when INSTALLED_FILES.json is missing.
+ * Scans both old (command/gsd) and new (commands/gsd) structures.
  *
  * @param {string} targetDir - Installation directory
  * @returns {Promise<Array>} Array of manifest entry objects
@@ -244,8 +250,14 @@ async function determineScope(options) {
 async function buildFallbackManifest(targetDir) {
   const entries = [];
 
-  // Scan allowed namespace directories
-  const dirsToScan = ['agents', 'command/gsd', 'skills', 'get-shit-done'];
+  // Scan allowed namespace directories - include both old and new command structures
+  const dirsToScan = [
+    'agents',
+    'command/gsd',   // Old structure (singular)
+    'commands/gsd',  // New structure (plural)
+    'skills',
+    'get-shit-done'
+  ];
 
   for (const dir of dirsToScan) {
     const fullPath = path.join(targetDir, dir);
@@ -351,8 +363,9 @@ async function categorizeItems(files, targetDir) {
   }
 
   // Ensure top-level directories in allowed namespaces are tracked for cleanup
-  // This includes get-shit-done, agents, command, skills
-  const topLevelDirs = ['agents', 'command', 'skills', 'get-shit-done'];
+  // This includes get-shit-done, agents, command, commands, skills
+  // Include both old (command) and new (commands) structures
+  const topLevelDirs = ['agents', 'command', 'commands', 'skills', 'get-shit-done'];
   for (const dir of topLevelDirs) {
     try {
       const fullPath = path.join(targetDir, dir);
