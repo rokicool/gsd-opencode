@@ -53,11 +53,9 @@ export const PATH_PATTERNS = {
  * Source directories to copy during installation.
  * These directories contain the core GSD-OpenCode assets.
  * 
- * NOTE: This constant uses the new 'commands' (plural) structure by default.
- * During installation, the FileOperations service transforms the source path
- * from 'command/' (source package) to 'commands/' (installation target).
- * This ensures fresh installations use the modern structure while the source
- * package can maintain backward compatibility.
+ * All directories use the 'commands' (plural) structure consistently
+ * in both source and destination. The FileOperations service copies
+ * files directly from source to target without path transformation.
  * 
  * @type {string[]}
  */
@@ -66,17 +64,17 @@ export const DIRECTORIES_TO_COPY = ['agents', 'commands', 'get-shit-done'];
 /**
  * Command directory mapping for source-to-destination path transformation.
  * 
- * The source package uses 'command/' (singular) for backward compatibility,
- * but fresh installations should use 'commands/' (plural) to align with
- * OpenCode conventions. This mapping enables the transformation during copy.
+ * Since the source package now uses 'commands/' (plural) and the destination
+ * also uses 'commands/' (plural), this mapping ensures consistency.
+ * This enables future transformations if needed.
  * 
  * @type {Object.<string, string>}
  * @example
- * // During install, files from sourceDir/command/gsd/ are copied to targetDir/commands/gsd/
- * const sourceDirName = COMMAND_DIR_MAPPING[destDirName]; // 'command'
+ * // During install, files from sourceDir/commands/gsd/ are copied to targetDir/commands/gsd/
+ * const sourceDirName = COMMAND_DIR_MAPPING[destDirName]; // 'commands'
  */
 export const COMMAND_DIR_MAPPING = {
-  'commands': 'command'  // When installing to 'commands/', read from 'command/' in source
+  'commands': 'commands'  // Both source and destination use 'commands/'
 };
 
 /**
