@@ -33,7 +33,9 @@
     "agents",
     "bin",
     "commands",
-    "get-shit-done"
+    "get-shit-done",
+    "src",
+    "lib"
   ],
   "engines": {
     "node": ">=18.0.0"
