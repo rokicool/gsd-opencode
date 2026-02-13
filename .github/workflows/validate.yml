@@ -225,15 +225,7 @@ jobs:
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."
 
-          # Install dependencies and run standalone checker
-          cd "${{ inputs.working_directory }}"
-          npm install
-          
-          # Install dependencies for forbidden strings checker (in root)
-          cd ..
-          npm install
-          
-          # Run checker from repository root
+          # Run the forbidden strings checker from repository root
           node assets/bin/check-forbidden-strings.js
 
       - name: Final validation summary
