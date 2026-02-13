@@ -748,7 +748,7 @@ export class RepairService {
   _getSourcePath(relativePath) {
     // Resolve from the package root (parent of src/services)
     const packageRoot = path.resolve(__dirname, '../..');
-    const sourcePath = path.join(packageRoot, 'gsd-opencode', relativePath);
+    const sourcePath = path.join(packageRoot, relativePath);
 
     return sourcePath;
   }

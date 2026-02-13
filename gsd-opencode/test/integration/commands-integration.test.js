@@ -534,7 +534,7 @@ describe('commands integration', () => {
   describe('integration with real source', () => {
     test('install from real gsd-opencode source replaces all paths', async () => {
       // Use actual source directory
-      const realSource = path.join(__dirname, '../../gsd-opencode');
+      const realSource = path.join(__dirname, '../..');
 
       // Check if source exists
       try {

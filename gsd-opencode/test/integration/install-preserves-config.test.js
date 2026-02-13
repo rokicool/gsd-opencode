@@ -16,7 +16,7 @@ import { FileOperations } from '../../src/services/file-ops.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const SOURCE_DIR = path.join(__dirname, '../../gsd-opencode');
+const SOURCE_DIR = path.join(__dirname, '../..');
 
 function createMockLogger() {
   return {

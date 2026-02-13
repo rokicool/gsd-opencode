@@ -81,7 +81,7 @@ export class SettingsManager {
     const xdgConfig = process.env.XDG_CONFIG_HOME;
     const baseDir = xdgConfig || path.join(os.homedir(), '.config');
 
-    this.configDir = path.join(baseDir, 'gsd-opencode');
+    this.configDir = path.join(baseDir, 'opencode', 'gsd-opencode');
     this.configPath = path.join(this.configDir, 'settings.json');
 
     // Default configuration values

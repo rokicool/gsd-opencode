@@ -272,7 +272,7 @@ This file references:
 
     test('repair handles missing files with path replacement', async () => {
       // Use real source for this test since HealthChecker looks for specific files
-      const realSource = path.join(__dirname, '../../gsd-opencode');
+      const realSource = path.join(__dirname, '../..');
 
       // Check if real source exists
       try {

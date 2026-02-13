@@ -101,9 +101,9 @@ function getSourceDirectory() {
   const __dirname = path.dirname(__filename);
   const packageRoot = path.resolve(__dirname, '../..');
 
-  // Source is the gsd-opencode directory at package root
+  // Source is the package root directory
   // This contains the distribution files (agents, command, get-shit-done)
-  return path.join(packageRoot, 'gsd-opencode');
+  return packageRoot;
 }
 
 /**

@@ -645,7 +645,7 @@ export class UpdateService {
       const targetDir = this.scopeManager.getTargetDir();
 
       // Copy files from package to target directory with path replacement
-      const sourceDir = path.join(packageRoot, 'gsd-opencode');
+      const sourceDir = packageRoot;
       try {
         await this._copyWithPathReplacement(sourceDir, targetDir);
       } catch (error) {
