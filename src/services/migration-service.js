@@ -640,7 +640,7 @@ export class MigrationService {
    */
   async _listMigrationBackups() {
     const backups = [];
-    const migrationBackupDir = path.join(this.targetDir, '.migration-backups');
+    const migrationBackupDir = path.join(this.targetDir, '.backups');
 
     try {
       await fs.access(migrationBackupDir);
@@ -770,7 +770,7 @@ export class MigrationService {
       errors: []
     };
 
-    const migrationBackupDir = path.join(this.targetDir, '.migration-backups');
+    const migrationBackupDir = path.join(this.targetDir, '.backups');
 
     try {
       await fs.access(migrationBackupDir);

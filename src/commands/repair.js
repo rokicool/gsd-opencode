@@ -202,7 +202,8 @@ async function checkScope(scope, options = {}) {
 
   logger.debug(`Checking ${scope} installation for issues...`);
 
-  if (!scopeManager.isInstalled()) {
+  const isInstalled = await scopeManager.isInstalled();
+  if (!isInstalled) {
     logger.debug(`No ${scope} installation found`);
     return {
       installed: false,

@@ -202,7 +202,8 @@ export class UpdateService {
    * @private
    */
   async _performPreUpdateCheck() {
-    if (!this.scopeManager.isInstalled()) {
+    const isInstalled = await this.scopeManager.isInstalled();
+    if (!isInstalled) {
       this.logger.debug('No existing installation, skipping pre-update health check');
       return { passed: true, details: null };
     }
@@ -281,8 +282,8 @@ export class UpdateService {
 
     try {
       if (isGlobal) {
-        // Global installation
-        await execAsync(`npm install -g ${escapedPackage}@${escapedVersion}`);
+        // Global installation with --force to overwrite existing binaries
+        await execAsync(`npm install -g --force ${escapedPackage}@${escapedVersion}`);
       } else {
         // Local installation in target directory
         const targetDir = this.scopeManager.getTargetDir();
@@ -600,7 +601,8 @@ export class UpdateService {
 
       // Phase 4: Create backup (if installed)
       reportProgress('backup', 0, 1, 'Creating backup');
-      if (this.scopeManager.isInstalled()) {
+      const isInstalled = await this.scopeManager.isInstalled();
+      if (isInstalled) {
         const targetDir = this.scopeManager.getTargetDir();
         const versionFile = path.join(targetDir, 'VERSION');
 

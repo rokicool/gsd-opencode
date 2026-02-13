@@ -74,7 +74,8 @@ export async function uninstallCommand(options = {}) {
     const scopeManager = new ScopeManager({ scope });
     const targetDir = scopeManager.getTargetDir();
 
-    if (!scopeManager.isInstalled()) {
+    const isInstalled = await scopeManager.isInstalled();
+    if (!isInstalled) {
       logger.warning(`No ${scope} installation found at ${scopeManager.getPathPrefix()}`);
       return ERROR_CODES.GENERAL_ERROR;
     }
@@ -213,8 +214,10 @@ async function determineScope(options) {
   const globalScope = new ScopeManager({ scope: 'global' });
   const localScope = new ScopeManager({ scope: 'local' });
 
-  const globalInstalled = globalScope.isInstalled();
-  const localInstalled = localScope.isInstalled();
+  const [globalInstalled, localInstalled] = await Promise.all([
+    globalScope.isInstalled(),
+    localScope.isInstalled()
+  ]);
 
   logger.debug(`Global installed: ${globalInstalled}, Local installed: ${localInstalled}`);
 

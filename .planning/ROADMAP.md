@@ -366,11 +366,11 @@ Plans:
 | 3 | 08-04, 08-05 | Check/update integration and lifecycle command support |
 
 Plans:
-- [ ] 08-01-PLAN.md — Foundation: Update constants and create StructureDetector
-- [ ] 08-02-PLAN.md — MigrationService: Atomic migration with rollback
-- [ ] 08-03-PLAN.md — Install update: Use new commands/ structure
-- [ ] 08-04-PLAN.md — Check/update integration: Detect and migrate structures
-- [ ] 08-05-PLAN.md — Lifecycle support: Uninstall and repair for both structures
+- [x] 08-01-PLAN.md — Foundation: Update constants and create StructureDetector
+- [x] 08-02-PLAN.md — MigrationService: Atomic migration with rollback
+- [x] 08-03-PLAN.md — Install update: Use new commands/ structure
+- [x] 08-04-PLAN.md — Check/update integration: Detect and migrate structures
+- [x] 08-05-PLAN.md — Lifecycle support: Uninstall and repair for both structures
 
 ---
 
@@ -385,7 +385,7 @@ Plans:
 | 5 | Lifecycle Management | 6 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
 | 6 | Integration & Polish | 2 | 🟢 Completed | 2026-02-10 | 2026-02-11 |
 | 7 | Make Uninstall Safe and User-Friendly | 5 | 🟢 Completed | 2026-02-11 | 2026-02-11 |
-| 8 | Support for opencode/commands/ Directory Structure | 6 | 🔵 Planned | — | — |
+| 8 | Support for opencode/commands/ Directory Structure | 6 | 🟢 Completed | 2026-02-11 | 2026-02-11 |
 
 **Legend:** 🔵 Planned | 🟡 In Progress | 🟢 Completed | ⭕ Blocked
 

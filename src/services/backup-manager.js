@@ -314,7 +314,7 @@ export class BackupManager {
    *
    * Creates a timestamped backup of the installation before migration,
    * including manifest, command/gsd/ directory, and all tracked files.
-   * Stores backup in .migration-backups/ subdirectory.
+   * Stores backup in .backups/ subdirectory.
    *
    * @param {Object} options - Backup options
    * @param {string} options.targetDir - Path to the installation directory
@@ -333,11 +333,11 @@ export class BackupManager {
    *   originalStructure: 'old',
    *   timestamp: Date.now()
    * });
-   * // Returns: { path: '/.../.migration-backups/backup-1234567890', ... }
+   * // Returns: { path: '/.../.backups/backup-1234567890', ... }
    */
   async createMigrationBackup({ targetDir, originalStructure, timestamp }) {
     const backupDirName = `backup-${timestamp}`;
-    const migrationBackupDir = path.join(targetDir, '.migration-backups', backupDirName);
+    const migrationBackupDir = path.join(targetDir, '.backups', backupDirName);
 
     this.logger.info('Creating migration backup...');
 

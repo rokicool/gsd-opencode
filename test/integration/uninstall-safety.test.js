@@ -446,7 +446,7 @@ describe('Uninstall Safety Features', () => {
       expect(result.combined).toContain('Backup');
 
       // Backup directory should exist
-      const backupDir = path.join(installDir, '.uninstall-backups');
+      const backupDir = path.join(installDir, '.backups');
       await expect(fs.access(backupDir)).resolves.not.toThrow();
 
       // Backup should contain files
@@ -480,7 +480,7 @@ describe('Uninstall Safety Features', () => {
       expect(result.exitCode).toBe(0);
 
       // Backup directory should not exist
-      const backupDir = path.join(installDir, '.uninstall-backups');
+      const backupDir = path.join(installDir, '.backups');
       await expect(fs.access(backupDir)).rejects.toThrow();
     });
 
@@ -509,7 +509,7 @@ describe('Uninstall Safety Features', () => {
       });
 
       // Read backup content
-      const backupDir = path.join(installDir, '.uninstall-backups');
+      const backupDir = path.join(installDir, '.backups');
       const timestampDirs = await fs.readdir(backupDir);
       expect(timestampDirs.length).toBeGreaterThan(0);
       
@@ -548,7 +548,7 @@ describe('Uninstall Safety Features', () => {
       });
 
       // Get backup directory
-      const backupDir = path.join(installDir, '.uninstall-backups');
+      const backupDir = path.join(installDir, '.backups');
 
       // Restore files
       await restoreFromBackup(backupDir, installDir);
@@ -776,7 +776,7 @@ describe('Safety Integration', () => {
       expect(protectionOk).toBe(true);
 
       // 6. Verify backup created
-      const backupDir = path.join(globalConfigDir, '.uninstall-backups');
+      const backupDir = path.join(globalConfigDir, '.backups');
       const backupExists = await fs.access(backupDir).then(() => true).catch(() => false);
       expect(backupExists).toBe(true);
 

@@ -278,6 +278,7 @@ async function cleanupEmptyDirectories(targetDir, namespaces, logger) {
   // Directories to check (in reverse order to remove deepest first)
   const dirsToCheck = [
     'get-shit-done',
+    'commands/gsd',
     'command/gsd',
     'agents/gsd-debugger',
     'agents/gsd-executor',
@@ -411,7 +412,8 @@ export async function installCommand(options = {}) {
     logger.debug(`Target directory: ${scopeManager.getTargetDir()}`);
 
     // Step 3: Check for existing installation
-    if (scopeManager.isInstalled()) {
+    const isInstalled = await scopeManager.isInstalled();
+    if (isInstalled) {
       const existingVersion = scopeManager.getInstalledVersion();
       logger.warning(`Existing installation detected${existingVersion ? ` (version ${existingVersion})` : ''}`);
 
@@ -460,11 +462,36 @@ export async function installCommand(options = {}) {
           // Clean up empty directories in allowed namespaces
           await cleanupEmptyDirectories(targetDir, ALLOWED_NAMESPACES, logger);
 
+          // Forcefully remove structure directories to ensure fresh install works
+          // This handles cases where files remain in the structure directories
+          const structureDirs = ['commands/gsd', 'command/gsd'];
+          for (const dir of structureDirs) {
+            const fullPath = path.join(targetDir, dir);
+            try {
+              await fs.rm(fullPath, { recursive: true, force: true });
+              logger.debug(`Removed structure directory: ${dir}`);
+            } catch (error) {
+              // Directory might not exist, ignore
+            }
+          }
+
           logger.debug('Removed existing gsd-opencode files while preserving other config');
         } else {
           // No manifest found - use conservative fallback
           logger.debug('No manifest found, using conservative fallback cleanup');
           await conservativeCleanup(targetDir, logger);
+
+          // Forcefully remove structure directories to ensure fresh install works
+          const structureDirs = ['commands/gsd', 'command/gsd'];
+          for (const dir of structureDirs) {
+            const fullPath = path.join(targetDir, dir);
+            try {
+              await fs.rm(fullPath, { recursive: true, force: true });
+              logger.debug(`Removed structure directory: ${dir}`);
+            } catch (error) {
+              // Directory might not exist, ignore
+            }
+          }
         }
       } catch (error) {
         logger.warning(`Could not remove existing installation: ${error.message}`);

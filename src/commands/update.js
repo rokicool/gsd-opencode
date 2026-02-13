@@ -224,7 +224,8 @@ export async function updateCommand(options = {}) {
         logger.debug(`Checking ${scope} installation...`);
 
         // Check if installed (unless --force which allows fresh install)
-        if (!scopeManager.isInstalled() && !options.force) {
+        const isInstalled = await scopeManager.isInstalled();
+        if (!isInstalled && !options.force) {
           logger.info(`No installation found at ${scopeLabel.toLowerCase()} scope`);
           logger.dim('');
           continue;

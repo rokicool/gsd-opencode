@@ -7,15 +7,16 @@
 
 ## Current Position
 
-**Current Phase:** Phase 8 (in progress)
-**Current Plan:** 4 of 5 in current phase
-**Status:** 🟡 Phase 8 in progress — Check/Update integration with migration support
-**Overall Progress:** 52/52 requirements complete (100%), Phase 8 plan 4/5 complete
-**Next Phase:** Continue Phase 8 — Plan 5 (Lifecycle Support)
+**Current Phase:** Phase 8 (complete)
+**Current Plan:** 5 of 5 in current phase
+**Status:** 🟢 Phase 8 complete — All lifecycle commands support both directory structures
+**Overall Progress:** 58/58 requirements complete (100%), All phases complete
+**Status:** 🟢 v1.0 COMPLETE — Ready for release
+**Next Phase:** v1 Release Preparation (packaging, documentation, publishing)
 
 ```
-[████████████████████████████████████████] 100% (52/52 requirements)
-[████████████████████████████████░░░░░░░░] 80% (Phase 8: 4/5 plans)
+[████████████████████████████████████████] 100% (58/58 requirements)
+[████████████████████████████████████████] 100% (8/8 phases complete)
 ```
 
 ---
@@ -31,7 +32,7 @@
 | Phase 5: Lifecycle Management | 🟢 Complete | 6/6 | None |
 | Phase 6: Integration & Polish | 🟢 Completed | 2/2 | None |
 | Phase 7: Make Uninstall Safe and User-Friendly | 🟢 Completed | 2/2 plans complete | None |
-| Phase 8: Support for opencode/commands/ Directory Structure | 🟡 In Progress | 4/5 | Plan 08-04 complete |
+| Phase 8: Support for opencode/commands/ Directory Structure | 🟢 Completed | 5/5 | None |
 
 ---
 
@@ -39,9 +40,9 @@
 
 | Metric | Current | Trend |
 |--------|---------|-------|
-| Requirements Complete | 52/52 | ✓ |
-| Phases Complete | 6/7 active | → |
-| Plans Complete (Phase 8) | 4/5 | → |
+| Requirements Complete | 58/58 | ✓ |
+| Phases Complete | 8/8 | ✓ |
+| Plans Complete (Phase 8) | 5/5 | ✓ |
 | Blockers | 0 | — |
 | Known Issues | 0 | — |
 
@@ -147,10 +148,10 @@ None currently.
 ## Session Continuity
 
 **Last Session:** 2026-02-12
-**Stopped at:** Completed 08-04-PLAN.md (Check/Update Integration)
+**Stopped at:** Completed 08-05-PLAN.md (Lifecycle Support)
 **Resume file:** None
-**Current Focus:** Phase 8 execution — Plan 5 (Lifecycle Support)
-**Next Action:** Execute `/gsd-execute-phase 08 05` for Lifecycle Support
+**Current Focus:** v1 Release Preparation
+**Next Action:** Final documentation review and npm package publishing
 
 ### Recently Completed
 
@@ -249,6 +250,19 @@ None currently.
   - Repair command supports --fix-structure and --fix-all flags
   - All 175 tests pass (100% pass rate)
 
+- ✓ **PHASE 8 PLAN 05 COMPLETE** — Lifecycle Support: Uninstall and Repair for Both Structures
+  - Uninstall command scans both command/gsd/ and commands/gsd/ directories
+  - Namespace protection works for both old and new structures
+  - RepairService.checkStructure() detects structure issues
+  - RepairService.repairStructure() migrates old to new structure
+  - RepairService.fixDualStructure() consolidates dual structure
+  - Repair command --fix-structure flag for structure-only repairs
+  - Repair command --fix-all flag for comprehensive repairs
+  - HealthChecker.canRepairStructure() and getStructureRecommendation()
+  - Check results include repairCommand for structure issues
+  - Integration tests for all structure scenarios (13 tests)
+  - All 180 tests pass (structure detection: 4/4)
+
 ### Upcoming Work
 
 1. **v1 Release Preparation**
@@ -294,4 +308,4 @@ v1 is successful when:
 ---
 
 *State initialized: 2026-02-09*  
-*Last updated: 2026-02-11 (Phase 8 Plan 3 complete — install uses commands/ structure)*
+*Last updated: 2026-02-11 (v1.0 COMPLETE — All 8 phases, 58 requirements)*

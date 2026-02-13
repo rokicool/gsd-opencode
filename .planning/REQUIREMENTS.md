@@ -29,6 +29,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INST-08**: Install validates target paths to prevent path traversal attacks
 - [x] **INST-09**: Install uses atomic operations (temp-then-move) to prevent partial installations
 - [x] **INST-10**: Install handles permission errors gracefully with helpful error messages
+- [x] **INST-11**: Install uses `commands/gsd/` directory structure (new default)
 
 ### Uninstall Command
 
@@ -50,6 +51,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **CHECK-03**: Check detects corrupted or modified files
 - [x] **CHECK-04**: Check provides clear pass/fail output for each verification
 - [x] **CHECK-05**: Check returns appropriate exit codes (0 for healthy, non-zero for issues)
+- [x] **CHECK-06**: Check detects dual structure state (both old and new exist)
 
 ### Repair Command
 
@@ -67,6 +69,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **UPDATE-04**: Update shows current and target versions before proceeding
 - [x] **UPDATE-05**: Update preserves existing installation scope (global vs local)
 - [x] **UPDATE-06**: Update performs full install procedure including path replacement
+- [x] **UPDATE-07**: Update migrates from old `command/gsd/` structure to new `commands/gsd/` structure
 
 ### List Command
 
@@ -91,6 +94,12 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **ERROR-05**: All commands provide clear, actionable error messages
 - [x] **ERROR-06**: CLI shows consistent branding and formatted output using colors
 - [x] **ERROR-07**: CLI provides helpful suggestions when commands fail
+
+### Migration (Phase 8)
+
+- [x] **MIGRATE-01**: Migration creates backup before changing structure
+- [x] **MIGRATE-02**: Migration is atomic with rollback capability
+- [x] **MIGRATE-03**: Migration updates manifest paths
 
 ## v2 Requirements
 
@@ -192,12 +201,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ERROR-05 | Phase 1 | Complete |
 | ERROR-06 | Phase 1 | Complete |
 | ERROR-07 | Phase 1 | Complete |
+| INST-11 | Phase 8 | Complete |
+| UPDATE-07 | Phase 8 | Complete |
+| CHECK-06 | Phase 8 | Complete |
+| MIGRATE-01 | Phase 8 | Complete |
+| MIGRATE-02 | Phase 8 | Complete |
+| MIGRATE-03 | Phase 8 | Complete |
 
 **Coverage:**
 - v1 requirements: 52 total
-- Mapped to phases: 52
+- Phase 8 requirements: 6 total
+- Total requirements: 58
+- Mapped to phases: 58
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-09*
-*Last updated: 2026-02-11 (All v1 requirements complete)*
+*Last updated: 2026-02-11 (Phase 8 complete — 58/58 requirements)*

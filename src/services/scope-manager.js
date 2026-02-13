@@ -18,6 +18,7 @@ import path from 'path';
 import fs from 'fs';
 import { expandPath, validatePath } from '../utils/path-resolver.js';
 import { DEFAULT_CONFIG_DIR, VERSION_FILE } from '../../lib/constants.js';
+import { StructureDetector, STRUCTURE_TYPES } from './structure-detector.js';
 
 /**
  * Manages installation scope (global vs local) and path resolution.
@@ -143,13 +144,16 @@ export class ScopeManager {
   }
 
   /**
-   * Checks if GSD-OpenCode is installed at the target location.
+   * Checks if GSD-OpenCode is installed at the target directory.
    *
-   * Detection is based on the presence of a VERSION file in the target
-   * directory. This file is created during installation and contains the
-   * installed version number.
+   * This method verifies installation by checking for:
+   * 1. The presence of a VERSION file at the target directory
+   * 2. OR the presence of GSD files in either old (command/gsd/) or new (commands/gsd/) structure
    *
-   * @returns {boolean} True if VERSION file exists at target directory
+   * This ensures we detect both new installations and legacy installations that may
+   * be missing a VERSION file or using the old directory structure.
+   *
+   * @returns {boolean} True if GSD-OpenCode is installed at target directory
    *
    * @example
    * const scope = new ScopeManager({ scope: 'global' });
@@ -157,7 +161,37 @@ export class ScopeManager {
    *   console.log('GSD-OpenCode is installed');
    * }
    */
-  isInstalled() {
+  async isInstalled() {
+    try {
+      const targetDir = this.getTargetDir();
+      
+      // Check for VERSION file (normal case)
+      const versionPath = path.join(targetDir, VERSION_FILE);
+      if (fs.existsSync(versionPath)) {
+        return true;
+      }
+      
+      // Check for actual GSD installation (old or new structure)
+      // This handles legacy installations that might not have VERSION file
+      const structureDetector = new StructureDetector(targetDir);
+      const structure = await structureDetector.detect();
+      
+      return structure !== STRUCTURE_TYPES.NONE;
+    } catch (error) {
+      return false;
+    }
+  }
+  
+  /**
+   * Synchronous version of isInstalled() for backwards compatibility.
+   * 
+   * Note: This only checks for VERSION file existence. For comprehensive
+   * detection including old structure installations, use isInstalled() (async).
+   *
+   * @returns {boolean} True if VERSION file exists at target directory
+   * @deprecated Use async isInstalled() for complete detection
+   */
+  isInstalledSync() {
     try {
       const versionPath = path.join(this.getTargetDir(), VERSION_FILE);
       return fs.existsSync(versionPath);
