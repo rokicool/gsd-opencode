@@ -226,8 +226,8 @@ jobs:
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."
 
-          # Run the forbidden strings checker
-          node ../assets/bin/check-forbidden-strings.js
+          # Set NODE_PATH to include local node_modules and run the checker
+          NODE_PATH="${{ github.workspace }}/${{ inputs.working_directory }}/node_modules" node ../assets/bin/check-forbidden-strings.js
 
       - name: Final validation summary
         run: |
