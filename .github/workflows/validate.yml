@@ -223,12 +223,13 @@ jobs:
 
       - name: Check forbidden strings in antipatterns
         working-directory: ${{ inputs.working_directory }}
-        continue-on-error: true
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."
 
-          # Set NODE_PATH to include local node_modules and run the checker
-          NODE_PATH="${{ github.workspace }}/${{ inputs.working_directory }}/node_modules" node ../assets/bin/check-forbidden-strings.js || echo "⚠️  Forbidden strings check failed but continuing..."
+          # Copy script to current directory so it can find node_modules
+          cp ../assets/bin/check-forbidden-strings.js ./check-forbidden-strings.js
+          node ./check-forbidden-strings.js
+          rm ./check-forbidden-strings.js
 
       - name: Final validation summary
         run: |
