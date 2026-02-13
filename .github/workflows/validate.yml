@@ -227,8 +227,8 @@ jobs:
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."
 
-          # Run from repo root so paths match antipatterns.toml configuration
-          node assets/bin/check-forbidden-strings.js
+          # Run from repo root with NODE_PATH set to find gsd-opencode dependencies
+          NODE_PATH="${{ inputs.working_directory }}/node_modules" node assets/bin/check-forbidden-strings.js
 
       - name: Final validation summary
         run: |
