@@ -224,15 +224,11 @@ jobs:
 
 
       - name: Check forbidden strings in antipatterns
-        working-directory: ${{ inputs.working_directory }}
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."
 
-          # Copy script to current directory and antipatterns.toml to parent (repo root)
-          cp ../assets/bin/check-forbidden-strings.js ./check-forbidden-strings.cjs
-          cp ../assets/antipatterns.toml ../antipatterns.toml
-          node ./check-forbidden-strings.cjs
-          rm ./check-forbidden-strings.cjs ../antipatterns.toml
+          # Run from repo root so paths match antipatterns.toml configuration
+          node assets/bin/check-forbidden-strings.js
 
       - name: Final validation summary
         run: |
