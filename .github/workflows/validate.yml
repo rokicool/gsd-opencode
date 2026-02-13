@@ -222,11 +222,12 @@ jobs:
 
 
       - name: Check forbidden strings in antipatterns
+        working-directory: ${{ inputs.working_directory }}
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."
 
-          # Run the forbidden strings checker from repository root
-          node assets/bin/check-forbidden-strings.js
+          # Run the forbidden strings checker
+          node ../assets/bin/check-forbidden-strings.js
 
       - name: Final validation summary
         run: |
