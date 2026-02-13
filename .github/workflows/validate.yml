@@ -78,7 +78,7 @@ jobs:
       - name: Validate command structure
         run: |
           echo "Checking command files..."
-          command_dir="${{ inputs.working_directory }}/command"
+          command_dir="${{ inputs.working_directory }}/commands"
           if [ -d "$command_dir" ]; then
             for cmd_file in "$command_dir"/gsd/*.md; do
               if [ -f "$cmd_file" ]; then
