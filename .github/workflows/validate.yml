@@ -73,7 +73,9 @@ jobs:
         with:
           node-version: "18"
 
-
+      - name: Install dependencies
+        working-directory: ${{ inputs.working_directory }}
+        run: npm install
 
       - name: Validate command structure
         run: |
