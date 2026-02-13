@@ -307,9 +307,11 @@ gsd-opencode install
 ```bash
 # Install globally without prompts
 gsd-opencode install --global
+gsd-opencode install -g
 
 # Install locally without prompts
 gsd-opencode install --local
+gsd-opencode install -l
 
 # With verbose output for debugging
 gsd-opencode install --local --verbose
@@ -318,12 +320,25 @@ gsd-opencode install --local --verbose
 gsd-opencode install --global --config-dir /custom/path
 ```
 
+**Handling existing installations:**
+```bash
+# When an existing installation is detected, you'll be prompted:
+# → Repair - Fix issues while preserving other files
+# → Fresh install - Remove existing files and reinstall
+# → Cancel - Keep current installation
+
+gsd-opencode install --local  # Automatically handles existing installations
+```
+
 **What happens during install:**
-1. Copies agents/, command/, and get-shit-done/ directories
-2. Replaces `@gsd-opencode/` references in .md files with actual paths
-3. Creates a VERSION file to track installed version
-4. Shows progress indicators during file operations
-5. Uses atomic operations (temp-then-move) to prevent partial installations
+1. **Pre-flight checks** - Verifies source directory, target permissions, and disk space
+2. **Existing installation detection** - Prompts for repair vs fresh install
+3. **Safe cleanup** - Only removes gsd-opencode files (preserves other config)
+4. **Copies directories** - agents/, command/, and get-shit-done/
+5. **Path replacement** - Replaces `@gsd-opencode/` references in .md files with actual paths
+6. **Creates VERSION file** - Tracks installed version for updates
+7. **Atomic operations** - Uses temp-then-move to prevent partial installations
+8. **Creates manifest** - Tracks all installed files for safe uninstallation
 
 #### List Command
 
@@ -353,34 +368,55 @@ gsd-opencode list --json
 
 #### Check Command
 
+**Comprehensive health verification:**
 ```bash
-# Verify installation health
+# Check all installations (global and local)
 gsd-opencode check
 # Output:
-# Checking installation health...
-#
-# Files
-#   ✓ agents/ro-commit/SKILL.md
-#   ✓ agents/ro-commit/agent.js
+# GSD-OpenCode Installation Health
+# ================================
+# 
+# Global Installation Health
+# ================================
+# Required Files
+#   ✓ agents/gsd-planner/agent.js
+#   ✓ agents/gsd-executor/agent.js
 #   ✓ command/gsd/new-project.js
 #   ...
 #
-# Version
-#   ✓ VERSION file exists: 1.9.4
+# Version Verification
+#   ✓ Version: 1.10.0 - OK
 #
-# Integrity
+# File Integrity
 #   ✓ All files verified
 #
-# Overall: HEALTHY ✓
+# Directory Structure
+#   ✓ Modern structure (commands/) - OK
+#
+# All checks passed - Installation is healthy
 
 # Check specific scope
 gsd-opencode check --global
 gsd-opencode check --local
+gsd-opencode check -g
+gsd-opencode check -l
+
+# Verbose output for debugging
+gsd-opencode check --verbose
 ```
+
+**What gets checked:**
+- **Required Files** - Verifies all core files exist (agents, commands, skills)
+- **Version Verification** - Compares installed version with expected version
+- **File Integrity** - Detects corrupted or modified files (hash-based verification)
+- **Directory Structure** - Detects legacy vs modern structure:
+  - Legacy: `command/gsd/` (old)
+  - Modern: `commands/gsd/` (new)
+  - Dual: Both structures detected (needs migration)
 
 **Exit codes:**
 - `0` - Installation is healthy
-- `1` - Issues detected (missing files, version mismatch, corruption)
+- `1` - Issues detected (missing files, version mismatch, corruption, dual structure)
 
 #### Repair Command
 
@@ -436,25 +472,76 @@ gsd-opencode update --local
 
 #### Uninstall Command
 
+**Safe removal with namespace protection:**
 ```bash
-# Remove installation (shows summary, asks for confirmation)
+# Remove installation (shows summary, requires typed confirmation)
 gsd-opencode uninstall
 # Output:
-# The following will be removed:
-#   ~/.config/opencode/agents/
-#   ~/.config/opencode/command/
-#   ~/.config/opencode/get-shit-done/
-#   ~/.config/opencode/VERSION
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  ⚠️  WARNING: DESTRUCTIVE OPERATION                          ║
+# ╚══════════════════════════════════════════════════════════════╝
 # 
-# Are you sure? (y/N)
+# Scope: global
+# Location: ~/.config/opencode/
+# 
+# 📋 Files that will be removed (142):
+#   ✓ agents/gsd-planner/agent.js
+#   ✓ command/gsd/new-project.js
+#   ...
+# 
+# 📊 Safety Summary:
+#   • 142 files will be removed (284.5 KB)
+#   • Backup will be created in: gsd-opencode-backups/
+# 
+# ⚠️  This will permanently remove the files listed above
+# Type "yes" to confirm:
+```
 
-# Force uninstall without confirmation (scripting)
+**Auto-detection (no flags needed):**
+```bash
+# Automatically detects and removes the only existing installation
+gsd-opencode uninstall
+# If both global and local exist, use --global or --local to specify
+```
+
+**Dry run mode (preview without removing):**
+```bash
+# See what would be removed without actually removing anything
+gsd-opencode uninstall --dry-run
+gsd-opencode uninstall --global --dry-run
+```
+
+**Skip confirmation (scripting):**
+```bash
+# Force uninstall without typed confirmation (still shows summary)
 gsd-opencode uninstall --force
+gsd-opencode uninstall --global --force
+```
 
-# Uninstall specific scope
+**Backup control:**
+```bash
+# Create backup before removal (default behavior)
+gsd-opencode uninstall
+
+# Skip backup creation (user takes responsibility)
+gsd-opencode uninstall --no-backup
+```
+
+**Scope-specific uninstall:**
+```bash
 gsd-opencode uninstall --global
 gsd-opencode uninstall --local
+gsd-opencode uninstall -g
+gsd-opencode uninstall -l
 ```
+
+**Safety features:**
+- **Namespace protection** - Only removes files in gsd-opencode namespaces (gsd-*, get-shit-done/)
+- **Directory preservation** - Keeps directories containing non-gsd-opencode files
+- **Manifest-based tracking** - Uses INSTALLED_FILES.json to know exactly what was installed
+- **Typed confirmation** - Requires typing "yes" to prevent accidental removal
+- **Automatic backup** - Creates timestamped backup before removal
+- **Dry run mode** - Preview changes before committing
 
 #### Config Command
 

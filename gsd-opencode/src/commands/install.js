@@ -22,16 +22,23 @@
  * @module install
  */
 
-import { ScopeManager } from '../services/scope-manager.js';
-import { ConfigManager } from '../services/config.js';
-import { FileOperations } from '../services/file-ops.js';
-import { ManifestManager } from '../services/manifest-manager.js';
-import { logger, setVerbose } from '../utils/logger.js';
-import { promptInstallScope, promptRepairOrFresh } from '../utils/interactive.js';
-import { ERROR_CODES, DIRECTORIES_TO_COPY, ALLOWED_NAMESPACES } from '../../lib/constants.js';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { ScopeManager } from "../services/scope-manager.js";
+import { ConfigManager } from "../services/config.js";
+import { FileOperations } from "../services/file-ops.js";
+import { ManifestManager } from "../services/manifest-manager.js";
+import { logger, setVerbose } from "../utils/logger.js";
+import {
+  promptInstallScope,
+  promptRepairOrFresh,
+} from "../utils/interactive.js";
+import {
+  ERROR_CODES,
+  DIRECTORIES_TO_COPY,
+  ALLOWED_NAMESPACES,
+} from "../../lib/constants.js";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Colors for banner
 const cyan = "\x1b[36m";
@@ -64,7 +71,7 @@ ${cyan}   ██████╗ ███████╗██████╗
   Get Shit Done ${dim}v${version}${reset}
   A meta-prompting, context engineering and spec-driven
   development system for Cloude Code by TÂCHES
-  (adopted for OpenCode by rokicool and GLM4.7)
+  (adopted for OpenCode by rokicool, GLM4.7, and Kimi K2.5)
 
 `;
 }
@@ -79,14 +86,14 @@ ${cyan}   ██████╗ ███████╗██████╗
 async function getPackageVersion(sourceDir) {
   try {
     // Read from the source directory's package.json
-    const packageJsonPath = path.join(sourceDir, 'package.json');
+    const packageJsonPath = path.join(sourceDir, "package.json");
 
-    const content = await fs.readFile(packageJsonPath, 'utf-8');
+    const content = await fs.readFile(packageJsonPath, "utf-8");
     const pkg = JSON.parse(content);
-    return pkg.version || '1.0.0';
+    return pkg.version || "1.0.0";
   } catch (error) {
-    logger.warning('Could not read package version from source, using 1.0.0');
-    return '1.0.0';
+    logger.warning("Could not read package version from source, using 1.0.0");
+    return "1.0.0";
   }
 }
 
@@ -99,7 +106,7 @@ async function getPackageVersion(sourceDir) {
 function getSourceDirectory() {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  const packageRoot = path.resolve(__dirname, '../..');
+  const packageRoot = path.resolve(__dirname, "../..");
 
   // Source is the package root directory
   // This contains the distribution files (agents, command, get-shit-done)
@@ -129,57 +136,72 @@ function handleError(error, verbose) {
 
   // Categorize by error code
   switch (error.code) {
-    case 'EACCES':
-      logger.error('Permission denied: Cannot write to installation directory');
-      logger.dim('');
-      logger.dim('Suggestion: Try one of the following:');
-      logger.dim('  - Use --local for user directory installation');
-      logger.dim('  - Use sudo for global system-wide install');
-      logger.dim('  - Check directory ownership and permissions');
+    case "EACCES":
+      logger.error("Permission denied: Cannot write to installation directory");
+      logger.dim("");
+      logger.dim("Suggestion: Try one of the following:");
+      logger.dim("  - Use --local for user directory installation");
+      logger.dim("  - Use sudo for global system-wide install");
+      logger.dim("  - Check directory ownership and permissions");
       return ERROR_CODES.PERMISSION_ERROR;
 
-    case 'ENOENT':
+    case "ENOENT":
       logger.error(`File or directory not found: ${error.message}`);
-      logger.dim('');
-      logger.dim('Suggestion: Check that the source directory exists and is accessible.');
-      if (error.message.includes('gsd-opencode')) {
-        logger.dim('The gsd-opencode directory may be missing from the package.');
+      logger.dim("");
+      logger.dim(
+        "Suggestion: Check that the source directory exists and is accessible.",
+      );
+      if (error.message.includes("gsd-opencode")) {
+        logger.dim(
+          "The gsd-opencode directory may be missing from the package.",
+        );
       }
       return ERROR_CODES.GENERAL_ERROR;
 
-    case 'ENOSPC':
-      logger.error('Insufficient disk space for installation');
-      logger.dim('');
-      logger.dim('Suggestion: Free up disk space and try again');
+    case "ENOSPC":
+      logger.error("Insufficient disk space for installation");
+      logger.dim("");
+      logger.dim("Suggestion: Free up disk space and try again");
       return ERROR_CODES.GENERAL_ERROR;
 
-    case 'EEXIST':
-      logger.error('Installation target already exists and cannot be overwritten');
-      logger.dim('');
-      logger.dim('Suggestion: Use --force or remove the existing installation first');
+    case "EEXIST":
+      logger.error(
+        "Installation target already exists and cannot be overwritten",
+      );
+      logger.dim("");
+      logger.dim(
+        "Suggestion: Use --force or remove the existing installation first",
+      );
       return ERROR_CODES.GENERAL_ERROR;
 
-    case 'ENOTEMPTY':
+    case "ENOTEMPTY":
       // This is handled internally by file-ops, but catch it here too
-      logger.error('Target directory is not empty');
+      logger.error("Target directory is not empty");
       return ERROR_CODES.GENERAL_ERROR;
 
     default:
       // Check for path traversal errors from validatePath
-      if (error.message?.includes('traversal') || error.message?.includes('outside allowed')) {
-        logger.error('Invalid installation path: Path traversal detected');
-        logger.dim('');
-        logger.dim('Suggestion: Use absolute or relative paths within allowed directories');
-        logger.dim('  - Global: within home directory (~/)');
-        logger.dim('  - Local: within current working directory');
+      if (
+        error.message?.includes("traversal") ||
+        error.message?.includes("outside allowed")
+      ) {
+        logger.error("Invalid installation path: Path traversal detected");
+        logger.dim("");
+        logger.dim(
+          "Suggestion: Use absolute or relative paths within allowed directories",
+        );
+        logger.dim("  - Global: within home directory (~/)");
+        logger.dim("  - Local: within current working directory");
         return ERROR_CODES.PATH_TRAVERSAL;
       }
 
       // Generic error
       logger.error(`Installation failed: ${error.message}`);
-      logger.dim('');
+      logger.dim("");
       if (!verbose) {
-        logger.dim('Suggestion: Run with --verbose for detailed error information');
+        logger.dim(
+          "Suggestion: Run with --verbose for detailed error information",
+        );
       }
       return ERROR_CODES.GENERAL_ERROR;
   }
@@ -207,10 +229,10 @@ async function preflightChecks(sourceDir, targetDir) {
       throw new Error(`Source path is not a directory: ${sourceDir}`);
     }
   } catch (error) {
-    if (error.code === 'ENOENT') {
+    if (error.code === "ENOENT") {
       throw new Error(
         `Source directory not found: ${sourceDir}\n` +
-        'The gsd-opencode directory may be missing from the package installation.'
+          "The gsd-opencode directory may be missing from the package installation.",
       );
     }
     throw error;
@@ -230,21 +252,23 @@ async function preflightChecks(sourceDir, targetDir) {
     } catch (accessError) {
       // On some systems, access check might fail even if we can write
       // Try to create a test file
-      const testFile = path.join(targetParent, '.gsd-write-test');
+      const testFile = path.join(targetParent, ".gsd-write-test");
       try {
-        await fs.writeFile(testFile, '', 'utf-8');
+        await fs.writeFile(testFile, "", "utf-8");
         await fs.unlink(testFile);
       } catch (writeError) {
         throw new Error(
           `Cannot write to target directory: ${targetParent}\n` +
-          'Check directory permissions or run with appropriate privileges.'
+            "Check directory permissions or run with appropriate privileges.",
         );
       }
     }
   } catch (error) {
-    if (error.code === 'ENOENT') {
+    if (error.code === "ENOENT") {
       // Parent doesn't exist, we'll create it during install
-      logger.debug(`Target parent directory does not exist, will create: ${targetParent}`);
+      logger.debug(
+        `Target parent directory does not exist, will create: ${targetParent}`,
+      );
     } else {
       throw error;
     }
@@ -257,7 +281,7 @@ async function preflightChecks(sourceDir, targetDir) {
       throw new Error(`Target path exists and is a file: ${targetDir}`);
     }
   } catch (error) {
-    if (error.code !== 'ENOENT') {
+    if (error.code !== "ENOENT") {
       throw error;
     }
     // ENOENT is fine - target doesn't exist yet
@@ -277,20 +301,20 @@ async function preflightChecks(sourceDir, targetDir) {
 async function cleanupEmptyDirectories(targetDir, namespaces, logger) {
   // Directories to check (in reverse order to remove deepest first)
   const dirsToCheck = [
-    'get-shit-done',
-    'commands/gsd',
-    'command/gsd',
-    'agents/gsd-debugger',
-    'agents/gsd-executor',
-    'agents/gsd-integration-checker',
-    'agents/gsd-phase-researcher',
-    'agents/gsd-plan-checker',
-    'agents/gsd-planner',
-    'agents/gsd-project-researcher',
-    'agents/gsd-research-synthesizer',
-    'agents/gsd-roadmapper',
-    'agents/gsd-set-model',
-    'agents/gsd-verifier'
+    "get-shit-done",
+    "commands/gsd",
+    "command/gsd",
+    "agents/gsd-debugger",
+    "agents/gsd-executor",
+    "agents/gsd-integration-checker",
+    "agents/gsd-phase-researcher",
+    "agents/gsd-plan-checker",
+    "agents/gsd-planner",
+    "agents/gsd-project-researcher",
+    "agents/gsd-research-synthesizer",
+    "agents/gsd-roadmapper",
+    "agents/gsd-set-model",
+    "agents/gsd-verifier",
   ];
 
   for (const dir of dirsToCheck) {
@@ -319,8 +343,8 @@ async function cleanupEmptyDirectories(targetDir, namespaces, logger) {
 async function conservativeCleanup(targetDir, logger) {
   // Only remove specific files we know belong to gsd-opencode
   const filesToRemove = [
-    'get-shit-done/VERSION',
-    'get-shit-done/INSTALLED_FILES.json'
+    "get-shit-done/VERSION",
+    "get-shit-done/INSTALLED_FILES.json",
   ];
 
   for (const file of filesToRemove) {
@@ -328,7 +352,7 @@ async function conservativeCleanup(targetDir, logger) {
       await fs.unlink(path.join(targetDir, file));
       logger.debug(`Removed: ${file}`);
     } catch (error) {
-      if (error.code !== 'ENOENT') {
+      if (error.code !== "ENOENT") {
         logger.debug(`Could not remove ${file}: ${error.message}`);
       }
     }
@@ -371,8 +395,10 @@ export async function installCommand(options = {}) {
   const verbose = options.verbose || false;
   setVerbose(verbose);
 
-  logger.debug('Starting install command');
-  logger.debug(`Options: global=${options.global}, local=${options.local}, configDir=${options.configDir}, verbose=${verbose}`);
+  logger.debug("Starting install command");
+  logger.debug(
+    `Options: global=${options.global}, local=${options.local}, configDir=${options.configDir}, verbose=${verbose}`,
+  );
 
   try {
     // Display banner
@@ -383,19 +409,19 @@ export async function installCommand(options = {}) {
     // Step 1: Determine scope
     let scope;
     if (options.global) {
-      scope = 'global';
-      logger.debug('Scope determined by --global flag');
+      scope = "global";
+      logger.debug("Scope determined by --global flag");
     } else if (options.local) {
-      scope = 'local';
-      logger.debug('Scope determined by --local flag');
+      scope = "local";
+      logger.debug("Scope determined by --local flag");
     } else {
       // Prompt user interactively
-      logger.debug('No scope flags provided, prompting user...');
+      logger.debug("No scope flags provided, prompting user...");
       scope = await promptInstallScope();
 
       if (scope === null) {
         // User cancelled (Ctrl+C)
-        logger.info('Installation cancelled by user');
+        logger.info("Installation cancelled by user");
         return ERROR_CODES.INTERRUPTED;
       }
     }
@@ -405,7 +431,7 @@ export async function installCommand(options = {}) {
     // Step 2: Create ScopeManager and ConfigManager
     const scopeManager = new ScopeManager({
       scope,
-      configDir: options.configDir
+      configDir: options.configDir,
     });
     const config = new ConfigManager(scopeManager);
 
@@ -415,21 +441,27 @@ export async function installCommand(options = {}) {
     const isInstalled = await scopeManager.isInstalled();
     if (isInstalled) {
       const existingVersion = scopeManager.getInstalledVersion();
-      logger.warning(`Existing installation detected${existingVersion ? ` (version ${existingVersion})` : ''}`);
+      logger.warning(
+        `Existing installation detected${existingVersion ? ` (version ${existingVersion})` : ""}`,
+      );
 
       const action = await promptRepairOrFresh();
 
-      if (action === 'cancel' || action === null) {
-        logger.info('Installation cancelled by user');
+      if (action === "cancel" || action === null) {
+        logger.info("Installation cancelled by user");
         return ERROR_CODES.INTERRUPTED;
       }
 
-      if (action === 'repair') {
+      if (action === "repair") {
         // Phase 4 will implement proper repair
         // For now, treat as fresh install
-        logger.info('Repair selected - performing fresh install (repair functionality coming in Phase 4)');
+        logger.info(
+          "Repair selected - performing fresh install (repair functionality coming in Phase 4)",
+        );
       } else {
-        logger.info('Fresh install selected - removing existing gsd-opencode files');
+        logger.info(
+          "Fresh install selected - removing existing gsd-opencode files",
+        );
       }
 
       // Fresh install: remove only gsd-opencode files (not entire directory)
@@ -441,11 +473,16 @@ export async function installCommand(options = {}) {
 
         if (manifestEntries && manifestEntries.length > 0) {
           // Filter to only files in allowed namespaces
-          const filesToRemove = manifestEntries.filter(entry =>
-            manifestManager.isInAllowedNamespace(entry.relativePath, ALLOWED_NAMESPACES)
+          const filesToRemove = manifestEntries.filter((entry) =>
+            manifestManager.isInAllowedNamespace(
+              entry.relativePath,
+              ALLOWED_NAMESPACES,
+            ),
           );
 
-          logger.debug(`Removing ${filesToRemove.length} tracked files in allowed namespaces`);
+          logger.debug(
+            `Removing ${filesToRemove.length} tracked files in allowed namespaces`,
+          );
 
           // Remove files only (directories will be cleaned up later if empty)
           for (const entry of filesToRemove) {
@@ -453,8 +490,10 @@ export async function installCommand(options = {}) {
               await fs.unlink(entry.path);
               logger.debug(`Removed: ${entry.relativePath}`);
             } catch (error) {
-              if (error.code !== 'ENOENT') {
-                logger.debug(`Could not remove ${entry.relativePath}: ${error.message}`);
+              if (error.code !== "ENOENT") {
+                logger.debug(
+                  `Could not remove ${entry.relativePath}: ${error.message}`,
+                );
               }
             }
           }
@@ -464,7 +503,7 @@ export async function installCommand(options = {}) {
 
           // Forcefully remove structure directories to ensure fresh install works
           // This handles cases where files remain in the structure directories
-          const structureDirs = ['commands/gsd', 'command/gsd'];
+          const structureDirs = ["commands/gsd", "command/gsd"];
           for (const dir of structureDirs) {
             const fullPath = path.join(targetDir, dir);
             try {
@@ -475,14 +514,18 @@ export async function installCommand(options = {}) {
             }
           }
 
-          logger.debug('Removed existing gsd-opencode files while preserving other config');
+          logger.debug(
+            "Removed existing gsd-opencode files while preserving other config",
+          );
         } else {
           // No manifest found - use conservative fallback
-          logger.debug('No manifest found, using conservative fallback cleanup');
+          logger.debug(
+            "No manifest found, using conservative fallback cleanup",
+          );
           await conservativeCleanup(targetDir, logger);
 
           // Forcefully remove structure directories to ensure fresh install works
-          const structureDirs = ['commands/gsd', 'command/gsd'];
+          const structureDirs = ["commands/gsd", "command/gsd"];
           for (const dir of structureDirs) {
             const fullPath = path.join(targetDir, dir);
             try {
@@ -494,13 +537,15 @@ export async function installCommand(options = {}) {
           }
         }
       } catch (error) {
-        logger.warning(`Could not remove existing installation: ${error.message}`);
+        logger.warning(
+          `Could not remove existing installation: ${error.message}`,
+        );
         // Continue anyway - file-ops will handle conflicts
       }
     }
 
     // Step 4: Show starting message
-    const scopeLabel = scope === 'global' ? 'Global' : 'Local';
+    const scopeLabel = scope === "global" ? "Global" : "Local";
     const pathPrefix = scopeManager.getPathPrefix();
     logger.heading(`${scopeLabel} Installation`);
     logger.info(`Installing to ${pathPrefix}...`);
@@ -522,27 +567,29 @@ export async function installCommand(options = {}) {
     logger.debug(`Created VERSION file with version: ${version}`);
 
     // Step 8: Show success summary
-    logger.success('Installation complete!');
-    logger.dim('');
-    logger.dim('Summary:');
+    logger.success("Installation complete!");
+    logger.dim("");
+    logger.dim("Summary:");
     logger.dim(`  Files copied: ${result.filesCopied}`);
     logger.dim(`  Directories: ${result.directories}`);
     logger.dim(`  Location: ${pathPrefix}`);
     logger.dim(`  Version: ${version}`);
 
     if (verbose) {
-      logger.dim('');
-      logger.dim('Additional details:');
+      logger.dim("");
+      logger.dim("Additional details:");
       logger.dim(`  Full path: ${targetDir}`);
       logger.dim(`  Scope: ${scope}`);
     }
 
     return ERROR_CODES.SUCCESS;
-
   } catch (error) {
     // Handle Ctrl+C during async operations
-    if (error.name === 'AbortPromptError' || error.message?.includes('cancel')) {
-      logger.info('\nInstallation cancelled by user');
+    if (
+      error.name === "AbortPromptError" ||
+      error.message?.includes("cancel")
+    ) {
+      logger.info("\nInstallation cancelled by user");
       return ERROR_CODES.INTERRUPTED;
     }
 
