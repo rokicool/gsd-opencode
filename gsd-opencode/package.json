@@ -32,7 +32,7 @@
   "files": [
     "agents",
     "bin",
-    "command",
+    "commands",
     "get-shit-done"
   ],
   "engines": {
