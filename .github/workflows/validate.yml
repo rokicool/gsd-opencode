@@ -226,10 +226,10 @@ jobs:
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."
 
-          # Copy script to current directory so it can find node_modules
-          cp ../assets/bin/check-forbidden-strings.js ./check-forbidden-strings.js
-          node ./check-forbidden-strings.js
-          rm ./check-forbidden-strings.js
+          # Copy script with .cjs extension (CommonJS) to avoid ES module issues
+          cp ../assets/bin/check-forbidden-strings.js ./check-forbidden-strings.cjs
+          node ./check-forbidden-strings.cjs
+          rm ./check-forbidden-strings.cjs
 
       - name: Final validation summary
         run: |
