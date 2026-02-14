@@ -179,7 +179,7 @@ jobs:
 
           # Copy essential files
           cp -r bin dist/
-          cp -r command dist/
+          cp -r commands dist/
           cp -r get-shit-done dist/
           cp package.json dist/
           cp README.md dist/ 2>/dev/null || echo "README.md not found, creating basic one"
