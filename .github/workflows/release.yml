@@ -179,6 +179,9 @@ jobs:
 
           # Copy essential files
           cp -r bin dist/
+          cp -r src dist/
+          cp -r lib dist/
+          cp -r agents dist/
           cp -r commands dist/
           cp -r get-shit-done dist/
           cp package.json dist/
@@ -228,28 +231,28 @@ jobs:
       - name: Generate changelog
         working-directory: ./gsd-opencode
         run: |
-          echo "Generating changelog..."
-
-           # Get previous tag
-           PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-           CURRENT_TAG="v${{ needs.update_version.outputs.version }}"
-
-          if [ -n "$PREVIOUS_TAG" ]; then
-            echo "Generating changelog from $PREVIOUS_TAG to $CURRENT_TAG..."
-
-            git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..$CURRENT_TAG > CHANGELOG.md
-
-            echo "## Changes since $PREVIOUS_TAG" >> CHANGELOG.md
-            echo "" >> CHANGELOG.md
-            git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..$CURRENT_TAG >> CHANGELOG.md
+          echo "Preparing changelog..."
+          
+          CURRENT_TAG="v${{ needs.update_version.outputs.version }}"
+          
+          # Use existing CHANGELOG.md from repo root
+          if [ -f "CHANGELOG.md" ]; then
+            echo "Using existing CHANGELOG.md..."
+            # Copy CHANGELOG.md to dist for release artifacts
+            cp CHANGELOG.md dist/CHANGELOG.md
           else
-            echo "No previous tag found, generating full changelog..."
-            echo "## Release $CURRENT_TAG" > CHANGELOG.md
-            echo "" >> CHANGELOG.md
-            git log --pretty=format:"- %s (%h)" >> CHANGELOG.md
+            echo "WARNING: CHANGELOG.md not found in repository root"
+            echo "# Changelog" > dist/CHANGELOG.md
+            echo "" >> dist/CHANGELOG.md
+            echo "## $CURRENT_TAG" >> dist/CHANGELOG.md
+            echo "" >> dist/CHANGELOG.md
+            echo "See repository for full changelog history." >> dist/CHANGELOG.md
           fi
-
-          echo "✓ Changelog generated"
+          
+          # Also copy to release root for metadata
+          cp dist/CHANGELOG.md ./CHANGELOG-release.md
+          
+          echo "✓ Changelog prepared"
 
       - name: Generate checksums
         working-directory: ./gsd-opencode
@@ -321,7 +324,7 @@ jobs:
             gsd-opencode/gsd-opencode-*.tgz.sha256
             gsd-opencode/dist-checksums.sha256
             gsd-opencode/release-checksums.txt
-            gsd-opencode/CHANGELOG.md
+            gsd-opencode/CHANGELOG-release.md
             gsd-opencode/release-metadata.json
           retention-days: 365
 
@@ -377,13 +380,18 @@ jobs:
 
            EOF
 
-           # Add changelog if available
-           if [ -f "./release-artifacts/CHANGELOG.md" ]; then
-             echo "" >> release-notes.md
-             echo "## Changelog" >> release-notes.md
-             echo "" >> release-notes.md
-             cat ./release-artifacts/CHANGELOG.md >> release-notes.md
-           fi
+            # Add changelog if available
+            if [ -f "./release-artifacts/dist/CHANGELOG.md" ]; then
+              echo "" >> release-notes.md
+              echo "## Changelog" >> release-notes.md
+              echo "" >> release-notes.md
+              cat ./release-artifacts/dist/CHANGELOG.md >> release-notes.md
+            elif [ -f "./release-artifacts/CHANGELOG-release.md" ]; then
+              echo "" >> release-notes.md
+              echo "## Changelog" >> release-notes.md
+              echo "" >> release-notes.md
+              cat ./release-artifacts/CHANGELOG-release.md >> release-notes.md
+            fi
 
             echo "✓ Release notes prepared"
 
