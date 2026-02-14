@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.1] - 2026-02-13
+
+Overview: Fixed release workflow directory references and updated changelog generation to use manually maintained CHANGELOG.md file instead of generating from git log.
+
+### Fixed
+
+- Updated `.github/workflows/release.yml` to reference `commands/` directory instead of legacy `command/` in build artifacts step
+- Added missing directories (`src/`, `lib/`, `agents/`) to production build artifacts
+
+### Changed
+
+- Replaced git log-based changelog generation with reading from repository root `CHANGELOG.md` file
+- Updated artifact upload paths to use `CHANGELOG-release.md` instead of generated `CHANGELOG.md`
+- Modified release notes generation to check both `dist/CHANGELOG.md` and `CHANGELOG-release.md` locations
+
 ## [1.10.0] - 2026-02-13
 
 Introduced complete CLI tool infrastructure for gsd-opencode with comprehensive installation, update, and lifecycle management capabilities. Migrated command documentation from `command/` to `commands/` directory structure.
