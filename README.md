@@ -58,7 +58,7 @@ $ npx gsd-opencode@latest
 
 **Trusted by engineers at Amazon, Google, Shopify, and Webflow.**
 
-[Why I Built This](#why-i-built-this) · [How It Works](#how-it-works) · [Commands](#commands) · [Why It Works](#why-it-works)
+[Why I Built This](#why-i-built-this) · [Distribution System](#distribution-system) · [How It Works](#how-it-works) · [Commands](#commands) · [Why It Works](#why-it-works)
 
 </div>
 
@@ -186,6 +186,29 @@ Use `--global` (`-g`) or `--local` (`-l`) to skip the interactive prompt.
 </details>
 
 <details>
+<summary><strong>Uninstall GSD-OpenCode</strong></summary>
+
+```bash
+# Uninstall (auto-detects global or local installation)
+gsd-opencode uninstall
+
+# Uninstall globally
+gsd-opencode uninstall --global
+gsd-opencode uninstall -g
+
+# Uninstall locally
+gsd-opencode uninstall --local
+gsd-opencode uninstall -l
+
+# Preview what would be removed (dry run)
+gsd-opencode uninstall --dry-run
+```
+
+See [DISTRIBUTION-MANAGER.md](./DISTRIBUTION-MANAGER.md) for detailed uninstall options including backup control and safety features.
+
+</details>
+
+<details>
 <summary><strong>Development Installation</strong></summary>
 
 Clone the repository and run the installer locally:
@@ -224,6 +247,28 @@ If you prefer not to use that flag, add this to your project's `.opencode/settin
 </details>
 
 ---
+
+## Distribution System
+
+GSD-OpenCode includes a comprehensive package manager for installing, maintaining, and updating the GSD system. Once installed via npm, you have access to a full CLI for managing your GSD installation.
+
+### Quick Reference
+
+| Command | Description |
+|---------|-------------|
+| `gsd-opencode install` | Install GSD (interactive) |
+| `gsd-opencode install --global` / `-g` | Install globally (~/.config/opencode/) |
+| `gsd-opencode install --local` / `-l` | Install locally (./.opencode/) |
+| `gsd-opencode list` | Show installation status |
+| `gsd-opencode check` | Verify installation health |
+| `gsd-opencode repair` | Fix broken installation |
+| `gsd-opencode update` | Update to latest version |
+| `gsd-opencode uninstall` | Remove installation |
+
+For detailed documentation on all commands, options, troubleshooting, and advanced usage, see [DISTRIBUTION-MANAGER.md](./DISTRIBUTION-MANAGER.md).
+
+---
+
 ## How It Works
 
 > **Already have code?** Run `/gsd-map-codebase` first. It spawns parallel agents to analyze your stack, architecture, conventions, and concerns. Then `/gsd-new-project` knows your codebase — questions focus on what you're adding, and planning automatically loads your patterns.
@@ -671,19 +716,25 @@ Use `/gsd-settings` to toggle these, or override per-invocation:
 ## Troubleshooting
 
 **Commands not found after install?**
+- See the [Distribution System Troubleshooting](#troubleshooting-installation-issues) section for detailed help
+- Verify installation: `gsd-opencode list`
 - Restart OpenCode to reload slash commands
-- Verify files exist in `~/.config/opencode/command/gsd/` (global) or `./.opencode/command/gsd/` (local)
 
-**Commands not working as expected?**
-- Run `/gsd-help` to verify installation
-- Re-run `npx gsd-opencode` to reinstall
+**Permission denied during installation?**
+- See [Troubleshooting Installation Issues](#troubleshooting-installation-issues) for solutions
 
 **Updating to the latest version?**
 ```bash
+# Use the built-in update command
+gsd-opencode update
+
+# Or reinstall via npm
 npx gsd-opencode@latest
 ```
 
 **Using Docker or containerized environments?**
+
+See the [Docker/Container Usage](#dockercontainer-usage) section for detailed instructions.
 
 If file reads fail with tilde paths (`~/.config/opencode/...`), set `OPENCODE_CONFIG_DIR` before installing:
 ```bash

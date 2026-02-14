@@ -73,12 +73,14 @@ jobs:
         with:
           node-version: "18"
 
-
+      - name: Install dependencies
+        working-directory: ${{ inputs.working_directory }}
+        run: npm install
 
       - name: Validate command structure
         run: |
           echo "Checking command files..."
-          command_dir="${{ inputs.working_directory }}/command"
+          command_dir="${{ inputs.working_directory }}/commands"
           if [ -d "$command_dir" ]; then
             for cmd_file in "$command_dir"/gsd/*.md; do
               if [ -f "$cmd_file" ]; then
@@ -225,16 +227,8 @@ jobs:
         run: |
           echo "Checking forbidden strings from antipatterns.toml..."
 
-          # Install dependencies and run standalone checker
-          cd "${{ inputs.working_directory }}"
-          npm install
-          
-          # Install dependencies for forbidden strings checker (in root)
-          cd ..
-          npm install
-          
-          # Run checker from repository root
-          node assets/bin/check-forbidden-strings.js
+          # Run from repo root with NODE_PATH set to find gsd-opencode dependencies
+          NODE_PATH="${{ inputs.working_directory }}/node_modules" node assets/bin/check-forbidden-strings.js
 
       - name: Final validation summary
         run: |

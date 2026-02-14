@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-02-13
+
+Introduced complete CLI tool infrastructure for gsd-opencode with comprehensive installation, update, and lifecycle management capabilities. Migrated command documentation from `command/` to `commands/` directory structure.
+
+### Added
+
+- Complete CLI tool implementation in `gsd-opencode/` with Node.js-based architecture
+- Entry point scripts: `bin/gsd.js` and `bin/gsd-install.js` for CLI execution
+- Command implementations in `src/commands/`: install.js, update.js, check.js, config.js, list.js, repair.js, and uninstall.js
+- Service layer in `src/services/`: backup-manager.js, config.js, file-ops.js, health-checker.js, manifest-manager.js, migration-service.js, repair-service.js, scope-manager.js, settings.js, structure-detector.js, and update-service.js
+- Utility modules in `src/utils/`: hash.js, interactive.js, logger.js, npm-registry.js, and path-resolver.js
+- Constants library in `lib/constants.js` for shared configuration
+- Comprehensive test suite in `test/` with unit, integration, and service-level tests
+- Test fixtures for manifest management, path replacement, and installation scenarios
+- Integration test coverage for install safety, migration paths, and command workflows
+
+### Changed
+
+- Renamed command documentation directory from `command/gsd/` to `commands/gsd/` for consistency
+- Updated gsd-debugger.md agent with refined debugging workflow references
+- Modified list-phase-assumptions.md and verify-work.md workflows with improved execution context
+- Updated multiple command documentations (debug.md, discuss-phase.md, execute-phase.md, map-codebase.md, new-milestone.md, new-project.md, plan-phase.md, research-phase.md, verify-work.md) with enhanced tool specifications and context references
+
+### Removed
+
+- Legacy package.json backup files (package-old.json, package-lock-old.json) from version control
+
 ## [1.9.1] - 2026-01-23
 
 Standardized command naming conventions and improved documentation formatting across project files.
