@@ -1,1 +1,0 @@
-// GSD install command

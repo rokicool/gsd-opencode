@@ -27,6 +27,12 @@ Do NOT modify agent .md files.
 - **Verification:** gsd-verifier, gsd-integration-checker, gsd-set-profile, gsd-settings, gsd-set-model
 
 **Model discovery:** Presets are user-defined, not hardcoded. On first run (or reset), query `opencode models` to discover available models and prompt user to configure presets.
+
+**Model ID structure:** Models use 2-level (provider/model) or 3-level (provider/subprovider/model) format:
+- 2-level: `opencode/glm-4.7-free`, `xai/grok-3`
+- 3-level: `openrouter/anthropic/claude-3.5-haiku`, `synthetic/hf:deepseek-ai/DeepSeek-R1`
+
+**Provider hierarchy:** Some providers (openrouter, synthetic) have subproviders; others (opencode, xai) are flat. Always use hierarchical selection: provider → subprovider (if applicable) → model.
 </context>
 
 <rules>
@@ -42,9 +48,42 @@ Do NOT modify agent .md files.
 - Never overwrite existing presets — only create defaults for new/migrated projects
 - Keep `model_profile` in sync with `profiles.active_profile`
 - Merge into existing `opencode.json` (preserve non-agent keys)
-</rules>
+  </rules>
 
 <behavior>
+
+## Helper Discovery Functions
+
+These bash commands use the cached MODELS_DATA for hierarchical model discovery:
+
+```bash
+# Initialize cache at wizard start (run once)
+MODELS_DATA=$(opencode models 2>/dev/null)
+
+# Get all unique providers (from cache)
+echo "$MODELS_DATA" | cut -d'/' -f1 | sort -u
+
+# Get model count for a provider (from cache)
+echo "$MODELS_DATA" | grep "^${provider}/" | wc -l
+
+# Check if provider has subproviders (returns "true" or "false", from cache)
+echo "$MODELS_DATA" | grep "^${provider}/" | awk -F'/' '{print NF}' | head -1 | grep -q '^3$' && echo "true" || echo "false"
+
+# Get unique subproviders for a provider (from cache)
+echo "$MODELS_DATA" | grep "^${provider}/" | cut -d'/' -f2 | sort -u
+
+# Get model count for a subprovider (from cache)
+echo "$MODELS_DATA" | grep "^${provider}/${subprovider}/" | wc -l
+
+# Get models for provider/subprovider (3-level, from cache)
+echo "$MODELS_DATA" | grep "^${provider}/${subprovider}/" | cut -d'/' -f3- | sort
+
+# Get models for 2-level provider (from cache)
+echo "$MODELS_DATA" | grep "^${provider}/" | cut -d'/' -f2- | sort
+
+# Verify a model ID exists (from cache)
+echo "$MODELS_DATA" | grep -q "^${model_id}$" && echo "valid" || echo "invalid"
+```
 
 ## Step 1: Load Config
 
@@ -68,29 +107,286 @@ Ensure `workflow` section exists (defaults: `research: true`, `plan_check: true`
 
 ### Preset Setup Wizard
 
-This wizard runs on first use or when "Reset presets" is selected. It queries available models and lets the user configure all three profiles.
+This wizard runs on first use or when "Reset presets" is selected. It queries available models and lets the user configure all three profiles using hierarchical selection (provider → subprovider → model).
 
-**Step W1: Discover models**
+**Step W1: Discover models and initialize cache**
 
 ```bash
-opencode models 2>/dev/null
+MODELS_DATA=$(opencode models 2>/dev/null)
 ```
 
-Parse the output to extract model IDs. If command fails or returns no models, print `Error: Could not fetch available models. Check your OpenCode installation.` and stop.
+Cache the models output in `MODELS_DATA` variable. All subsequent operations use this cache instead of calling `opencode models` repeatedly.
 
-**Step W2: Configure each profile**
+If command fails or returns no models, print `Error: Could not fetch available models. Check your OpenCode installation.` and stop.
 
-For each profile (quality, balanced, budget), use a multi-question call:
+**Cache Statistics (for internal use):**
+```bash
+# Pre-compute provider counts for all menus
+PROVIDER_COUNTS=$(echo "$MODELS_DATA" | awk -F'/' '{count[$1]++} END {for(p in count) print p ":" count[p]}')
 
-```json
-[
-  { "header": "{Profile} Profile - Planning", "question": "Which model for planning agents?", "options": ["{model1}", "{model2}", ...] },
-  { "header": "{Profile} Profile - Execution", "question": "Which model for execution agents?", "options": ["{model1}", "{model2}", ...] },
-  { "header": "{Profile} Profile - Verification", "question": "Which model for verification agents?", "options": ["{model1}", "{model2}", ...] }
-]
+# Pre-compute subprovider structure for 3-level providers
+SUBPROVIDER_MAP=$(echo "$MODELS_DATA" | awk -F'/' 'NF==3 {print $1 "/" $2}' | sort -u)
 ```
 
-**Step W3: Save config**
+**Step W2: Configure Quality Profile**
+
+Configure all 3 stages for the quality profile with full hierarchical selection.
+
+**W2.1: Quality Profile - Planning Stage**
+
+1. **Build Provider Menu (using cached data)**
+
+```bash
+# Get providers with counts from cache
+echo "$PROVIDER_COUNTS" | while IFS=':' read -r provider count; do
+  echo "- label: \"$provider\""
+  echo "  description: \"$count models\""
+done
+```
+
+Use Question tool:
+
+```
+header: "Quality Profile - Planning"
+question: "Which provider for planning agents (Quality profile)?"
+options:
+  [providers from above with counts]
+```
+
+Store selected provider as `quality_planning_provider`.
+
+2. **Check for Subproviders (using cache)**
+
+```bash
+# Check if provider has subproviders using cached data
+HAS_SUBPROVIDERS=$(echo "$MODELS_DATA" | grep "^${quality_planning_provider}/" | awk -F'/' '{print NF}' | head -1 | grep -q '^3$' && echo "true" || echo "false")
+```
+
+If result is "true" (provider has subproviders):
+
+**Build Subprovider Menu (lazy-load examples only when selected):**
+
+```bash
+# Get subproviders with counts from cache
+echo "$MODELS_DATA" | grep "^${quality_planning_provider}/" | awk -F'/' '{print $2}' | sort | uniq -c | while read count subprovider; do
+  echo "- label: \"$subprovider\""
+  echo "  description: \"$count models\""
+done
+```
+
+Use Question tool:
+
+```
+header: "Quality Profile - {quality_planning_provider} Subprovider (Planning Stage)"
+question: "Which subprovider for planning agents?"
+options:
+  - label: "{subprovider1}"
+    description: "{model_count} models (e.g., {model1}, {model2}, {model3}, ...)"
+  - label: "{subprovider2}"
+    description: "{model_count} models (e.g., {model1}, {model2}, {model3}, ...)"
+  [all unique subproviders for this provider with 3 example models each]
+```
+
+Store selected subprovider as `quality_planning_subprovider`.
+
+3. **Choose Model (using cache)**
+
+For 3-level structure (provider/subprovider/model):
+```bash
+MODELS=$(echo "$MODELS_DATA" | grep "^${quality_planning_provider}/${quality_planning_subprovider}/" | cut -d'/' -f3- | sort)
+```
+
+For 2-level structure (provider/model):
+```bash
+MODELS=$(echo "$MODELS_DATA" | grep "^${quality_planning_provider}/" | cut -d'/' -f2- | sort)
+```
+
+Use Question tool:
+
+```
+header: "{quality_planning_provider} {quality_planning_subprovider} Models"
+question: "Which model for planning?"
+options:
+  [models from filtered list]
+```
+
+Store full model ID as `quality_planning_model`.
+
+**W2.2: Quality Profile - Execution Stage**
+
+1. **Choose Provider (using cached data)**
+
+Use Question tool with smart proposal:
+
+```
+header: "Quality Profile - Execution"
+question: "Which provider for execution agents (Quality profile)?"
+options:
+  - label: "Same as planning"
+    description: "Use {quality_planning_model}"
+  [providers from cache with counts]
+```
+
+If "Same as planning" selected: Set `quality_execution_model = quality_planning_model`, skip to W2.3.
+
+Otherwise: Repeat W2.1 steps 2-3 (subprovider → model) for execution, store as `quality_execution_model`.
+
+**W2.3: Quality Profile - Verification Stage**
+
+Use Question tool with smart proposals (using cached data):
+
+```
+header: "Quality Profile - Verification"
+question: "Which provider for verification agents (Quality profile)?"
+options:
+  - label: "Same as planning"
+    description: "Use {quality_planning_model}"
+  - label: "Same as execution"
+    description: "Use {quality_execution_model}"
+  [providers from cache with counts]
+```
+
+If "Same as planning" selected: Set `quality_verification_model = quality_planning_model`, skip to W2.4.
+
+If "Same as execution" selected: Set `quality_verification_model = quality_execution_model`, skip to W2.4.
+
+Otherwise: Repeat W2.1 steps 2-3 (subprovider → model) for verification, store as `quality_verification_model`.
+
+**Step W3: Configure Balanced Profile**
+
+Configure all 3 stages for balanced profile with smart proposals from quality profile.
+
+**W3.1: Balanced Profile - Planning**
+
+Use Question tool (using cached data):
+
+```
+header: "Balanced Profile - Planning"
+question: "Which provider for planning agents (Balanced profile)?"
+options:
+  - label: "Same as quality profile"
+    description: "Use {quality_planning_model}"
+  [providers from cache with counts]
+```
+
+If "Same as quality profile" selected: Set `balanced_planning_model = quality_planning_model`, skip to W3.2.
+
+Otherwise: Repeat hierarchical selection (provider → subprovider → model), store as `balanced_planning_model`.
+
+**W3.2: Balanced Profile - Execution**
+
+Use Question tool (using cached data):
+
+```
+header: "Balanced Profile - Execution"
+question: "Which provider for execution agents (Balanced profile)?"
+options:
+  - label: "Same as planning"
+    description: "Use {balanced_planning_model}"
+  - label: "Same as quality execution"
+    description: "Use {quality_execution_model}"
+  [providers from cache with counts]
+```
+
+If "Same as planning" selected: Set `balanced_execution_model = balanced_planning_model`, skip to W3.3.
+
+If "Same as quality execution" selected: Set `balanced_execution_model = quality_execution_model`, skip to W3.3.
+
+Otherwise: Repeat hierarchical selection, store as `balanced_execution_model`.
+
+**W3.3: Balanced Profile - Verification**
+
+Use Question tool (using cached data):
+
+```
+header: "Balanced Profile - Verification"
+question: "Which provider for verification agents (Balanced profile)?"
+options:
+  - label: "Same as planning"
+    description: "Use {balanced_planning_model}"
+  - label: "Same as quality verification"
+    description: "Use {quality_verification_model}"
+  [providers from cache with counts]
+```
+
+If "Same as planning" selected: Set `balanced_verification_model = balanced_planning_model`, skip to W4.
+
+If "Same as quality verification" selected: Set `balanced_verification_model = quality_verification_model`, skip to W4.
+
+Otherwise: Repeat hierarchical selection, store as `balanced_verification_model`.
+
+**Step W4: Configure Budget Profile**
+
+Configure all 3 stages for budget profile with smart proposals from balanced and quality profiles.
+
+**W4.1: Budget Profile - Planning**
+
+Use Question tool (using cached data):
+
+```
+header: "Budget Profile - Planning"
+question: "Which provider for planning agents (Budget profile)?"
+options:
+  - label: "Same as balanced profile"
+    description: "Use {balanced_planning_model}"
+  - label: "Same as quality profile"
+    description: "Use {quality_planning_model}"
+  [providers from cache with counts]
+```
+
+If "Same as balanced profile" selected: Set `budget_planning_model = balanced_planning_model`, skip to W4.2.
+
+If "Same as quality profile" selected: Set `budget_planning_model = quality_planning_model`, skip to W4.2.
+
+Otherwise: Repeat hierarchical selection, store as `budget_planning_model`.
+
+**W4.2: Budget Profile - Execution**
+
+Use Question tool (using cached data):
+
+```
+header: "Budget Profile - Execution"
+question: "Which provider for execution agents (Budget profile)?"
+options:
+  - label: "Same as planning"
+    description: "Use {budget_planning_model}"
+  - label: "Same as balanced execution"
+    description: "Use {balanced_execution_model}"
+  - label: "Same as quality execution"
+    description: "Use {quality_execution_model}"
+  [providers from cache with counts]
+```
+
+If "Same as planning" selected: Set `budget_execution_model = budget_planning_model`, skip to W4.3.
+
+Otherwise if other "Same as" option selected: Set accordingly and skip to W4.3.
+
+Otherwise: Repeat hierarchical selection, store as `budget_execution_model`.
+
+**W4.3: Budget Profile - Verification**
+
+Use Question tool (using cached data):
+
+```
+header: "Budget Profile - Verification"
+question: "Which provider for verification agents (Budget profile)?"
+options:
+  - label: "Same as planning"
+    description: "Use {budget_planning_model}"
+  - label: "Same as balanced verification"
+    description: "Use {balanced_verification_model}"
+  - label: "Same as quality verification"
+    description: "Use {quality_verification_model}"
+  [providers from cache with counts]
+```
+
+If "Same as planning" selected: Set `budget_verification_model = budget_planning_model`, skip to W5.
+
+Otherwise if other "Same as" option selected: Set accordingly and skip to W5.
+
+Otherwise: Repeat hierarchical selection, store as `budget_verification_model`.
+
+**Step W5: Save config**
 
 Create config with user selections:
 
@@ -99,9 +395,21 @@ Create config with user selections:
   "profiles": {
     "active_profile": "balanced",
     "presets": {
-      "quality": { "planning": "{user_selection}", "execution": "{user_selection}", "verification": "{user_selection}" },
-      "balanced": { "planning": "{user_selection}", "execution": "{user_selection}", "verification": "{user_selection}" },
-      "budget": { "planning": "{user_selection}", "execution": "{user_selection}", "verification": "{user_selection}" }
+      "quality": {
+        "planning": "{user_selection}",
+        "execution": "{user_selection}",
+        "verification": "{user_selection}"
+      },
+      "balanced": {
+        "planning": "{user_selection}",
+        "execution": "{user_selection}",
+        "verification": "{user_selection}"
+      },
+      "budget": {
+        "planning": "{user_selection}",
+        "execution": "{user_selection}",
+        "verification": "{user_selection}"
+      }
     },
     "custom_overrides": { "quality": {}, "balanced": {}, "budget": {} }
   },
@@ -116,7 +424,7 @@ Print:
  GSD ► PRESETS CONFIGURED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Your model presets have been saved. Use "Reset presets" 
+Your model presets have been saved. Use "Reset presets"
 from the settings menu if available models change.
 
 Note: Quit and relaunch OpenCode to apply model changes.
@@ -187,10 +495,26 @@ Use multi-question call with pre-selected current values:
 
 ```json
 [
-  { "header": "Model", "question": "Which model profile?", "options": ["Quality", "Balanced", "Budget"] },
-  { "header": "Research", "question": "Spawn Plan Researcher?", "options": ["Yes", "No"] },
-  { "header": "Plan Check", "question": "Spawn Plan Checker?", "options": ["Yes", "No"] },
-  { "header": "Verifier", "question": "Spawn Execution Verifier?", "options": ["Yes", "No"] }
+  {
+    "header": "Model",
+    "question": "Which model profile?",
+    "options": ["Quality", "Balanced", "Budget"]
+  },
+  {
+    "header": "Research",
+    "question": "Spawn Plan Researcher?",
+    "options": ["Yes", "No"]
+  },
+  {
+    "header": "Plan Check",
+    "question": "Spawn Plan Checker?",
+    "options": ["Yes", "No"]
+  },
+  {
+    "header": "Verifier",
+    "question": "Spawn Execution Verifier?",
+    "options": ["Yes", "No"]
+  }
 ]
 ```
 
@@ -223,13 +547,128 @@ Quick commands:
 
 ### Set stage override
 
-1. Pick stage: Planning / Execution / Verification / Cancel
-2. If Cancel, return to menu
-3. Fetch models via `opencode models` command
-4. If command fails: print error and stop
-5. Pick model from list (include Cancel option)
-6. Set `custom_overrides[activeProfile][stage]` = model
-7. Save, print "Saved", return to menu
+1. **Pick stage**
+
+Use Question tool:
+
+```
+header: "Select Stage"
+question: "Which stage to override?"
+options:
+  - label: "Planning"
+    description: "Override planning model"
+  - label: "Execution"
+    description: "Override execution model"
+  - label: "Verification"
+    description: "Override verification model"
+  - label: "Cancel"
+    description: "Return to menu"
+```
+
+If Cancel selected, return to menu.
+
+Store selected stage as `targetStage`.
+
+2. **Choose Provider (using cache)**
+
+Initialize cache if not already available:
+```bash
+[ -z "$MODELS_DATA" ] && MODELS_DATA=$(opencode models 2>/dev/null)
+PROVIDER_COUNTS=$(echo "$MODELS_DATA" | awk -F'/' '{count[$1]++} END {for(p in count) print p ":" count[p]}')
+```
+
+Build provider menu from cache:
+```bash
+echo "$PROVIDER_COUNTS" | while IFS=':' read -r provider count; do
+  echo "- label: \"$provider\""
+  echo "  description: \"$count models\""
+done
+```
+
+Use Question tool:
+
+```
+header: "Choose LLM Provider ({activeProfile} profile)"
+question: "Which provider for {targetStage} stage?"
+options:
+  [providers from cache with counts]
+  - label: "Cancel"
+    description: "Return to menu"
+```
+
+If Cancel selected, return to menu.
+
+Store selected provider as `overrideProvider`.
+
+3. **Check for Subproviders (using cache)**
+
+```bash
+HAS_SUBPROVIDERS=$(echo "$MODELS_DATA" | grep "^${overrideProvider}/" | awk -F'/' '{print NF}' | head -1 | grep -q '^3$' && echo "true" || echo "false")
+```
+
+If result is "true" (provider has subproviders):
+
+Build subprovider menu from cache:
+```bash
+echo "$MODELS_DATA" | grep "^${overrideProvider}/" | awk -F'/' '{print $2}' | sort | uniq -c | while read count subprovider; do
+  echo "- label: \"$subprovider\""
+  echo "  description: \"$count models\""
+done
+```
+
+Use Question tool:
+
+```
+header: "{activeProfile} Profile - {overrideProvider} Subprovider ({targetStage} Stage)"
+question: "Which subprovider for {targetStage}?"
+options:
+  [subproviders from cache with counts]
+  - label: "Cancel"
+    description: "Back to provider selection"
+```
+
+If Cancel selected, return to step 2.
+
+Store selected subprovider as `overrideSubprovider`.
+
+4. **Choose Model**
+
+For 3-level structure (provider/subprovider/model):
+```bash
+MODELS=$(echo "$MODELS_DATA" | grep "^${overrideProvider}/${overrideSubprovider}/" | cut -d'/' -f3- | sort)
+```
+
+For 2-level structure (provider/model):
+```bash
+MODELS=$(echo "$MODELS_DATA" | grep "^${overrideProvider}/" | cut -d'/' -f2- | sort)
+```
+
+Use Question tool:
+
+```
+header: "{overrideProvider} {overrideSubprovider} Models"
+question: "Which model for {targetStage} stage?"
+options:
+  [models from cache]
+  - label: "Cancel"
+    description: "Back to provider selection"
+```
+
+If Cancel selected, return to step 2.
+
+Store selected model and construct full model ID:
+- 3-level: `{overrideProvider}/{overrideSubprovider}/{model}`
+- 2-level: `{overrideProvider}/{model}`
+
+5. **Save Override**
+
+Set `config.profiles.custom_overrides[activeProfile][targetStage] = model_id`
+
+6. **Save and Return**
+
+Save both files and print: `Saved {targetStage} override: {model_id}`
+
+Return to main menu (Step 4).
 
 ### Clear stage override
 
@@ -253,7 +692,7 @@ Current overrides for {activeProfile} profile:
 
 ### Reset presets
 
-Run the **Preset Setup Wizard** (see Step 1). This re-queries available models and lets the user reconfigure all three profiles from scratch. Existing `custom_overrides` are cleared. After completion, return to menu.
+Run the **Preset Setup Wizard** (see Step 1, W1-W5). This re-queries available models and lets the user reconfigure all three profiles from scratch using hierarchical selection. Existing `custom_overrides` are cleared. After completion, return to menu.
 
 ### Exit
 
@@ -299,5 +738,12 @@ Preserve existing non-agent keys in `opencode.json`.
 - Overrides are profile-scoped: `custom_overrides.{profile}.{stage}`
 - Source of truth: `config.json`; `opencode.json` is derived
 - OpenCode does not hot-reload model assignments; user must quit and relaunch to apply changes
+- Model IDs support 2-level (provider/model) and 3-level (provider/subprovider/model) structures
+- Hierarchical selection is used by default: provider → subprovider (if applicable) → model
+- Providers with subproviders: openrouter (anthropic, meta-llama, google, etc.), synthetic (hf:deepseek-ai, hf:meta-llama, etc.)
+- Providers without subproviders: opencode, xai, back, ollama, kimi-for-coding, zai-coding-plan
+- Smart proposals allow reusing previous selections across profiles and stages to reduce user input
+- All model selections are validated against `opencode models` output
+- **Performance Optimization:** All model discovery uses a single cached `MODELS_DATA` variable instead of repeated `opencode models` calls. Provider counts are pre-computed with awk for O(n) efficiency. Lazy loading: model examples are not fetched until user selects a subprovider.
 
 </notes>
