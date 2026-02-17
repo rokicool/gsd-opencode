@@ -264,6 +264,65 @@ import { something } from '@gsd-opencode/lib/constants.js';
     });
   });
 
+  describe('Absolute path reference replacement', () => {
+    it('local install should replace @~/.config/opencode/ with ./.opencode/', async () => {
+      // Arrange: Create a test file with absolute path references
+      const scopeManager = new ScopeManager({ scope: 'local' });
+      const fileOps = new FileOperations(scopeManager, logger);
+
+      const sourceContent = `# Test Document
+
+This document references:
+- @~/.config/opencode/workflows/execute-plan.md
+- @~/.config/opencode/templates/summary.md
+- @~/.config/opencode/agents/test-agent/SKILL.md
+`;
+      const sourcePath = path.join(tempDir, 'abs-ref-source.md');
+      const targetPath = path.join(tempDir, 'abs-ref-output.md');
+      await fs.writeFile(sourcePath, sourceContent, 'utf-8');
+
+      // Act: Copy the file using FileOperations
+      await fileOps._copyFile(sourcePath, targetPath);
+
+      // Assert: Read the output and verify replacements
+      const content = await fs.readFile(targetPath, 'utf-8');
+
+      // Verify NO @~/.config/opencode/ references remain
+      expect(content).not.toContain('@~/.config/opencode/');
+
+      // Verify all references are replaced with relative local path
+      expect(content).toContain('./.opencode/workflows/execute-plan.md');
+      expect(content).toContain('./.opencode/templates/summary.md');
+      expect(content).toContain('./.opencode/agents/test-agent/SKILL.md');
+    });
+
+    it('global install should preserve @~/.config/opencode/ references', async () => {
+      // Arrange: Create a test file with absolute path references
+      const scopeManager = new ScopeManager({ scope: 'global' });
+      const fileOps = new FileOperations(scopeManager, logger);
+
+      const sourceContent = `# Test Document
+
+This document references:
+- @~/.config/opencode/workflows/execute-plan.md
+- @~/.config/opencode/templates/summary.md
+`;
+      const sourcePath = path.join(tempDir, 'abs-ref-global-source.md');
+      const targetPath = path.join(tempDir, 'abs-ref-global-output.md');
+      await fs.writeFile(sourcePath, sourceContent, 'utf-8');
+
+      // Act: Copy the file using FileOperations
+      await fileOps._copyFile(sourcePath, targetPath);
+
+      // Assert: Read the output and verify @~/.config/opencode/ is preserved
+      const content = await fs.readFile(targetPath, 'utf-8');
+
+      // For global installs, @~/.config/opencode/ should stay unchanged
+      expect(content).toContain('@~/.config/opencode/workflows/execute-plan.md');
+      expect(content).toContain('@~/.config/opencode/templates/summary.md');
+    });
+  });
+
   describe('Nested directory handling', () => {
     it('should replace paths in deeply nested .md files', async () => {
       // Arrange

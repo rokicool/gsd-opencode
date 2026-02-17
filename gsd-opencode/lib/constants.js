@@ -46,7 +46,13 @@ export const PATH_PATTERNS = {
    * Pattern to match @gsd-opencode/ references in markdown files.
    * Used for replacing package references with actual paths.
    */
-  gsdReference: /@gsd-opencode\//g
+  gsdReference: /@gsd-opencode\//g,
+  /**
+   * Pattern to match @~/.config/opencode/ references in markdown files.
+   * These are absolute references to the global config that need to be
+   * replaced for local installs.
+   */
+  absoluteReference: /@~\/\.config\/opencode\//g
 };
 
 /**

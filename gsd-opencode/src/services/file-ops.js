@@ -474,8 +474,15 @@ export class FileOperations {
       // Read, replace, and write markdown content
       let content = await fs.readFile(sourcePath, 'utf-8');
 
-      // Optimization: Skip files that don't contain @gsd-opencode/ references
-      if (!PATH_PATTERNS.gsdReference.test(content)) {
+      // Optimization: Skip files that don't contain any patterns needing replacement
+      const hasGsdRef = PATH_PATTERNS.gsdReference.test(content);
+      PATH_PATTERNS.gsdReference.lastIndex = 0; // Reset regex
+      const hasAbsRef = PATH_PATTERNS.absoluteReference && PATH_PATTERNS.absoluteReference.test(content);
+      if (PATH_PATTERNS.absoluteReference) {
+        PATH_PATTERNS.absoluteReference.lastIndex = 0; // Reset regex
+      }
+
+      if (!hasGsdRef && !hasAbsRef) {
         await fs.copyFile(sourcePath, targetPath, fsConstants.COPYFILE_FICLONE);
         return;
       }
@@ -489,6 +496,15 @@ export class FileOperations {
         PATH_PATTERNS.gsdReference,
         () => targetDir + '/'
       );
+
+      // For local installs, also replace @~/.config/opencode/ with local path
+      // This handles files that have hardcoded global references
+      if (this.scopeManager.scope === 'local' && PATH_PATTERNS.absoluteReference) {
+        content = content.replace(
+          PATH_PATTERNS.absoluteReference,
+          () => targetDir + '/'
+        );
+      }
 
       await fs.writeFile(targetPath, content, 'utf-8');
     } else {
