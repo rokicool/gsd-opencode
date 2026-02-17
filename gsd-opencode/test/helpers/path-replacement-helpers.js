@@ -113,7 +113,7 @@ export async function createMockSourceDir(tempDir) {
   // Create directory structure
   const dirs = [
     path.join(sourceDir, 'agents', 'test-agent'),
-    path.join(sourceDir, 'command', 'gsd'),
+    path.join(sourceDir, 'commands', 'gsd'),
     path.join(sourceDir, 'get-shit-done', 'templates'),
     path.join(sourceDir, 'get-shit-done', 'workflows')
   ];
@@ -162,7 +162,7 @@ Uses files from @gsd-opencode/get-shit-done/templates/
 `;
 
   await fs.writeFile(
-    path.join(sourceDir, 'command', 'gsd', 'test.md'),
+    path.join(sourceDir, 'commands', 'gsd', 'test.md'),
     commandContent,
     'utf-8'
   );
