@@ -483,7 +483,8 @@ export class FileOperations {
       // Replace @gsd-opencode/ references with actual path
       // Use function-based replacement to avoid issues with special characters
       // like '$' in the target directory path
-      const targetDir = this.scopeManager.getTargetDir();
+      // Use getPathPrefix() to get the correct prefix (./.opencode for local, ~/.config/opencode for global)
+      const targetDir = this.scopeManager.getPathPrefix();
       content = content.replace(
         PATH_PATTERNS.gsdReference,
         () => targetDir + '/'

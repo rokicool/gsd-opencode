@@ -413,6 +413,15 @@ Plans:
 | Phase 8 | INST-11, UPDATE-07, CHECK-06, MIGRATE-01-03 | 6 |
 | Phase 8 | TBD (support opencode/commands/ directory) | TBD |
 
+### Phase 9: fix support for local install
+
+**Goal:** Fix local installation path replacement bug where @gsd-opencode/ references are not replaced
+**Depends on:** Phase 8
+**Plans:** 1 plan in 1 wave
+
+Plans:
+- [ ] 09-01-PLAN.md — Fix path replacement for local scope (NOT DONE - needs rework)
+
 ---
 
 *Roadmap created: 2026-02-09*  
