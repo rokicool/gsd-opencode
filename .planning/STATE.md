@@ -7,11 +7,11 @@
 
 ## Current Position
 
-**Current Phase:** Phase 8 (complete)
-**Current Plan:** 5 of 5 in current phase
-**Status:** 🟢 Phase 8 complete — All lifecycle commands support both directory structures
-**Overall Progress:** 58/58 requirements complete (100%), All phases complete
-**Status:** 🟢 v1.0 COMPLETE — Ready for release
+**Current Phase:** Phase 9 (in progress)
+**Current Plan:** 1 of 1 in current phase
+**Status:** 🟡 Phase 9 in progress — Local install path replacement bug fix
+**Overall Progress:** 62/62 requirements complete (100%), 8/9 phases complete
+**Next Phase:** Phase 9 Plan 2 (if any)
 **Next Phase:** v1 Release Preparation (packaging, documentation, publishing)
 
 ```
@@ -33,6 +33,7 @@
 | Phase 6: Integration & Polish | 🟢 Completed | 2/2 | None |
 | Phase 7: Make Uninstall Safe and User-Friendly | 🟢 Completed | 2/2 plans complete | None |
 | Phase 8: Support for opencode/commands/ Directory Structure | 🟢 Completed | 5/5 | None |
+| Phase 9: Fix Support for Local Install | 🟡 In Progress | 1/1 | None |
 
 ---
 
@@ -142,16 +143,18 @@ None currently.
 |------|--------|---------|
 | 2026-02-11 | Phase 7 added | Make uninstall safe and user-friendly — identified during v1 completion review |
 | 2026-02-11 | Phase 8 added | Support for opencode/commands/ directory structure — support for commands folder naming |
+| 2026-02-16 | Phase 9 added | Fix support for local install — address local installation issues |
+| 2026-02-17 | Phase 9 Plan 01 complete | Fixed path replacement bug for local scope with special characters |
 
 ---
 
 ## Session Continuity
 
-**Last Session:** 2026-02-12
-**Stopped at:** Completed 08-05-PLAN.md (Lifecycle Support)
-**Resume file:** None
-**Current Focus:** v1 Release Preparation
-**Next Action:** Final documentation review and npm package publishing
+**Last Session:** 2026-02-17T02:33:00.000Z
+**Stopped at:** Phase 9 Plan 01 complete
+**Resume file:** .planning/phases/09-fix-support-for-local-install/09-01-SUMMARY.md
+**Current Focus:** Phase 9 — Local install path replacement bug fixed
+**Next Action:** Review if additional Phase 9 plans needed or proceed to release preparation
 
 ### Recently Completed
 
@@ -249,6 +252,15 @@ None currently.
   - --skip-migration flag for advanced users (not recommended)
   - Repair command supports --fix-structure and --fix-all flags
   - All 175 tests pass (100% pass rate)
+
+- ✓ **PHASE 9 PLAN 01 COMPLETE** — Fix Local Install Path Replacement Bug
+  - Fixed _copyFile method to use function-based replacement
+  - Bug was caused by special characters ($) in paths being interpreted as replacement patterns
+  - Added optimization to skip files without @gsd-opencode/ references
+  - Added 3 new unit tests for local scope path replacement
+  - Fixed test helper to use correct 'commands/' directory structure
+  - All 37 path replacement tests pass (24 unit + 13 integration)
+  - Requirements LOCAL-01 through LOCAL-04 satisfied
 
 - ✓ **PHASE 8 PLAN 05 COMPLETE** — Lifecycle Support: Uninstall and Repair for Both Structures
   - Uninstall command scans both command/gsd/ and commands/gsd/ directories
