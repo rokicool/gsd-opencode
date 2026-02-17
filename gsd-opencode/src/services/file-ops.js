@@ -474,11 +474,19 @@ export class FileOperations {
       // Read, replace, and write markdown content
       let content = await fs.readFile(sourcePath, 'utf-8');
 
+      // Optimization: Skip files that don't contain @gsd-opencode/ references
+      if (!PATH_PATTERNS.gsdReference.test(content)) {
+        await fs.copyFile(sourcePath, targetPath, fsConstants.COPYFILE_FICLONE);
+        return;
+      }
+
       // Replace @gsd-opencode/ references with actual path
+      // Use function-based replacement to avoid issues with special characters
+      // like '$' in the target directory path
       const targetDir = this.scopeManager.getTargetDir();
       content = content.replace(
         PATH_PATTERNS.gsdReference,
-        targetDir + '/'
+        () => targetDir + '/'
       );
 
       await fs.writeFile(targetPath, content, 'utf-8');
