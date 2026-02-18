@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.2] - 2026-02-17
+
+Overview: Fixed path replacement bug in file operations service for local scope installs. Removed duplicate local directory and obsolete backup files. Added comprehensive test coverage for path replacement functionality.
+
+### Fixed
+
+- Fixed path replacement bug in `gsd-opencode/src/services/file-ops.js` `_copyFile` method that incorrectly handled absolute path references in local installs
+
+### Added
+
+- Added comprehensive test coverage for local scope path replacement in `gsd-opencode/test/unit/file-ops.test.js`
+- Added path replacement helper utilities in `gsd-opencode/test/helpers/path-replacement-helpers.js`
+
+### Changed
+
+- Updated `gsd-opencode/agents/gsd-settings.md` with enhanced configuration documentation
+- Modified `gsd-opencode/lib/constants.js` with updated constants
+
+### Removed
+
+- Removed duplicate `local/gsd-opencode/` directory containing 162 redundant files
+- Removed obsolete `local/gsd-opencode/package.json-old` backup file
+
 ## [1.10.1] - 2026-02-13
 
 Overview: Fixed release workflow directory references and updated changelog generation to use manually maintained CHANGELOG.md file instead of generating from git log.
