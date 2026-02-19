@@ -422,6 +422,40 @@ Plans:
 Plans:
 - [ ] 09-01-PLAN.md — Fix path replacement for local scope (NOT DONE - needs rework)
 
+### Phase 10: Create Node.js script to translate gsd to gsd-opencode
+
+**Goal:** Create a utility script that translates/replaces references from "gsd" to "gsd-opencode" in files for migration purposes
+**Depends on:** Phase 9
+**Plans:** 1 plan in 1 wave
+
+**Requirements:**
+| ID | Requirement |
+|----|-------------|
+| TRANS-01 | Script accepts file paths or glob patterns as input |
+| TRANS-02 | Script supports dry-run mode to preview changes |
+| TRANS-03 | Script supports in-place editing or output to new files |
+| TRANS-04 | Script handles various file types (md, js, json, yaml, etc.) |
+| TRANS-05 | Script provides clear output about what was changed |
+| TRANS-06 | Script has comprehensive tests |
+
+**Success Criteria:**
+1. User can run `gsd-opencode translate "*.md"` to translate all markdown files
+2. Dry-run mode shows preview without modifying files
+3. Output directory mode preserves originals and writes to new location
+4. In-place mode modifies files directly
+5. Pattern matching respects word boundaries (no partial matches)
+6. Case preservation works (GSD -> GSD-OPENCODE)
+7. Clear output shows files processed and replacement counts
+8. All unit and integration tests pass
+
+**Wave Structure:**
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 10-01 | Complete translation utility with TextTranslator service, CLI command, and tests |
+
+Plans:
+- [ ] 10-01-PLAN.md — Create translation utility with TextTranslator service, CLI command, standalone script, and comprehensive tests
+
 ---
 
 *Roadmap created: 2026-02-09*  

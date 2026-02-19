@@ -1,0 +1,36 @@
+{
+  "name": "gsd-opencode-translator",
+  "version": "1.0.0",
+  "description": "Text translation utility for migrating from 'gsd' to 'gsd-opencode'",
+  "type": "module",
+  "main": "bin/translate.js",
+  "bin": {
+    "translate-gsd": "bin/translate.js"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "translate": "node bin/translate.js",
+    "translate:help": "node bin/translate.js --help"
+  },
+  "keywords": [
+    "gsd",
+    "gsd-opencode",
+    "translate",
+    "migrate",
+    "text-replacement"
+  ],
+  "author": "Roki",
+  "license": "MIT",
+  "dependencies": {
+    "diff": "^5.1.0",
+    "tinyglobby": "^0.2.9"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
