@@ -80,11 +80,31 @@ export class TextTranslator {
       // Use provided regex directly
       regex = rule.pattern;
     } else if (typeof rule.pattern === 'string') {
-      // Convert string to regex with word boundaries
-      const flags = rule.flags || (rule.caseSensitive ? 'g' : 'gi');
-      const escaped = this.escapeRegex(rule.pattern);
-      // Use word boundaries to avoid partial matches
-      regex = new RegExp(`\\b${escaped}\\b`, flags);
+      // Convert string to regex
+      const flags = rule.flags || (rule.caseSensitive ? 'gm' : 'gmi');
+
+      if (rule.isRegex) {
+        // Use pattern as raw regex (no escaping, no word boundaries)
+        regex = new RegExp(rule.pattern, flags);
+      } else {
+        // Escape and add word boundaries for literal string matching
+        const escaped = this.escapeRegex(rule.pattern);
+
+        // Only use word boundaries if pattern starts/ends with word characters
+        // Word boundaries \b only work with [a-zA-Z0-9_]
+        const startsWithWord = /^[a-zA-Z0-9_]/.test(rule.pattern);
+        const endsWithWord = /[a-zA-Z0-9_]$/.test(rule.pattern);
+
+        let patternStr = escaped;
+        if (startsWithWord) {
+          patternStr = '\\b' + patternStr;
+        }
+        if (endsWithWord) {
+          patternStr = patternStr + '\\b';
+        }
+
+        regex = new RegExp(patternStr, flags);
+      }
     } else {
       throw new Error(`Invalid pattern type: ${typeof rule.pattern}`);
     }
@@ -92,7 +112,8 @@ export class TextTranslator {
     return {
       regex,
       replacement: rule.replacement,
-      caseSensitive: rule.caseSensitive || false
+      caseSensitive: rule.caseSensitive || false,
+      transform: rule.transform || null
     };
   }
 
@@ -181,6 +202,19 @@ export class TextTranslator {
   }
 
   /**
+   * Process escape sequences in a string (\n -> newline, \t -> tab, etc.)
+   * @param {string} str
+   * @returns {string}
+   */
+  processEscapes(str) {
+    return str
+      .replace(/\\n/g, '\n')
+      .replace(/\\t/g, '\t')
+      .replace(/\\r/g, '\r')
+      .replace(/\\\\/g, '\\');
+  }
+
+  /**
    * Apply a single translation rule
    * @param {string} content
    * @param {Object} rule
@@ -190,6 +224,9 @@ export class TextTranslator {
     const changes = [];
     const lines = content.split('\n');
     let result = content;
+
+    // Process escape sequences in the replacement string
+    const processedReplacement = this.processEscapes(rule.replacement);
 
     // Track position changes as we modify the content
     let offset = 0;
@@ -207,12 +244,12 @@ export class TextTranslator {
       const lastNewline = textBeforeMatch.lastIndexOf('\n');
       const columnNumber = position - (lastNewline === -1 ? 0 : lastNewline + 1) + 1;
 
-      // Preserve case if possible
-      let replacement = rule.replacement;
+      // Preserve case if possible (using processed replacement)
+      let replacement = processedReplacement;
       if (!rule.caseSensitive && matchText === matchText.toUpperCase() && matchText !== matchText.toLowerCase()) {
-        replacement = rule.replacement.toUpperCase();
+        replacement = processedReplacement.toUpperCase();
       } else if (!rule.caseSensitive && matchText[0] === matchText[0].toUpperCase()) {
-        replacement = rule.replacement.charAt(0).toUpperCase() + rule.replacement.slice(1);
+        replacement = processedReplacement.charAt(0).toUpperCase() + processedReplacement.slice(1);
       }
 
       // Record the change
@@ -225,20 +262,28 @@ export class TextTranslator {
     }
 
     // Apply the replacement with case preservation
-    result = content.replace(rule.regex, (match) => {
+    result = content.replace(rule.regex, (match, ...args) => {
+      // Handle special transforms
+      if (rule.transform === 'tools_list_to_yaml') {
+        // args[0] is the captured group (the tools list)
+        const toolsList = args[0];
+        const tools = toolsList.split(',').map(t => t.trim()).filter(t => t);
+        return 'tools:\n' + tools.map(t => `  ${t}: true`).join('\n');
+      }
+
       if (rule.caseSensitive) {
-        return rule.replacement;
+        return processedReplacement;
       }
       // All uppercase: GSD -> GSD-OPENCODE
       if (match === match.toUpperCase() && match !== match.toLowerCase()) {
-        return rule.replacement.toUpperCase();
+        return processedReplacement.toUpperCase();
       }
       // Title case (first letter uppercase): Gsd -> Gsd-opencode
       if (match[0] === match[0].toUpperCase()) {
-        return rule.replacement.charAt(0).toUpperCase() + rule.replacement.slice(1);
+        return processedReplacement.charAt(0).toUpperCase() + processedReplacement.slice(1);
       }
       // Default (lowercase): gsd -> gsd-opencode
-      return rule.replacement;
+      return processedReplacement;
     });
 
     return { content: result, changes };

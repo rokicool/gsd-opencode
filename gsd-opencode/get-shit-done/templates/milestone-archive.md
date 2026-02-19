@@ -39,7 +39,7 @@ Plans:
 
 **For decimal phases, include (INSERTED) marker:**
 
-### Phase 2.1: Critical Security Patch (INSERTED)
+### Phase 2.1: Critical Security patch (INSERTED)
 
 **Goal**: Fix authentication bypass vulnerability
 **Depends on**: Phase 2
@@ -47,7 +47,7 @@ Plans:
 
 Plans:
 
-- [x] 02.1-01: Patch auth vulnerability
+- [x] 02.1-01: patch auth vulnerability
 
 **Details:**
 {{PHASE_DETAILS_FROM_ROADMAP}}
@@ -58,7 +58,7 @@ Plans:
 
 **Decimal Phases:**
 
-- Phase 2.1: Critical Security Patch (inserted after Phase 2 for urgent fix)
+- Phase 2.1: Critical Security patch (inserted after Phase 2 for urgent fix)
 - Phase 5.1: Performance Hotfix (inserted after Phase 5 for production issue)
 
 **Key Decisions:**

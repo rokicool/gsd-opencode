@@ -1,5 +1,5 @@
 ---
-name: gsd:join-discord
+name: gsd-join-discord
 description: Join the GSD Discord community
 ---
 

@@ -3,23 +3,23 @@ Add a new integer phase to the end of the current milestone in the roadmap. Auto
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
 
 <step name="parse_arguments">
 Parse the command arguments:
-- All arguments become the phase description
-- Example: `/gsd:add-phase Add authentication` → description = "Add authentication"
-- Example: `/gsd:add-phase Fix critical performance issues` → description = "Fix critical performance issues"
+- $ARGUMENTS become the phase description
+- Example: `/gsd-add-phase Add authentication` → description = "Add authentication"
+- Example: `/gsd-add-phase Fix critical performance issues` → description = "Fix critical performance issues"
 
 If no arguments provided:
 
 ```
 ERROR: Phase description required
-Usage: /gsd:add-phase <description>
-Example: /gsd:add-phase Add authentication system
+Usage: /gsd-add-phase <description>
+Example: /gsd-add-phase Add authentication system
 ```
 
 Exit.
@@ -29,13 +29,13 @@ Exit.
 Load phase operation context:
 
 ```bash
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init phase-op "0")
+INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init phase-op "0")
 ```
 
 Check `roadmap_exists` from init JSON. If false:
 ```
 ERROR: No roadmap found (.planning/ROADMAP.md)
-Run /gsd:new-project to initialize.
+Run /gsd-new-project to initialize.
 ```
 Exit.
 </step>
@@ -44,7 +44,7 @@ Exit.
 **Delegate the phase addition to gsd-tools:**
 
 ```bash
-RESULT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs phase add "${description}")
+RESULT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs phase add "${description}")
 ```
 
 The CLI handles:
@@ -60,7 +60,7 @@ Extract from result: `phase_number`, `padded`, `name`, `slug`, `directory`.
 <step name="update_project_state">
 Update STATE.md to reflect the new phase:
 
-1. Read `.planning/STATE.md`
+1. read `.planning/STATE.md`
 2. Under "## Accumulated Context" → "### Roadmap Evolution" add entry:
    ```
    - Phase {N} added: {description}
@@ -86,14 +86,14 @@ Roadmap updated: .planning/ROADMAP.md
 
 **Phase {N}: {description}**
 
-`/gsd:plan-phase {N}`
+`/gsd-plan-phase {N}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:add-phase <description>` — add another phase
+- `/gsd-add-phase <description>` — add another phase
 - Review roadmap
 
 ---

@@ -3,7 +3,7 @@ Create `.continue-here.md` handoff file to preserve complete work state across s
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -34,7 +34,7 @@ Ask user for clarifications if needed via conversational questions.
 </step>
 
 <step name="write">
-**Write handoff to `.planning/phases/XX-name/.continue-here.md`:**
+**write handoff to `.planning/phases/XX-name/.continue-here.md`:**
 
 ```markdown
 ---
@@ -82,17 +82,17 @@ Start with: [specific first action when resuming]
 </next_action>
 ```
 
-Be specific enough for a fresh Claude to understand immediately.
+Be specific enough for a fresh The assistant to understand immediately.
 
 Use `current-timestamp` for last_updated field. You can use init todos (which provides timestamps) or call directly:
 ```bash
-timestamp=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs current-timestamp full --raw)
+timestamp=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs current-timestamp full --raw)
 ```
 </step>
 
 <step name="commit">
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/phases/*/.continue-here.md
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/phases/*/.continue-here.md
 ```
 </step>
 
@@ -107,7 +107,7 @@ Current state:
 - Status: [in_progress/blocked]
 - Committed as WIP
 
-To resume: /gsd:resume-work
+To resume: /gsd-resume-work
 
 ```
 </step>

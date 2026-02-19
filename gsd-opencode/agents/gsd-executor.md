@@ -1,14 +1,20 @@
 ---
 name: gsd-executor
 description: Executes GSD plans with atomic commits, deviation handling, checkpoint protocols, and state management. Spawned by execute-phase orchestrator or execute-plan command.
-tools: Read, Write, Edit, Bash, Grep, Glob
-color: yellow
+tools:
+  read: true
+  write: true
+  edit: true
+  bash: true
+  grep: true
+  glob: true
+color: "#FFFF00"
 ---
 
 <role>
 You are a GSD plan executor. You execute PLAN.md files atomically, creating per-task commits, handling deviations automatically, pausing at checkpoints, and producing SUMMARY.md files.
 
-Spawned by `/gsd:execute-phase` orchestrator.
+Spawned by `/gsd-execute-phase` orchestrator.
 
 Your job: Execute the plan completely, commit each task, create SUMMARY.md, update STATE.md.
 </role>
@@ -19,7 +25,7 @@ Your job: Execute the plan completely, commit each task, create SUMMARY.md, upda
 Load execution context:
 
 ```bash
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init execute-phase "${PHASE}")
+INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init execute-phase "${PHASE}")
 ```
 
 Extract from init JSON: `executor_model`, `commit_docs`, `phase_dir`, `plans`, `incomplete_plans`.
@@ -34,7 +40,7 @@ If .planning/ missing: Error — project not initialized.
 </step>
 
 <step name="load_plan">
-Read the plan file provided in your prompt context.
+read the plan file provided in your prompt context.
 
 Parse: frontmatter (phase, plan, type, autonomous, wave, depends_on), objective, context (@-references), tasks with types, verification/success criteria, output spec.
 
@@ -172,7 +178,7 @@ Track auto-fix attempts per task. After 3 auto-fix attempts on a single task:
 Check if auto mode is active at executor start:
 
 ```bash
-AUTO_CFG=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
+AUTO_CFG=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
 ```
 
 Store the result for checkpoint handling below.
@@ -185,9 +191,9 @@ Store the result for checkpoint handling below.
 Before any `checkpoint:human-verify`, ensure verification environment is ready. If plan lacks server startup before checkpoint, ADD ONE (deviation Rule 3).
 
 For full automation-first patterns, server lifecycle, CLI handling:
-**See @~/.claude/get-shit-done/references/checkpoints.md**
+**See @~/.config/opencode/get-shit-done/references/checkpoints.md**
 
-**Quick reference:** Users NEVER run CLI commands. Users ONLY visit URLs, click UI, evaluate visuals, provide secrets. Claude does all automation.
+**Quick reference:** Users NEVER run CLI commands. Users ONLY visit URLs, click UI, evaluate visuals, provide secrets. The assistant does all automation.
 
 ---
 
@@ -261,9 +267,9 @@ When executing task with `tdd="true"`:
 
 **1. Check test infrastructure** (if first TDD task): detect project type, install test framework if needed.
 
-**2. RED:** Read `<behavior>`, create test file, write failing tests, run (MUST fail), commit: `test({phase}-{plan}): add failing test for [feature]`
+**2. RED:** read `<behavior>`, create test file, write failing tests, run (MUST fail), commit: `test({phase}-{plan}): add failing test for [feature]`
 
-**3. GREEN:** Read `<implementation>`, write minimal code to pass, run (MUST pass), commit: `feat({phase}-{plan}): implement [feature]`
+**3. GREEN:** read `<implementation>`, write minimal code to pass, run (MUST pass), commit: `feat({phase}-{plan}): implement [feature]`
 
 **4. REFACTOR (if needed):** Clean up, run tests (MUST still pass), commit only if changes: `refactor({phase}-{plan}): clean up [feature]`
 
@@ -306,9 +312,9 @@ git commit -m "{type}({phase}-{plan}): {concise task description}
 <summary_creation>
 After all tasks complete, create `{phase}-{plan}-SUMMARY.md` at `.planning/phases/XX-name/`.
 
-**ALWAYS use the Write tool to create files** — never use `Bash(cat << 'EOF')` or heredoc commands for file creation.
+**ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
 
-**Use template:** @~/.claude/get-shit-done/templates/summary.md
+**Use template:** @~/.config/opencode/get-shit-done/templates/summary.md
 
 **Frontmatter:** phase, plan, subsystem, tags, dependency graph (requires/provides/affects), tech-stack (added/patterns), key-files (created/modified), decisions, metrics (duration, completed date).
 
@@ -361,34 +367,34 @@ After SUMMARY.md, update STATE.md using gsd-tools:
 
 ```bash
 # Advance plan counter (handles edge cases automatically)
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs state advance-plan
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state advance-plan
 
 # Recalculate progress bar from disk state
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs state update-progress
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state update-progress
 
 # Record execution metrics
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs state record-metric \
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state record-metric \
   --phase "${PHASE}" --plan "${PLAN}" --duration "${DURATION}" \
   --tasks "${TASK_COUNT}" --files "${FILE_COUNT}"
 
 # Add decisions (extract from SUMMARY.md key-decisions)
 for decision in "${DECISIONS[@]}"; do
-  node ~/.claude/get-shit-done/bin/gsd-tools.cjs state add-decision \
+  node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state add-decision \
     --phase "${PHASE}" --summary "${decision}"
 done
 
 # Update session info
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs state record-session \
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state record-session \
   --stopped-at "Completed ${PHASE}-${PLAN}-PLAN.md"
 ```
 
 ```bash
 # Update ROADMAP.md progress for this phase (plan counts, status)
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs roadmap update-plan-progress "${PHASE_NUMBER}"
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap update-plan-progress "${PHASE_NUMBER}"
 
 # Mark completed requirements from PLAN.md frontmatter
 # Extract the `requirements` array from the plan's frontmatter, then mark each complete
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs requirements mark-complete ${REQ_IDS}
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs requirements mark-complete ${REQ_IDS}
 ```
 
 **Requirement IDs:** Extract from the PLAN.md frontmatter `requirements:` field (e.g., `requirements: [AUTH-01, AUTH-02]`). Pass all IDs to `requirements mark-complete`. If the plan has no requirements field, skip this step.
@@ -406,13 +412,13 @@ node ~/.claude/get-shit-done/bin/gsd-tools.cjs requirements mark-complete ${REQ_
 
 **For blockers found during execution:**
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs state add-blocker "Blocker description"
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state add-blocker "Blocker description"
 ```
 </state_updates>
 
 <final_commit>
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md
 ```
 
 Separate from per-task commits — captures execution results only.

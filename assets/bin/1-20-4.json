@@ -281,6 +281,90 @@
       "caseSensitive": true
     },
     {
+      "_comment": "Tool mapping: lowercase tools - WebSearch",
+      "pattern": "WebSearch",
+      "replacement": "websearch",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools - AskUserQuestion",
+      "pattern": "AskUserQuestion",
+      "replacement": "askuserquestion",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools - SlashCommand",
+      "pattern": "SlashCommand",
+      "replacement": "slashcommand",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools - BashOutput",
+      "pattern": "BashOutput",
+      "replacement": "bashoutput",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Variable usage: All arguments become → $ARGUMENTS preserved",
+      "pattern": "All arguments become",
+      "replacement": "$ARGUMENTS become",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Subagent type: general-purpose",
+      "pattern": "subagent_type=\"general-purpose\"",
+      "replacement": "subagent_type=\"general_purpose\"",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Subagent type: Explore",
+      "pattern": "subagent_type=\"Explore\"",
+      "replacement": "subagent_type=\"explore\"",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Color: orange → hex",
+      "pattern": "color: orange",
+      "replacement": "color: \"#FFA500\"",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Color: yellow → hex",
+      "pattern": "color: yellow",
+      "replacement": "color: \"#FFFF00\"",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Color: blue → hex",
+      "pattern": "color: blue",
+      "replacement": "color: \"#0000FF\"",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Color: green → hex",
+      "pattern": "color: green",
+      "replacement": "color: \"#00FF00\"",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Color: purple → hex",
+      "pattern": "color: purple",
+      "replacement": "color: \"#800080\"",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Remove 'Claude Code' references",
+      "pattern": "Claude Code",
+      "replacement": "the assistant",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Remove standalone 'Claude' references in descriptions",
+      "pattern": "Claude",
+      "replacement": "the assistant",
+      "caseSensitive": false
+    },
+    {
       "_comment": "Project reference: get-shit-done-cc → gsd-opencode",
       "pattern": "get-shit-done-cc",
       "replacement": "gsd-opencode",
@@ -371,10 +455,12 @@
       "caseSensitive": true
     },
     {
-      "_comment": "Agent tool mapping: tools: list format",
-      "pattern": "tools: read, write",
-      "replacement": "tools:\\n  read: true\\n  write: true",
-      "caseSensitive": true
+      "_comment": "Agent tool mapping: tools list to YAML format with regex",
+      "pattern": "^tools: ([a-z0-9_*, ]+)$",
+      "replacement": "tools:\\n  $1: true",
+      "caseSensitive": true,
+      "isRegex": true,
+      "transform": "tools_list_to_yaml"
     },
     {
       "_comment": "Color format: cyan → hex",

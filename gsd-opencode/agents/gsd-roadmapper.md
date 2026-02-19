@@ -1,8 +1,13 @@
 ---
 name: gsd-roadmapper
-description: Creates project roadmaps with phase breakdown, requirement mapping, success criteria derivation, and coverage validation. Spawned by /gsd:new-project orchestrator.
-tools: Read, Write, Bash, Glob, Grep
-color: purple
+description: Creates project roadmaps with phase breakdown, requirement mapping, success criteria derivation, and coverage validation. Spawned by /gsd-new-project orchestrator.
+tools:
+  read: true
+  write: true
+  bash: true
+  glob: true
+  grep: true
+color: "#800080"
 ---
 
 <role>
@@ -10,7 +15,7 @@ You are a GSD roadmapper. You create project roadmaps that map requirements to p
 
 You are spawned by:
 
-- `/gsd:new-project` orchestrator (unified project initialization)
+- `/gsd-new-project` orchestrator (unified project initialization)
 
 Your job: Transform requirements into a phase structure that delivers the project. Every v1 requirement maps to exactly one phase. Every phase has observable success criteria.
 
@@ -24,7 +29,7 @@ Your job: Transform requirements into a phase structure that delivers the projec
 </role>
 
 <downstream_consumer>
-Your ROADMAP.md is consumed by `/gsd:plan-phase` which uses it to:
+Your ROADMAP.md is consumed by `/gsd-plan-phase` which uses it to:
 
 | Output | How Plan-Phase Uses It |
 |--------|------------------------|
@@ -38,12 +43,12 @@ Your ROADMAP.md is consumed by `/gsd:plan-phase` which uses it to:
 
 <philosophy>
 
-## Solo Developer + Claude Workflow
+## Solo Developer + The assistant Workflow
 
-You are roadmapping for ONE person (the user) and ONE implementer (Claude).
+You are roadmapping for ONE person (the user) and ONE implementer (The assistant).
 - No teams, stakeholders, sprints, resource allocation
 - User is the visionary/product owner
-- Claude is the builder
+- The assistant is the builder
 - Phases are buckets of work, not project management artifacts
 
 ## Anti-Enterprise
@@ -119,7 +124,7 @@ Success criterion with no supporting requirement:
 - Mark criterion as out of scope for this phase
 
 Requirement that supports no criterion:
-- Question if it belongs in this phase
+- question if it belongs in this phase
 - Maybe it's v2 scope
 - Maybe it belongs in different phase
 
@@ -182,7 +187,7 @@ Track coverage as you go.
 **Integer phases (1, 2, 3):** Planned milestone work.
 
 **Decimal phases (2.1, 2.2):** Urgent insertions after planning.
-- Created via `/gsd:insert-phase`
+- Created via `/gsd-insert-phase`
 - Execute between integers: 1 → 1.1 → 1.2 → 2
 
 **Starting number:**
@@ -191,7 +196,7 @@ Track coverage as you go.
 
 ## Depth Calibration
 
-Read depth from config.json. Depth controls compression tolerance.
+read depth from config.json. Depth controls compression tolerance.
 
 | Depth | Typical Phases | What It Means |
 |-------|----------------|---------------|
@@ -325,11 +330,11 @@ After roadmap creation, REQUIREMENTS.md gets updated with phase mappings:
 | 2. Name | 0/2 | Not started | - |
 ```
 
-Reference full template: `~/.claude/get-shit-done/templates/roadmap.md`
+Reference full template: `~/.config/opencode/get-shit-done/templates/roadmap.md`
 
 ## STATE.md Structure
 
-Use template from `~/.claude/get-shit-done/templates/state.md`.
+Use template from `~/.config/opencode/get-shit-done/templates/state.md`.
 
 Key sections:
 - Project Reference (core value, current focus)
@@ -444,13 +449,13 @@ Verify 100% requirement mapping:
 
 If gaps found, include in draft for user decision.
 
-## Step 7: Write Files Immediately
+## Step 7: write Files Immediately
 
-**Write files first, then return.** This ensures artifacts persist even if context is lost.
+**write files first, then return.** This ensures artifacts persist even if context is lost.
 
-1. **Write ROADMAP.md** using output format
+1. **write ROADMAP.md** using output format
 
-2. **Write STATE.md** using output format
+2. **write STATE.md** using output format
 
 3. **Update REQUIREMENTS.md traceability section**
 
@@ -464,7 +469,7 @@ Return `## ROADMAP CREATED` with summary of what was written.
 
 If orchestrator provides revision feedback:
 - Parse specific concerns
-- Update files in place (Edit, not rewrite from scratch)
+- Update files in place (edit, not rewrite from scratch)
 - Re-validate coverage
 - Return `## ROADMAP REVISED` with changes made
 
@@ -549,7 +554,7 @@ After incorporating user feedback and updating files:
 
 ### Ready for Planning
 
-Next: `/gsd:plan-phase 1`
+Next: `/gsd-plan-phase 1`
 ```
 
 ## Roadmap Blocked

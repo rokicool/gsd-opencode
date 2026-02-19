@@ -6,7 +6,7 @@ Start a new milestone cycle for an existing project. Loads project context, gath
 
 <required_reading>
 
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 
 </required_reading>
 
@@ -14,10 +14,10 @@ Read all files referenced by the invoking prompt's execution_context before star
 
 ## 1. Load Context
 
-- Read PROJECT.md (existing project, validated requirements, decisions)
-- Read MILESTONES.md (what shipped previously)
-- Read STATE.md (pending todos, blockers)
-- Check for MILESTONE-CONTEXT.md (from /gsd:discuss-milestone)
+- read PROJECT.md (existing project, validated requirements, decisions)
+- read MILESTONES.md (what shipped previously)
+- read STATE.md (pending todos, blockers)
+- Check for MILESTONE-CONTEXT.md (from /gsd-discuss-milestone)
 
 ## 2. Gather Milestone Goals
 
@@ -28,7 +28,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 **If no context file:**
 - Present what shipped in last milestone
 - Ask: "What do you want to build next?"
-- Use AskUserQuestion to explore features, priorities, constraints, scope
+- Use askuserquestion to explore features, priorities, constraints, scope
 
 ## 3. Determine Milestone Version
 
@@ -71,31 +71,31 @@ Keep Accumulated Context section from previous milestone.
 Delete MILESTONE-CONTEXT.md if exists (consumed).
 
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs: start milestone v[X.Y] [Name]" --files .planning/PROJECT.md .planning/STATE.md
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: start milestone v[X.Y] [Name]" --files .planning/PROJECT.md .planning/STATE.md
 ```
 
 ## 7. Load Context and Resolve Models
 
 ```bash
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init new-milestone)
+INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init new-milestone)
 ```
 
 Extract from init JSON: `researcher_model`, `synthesizer_model`, `roadmapper_model`, `commit_docs`, `research_enabled`, `current_milestone`, `project_exists`, `roadmap_exists`.
 
 ## 8. Research Decision
 
-AskUserQuestion: "Research the domain ecosystem for new features before defining requirements?"
+askuserquestion: "Research the domain ecosystem for new features before defining requirements?"
 - "Research first (Recommended)" — Discover patterns, features, architecture for NEW capabilities
 - "Skip research" — Go straight to requirements
 
-**Persist choice to config** (so future `/gsd:plan-phase` honors it):
+**Persist choice to config** (so future `/gsd-plan-phase` honors it):
 
 ```bash
 # If "Research first": persist true
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs config-set workflow.research true
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-set workflow.research true
 
 # If "Skip research": persist false
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs config-set workflow.research false
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-set workflow.research false
 ```
 
 **If "Research first":**
@@ -135,8 +135,8 @@ Focus ONLY on what's needed for the NEW features.
 <quality_gate>{GATES}</quality_gate>
 
 <output>
-Write to: .planning/research/{FILE}
-Use template: ~/.claude/get-shit-done/templates/research-project/{FILE}
+write to: .planning/research/{FILE}
+Use template: ~/.config/opencode/get-shit-done/templates/research-project/{FILE}
 </output>
 ", subagent_type="gsd-project-researcher", model="{researcher_model}", description="{DIMENSION} research")
 ```
@@ -157,10 +157,10 @@ After all 4 complete, spawn synthesizer:
 Task(prompt="
 Synthesize research outputs into SUMMARY.md.
 
-Read: .planning/research/STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md
+read: .planning/research/STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md
 
-Write to: .planning/research/SUMMARY.md
-Use template: ~/.claude/get-shit-done/templates/research-project/SUMMARY.md
+write to: .planning/research/SUMMARY.md
+Use template: ~/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 ", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
 ```
@@ -186,9 +186,9 @@ Display key findings from SUMMARY.md:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Read PROJECT.md: core value, current milestone goals, validated requirements (what exists).
+read PROJECT.md: core value, current milestone goals, validated requirements (what exists).
 
-**If research exists:** Read FEATURES.md, extract feature categories.
+**If research exists:** read FEATURES.md, extract feature categories.
 
 Present features by category:
 ```
@@ -200,14 +200,14 @@ Present features by category:
 
 **If no research:** Gather requirements through conversation. Ask: "What are the main things users need to do with [new features]?" Clarify, probe for related capabilities, group into categories.
 
-**Scope each category** via AskUserQuestion (multiSelect: true, header max 12 chars):
+**Scope each category** via askuserquestion (multiSelect: true, header max 12 chars):
 - "[Feature 1]" — [brief description]
 - "[Feature 2]" — [brief description]
 - "None for this milestone" — Defer entire category
 
 Track: Selected → this milestone. Unselected table stakes → future. Unselected differentiators → out of scope.
 
-**Identify gaps** via AskUserQuestion:
+**Identify gaps** via askuserquestion:
 - "No, research covered it" — Proceed
 - "Yes, let me add some" — Capture additions
 
@@ -246,7 +246,7 @@ If "adjust": Return to scoping.
 
 **Commit requirements:**
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs: define milestone v[X.Y] requirements" --files .planning/REQUIREMENTS.md
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: define milestone v[X.Y] requirements" --files .planning/REQUIREMENTS.md
 ```
 
 ## 10. Create Roadmap
@@ -259,7 +259,7 @@ node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs: define milestone v[
 ◆ Spawning roadmapper...
 ```
 
-**Starting phase number:** Read MILESTONES.md for last phase number. Continue from there (v1.0 ended at phase 5 → v1.1 starts at phase 6).
+**Starting phase number:** read MILESTONES.md for last phase number. Continue from there (v1.0 ended at phase 5 → v1.1 starts at phase 6).
 
 ```
 Task(prompt="
@@ -278,10 +278,10 @@ Create roadmap for milestone v[X.Y]:
 3. Map every requirement to exactly one phase
 4. Derive 2-5 success criteria per phase (observable user behaviors)
 5. Validate 100% coverage
-6. Write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
+6. write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
 7. Return ROADMAP CREATED with summary
 
-Write files first, then return.
+write files first, then return.
 </instructions>
 ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
 ```
@@ -290,7 +290,7 @@ Write files first, then return.
 
 **If `## ROADMAP BLOCKED`:** Present blocker, work with user, re-spawn.
 
-**If `## ROADMAP CREATED`:** Read ROADMAP.md, present inline:
+**If `## ROADMAP CREATED`:** read ROADMAP.md, present inline:
 
 ```
 ## Proposed Roadmap
@@ -311,7 +311,7 @@ Success criteria:
 2. [criterion]
 ```
 
-**Ask for approval** via AskUserQuestion:
+**Ask for approval** via askuserquestion:
 - "Approve" — Commit and continue
 - "Adjust phases" — Tell me what to change
 - "Review full file" — Show raw ROADMAP.md
@@ -321,7 +321,7 @@ Success criteria:
 
 **Commit roadmap** (after approval):
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs: create milestone v[X.Y] roadmap ([N] phases)" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: create milestone v[X.Y] roadmap ([N] phases)" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md
 ```
 
 ## 11. Done
@@ -346,11 +346,11 @@ node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs: create milestone v[
 
 **Phase [N]: [Phase Name]** — [Goal]
 
-`/gsd:discuss-phase [N]` — gather context and clarify approach
+`/gsd-discuss-phase [N]` — gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
-Also: `/gsd:plan-phase [N]` — skip discussion, plan directly
+Also: `/gsd-plan-phase [N]` — skip discussion, plan directly
 ```
 
 </process>
@@ -367,7 +367,7 @@ Also: `/gsd:plan-phase [N]` — skip discussion, plan directly
 - [ ] User feedback incorporated (if any)
 - [ ] ROADMAP.md phases continue from previous milestone
 - [ ] All commits made (if planning docs committed)
-- [ ] User knows next step: `/gsd:discuss-phase [N]`
+- [ ] User knows next step: `/gsd-discuss-phase [N]`
 
 **Atomic commits:** Each phase commits its artifacts immediately.
 </success_criteria>

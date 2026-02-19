@@ -1,10 +1,10 @@
 ---
-name: gsd:pause-work
+name: gsd-pause-work
 description: Create context handoff when pausing work mid-phase
 allowed-tools:
-  - Read
-  - Write
-  - Bash
+  - read
+  - write
+  - bash
 ---
 
 <objective>
@@ -20,11 +20,11 @@ Routes to the pause-work workflow which handles:
 
 <execution_context>
 @.planning/STATE.md
-@~/.claude/get-shit-done/workflows/pause-work.md
+@~/.config/opencode/get-shit-done/workflows/pause-work.md
 </execution_context>
 
 <process>
-**Follow the pause-work workflow** from `@~/.claude/get-shit-done/workflows/pause-work.md`.
+**Follow the pause-work workflow** from `@~/.config/opencode/get-shit-done/workflows/pause-work.md`.
 
 The workflow handles all logic including:
 1. Phase directory detection

@@ -68,7 +68,7 @@ Use these as inspiration, not a checklist. Pick what's relevant to the thread.
 
 <using_askuserquestion>
 
-Use AskUserQuestion to help users think by presenting concrete options to react to.
+Use askuserquestion to help users think by presenting concrete options to react to.
 
 **Good options:**
 - Interpretations of what they might mean
@@ -138,7 +138,7 @@ Loop until "Create PROJECT.md" selected.
 - **Rushing** — Minimizing questions to get to "the work"
 - **Shallow acceptance** — Taking vague answers without probing
 - **Premature constraints** — Asking about tech stack before understanding the idea
-- **User skills** — NEVER ask about user's technical experience. Claude builds.
+- **User skills** — NEVER ask about user's technical experience. The assistant builds.
 
 </anti_patterns>
 

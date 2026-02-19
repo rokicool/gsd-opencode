@@ -1,16 +1,16 @@
 ---
-name: gsd:quick
+name: gsd-quick
 description: Execute a quick task with GSD guarantees (atomic commits, state tracking) but skip optional agents
 argument-hint: "[--full]"
 allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Glob
-  - Grep
-  - Bash
+  - read
+  - write
+  - edit
+  - glob
+  - grep
+  - bash
   - Task
-  - AskUserQuestion
+  - askuserquestion
 ---
 <objective>
 Execute small, ad-hoc tasks with GSD guarantees (atomic commits, STATE.md tracking).
@@ -26,7 +26,7 @@ Quick mode is the same system with a shorter path:
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/quick.md
+@~/.config/opencode/get-shit-done/workflows/quick.md
 </execution_context>
 
 <context>
@@ -35,6 +35,6 @@ $ARGUMENTS
 </context>
 
 <process>
-Execute the quick workflow from @~/.claude/get-shit-done/workflows/quick.md end-to-end.
+Execute the quick workflow from @~/.config/opencode/get-shit-done/workflows/quick.md end-to-end.
 Preserve all workflow gates (validation, task description, planning, execution, state updates, commits).
 </process>

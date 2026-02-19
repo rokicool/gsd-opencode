@@ -4,7 +4,7 @@ Template for `.planning/phases/XX-name/DISCOVERY.md` - shallow research for libr
 
 **Purpose:** Answer "which library/option should we use" questions during mandatory discovery in plan-phase.
 
-For deep ecosystem research ("how do experts build this"), use `/gsd:research-phase` which produces RESEARCH.md.
+For deep ecosystem research ("how do experts build this"), use `/gsd-research-phase` which produces RESEARCH.md.
 
 ---
 
@@ -35,7 +35,7 @@ Output: DISCOVERY.md with recommendation
 
 <discovery_scope>
 <include>
-- [Question to answer]
+- [question to answer]
 - [Area to investigate]
 - [Specific comparison if needed]
 </include>
@@ -51,21 +51,21 @@ Output: DISCOVERY.md with recommendation
 **Source Priority:**
 1. **Context7 MCP** - For library/framework documentation (current, authoritative)
 2. **Official Docs** - For platform-specific or non-indexed libraries
-3. **WebSearch** - For comparisons, trends, community patterns (verify all findings)
+3. **websearch** - For comparisons, trends, community patterns (verify all findings)
 
 **Quality Checklist:**
 Before completing discovery, verify:
 - [ ] All claims have authoritative sources (Context7 or official docs)
 - [ ] Negative claims ("X is not possible") verified with official documentation
-- [ ] API syntax/configuration from Context7 or official docs (never WebSearch alone)
-- [ ] WebSearch findings cross-checked with authoritative sources
+- [ ] API syntax/configuration from Context7 or official docs (never websearch alone)
+- [ ] websearch findings cross-checked with authoritative sources
 - [ ] Recent updates/changelogs checked for breaking changes
 - [ ] Alternative approaches considered (not just first solution found)
 
 **Confidence Levels:**
 - HIGH: Context7 or official docs confirm
-- MEDIUM: WebSearch + Context7/official docs confirm
-- LOW: WebSearch only or training knowledge only (mark for validation)
+- MEDIUM: websearch + Context7/official docs confirm
+- LOW: websearch only or training knowledge only (mark for validation)
 
 </discovery_protocol>
 
@@ -142,5 +142,5 @@ Create `.planning/phases/XX-name/DISCOVERY.md`:
 - Niche/complex domains (3D, games, audio, shaders)
 - Need ecosystem knowledge, not just library choice
 - "How do experts build this" questions
-- Use `/gsd:research-phase` for these
+- Use `/gsd-research-phase` for these
 </guidelines>

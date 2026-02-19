@@ -2,7 +2,7 @@
 
 Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive ecosystem research before planning.
 
-**Purpose:** Document what Claude needs to know to implement a phase well - not just "which library" but "how do experts build this."
+**Purpose:** Document what The assistant needs to know to implement a phase well - not just "which library" but "how do experts build this."
 
 ---
 
@@ -18,14 +18,14 @@ Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive 
 <user_constraints>
 ## User Constraints (from CONTEXT.md)
 
-**CRITICAL:** If CONTEXT.md exists from /gsd:discuss-phase, copy locked decisions here verbatim. These MUST be honored by the planner.
+**CRITICAL:** If CONTEXT.md exists from /gsd-discuss-phase, copy locked decisions here verbatim. These MUST be honored by the planner.
 
 ### Locked Decisions
 [Copy from CONTEXT.md `## Decisions` section - these are NON-NEGOTIABLE]
 - [Decision 1]
 - [Decision 2]
 
-### Claude's Discretion
+### The assistant's Discretion
 [Copy from CONTEXT.md - areas where researcher/planner can choose]
 - [Area 1]
 - [Area 2]
@@ -35,7 +35,7 @@ Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive 
 - [Deferred 1]
 - [Deferred 2]
 
-**If no CONTEXT.md exists:** Write "No user constraints - all decisions at Claude's discretion"
+**If no CONTEXT.md exists:** write "No user constraints - all decisions at The assistant's discretion"
 </user_constraints>
 
 <research_summary>
@@ -193,12 +193,12 @@ What's changed recently:
 
 Things that couldn't be fully resolved:
 
-1. **[Question]**
+1. **[question]**
    - What we know: [partial info]
    - What's unclear: [the gap]
    - Recommendation: [how to handle during planning/execution]
 
-2. **[Question]**
+2. **[question]**
    - What we know: [partial info]
    - What's unclear: [the gap]
    - Recommendation: [how to handle]
@@ -212,10 +212,10 @@ Things that couldn't be fully resolved:
 - [Official docs URL] - [what was checked]
 
 ### Secondary (MEDIUM confidence)
-- [WebSearch verified with official source] - [finding + verification]
+- [websearch verified with official source] - [finding + verification]
 
 ### Tertiary (LOW confidence - needs validation)
-- [WebSearch only] - [finding, marked for validation during implementation]
+- [websearch only] - [finding, marked for validation during implementation]
 </sources>
 
 <metadata>
@@ -524,7 +524,7 @@ function useVehicleControls(rigidBodyRef) {
 
 **When to create:**
 - Before planning phases in niche/complex domains
-- When Claude's training data is likely stale or sparse
+- When The assistant's training data is likely stale or sparse
 - When "how do experts do this" matters more than "which library"
 
 **Structure:**

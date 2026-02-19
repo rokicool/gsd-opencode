@@ -1,24 +1,24 @@
 <purpose>
 Research how to implement a phase. Spawns gsd-phase-researcher with phase context.
 
-Standalone research command. For most workflows, use `/gsd:plan-phase` which integrates research automatically.
+Standalone research command. For most workflows, use `/gsd-plan-phase` which integrates research automatically.
 </purpose>
 
 <process>
 
 ## Step 0: Resolve Model Profile
 
-@~/.claude/get-shit-done/references/model-profile-resolution.md
+@~/.config/opencode/get-shit-done/references/model-profile-resolution.md
 
 Resolve model for:
 - `gsd-phase-researcher`
 
 ## Step 1: Normalize and Validate Phase
 
-@~/.claude/get-shit-done/references/phase-argument-parsing.md
+@~/.config/opencode/get-shit-done/references/phase-argument-parsing.md
 
 ```bash
-PHASE_INFO=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "${PHASE}")
+PHASE_INFO=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "${PHASE}")
 ```
 
 If `found` is false: Error and exit.
@@ -39,7 +39,7 @@ echo "$PHASE_INFO" | jq -r '.section'
 cat .planning/REQUIREMENTS.md 2>/dev/null
 cat .planning/phases/${PHASE}-*/*-CONTEXT.md 2>/dev/null
 # Decisions from state-snapshot (structured JSON)
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs state-snapshot | jq '.decisions'
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state-snapshot | jq '.decisions'
 ```
 
 ## Step 4: Spawn Researcher
@@ -58,7 +58,7 @@ Phase context: {context_md}
 </context>
 
 <output>
-Write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
+write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 </output>",
   subagent_type="gsd-phase-researcher",
   model="{researcher_model}"

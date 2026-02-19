@@ -3,7 +3,7 @@ List all pending todos, allow selection, load full context for the selected todo
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -12,7 +12,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 Load todo context:
 
 ```bash
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init todos)
+INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init todos)
 ```
 
 Extract from init JSON: `todo_count`, `todos`, `pending_dir`.
@@ -21,14 +21,14 @@ If `todo_count` is 0:
 ```
 No pending todos.
 
-Todos are captured during work sessions with /gsd:add-todo.
+Todos are captured during work sessions with /gsd-add-todo.
 
 ---
 
 Would you like to:
 
-1. Continue with current phase (/gsd:progress)
-2. Add a todo now (/gsd:add-todo)
+1. Continue with current phase (/gsd-progress)
+2. Add a todo now (/gsd-add-todo)
 ```
 
 Exit.
@@ -36,8 +36,8 @@ Exit.
 
 <step name="parse_filter">
 Check for area filter in arguments:
-- `/gsd:check-todos` → show all
-- `/gsd:check-todos api` → filter to area:api only
+- `/gsd-check-todos` → show all
+- `/gsd-check-todos api` → filter to area:api only
 </step>
 
 <step name="list_todos">
@@ -55,7 +55,7 @@ Pending Todos:
 ---
 
 Reply with a number to view details, or:
-- `/gsd:check-todos [area]` to filter by area
+- `/gsd-check-todos [area]` to filter by area
 - `q` to exit
 ```
 
@@ -70,7 +70,7 @@ If invalid: "Invalid selection. Reply with a number (1-[N]) or `q` to exit."
 </step>
 
 <step name="load_context">
-Read the todo file completely. Display:
+read the todo file completely. Display:
 
 ```
 ## [title]
@@ -101,7 +101,7 @@ If `.planning/ROADMAP.md` exists:
 <step name="offer_actions">
 **If todo maps to a roadmap phase:**
 
-Use AskUserQuestion:
+Use askuserquestion:
 - header: "Action"
 - question: "This todo relates to Phase [N]: [name]. What would you like to do?"
 - options:
@@ -112,12 +112,12 @@ Use AskUserQuestion:
 
 **If no roadmap match:**
 
-Use AskUserQuestion:
+Use askuserquestion:
 - header: "Action"
 - question: "What would you like to do with this todo?"
 - options:
   - "Work on it now" — move to done, start working
-  - "Create a phase" — /gsd:add-phase with this scope
+  - "Create a phase" — /gsd-add-phase with this scope
   - "Brainstorm approach" — think through before deciding
   - "Put it back" — return to list
 </step>
@@ -133,7 +133,7 @@ Update STATE.md todo count. Present problem/solution context. Begin work or ask 
 Note todo reference in phase planning notes. Keep in pending. Return to list or exit.
 
 **Create a phase:**
-Display: `/gsd:add-phase [description from todo]`
+Display: `/gsd-add-phase [description from todo]`
 Keep in pending. User runs command in fresh context.
 
 **Brainstorm approach:**
@@ -154,7 +154,7 @@ If todo was moved to done/, commit the change:
 
 ```bash
 git rm --cached .planning/todos/pending/[filename] 2>/dev/null || true
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs: start work on todo - [title]" --files .planning/todos/done/[filename] .planning/STATE.md
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: start work on todo - [title]" --files .planning/todos/done/[filename] .planning/STATE.md
 ```
 
 Tool respects `commit_docs` config and gitignore automatically.

@@ -3,7 +3,7 @@ Check for GSD updates via npm, display changelog for versions between installed 
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -14,11 +14,11 @@ Detect whether GSD is installed locally or globally by checking both locations:
 ```bash
 # Check local first (takes priority)
 # Paths templated at install time for runtime compatibility
-if [ -f ./.claude/get-shit-done/VERSION ]; then
-  cat ./.claude/get-shit-done/VERSION
+if [ -f ./.the assistant/get-shit-done/VERSION ]; then
+  cat ./.the assistant/get-shit-done/VERSION
   echo "LOCAL"
-elif [ -f ~/.claude/get-shit-done/VERSION ]; then
-  cat ~/.claude/get-shit-done/VERSION
+elif [ -f ~/.config/opencode/get-shit-done/VERSION ]; then
+  cat ~/.config/opencode/get-shit-done/VERSION
   echo "GLOBAL"
 else
   echo "UNKNOWN"
@@ -48,14 +48,14 @@ Proceed to install step (treat as version 0.0.0 for comparison).
 Check npm for latest version:
 
 ```bash
-npm view get-shit-done-cc version 2>/dev/null
+npm view gsd-opencode version 2>/dev/null
 ```
 
 **If npm check fails:**
 ```
 Couldn't check for updates (offline or npm unavailable).
 
-To update manually: `npx get-shit-done-cc --global`
+To update manually: `npx gsd-opencode --global`
 ```
 
 Exit.
@@ -122,19 +122,19 @@ Exit.
 - `get-shit-done/` will be wiped and replaced
 - `agents/gsd-*` files will be replaced
 
-(Paths are relative to your install location: `~/.claude/` for global, `./.claude/` for local)
+(Paths are relative to your install location: `~/.config/opencode/` for global, `./.the assistant/` for local)
 
 Your custom files in other locations are preserved:
 - Custom commands not in `commands/gsd/` ✓
 - Custom agents not prefixed with `gsd-` ✓
 - Custom hooks ✓
-- Your CLAUDE.md files ✓
+- Your THE ASSISTANT.md files ✓
 
-If you've modified any GSD files directly, they'll be automatically backed up to `gsd-local-patches/` and can be reapplied with `/gsd:reapply-patches` after the update.
+If you've modified any GSD files directly, they'll be automatically backed up to `gsd-local-patches/` and can be reapplied with `/gsd-reapply-patches` after the update.
 ```
 
-Use AskUserQuestion:
-- Question: "Proceed with update?"
+Use askuserquestion:
+- question: "Proceed with update?"
 - Options:
   - "Yes, update now"
   - "No, cancel"
@@ -147,12 +147,12 @@ Run the update using the install type detected in step 1:
 
 **If LOCAL install:**
 ```bash
-npx get-shit-done-cc --local
+npx gsd-opencode --local
 ```
 
 **If GLOBAL install (or unknown):**
 ```bash
-npx get-shit-done-cc --global
+npx gsd-opencode --global
 ```
 
 Capture output. If install fails, show error and exit.
@@ -161,12 +161,12 @@ Clear the update cache so statusline indicator disappears:
 
 **If LOCAL install:**
 ```bash
-rm -f ./.claude/cache/gsd-update-check.json
+rm -f ./.the assistant/cache/gsd-update-check.json
 ```
 
 **If GLOBAL install:**
 ```bash
-rm -f ~/.claude/cache/gsd-update-check.json
+rm -f ~/.config/opencode/cache/gsd-update-check.json
 ```
 (Paths are templated at install time for runtime compatibility)
 </step>
@@ -179,9 +179,9 @@ Format completion message (changelog was already shown in confirmation step):
 ║  GSD Updated: v1.5.10 → v1.5.15                           ║
 ╚═══════════════════════════════════════════════════════════╝
 
-⚠️  Restart Claude Code to pick up the new commands.
+⚠️  Restart The assistant to pick up the new commands.
 
-[View full changelog](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md)
+[View full changelog](https://github.com/rokicool/gsd-opencode/blob/main/CHANGELOG.md)
 ```
 </step>
 
@@ -195,7 +195,7 @@ Check for gsd-local-patches/backup-meta.json in the config directory.
 
 ```
 Local patches were backed up before the update.
-Run /gsd:reapply-patches to merge your modifications into the new version.
+Run /gsd-reapply-patches to merge your modifications into the new version.
 ```
 
 **If no patches:** Continue normally.

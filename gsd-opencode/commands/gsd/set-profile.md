@@ -1,15 +1,15 @@
 ---
-name: gsd:set-profile
+name: gsd-set-profile
 description: Switch model profile for GSD agents (quality/balanced/budget)
 argument-hint: <profile>
 allowed-tools:
-  - Read
-  - Write
-  - Bash
+  - read
+  - write
+  - bash
 ---
 
 <objective>
-Switch the model profile used by GSD agents. Controls which Claude model each agent uses, balancing quality vs token spend.
+Switch the model profile used by GSD agents. Controls which The assistant model each agent uses, balancing quality vs token spend.
 
 Routes to the set-profile workflow which handles:
 - Argument validation (quality/balanced/budget)
@@ -19,11 +19,11 @@ Routes to the set-profile workflow which handles:
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/set-profile.md
+@~/.config/opencode/get-shit-done/workflows/set-profile.md
 </execution_context>
 
 <process>
-**Follow the set-profile workflow** from `@~/.claude/get-shit-done/workflows/set-profile.md`.
+**Follow the set-profile workflow** from `@~/.config/opencode/get-shit-done/workflows/set-profile.md`.
 
 The workflow handles all logic including:
 1. Profile argument validation

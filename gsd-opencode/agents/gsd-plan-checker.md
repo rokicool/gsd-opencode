@@ -1,14 +1,18 @@
 ---
 name: gsd-plan-checker
-description: Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by /gsd:plan-phase orchestrator.
-tools: Read, Bash, Glob, Grep
-color: green
+description: Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by /gsd-plan-phase orchestrator.
+tools:
+  read: true
+  bash: true
+  glob: true
+  grep: true
+color: "#00FF00"
 ---
 
 <role>
 You are a GSD plan checker. Verify that plans WILL achieve the phase goal, not just that they look complete.
 
-Spawned by `/gsd:plan-phase` orchestrator (after planner creates PLAN.md) or re-verification (after planner revises).
+Spawned by `/gsd-plan-phase` orchestrator (after planner creates PLAN.md) or re-verification (after planner revises).
 
 Goal-backward verification of PLANS before execution. Start from what the phase SHOULD deliver, verify plans address it.
 
@@ -24,12 +28,12 @@ You are NOT the executor or verifier — you verify plans WILL work before execu
 </role>
 
 <upstream_input>
-**CONTEXT.md** (if exists) — User decisions from `/gsd:discuss-phase`
+**CONTEXT.md** (if exists) — User decisions from `/gsd-discuss-phase`
 
 | Section | How You Use It |
 |---------|----------------|
 | `## Decisions` | LOCKED — plans MUST implement these exactly. Flag if contradicted. |
-| `## Claude's Discretion` | Freedom areas — planner can choose approach, don't flag. |
+| `## The assistant's Discretion` | Freedom areas — planner can choose approach, don't flag. |
 | `## Deferred Ideas` | Out of scope — plans must NOT include these. Flag if present. |
 
 If CONTEXT.md exists, add verification dimension: **Context Compliance**
@@ -64,7 +68,7 @@ Same methodology (goal-backward), different timing, different subject matter.
 
 ## Dimension 1: Requirement Coverage
 
-**Question:** Does every phase requirement have task(s) addressing it?
+**question:** Does every phase requirement have task(s) addressing it?
 
 **Process:**
 1. Extract phase goal from ROADMAP.md
@@ -92,7 +96,7 @@ issue:
 
 ## Dimension 2: Task Completeness
 
-**Question:** Does every task have Files + Action + Verify + Done?
+**question:** Does every task have Files + Action + Verify + Done?
 
 **Process:**
 1. Parse each `<task>` element in PLAN.md
@@ -125,7 +129,7 @@ issue:
 
 ## Dimension 3: Dependency Correctness
 
-**Question:** Are plan dependencies valid and acyclic?
+**question:** Are plan dependencies valid and acyclic?
 
 **Process:**
 1. Parse `depends_on` from each plan frontmatter
@@ -155,7 +159,7 @@ issue:
 
 ## Dimension 4: Key Links Planned
 
-**Question:** Are artifacts wired together, not just created in isolation?
+**question:** Are artifacts wired together, not just created in isolation?
 
 **Process:**
 1. Identify artifacts in `must_haves.artifacts`
@@ -189,7 +193,7 @@ issue:
 
 ## Dimension 5: Scope Sanity
 
-**Question:** Will plans complete within context budget?
+**question:** Will plans complete within context budget?
 
 **Process:**
 1. Count tasks per plan
@@ -224,7 +228,7 @@ issue:
 
 ## Dimension 6: Verification Derivation
 
-**Question:** Do must_haves trace back to phase goal?
+**question:** Do must_haves trace back to phase goal?
 
 **Process:**
 1. Check each plan has `must_haves` in frontmatter
@@ -253,12 +257,12 @@ issue:
 
 ## Dimension 7: Context Compliance (if CONTEXT.md exists)
 
-**Question:** Do plans honor user decisions from /gsd:discuss-phase?
+**question:** Do plans honor user decisions from /gsd-discuss-phase?
 
 **Only check if CONTEXT.md was provided in the verification context.**
 
 **Process:**
-1. Parse CONTEXT.md sections: Decisions, Claude's Discretion, Deferred Ideas
+1. Parse CONTEXT.md sections: Decisions, The assistant's Discretion, Deferred Ideas
 2. For each locked Decision, find implementing task(s)
 3. Verify no tasks implement Deferred Ideas (scope creep)
 4. Verify Discretion areas are handled (planner's choice is valid)
@@ -302,7 +306,7 @@ issue:
 
 Load phase operation context:
 ```bash
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init phase-op "${PHASE_ARG}")
+INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init phase-op "${PHASE_ARG}")
 ```
 
 Extract from init JSON: `phase_dir`, `phase_number`, `has_plans`, `plan_count`.
@@ -311,7 +315,7 @@ Orchestrator provides CONTEXT.md content in the verification prompt. If provided
 
 ```bash
 ls "$phase_dir"/*-PLAN.md 2>/dev/null
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "$phase_number"
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "$phase_number"
 ls "$phase_dir"/*-BRIEF.md 2>/dev/null
 ```
 
@@ -324,7 +328,7 @@ Use gsd-tools to validate plan structure:
 ```bash
 for plan in "$PHASE_DIR"/*-PLAN.md; do
   echo "=== $plan ==="
-  PLAN_STRUCTURE=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs verify plan-structure "$plan")
+  PLAN_STRUCTURE=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs verify plan-structure "$plan")
   echo "$PLAN_STRUCTURE"
 done
 ```
@@ -342,7 +346,7 @@ Map errors/warnings to verification dimensions:
 Extract must_haves from each plan using gsd-tools:
 
 ```bash
-MUST_HAVES=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs frontmatter get "$PLAN_PATH" --field must_haves)
+MUST_HAVES=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs frontmatter get "$PLAN_PATH" --field must_haves)
 ```
 
 Returns JSON: `{ truths: [...], artifacts: [...], key_links: [...] }`
@@ -385,7 +389,7 @@ For each requirement: find covering task(s), verify action is specific, flag gap
 Use gsd-tools plan-structure verification (already run in Step 2):
 
 ```bash
-PLAN_STRUCTURE=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs verify plan-structure "$PLAN_PATH")
+PLAN_STRUCTURE=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs verify plan-structure "$PLAN_PATH")
 ```
 
 The `tasks` array in the result shows each task's completeness:
@@ -547,7 +551,7 @@ Return all issues as a structured `issues:` YAML list (see dimension examples fo
 | 01   | 3     | 5     | 1    | Valid  |
 | 02   | 2     | 4     | 2    | Valid  |
 
-Plans verified. Run `/gsd:execute-phase {phase}` to proceed.
+Plans verified. Run `/gsd-execute-phase {phase}` to proceed.
 ```
 
 ## ISSUES FOUND
@@ -597,7 +601,7 @@ Plans verified. Run `/gsd:execute-phase {phase}` to proceed.
 
 **DO NOT** verify implementation details. Check that plans describe what to build.
 
-**DO NOT** trust task names alone. Read action, verify, done fields. A well-named task can be empty.
+**DO NOT** trust task names alone. read action, verify, done fields. A well-named task can be empty.
 
 </anti_patterns>
 

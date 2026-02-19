@@ -1,13 +1,13 @@
 ---
-name: gsd:map-codebase
+name: gsd-map-codebase
 description: Analyze codebase with parallel mapper agents to produce .planning/codebase/ documents
 argument-hint: "[optional: specific area to map, e.g., 'api' or 'auth']"
 allowed-tools:
-  - Read
-  - Bash
-  - Glob
-  - Grep
-  - Write
+  - read
+  - bash
+  - glob
+  - grep
+  - write
   - Task
 ---
 
@@ -20,7 +20,7 @@ Output: .planning/codebase/ folder with 7 structured documents about the codebas
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/map-codebase.md
+@~/.config/opencode/get-shit-done/workflows/map-codebase.md
 </execution_context>
 
 <context>
@@ -30,8 +30,8 @@ Focus area: $ARGUMENTS (optional - if provided, tells agents to focus on specifi
 Check for .planning/STATE.md - loads context if project already initialized
 
 **This command can run:**
-- Before /gsd:new-project (brownfield codebases) - creates codebase map first
-- After /gsd:new-project (greenfield codebases) - updates codebase map as code evolves
+- Before /gsd-new-project (brownfield codebases) - creates codebase map first
+- After /gsd-new-project (greenfield codebases) - updates codebase map as code evolves
 - Anytime to refresh codebase understanding
 </context>
 
@@ -59,7 +59,7 @@ Check for .planning/STATE.md - loads context if project already initialized
 4. Wait for agents to complete, collect confirmations (NOT document contents)
 5. Verify all 7 documents exist with line counts
 6. Commit codebase map
-7. Offer next steps (typically: /gsd:new-project or /gsd:plan-phase)
+7. Offer next steps (typically: /gsd-new-project or /gsd-plan-phase)
 </process>
 
 <success_criteria>

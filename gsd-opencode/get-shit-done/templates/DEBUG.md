@@ -32,7 +32,7 @@ reproduction: [how to trigger]
 started: [when it broke / always broken]
 
 ## Eliminated
-<!-- APPEND only - prevents re-investigating after /clear -->
+<!-- APPEND only - prevents re-investigating after /new -->
 
 - hypothesis: [theory that was wrong]
   evidence: [what disproved it]
@@ -67,8 +67,8 @@ files_changed: []
 
 **Current Focus:**
 - OVERWRITE entirely on each update
-- Always reflects what Claude is doing RIGHT NOW
-- If Claude reads this after /clear, it knows exactly where to resume
+- Always reflects what The assistant is doing RIGHT NOW
+- If The assistant reads this after /new, it knows exactly where to resume
 - Fields: hypothesis, test, expecting, next_action
 
 **Symptoms:**
@@ -81,7 +81,7 @@ files_changed: []
 - APPEND only - never remove entries
 - Prevents re-investigating dead ends after context reset
 - Each entry: hypothesis, evidence that disproved it, timestamp
-- Critical for efficiency across /clear boundaries
+- Critical for efficiency across /new boundaries
 
 **Evidence:**
 - APPEND only - never remove entries
@@ -99,7 +99,7 @@ files_changed: []
 
 <lifecycle>
 
-**Creation:** Immediately when /gsd:debug is called
+**Creation:** Immediately when /gsd-debug is called
 - Create file with trigger from user input
 - Set status to "gathering"
 - Current Focus: next_action = "gather symptoms"
@@ -135,15 +135,15 @@ files_changed: []
 
 <resume_behavior>
 
-When Claude reads this file after /clear:
+When The assistant reads this file after /new:
 
 1. Parse frontmatter → know status
-2. Read Current Focus → know exactly what was happening
-3. Read Eliminated → know what NOT to retry
-4. Read Evidence → know what's been learned
+2. read Current Focus → know exactly what was happening
+3. read Eliminated → know what NOT to retry
+4. read Evidence → know what's been learned
 5. Continue from next_action
 
-The file IS the debugging brain. Claude should be able to resume perfectly from any interruption point.
+The file IS the debugging brain. The assistant should be able to resume perfectly from any interruption point.
 
 </resume_behavior>
 

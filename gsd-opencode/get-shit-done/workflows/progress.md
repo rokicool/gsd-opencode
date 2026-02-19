@@ -3,7 +3,7 @@ Check project progress, summarize recent work and what's ahead, then intelligent
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -12,7 +12,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 **Load progress context (with file contents to avoid redundant reads):**
 
 ```bash
-INIT_RAW=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init progress --include state,roadmap,project,config)
+INIT_RAW=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init progress --include state,roadmap,project,config)
 # Large payloads are written to a tmpfile — output starts with @file:/path
 if [[ "$INIT_RAW" == @file:* ]]; then
   INIT_FILE="${INIT_RAW#@file:}"
@@ -32,18 +32,18 @@ If `project_exists` is false (no `.planning/` directory):
 ```
 No planning structure found.
 
-Run /gsd:new-project to start a new project.
+Run /gsd-new-project to start a new project.
 ```
 
 Exit.
 
-If missing STATE.md: suggest `/gsd:new-project`.
+If missing STATE.md: suggest `/gsd-new-project`.
 
 **If ROADMAP.md missing but PROJECT.md exists:**
 
 This means a milestone was completed and archived. Go to **Route F** (between milestones).
 
-If missing both ROADMAP.md and PROJECT.md: suggest `/gsd:new-project`.
+If missing both ROADMAP.md and PROJECT.md: suggest `/gsd-new-project`.
 </step>
 
 <step name="load">
@@ -62,7 +62,7 @@ No additional file reads needed.
 **Get comprehensive roadmap analysis (replaces manual parsing):**
 
 ```bash
-ROADMAP=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs roadmap analyze)
+ROADMAP=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap analyze)
 ```
 
 This returns structured JSON with:
@@ -81,7 +81,7 @@ Use this instead of manually reading/parsing ROADMAP.md.
 - Find the 2-3 most recent SUMMARY.md files
 - Use `summary-extract` for efficient parsing:
   ```bash
-  node ~/.claude/get-shit-done/bin/gsd-tools.cjs summary-extract <path> --fields one_liner
+  node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs summary-extract <path> --fields one_liner
   ```
 - This shows "what we've been working on"
   </step>
@@ -101,7 +101,7 @@ Use this instead of manually reading/parsing ROADMAP.md.
 
 ```bash
 # Get formatted progress bar
-PROGRESS_BAR=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs progress bar --raw)
+PROGRESS_BAR=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs progress bar --raw)
 ```
 
 Present:
@@ -129,10 +129,10 @@ CONTEXT: [✓ if has_context | - if not]
 - [any blockers or concerns from STATE.md]
 
 ## Pending Todos
-- [count] pending — /gsd:check-todos to review
+- [count] pending — /gsd-check-todos to review
 
 ## Active Debug Sessions
-- [count] active — /gsd:debug to continue
+- [count] active — /gsd-debug to continue
 (Only show this section if count > 0)
 
 ## What's Next
@@ -182,7 +182,7 @@ Track:
 **Route A: Unexecuted plan exists**
 
 Find the first PLAN.md without matching SUMMARY.md.
-Read its `<objective>` section.
+read its `<objective>` section.
 
 ```
 ---
@@ -191,9 +191,9 @@ Read its `<objective>` section.
 
 **{phase}-{plan}: [Plan Name]** — [objective summary from PLAN.md]
 
-`/gsd:execute-phase {phase}`
+`/gsd-execute-phase {phase}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 ```
@@ -212,11 +212,11 @@ Check if `{phase_num}-CONTEXT.md` exists in phase directory.
 ## ▶ Next Up
 
 **Phase {N}: {Name}** — {Goal from ROADMAP.md}
-<sub>✓ Context gathered, ready to plan</sub>
+*✓ Context gathered, ready to plan*
 
-`/gsd:plan-phase {phase-number}`
+`/gsd-plan-phase {phase-number}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 ```
@@ -230,15 +230,15 @@ Check if `{phase_num}-CONTEXT.md` exists in phase directory.
 
 **Phase {N}: {Name}** — {Goal from ROADMAP.md}
 
-`/gsd:discuss-phase {phase}` — gather context and clarify approach
+`/gsd-discuss-phase {phase}` — gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:plan-phase {phase}` — skip discussion, plan directly
-- `/gsd:list-phase-assumptions {phase}` — see Claude's assumptions
+- `/gsd-plan-phase {phase}` — skip discussion, plan directly
+- `/gsd-list-phase-assumptions {phase}` — see The assistant's assumptions
 
 ---
 ```
@@ -256,15 +256,15 @@ UAT.md exists with gaps (diagnosed issues). User needs to plan fixes.
 
 **{phase_num}-UAT.md** has {N} gaps requiring fixes.
 
-`/gsd:plan-phase {phase} --gaps`
+`/gsd-plan-phase {phase} --gaps`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:execute-phase {phase}` — execute phase plans
-- `/gsd:verify-work {phase}` — run more UAT testing
+- `/gsd-execute-phase {phase}` — execute phase plans
+- `/gsd-verify-work {phase}` — run more UAT testing
 
 ---
 ```
@@ -273,7 +273,7 @@ UAT.md exists with gaps (diagnosed issues). User needs to plan fixes.
 
 **Step 3: Check milestone status (only when phase complete)**
 
-Read ROADMAP.md and identify:
+read ROADMAP.md and identify:
 1. Current phase number
 2. All phase numbers in the current milestone section
 
@@ -292,7 +292,7 @@ State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
 
 **Route C: Phase complete, more phases remain**
 
-Read ROADMAP.md to get the next phase's name and goal.
+read ROADMAP.md to get the next phase's name and goal.
 
 ```
 ---
@@ -303,15 +303,15 @@ Read ROADMAP.md to get the next phase's name and goal.
 
 **Phase {Z+1}: {Name}** — {Goal from ROADMAP.md}
 
-`/gsd:discuss-phase {Z+1}` — gather context and clarify approach
+`/gsd-discuss-phase {Z+1}` — gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:plan-phase {Z+1}` — skip discussion, plan directly
-- `/gsd:verify-work {Z}` — user acceptance test before continuing
+- `/gsd-plan-phase {Z+1}` — skip discussion, plan directly
+- `/gsd-verify-work {Z}` — user acceptance test before continuing
 
 ---
 ```
@@ -331,14 +331,14 @@ All {N} phases finished!
 
 **Complete Milestone** — archive and prepare for next
 
-`/gsd:complete-milestone`
+`/gsd-complete-milestone`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:verify-work` — user acceptance test before completing milestone
+- `/gsd-verify-work` — user acceptance test before completing milestone
 
 ---
 ```
@@ -349,7 +349,7 @@ All {N} phases finished!
 
 A milestone was completed and archived. Ready to start the next milestone cycle.
 
-Read MILESTONES.md to find the last completed milestone version.
+read MILESTONES.md to find the last completed milestone version.
 
 ```
 ---
@@ -362,9 +362,9 @@ Ready to plan the next milestone.
 
 **Start Next Milestone** — questioning → research → requirements → roadmap
 
-`/gsd:new-milestone`
+`/gsd-new-milestone`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 ```
@@ -374,10 +374,10 @@ Ready to plan the next milestone.
 <step name="edge_cases">
 **Handle edge cases:**
 
-- Phase complete but next phase not planned → offer `/gsd:plan-phase [next]`
+- Phase complete but next phase not planned → offer `/gsd-plan-phase [next]`
 - All work complete → offer milestone completion
 - Blockers present → highlight before offering to continue
-- Handoff file exists → mention it, offer `/gsd:resume-work`
+- Handoff file exists → mention it, offer `/gsd-resume-work`
   </step>
 
 </process>
@@ -387,7 +387,7 @@ Ready to plan the next milestone.
 - [ ] Rich context provided (recent work, decisions, issues)
 - [ ] Current position clear with visual progress
 - [ ] What's next clearly explained
-- [ ] Smart routing: /gsd:execute-phase if plans exist, /gsd:plan-phase if not
+- [ ] Smart routing: /gsd-execute-phase if plans exist, /gsd-plan-phase if not
 - [ ] User confirms before any action
 - [ ] Seamless handoff to appropriate gsd command
       </success_criteria>

@@ -3,7 +3,7 @@ Interactive configuration of GSD workflow agents (research, plan_check, verifier
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -12,8 +12,8 @@ Read all files referenced by the invoking prompt's execution_context before star
 Ensure config exists and load current state:
 
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs config-ensure-section
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs state load)
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-ensure-section
+INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state load)
 ```
 
 Creates `.planning/config.json` with defaults if missing and loads current config values.
@@ -33,10 +33,10 @@ Parse current values (default to `true` if not present):
 </step>
 
 <step name="present_settings">
-Use AskUserQuestion with current values pre-selected:
+Use askuserquestion with current values pre-selected:
 
 ```
-AskUserQuestion([
+askuserquestion([
   {
     question: "Which model profile for agents?",
     header: "Model",
@@ -79,7 +79,7 @@ AskUserQuestion([
     header: "Auto",
     multiSelect: false,
     options: [
-      { label: "No (Recommended)", description: "Manual /clear + paste between stages" },
+      { label: "No (Recommended)", description: "Manual /new + paste between stages" },
       { label: "Yes", description: "Chain stages via Task() subagents (same isolation)" }
     ]
   },
@@ -116,14 +116,14 @@ Merge new settings into existing config.json:
 }
 ```
 
-Write updated config to `.planning/config.json`.
+write updated config to `.planning/config.json`.
 </step>
 
 <step name="save_as_defaults">
 Ask whether to save these settings as global defaults for future projects:
 
 ```
-AskUserQuestion([
+askuserquestion([
   {
     question: "Save these as default settings for all new projects?",
     header: "Defaults",
@@ -142,7 +142,7 @@ If "Yes": write the same config object (minus project-specific fields like `brav
 mkdir -p ~/.gsd
 ```
 
-Write `~/.gsd/defaults.json` with:
+write `~/.gsd/defaults.json` with:
 ```json
 {
   "mode": <current>,
@@ -179,13 +179,13 @@ Display:
 | Git Branching        | {None/Per Phase/Per Milestone} |
 | Saved as Defaults    | {Yes/No} |
 
-These settings apply to future /gsd:plan-phase and /gsd:execute-phase runs.
+These settings apply to future /gsd-plan-phase and /gsd-execute-phase runs.
 
 Quick commands:
-- /gsd:set-profile <profile> — switch model profile
-- /gsd:plan-phase --research — force research
-- /gsd:plan-phase --skip-research — skip research
-- /gsd:plan-phase --skip-verify — skip plan check
+- /gsd-set-profile <profile> — switch model profile
+- /gsd-plan-phase --research — force research
+- /gsd-plan-phase --skip-research — skip research
+- /gsd-plan-phase --skip-verify — skip plan check
 ```
 </step>
 

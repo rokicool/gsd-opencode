@@ -1,11 +1,11 @@
 ---
-name: gsd:settings
+name: gsd-settings
 description: Configure GSD workflow toggles and model profile
 allowed-tools:
-  - Read
-  - Write
-  - Bash
-  - AskUserQuestion
+  - read
+  - write
+  - bash
+  - askuserquestion
 ---
 
 <objective>
@@ -20,11 +20,11 @@ Routes to the settings workflow which handles:
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/settings.md
+@~/.config/opencode/get-shit-done/workflows/settings.md
 </execution_context>
 
 <process>
-**Follow the settings workflow** from `@~/.claude/get-shit-done/workflows/settings.md`.
+**Follow the settings workflow** from `@~/.config/opencode/get-shit-done/workflows/settings.md`.
 
 The workflow handles all logic including:
 1. Config file creation with defaults if missing

@@ -1,9 +1,9 @@
 <purpose>
-Switch the model profile used by GSD agents. Controls which Claude model each agent uses, balancing quality vs token spend.
+Switch the model profile used by GSD agents. Controls which The assistant model each agent uses, balancing quality vs token spend.
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -23,15 +23,15 @@ if $ARGUMENTS.profile not in ["quality", "balanced", "budget"]:
 Ensure config exists and load current state:
 
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs config-ensure-section
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs state load)
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-ensure-section
+INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state load)
 ```
 
 This creates `.planning/config.json` with defaults if missing and loads current config.
 </step>
 
 <step name="update_config">
-Read current config from state load or directly:
+read current config from state load or directly:
 
 Update `model_profile` field:
 ```json
@@ -40,7 +40,7 @@ Update `model_profile` field:
 }
 ```
 
-Write updated config back to `.planning/config.json`.
+write updated config back to `.planning/config.json`.
 </step>
 
 <step name="confirm">

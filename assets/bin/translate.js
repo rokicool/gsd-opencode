@@ -191,7 +191,22 @@ async function main() {
   const translator = new TextTranslator(config);
   const backupManager = new BackupManager();
   const gitChecker = new GitChecker();
-  const validator = new Validator();
+
+  // Build forbidden patterns from config if available
+  const forbiddenPatterns = [];
+  if (config._forbidden_strings_after_translation) {
+    for (const str of config._forbidden_strings_after_translation) {
+      // Escape special regex characters for literal matching
+      const escaped = str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      forbiddenPatterns.push({
+        pattern: new RegExp(escaped, 'g'),
+        message: `Found forbidden string "${str}"`,
+        suggestion: 'Check translation rules',
+        exceptions: []
+      });
+    }
+  }
+  const validator = new Validator({ forbiddenPatterns });
 
   // Resolve file patterns
   let files;

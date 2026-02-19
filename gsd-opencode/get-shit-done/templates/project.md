@@ -147,7 +147,7 @@ PROJECT.md evolves throughout the project lifecycle.
 
 For existing codebases:
 
-1. **Map codebase first** via `/gsd:map-codebase`
+1. **Map codebase first** via `/gsd-map-codebase`
 
 2. **Infer Validated requirements** from existing code:
    - What does the codebase actually do?
@@ -179,6 +179,6 @@ See: .planning/PROJECT.md (updated [date])
 **Current focus:** [Current phase name]
 ```
 
-This ensures Claude reads current PROJECT.md context.
+This ensures The assistant reads current PROJECT.md context.
 
 </state_reference>

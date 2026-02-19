@@ -13,7 +13,7 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 
 2. **gsd-planner** — Reads CONTEXT.md to know WHAT decisions are locked
    - "Pull-to-refresh on mobile" → planner includes that in task specs
-   - "Claude's Discretion: loading skeleton" → planner can decide approach
+   - "The assistant's Discretion: loading skeleton" → planner can decide approach
 
 **Your job:** Capture decisions clearly enough that downstream agents can act on them without asking the user again.
 
@@ -21,7 +21,7 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 </downstream_awareness>
 
 <philosophy>
-**User = founder/visionary. Claude = builder.**
+**User = founder/visionary. The assistant = builder.**
 
 The user knows:
 - How they imagine it working
@@ -71,7 +71,7 @@ Gray areas are **implementation decisions the user cares about** — things that
 
 **How to identify gray areas:**
 
-1. **Read the phase goal** from ROADMAP.md
+1. **read the phase goal** from ROADMAP.md
 2. **Understand the domain** — What kind of thing is being built?
    - Something users SEE → visual presentation, interactions, states matter
    - Something users CALL → interface contracts, responses, errors matter
@@ -98,7 +98,7 @@ Phase: "API documentation"
 
 **The key question:** What decisions would change the outcome that the user should weigh in on?
 
-**Claude handles these (don't ask):**
+**The assistant handles these (don't ask):**
 - Technical implementation details
 - Architecture patterns
 - Performance optimization
@@ -111,7 +111,7 @@ Phase: "API documentation"
 Phase number from argument (required).
 
 ```bash
-INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init phase-op "${PHASE}")
+INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init phase-op "${PHASE}")
 ```
 
 Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `has_verification`, `plan_count`, `roadmap_exists`, `planning_exists`.
@@ -120,7 +120,7 @@ Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phas
 ```
 Phase [X] not found in roadmap.
 
-Use /gsd:progress to see available phases.
+Use /gsd-progress to see available phases.
 ```
 Exit workflow.
 
@@ -135,7 +135,7 @@ ls ${phase_dir}/*-CONTEXT.md 2>/dev/null
 ```
 
 **If exists:**
-Use AskUserQuestion:
+Use askuserquestion:
 - header: "Context"
 - question: "Phase [X] already has context. What do you want to do?"
 - options:
@@ -151,11 +151,11 @@ If "Skip": Exit workflow
 
 Check `has_plans` and `plan_count` from init. **If `has_plans` is true:**
 
-Use AskUserQuestion:
+Use askuserquestion:
 - header: "Plans exist"
 - question: "Phase [X] already has {plan_count} plan(s) created without user context. Your decisions here won't affect existing plans unless you replan."
 - options:
-  - "Continue and replan after" — Capture context, then run /gsd:plan-phase {X} to replan
+  - "Continue and replan after" — Capture context, then run /gsd-plan-phase {X} to replan
   - "View existing plans" — Show plans before deciding
   - "Cancel" — Skip discuss-phase
 
@@ -169,7 +169,7 @@ If "Cancel": Exit workflow.
 <step name="analyze_phase">
 Analyze the phase to identify gray areas worth discussing.
 
-**Read the phase description from ROADMAP.md and determine:**
+**read the phase description from ROADMAP.md and determine:**
 
 1. **Domain boundary** — What capability is this phase delivering? State it clearly.
 
@@ -203,7 +203,7 @@ We'll clarify HOW to implement this.
 (New capabilities belong in other phases.)
 ```
 
-**Then use AskUserQuestion (multiSelect: true):**
+**Then use askuserquestion (multiSelect: true):**
 - header: "Discuss"
 - question: "Which areas do you want to discuss for [phase name]?"
 - options: Generate 3-4 phase-specific gray areas, each formatted as:
@@ -255,11 +255,11 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
    Let's talk about [Area].
    ```
 
-2. **Ask 4 questions using AskUserQuestion:**
+2. **Ask 4 questions using askuserquestion:**
    - header: "[Area]" (max 12 chars — abbreviate if needed)
    - question: Specific decision for this area
-   - options: 2-3 concrete choices (AskUserQuestion adds "Other" automatically)
-   - Include "You decide" as an option when reasonable — captures Claude discretion
+   - options: 2-3 concrete choices (askuserquestion adds "Other" automatically)
+   - Include "You decide" as an option when reasonable — captures The assistant discretion
 
 3. **After 4 questions, check:**
    - header: "[Area]" (max 12 chars)
@@ -275,7 +275,7 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
    - question: "That covers [list areas]. Ready to create context?"
    - options: "Create context" / "Revisit an area"
 
-**Question design:**
+**question design:**
 - Options should be concrete, not abstract ("Cards" not "Option A")
 - Each answer should inform the next question
 - If user picks "Other", receive their input, reflect it back, confirm
@@ -331,8 +331,8 @@ mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 ### [Category 2 that was discussed]
 - [Decision or preference captured]
 
-### Claude's Discretion
-[Areas where user said "you decide" — note that Claude has flexibility here]
+### The assistant's Discretion
+[Areas where user said "you decide" — note that The assistant has flexibility here]
 
 </decisions>
 
@@ -360,7 +360,7 @@ mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 *Context gathered: [date]*
 ```
 
-Write file.
+write file.
 </step>
 
 <step name="confirm_creation">
@@ -387,14 +387,14 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 **Phase ${PHASE}: [Name]** — [Goal from ROADMAP.md]
 
-`/gsd:plan-phase ${PHASE}`
+`/gsd-plan-phase ${PHASE}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
 **Also available:**
-- `/gsd:plan-phase ${PHASE} --skip-research` — plan without research
+- `/gsd-plan-phase ${PHASE} --skip-research` — plan without research
 - Review/edit CONTEXT.md before continuing
 
 ---
@@ -405,7 +405,7 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 Commit phase context (uses `commit_docs` from init internally):
 
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs(${padded_phase}): capture phase context" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs(${padded_phase}): capture phase context" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
 ```
 
 Confirm: "Committed: docs(${padded_phase}): capture phase context"
@@ -415,7 +415,7 @@ Confirm: "Committed: docs(${padded_phase}): capture phase context"
 Update STATE.md with session info:
 
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs state record-session \
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state record-session \
   --stopped-at "Phase ${PHASE} context gathered" \
   --resume-file "${phase_dir}/${padded_phase}-CONTEXT.md"
 ```
@@ -423,7 +423,7 @@ node ~/.claude/get-shit-done/bin/gsd-tools.cjs state record-session \
 Commit STATE.md:
 
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs(state): record phase ${PHASE} context session" --files .planning/STATE.md
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs(state): record phase ${PHASE} context session" --files .planning/STATE.md
 ```
 </step>
 
@@ -431,14 +431,14 @@ node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs(state): record phase
 Check for auto-advance trigger:
 
 1. Parse `--auto` flag from $ARGUMENTS
-2. Read `workflow.auto_advance` from config:
+2. read `workflow.auto_advance` from config:
    ```bash
-   AUTO_CFG=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
+   AUTO_CFG=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
 
 **If `--auto` flag present AND `AUTO_CFG` is not true:** Persist auto-advance to config (handles direct `--auto` usage without new-project):
 ```bash
-node ~/.claude/get-shit-done/bin/gsd-tools.cjs config-set workflow.auto_advance true
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-set workflow.auto_advance true
 ```
 
 **If `--auto` flag present OR `AUTO_CFG` is true:**
@@ -455,8 +455,8 @@ Context captured. Spawning plan-phase...
 Spawn plan-phase as Task:
 ```
 Task(
-  prompt="Run /gsd:plan-phase ${PHASE} --auto",
-  subagent_type="general-purpose",
+  prompt="Run /gsd-plan-phase ${PHASE} --auto",
+  subagent_type="general_purpose",
   description="Plan Phase ${PHASE}"
 )
 ```
@@ -468,7 +468,7 @@ Task(
   Auto-advance stopped: Planning needs input.
 
   Review the output above and continue manually:
-  /gsd:plan-phase ${PHASE}
+  /gsd-plan-phase ${PHASE}
   ```
 
 **If neither `--auto` nor config enabled:**

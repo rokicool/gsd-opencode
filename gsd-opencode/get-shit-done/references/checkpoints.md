@@ -1,13 +1,13 @@
 <overview>
 Plans execute autonomously. Checkpoints formalize interaction points where human verification or decisions are needed.
 
-**Core principle:** Claude automates everything with CLI/API. Checkpoints are for verification and decisions, not manual work.
+**Core principle:** The assistant automates everything with CLI/API. Checkpoints are for verification and decisions, not manual work.
 
 **Golden rules:**
-1. **If Claude can run it, Claude runs it** - Never ask user to execute CLI commands, start servers, or run builds
-2. **Claude sets up the verification environment** - Start dev servers, seed databases, configure env vars
+1. **If The assistant can run it, The assistant runs it** - Never ask user to execute CLI commands, start servers, or run builds
+2. **The assistant sets up the verification environment** - Start dev servers, seed databases, configure env vars
 3. **User only does what requires human judgment** - Visual checks, UX evaluation, "does this feel right?"
-4. **Secrets come from user, automation comes from Claude** - Ask for API keys, then Claude uses them via CLI
+4. **Secrets come from user, automation comes from The assistant** - Ask for API keys, then The assistant uses them via CLI
 5. **Auto-mode bypasses verification/decision checkpoints** — When `workflow.auto_advance` is true in config: human-verify auto-approves, decision auto-selects first option, human-action still stops (auth gates cannot be automated)
 </overview>
 
@@ -16,7 +16,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 <type name="human-verify">
 ## checkpoint:human-verify (Most Common - 90%)
 
-**When:** Claude completed automated work, human confirms it works correctly.
+**When:** The assistant completed automated work, human confirms it works correctly.
 
 **Use for:**
 - Visual UI checks (layout, styling, responsiveness)
@@ -29,7 +29,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 **Structure:**
 ```xml
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>[What Claude automated and deployed/built]</what-built>
+  <what-built>[What The assistant automated and deployed/built]</what-built>
   <how-to-verify>
     [Exact steps to test - URLs, commands, expected behavior]
   </how-to-verify>
@@ -37,7 +37,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 </task>
 ```
 
-**Example: UI Component (shows key pattern: Claude starts server BEFORE checkpoint)**
+**Example: UI Component (shows key pattern: The assistant starts server BEFORE checkpoint)**
 ```xml
 <task type="auto">
   <name>Build responsive dashboard layout</name>
@@ -185,10 +185,10 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 <type name="human-action">
 ## checkpoint:human-action (1% - Rare)
 
-**When:** Action has NO CLI/API and requires human-only interaction, OR Claude hit an authentication gate during automation.
+**When:** Action has NO CLI/API and requires human-only interaction, OR The assistant hit an authentication gate during automation.
 
 **Use ONLY for:**
-- **Authentication gates** - Claude tried CLI/API but needs credentials (this is NOT a failure)
+- **Authentication gates** - The assistant tried CLI/API but needs credentials (this is NOT a failure)
 - Email verification links (clicking email)
 - SMS 2FA codes (phone verification)
 - Manual account approvals (platform requires human review)
@@ -198,18 +198,18 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 **Do NOT use for pre-planned manual work:**
 - Deploying (use CLI - auth gate if needed)
 - Creating webhooks/databases (use API/CLI - auth gate if needed)
-- Running builds/tests (use Bash tool)
-- Creating files (use Write tool)
+- Running builds/tests (use bash tool)
+- Creating files (use write tool)
 
 **Structure:**
 ```xml
 <task type="checkpoint:human-action" gate="blocking">
-  <action>[What human must do - Claude already did everything automatable]</action>
+  <action>[What human must do - The assistant already did everything automatable]</action>
   <instructions>
-    [What Claude already automated]
+    [What The assistant already automated]
     [The ONE thing requiring human action]
   </instructions>
-  <verification>[What Claude can check afterward]</verification>
+  <verification>[What The assistant can check afterward]</verification>
   <resume-signal>[How to continue]</resume-signal>
 </task>
 ```
@@ -243,7 +243,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
   <verify>vercel ls shows deployment, curl returns 200</verify>
 </task>
 
-<!-- If vercel returns "Error: Not authenticated", Claude creates checkpoint on the fly -->
+<!-- If vercel returns "Error: Not authenticated", The assistant creates checkpoint on the fly -->
 
 <task type="checkpoint:human-action" gate="blocking">
   <action>Authenticate Vercel CLI so I can continue deployment</action>
@@ -256,7 +256,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
   <resume-signal>Type "done" when authenticated</resume-signal>
 </task>
 
-<!-- After authentication, Claude retries the deployment -->
+<!-- After authentication, The assistant retries the deployment -->
 
 <task type="auto">
   <name>Retry Vercel deployment</name>
@@ -265,13 +265,13 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 </task>
 ```
 
-**Key distinction:** Auth gates are created dynamically when Claude encounters auth errors. NOT pre-planned — Claude automates first, asks for credentials only when blocked.
+**Key distinction:** Auth gates are created dynamically when The assistant encounters auth errors. NOT pre-planned — The assistant automates first, asks for credentials only when blocked.
 </type>
 </checkpoint_types>
 
 <execution_protocol>
 
-When Claude encounters `type="checkpoint:*"`:
+When The assistant encounters `type="checkpoint:*"`:
 
 1. **Stop immediately** - do not proceed to next task
 2. **Display checkpoint clearly** using the format below
@@ -359,9 +359,9 @@ I'll verify: vercel whoami returns your account
 
 <authentication_gates>
 
-**Auth gate = Claude tried CLI/API, got auth error.** Not a failure — a gate requiring human input to unblock.
+**Auth gate = The assistant tried CLI/API, got auth error.** Not a failure — a gate requiring human input to unblock.
 
-**Pattern:** Claude tries automation → auth error → creates checkpoint:human-action → user authenticates → Claude retries → continues
+**Pattern:** The assistant tries automation → auth error → creates checkpoint:human-action → user authenticates → The assistant retries → continues
 
 **Gate protocol:**
 1. Recognize it's not a failure - missing auth is expected
@@ -373,14 +373,14 @@ I'll verify: vercel whoami returns your account
 7. Continue normally
 
 **Key distinction:**
-- Pre-planned checkpoint: "I need you to do X" (wrong - Claude should automate)
+- Pre-planned checkpoint: "I need you to do X" (wrong - The assistant should automate)
 - Auth gate: "I tried to automate X but need credentials" (correct - unblocks automation)
 
 </authentication_gates>
 
 <automation_reference>
 
-**The rule:** If it has CLI/API, Claude does it. Never ask human to perform automatable work.
+**The rule:** If it has CLI/API, The assistant does it. Never ask human to perform automatable work.
 
 ## Service CLI Reference
 
@@ -400,7 +400,7 @@ I'll verify: vercel whoami returns your account
 
 ## Environment Variable Automation
 
-**Env files:** Use Write/Edit tools. Never ask human to create .env manually.
+**Env files:** Use write/edit tools. Never ask human to create .env manually.
 
 **Dashboard env vars via CLI:**
 
@@ -420,7 +420,7 @@ I'll verify: vercel whoami returns your account
   <instructions>Go to dashboard.convex.dev → Settings → Environment Variables → Add</instructions>
 </task>
 
-<!-- RIGHT: Claude asks for value, then adds via CLI -->
+<!-- RIGHT: The assistant asks for value, then adds via CLI -->
 <task type="checkpoint:human-action">
   <action>Provide your OpenAI API key</action>
   <instructions>
@@ -513,11 +513,11 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 
 ## Automatable Quick Reference
 
-| Action | Automatable? | Claude does it? |
+| Action | Automatable? | The assistant does it? |
 |--------|--------------|-----------------|
 | Deploy to Vercel | Yes (`vercel`) | YES |
 | Create Stripe webhook | Yes (API) | YES |
-| Write .env file | Yes (Write tool) | YES |
+| write .env file | Yes (write tool) | YES |
 | Create Upstash DB | Yes (`upstash`) | YES |
 | Run tests | Yes (`npm test`) | YES |
 | Start dev server | Yes (`npm run dev`) | YES |
@@ -542,13 +542,13 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 - Provide context: why this checkpoint exists
 
 **DON'T:**
-- Ask human to do work Claude can automate ❌
+- Ask human to do work The assistant can automate ❌
 - Assume knowledge: "Configure the usual settings" ❌
 - Skip steps: "Set up database" (too vague) ❌
 - Mix multiple verifications in one checkpoint ❌
 
 **Placement:**
-- **After automation completes** - not before Claude does the work
+- **After automation completes** - not before The assistant does the work
 - **After UI buildout** - before declaring phase complete
 - **Before dependent work** - decisions before implementation
 - **At integration points** - after configuring external services
@@ -567,7 +567,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
   <action>
     1. Run `upstash redis create myapp-cache --region us-east-1`
     2. Capture connection URL from output
-    3. Write to .env: UPSTASH_REDIS_URL={url}
+    3. write to .env: UPSTASH_REDIS_URL={url}
     4. Verify connection with test command
   </action>
   <verify>
@@ -578,7 +578,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
   <done>Redis database created and configured</done>
 </task>
 
-<!-- NO CHECKPOINT NEEDED - Claude automated everything and verified programmatically -->
+<!-- NO CHECKPOINT NEEDED - The assistant automated everything and verified programmatically -->
 ```
 
 ### Example 2: Full Auth Flow (Single checkpoint at end)
@@ -643,9 +643,9 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 </task>
 ```
 
-**Why bad:** Claude can run `npm run dev`. User should only visit URLs, not execute commands.
+**Why bad:** The assistant can run `npm run dev`. User should only visit URLs, not execute commands.
 
-### ✅ GOOD: Claude starts server, user visits
+### ✅ GOOD: The assistant starts server, user visits
 
 ```xml
 <task type="auto">
@@ -664,7 +664,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 </task>
 ```
 
-### ❌ BAD: Asking human to deploy / ✅ GOOD: Claude automates
+### ❌ BAD: Asking human to deploy / ✅ GOOD: The assistant automates
 
 ```xml
 <!-- BAD: Asking user to deploy via dashboard -->
@@ -673,7 +673,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
   <instructions>Visit vercel.com/new → Import repo → Click Deploy → Copy URL</instructions>
 </task>
 
-<!-- GOOD: Claude deploys, user verifies -->
+<!-- GOOD: The assistant deploys, user verifies -->
 <task type="auto">
   <name>Deploy to Vercel</name>
   <action>Run `vercel --yes`. Capture URL.</action>
@@ -742,7 +742,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 </task>
 ```
 
-**Why bad:** Claude can run these commands. User should never execute CLI commands.
+**Why bad:** The assistant can run these commands. User should never execute CLI commands.
 
 ### ❌ BAD: Asking user to copy values between services
 
@@ -753,7 +753,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 </task>
 ```
 
-**Why bad:** Stripe has an API. Claude should create the webhook via API and write to .env directly.
+**Why bad:** Stripe has an API. The assistant should create the webhook via API and write to .env directly.
 
 </anti_patterns>
 
@@ -761,16 +761,16 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 
 Checkpoints formalize human-in-the-loop points for verification and decisions, not manual work.
 
-**The golden rule:** If Claude CAN automate it, Claude MUST automate it.
+**The golden rule:** If The assistant CAN automate it, The assistant MUST automate it.
 
 **Checkpoint priority:**
-1. **checkpoint:human-verify** (90%) - Claude automated everything, human confirms visual/functional correctness
+1. **checkpoint:human-verify** (90%) - The assistant automated everything, human confirms visual/functional correctness
 2. **checkpoint:decision** (9%) - Human makes architectural/technology choices
 3. **checkpoint:human-action** (1%) - Truly unavoidable manual steps with no API/CLI
 
 **When NOT to use checkpoints:**
-- Things Claude can verify programmatically (tests, builds)
-- File operations (Claude can read files)
+- Things The assistant can verify programmatically (tests, builds)
+- File operations (The assistant can read files)
 - Code correctness (tests and static analysis)
 - Anything automatable via CLI/API
 </summary>
