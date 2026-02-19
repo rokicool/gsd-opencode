@@ -224,11 +224,20 @@ export class TextTranslator {
       });
     }
 
-    // Apply the replacement
+    // Apply the replacement with case preservation
     result = content.replace(rule.regex, (match) => {
-      if (!rule.caseSensitive && match === match.toUpperCase() && match !== match.toLowerCase()) {
+      if (rule.caseSensitive) {
+        return rule.replacement;
+      }
+      // All uppercase: GSD -> GSD-OPENCODE
+      if (match === match.toUpperCase() && match !== match.toLowerCase()) {
         return rule.replacement.toUpperCase();
       }
+      // Title case (first letter uppercase): Gsd -> Gsd-opencode
+      if (match[0] === match[0].toUpperCase()) {
+        return rule.replacement.charAt(0).toUpperCase() + rule.replacement.slice(1);
+      }
+      // Default (lowercase): gsd -> gsd-opencode
       return rule.replacement;
     });
 
@@ -247,6 +256,16 @@ export class TextTranslator {
       // Check file size first
       const sizeCheck = await this.checkFileSize(resolvedPath);
       if (!sizeCheck.valid) {
+        if (sizeCheck.error) {
+          return {
+            original: '',
+            translated: '',
+            changeCount: 0,
+            changes: [],
+            wasModified: false,
+            error: sizeCheck.error
+          };
+        }
         return {
           original: '',
           translated: '',

@@ -24,8 +24,8 @@
   "author": "Roki",
   "license": "MIT",
   "dependencies": {
-    "diff": "^5.1.0",
-    "tinyglobby": "^0.2.9"
+    "diff": "^5.2.2",
+    "tinyglobby": "^0.2.15"
   },
   "devDependencies": {
     "vitest": "^1.6.0"

@@ -169,7 +169,8 @@ export class BackupManager {
           const age = (Date.now() - stats.mtime.getTime()) / (1000 * 60 * 60 * 24);
 
           // Extract original path and timestamp from filename
-          const match = file.match(/^(.+)\.([\d-T]+)\.bak$/);
+          // Timestamp format: 2026-02-19T20-46-13-123Z (from toISOString with : replaced by -)
+          const match = file.match(/^(.+)\.([\d-TZ-]+)\.bak$/);
           if (match) {
             backups.push({
               path: filePath,
@@ -197,7 +198,9 @@ export class BackupManager {
     const sanitized = this.sanitizePathForFilename(resolvedPath);
 
     const backups = await this.listBackups();
-    const matching = backups.filter(b =>
+    // Sort by age ascending (newest first)
+    const sorted = backups.sort((a, b) => a.age - b.age);
+    const matching = sorted.filter(b =>
       b.originalPath === resolvedPath ||
       b.path.includes(sanitized)
     );

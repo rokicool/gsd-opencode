@@ -42,11 +42,7 @@ const DEFAULT_FORBIDDEN_PATTERNS = [
     pattern: /\bgsd\b/gi,
     message: 'Found standalone "gsd" reference',
     suggestion: 'gsd-opencode',
-    exceptions: [\n      /gsd-opencode/gi,
-      /gsd-ops/gi,
-      /gsd-tools/gi,
-      /gsd-utils/gi
-    ]
+    exceptions: []
   },
   {
     pattern: /get-shit-done/gi,
@@ -114,15 +110,19 @@ export class Validator {
     for (const match of matches) {
       const matchText = match[0];
       const column = (match.index || 0) + 1;
+      const matchEndIndex = (match.index || 0) + matchText.length;
 
       // Check exceptions
       if (this.isException(matchText, rule.exceptions)) {
         continue;
       }
 
-      // Skip "gsd-opencode" if configured
-      if (this.ignoreGsdOpencode && /gsd-opencode/i.test(matchText)) {
-        continue;
+      // Skip "gsd-opencode" - check if match is followed by "-opencode"
+      if (this.ignoreGsdOpencode) {
+        const afterMatch = line.substring(matchEndIndex, matchEndIndex + 10);
+        if (/^-opencode/i.test(afterMatch)) {
+          continue;
+        }
       }
 
       violations.push({
