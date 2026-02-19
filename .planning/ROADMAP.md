@@ -454,9 +454,9 @@ Plans:
 | 1 | 10-01 | Complete translation utility with TextTranslator service, CLI command, and tests |
 
 Plans:
-- [ ] 10-01-PLAN.md — Create translation utility with TextTranslator service, CLI command, standalone script, and comprehensive tests
+- [x] 10-01-PLAN.md — Create translation utility with TextTranslator service, CLI command, standalone script, and comprehensive tests
 
 ---
 
-*Roadmap created: 2026-02-09*  
-*Last updated: 2026-02-11 (Phase 8 added — support for opencode/commands/ directory)*
+*Roadmap created: 2026-02-09*
+*Last updated: 2026-02-19 (Phase 10 complete — translation script with 91 tests)*
