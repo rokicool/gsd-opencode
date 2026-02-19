@@ -379,7 +379,7 @@ Plans:
 | Phase | Goal | Requirements | Status | Started | Completed |
 |-------|------|--------------|--------|---------|-----------|
 | 1 | Core CLI & Installation | 22 | 🟢 Completed | 2026-02-09 | 2026-02-09 |
-| 2 | Uninstall & Configuration | 10 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
+| 2 | Uninstall & Configuration | 10 | 🟢 Completed | Complete    | 2026-02-19 |
 | 3 | Health Verification | 6 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
 | 4 | Self-Healing | 6 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
 | 5 | Lifecycle Management | 6 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
@@ -426,7 +426,7 @@ Plans:
 
 **Goal:** Create a utility script that translates/replaces references from "gsd" to "gsd-opencode" in files for migration purposes
 **Depends on:** Phase 9
-**Plans:** 1 plan in 1 wave
+**Plans:** 1/1 plans complete
 
 **Requirements:**
 | ID | Requirement |

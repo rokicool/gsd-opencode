@@ -134,8 +134,21 @@ async function loadConfig(configPath) {
 
   // Set defaults
   config.patterns = config.patterns || ['**/*'];
+  config.include = config.include || [];
   config.exclude = config.exclude || ['node_modules/**', '.git/**', '.translate-backups/**'];
   config.maxFileSize = config.maxFileSize || 10 * 1024 * 1024;
+
+  // Validate include option if present
+  if (config.include.length > 0) {
+    if (!Array.isArray(config.include)) {
+      throw new Error('Config "include" must be an array of strings');
+    }
+    for (let i = 0; i < config.include.length; i++) {
+      if (typeof config.include[i] !== 'string') {
+        throw new Error(`Config "include" item ${i + 1} must be a string`);
+      }
+    }
+  }
 
   return config;
 }
@@ -183,10 +196,26 @@ async function main() {
   // Resolve file patterns
   let files;
   try {
-    files = await glob(config.patterns, {
-      ignore: config.exclude,
-      onlyFiles: true
-    });
+    // If include patterns are specified, use them as whitelist first
+    // then apply exclude patterns
+    if (config.include.length > 0) {
+      // Get all files matching include patterns
+      const includedFiles = await glob(config.include, {
+        onlyFiles: true
+      });
+      // Apply exclude patterns to the included files
+      const excludedSet = new Set(await glob(config.include, {
+        ignore: config.exclude,
+        onlyFiles: true
+      }));
+      files = includedFiles.filter(f => excludedSet.has(f));
+    } else {
+      // Use patterns with exclude (existing behavior)
+      files = await glob(config.patterns, {
+        ignore: config.exclude,
+        onlyFiles: true
+      });
+    }
   } catch (error) {
     console.error(formatter.formatError(`Failed to resolve patterns: ${error.message}`));
     process.exit(EXIT_RUNTIME_ERROR);
