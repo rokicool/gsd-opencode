@@ -71,7 +71,7 @@ Required YAML frontmatter:
 </yaml_fields>
 
 <guidelines>
-- Be specific enough that a fresh OpenCode instance understands immediately
+- Be specific enough that a fresh Claude instance understands immediately
 - Include WHY decisions were made, not just what
 - The `<next_action>` should be actionable without reading anything else
 - This file gets DELETED after resume - it's not permanent storage

@@ -17,34 +17,27 @@ Output: .planning/codebase/ folder with 7 structured documents about the codebas
 Include enough detail to be useful as reference. Prioritize practical examples (especially code patterns) over arbitrary brevity.
 
 **Always include file paths:**
-Documents are reference material for OpenCode when planning/executing. Always include actual file paths formatted with backticks: `src/services/user.ts`.
+Documents are reference material for Claude when planning/executing. Always include actual file paths formatted with backticks: `src/services/user.ts`.
 </philosophy>
 
 <process>
 
-<step name="resolve_model_profile" priority="first">
-read model profile for agent spawning:
+<step name="init_context" priority="first">
+Load codebase mapping context:
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init map-codebase)
 ```
 
-Default to "balanced" if not set.
-
-**Model lookup table:**
-
-| Agent | quality | balanced | budget |
-|-------|---------|----------|--------|
-| gsd-codebase-mapper | sonnet | haiku | haiku |
-
-Store resolved model for use in Task calls below.
+Extract from init JSON: `mapper_model`, `commit_docs`, `codebase_dir`, `existing_maps`, `has_maps`, `codebase_dir_exists`.
 </step>
 
 <step name="check_existing">
-Check if .planning/codebase/ already exists:
+Check if .planning/codebase/ already exists using `has_maps` from init context.
 
+If `codebase_dir_exists` is true:
 ```bash
-ls -la .planning/codebase/ 2>/dev/null
+ls -la .planning/codebase/
 ```
 
 **If exists:**
@@ -111,11 +104,11 @@ Focus: tech
 
 Analyze this codebase for technology stack and external integrations.
 
-write these documents to .planning/codebase/:
+Write these documents to .planning/codebase/:
 - STACK.md - Languages, runtime, frameworks, dependencies, configuration
 - INTEGRATIONS.md - External APIs, databases, auth providers, webhooks
 
-Explore thoroughly. write documents directly using templates. Return confirmation only.
+Explore thoroughly. Write documents directly using templates. Return confirmation only.
 ```
 
 **Agent 2: Architecture Focus**
@@ -134,11 +127,11 @@ Focus: arch
 
 Analyze this codebase architecture and directory structure.
 
-write these documents to .planning/codebase/:
+Write these documents to .planning/codebase/:
 - ARCHITECTURE.md - Pattern, layers, data flow, abstractions, entry points
 - STRUCTURE.md - Directory layout, key locations, naming conventions
 
-Explore thoroughly. write documents directly using templates. Return confirmation only.
+Explore thoroughly. Write documents directly using templates. Return confirmation only.
 ```
 
 **Agent 3: Quality Focus**
@@ -157,11 +150,11 @@ Focus: quality
 
 Analyze this codebase for coding conventions and testing patterns.
 
-write these documents to .planning/codebase/:
+Write these documents to .planning/codebase/:
 - CONVENTIONS.md - Code style, naming, patterns, error handling
 - TESTING.md - Framework, structure, mocking, coverage
 
-Explore thoroughly. write documents directly using templates. Return confirmation only.
+Explore thoroughly. Write documents directly using templates. Return confirmation only.
 ```
 
 **Agent 4: Concerns Focus**
@@ -180,10 +173,10 @@ Focus: concerns
 
 Analyze this codebase for technical debt, known issues, and areas of concern.
 
-write this document to .planning/codebase/:
+Write this document to .planning/codebase/:
 - CONCERNS.md - Tech debt, bugs, security, performance, fragile areas
 
-Explore thoroughly. write document directly using template. Return confirmation only.
+Explore thoroughly. Write document directly using template. Return confirmation only.
 ```
 
 Continue to collect_confirmations.
@@ -192,7 +185,7 @@ Continue to collect_confirmations.
 <step name="collect_confirmations">
 Wait for all 4 agents to complete.
 
-read each agent's output file to collect confirmations.
+Read each agent's output file to collect confirmations.
 
 **Expected confirmation format from each agent:**
 ```
@@ -227,37 +220,49 @@ wc -l .planning/codebase/*.md
 
 If any documents missing or empty, note which agents may have failed.
 
+Continue to scan_for_secrets.
+</step>
+
+<step name="scan_for_secrets">
+**CRITICAL SECURITY CHECK:** Scan output files for accidentally leaked secrets before committing.
+
+Run secret pattern detection:
+
+```bash
+# Check for common API key patterns in generated docs
+grep -E '(sk-[a-zA-Z0-9]{20,}|sk_live_[a-zA-Z0-9]+|sk_test_[a-zA-Z0-9]+|ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|glpat-[a-zA-Z0-9_-]+|AKIA[A-Z0-9]{16}|xox[baprs]-[a-zA-Z0-9-]+|-----BEGIN.*PRIVATE KEY|eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.)' .planning/codebase/*.md 2>/dev/null && SECRETS_FOUND=true || SECRETS_FOUND=false
+```
+
+**If SECRETS_FOUND=true:**
+
+```
+⚠️  SECURITY ALERT: Potential secrets detected in codebase documents!
+
+Found patterns that look like API keys or tokens in:
+[show grep output]
+
+This would expose credentials if committed.
+
+**Action required:**
+1. Review the flagged content above
+2. If these are real secrets, they must be removed before committing
+3. Consider adding sensitive files to Claude Code "Deny" permissions
+
+Pausing before commit. Reply "safe to proceed" if the flagged content is not actually sensitive, or edit the files first.
+```
+
+Wait for user confirmation before continuing to commit_codebase_map.
+
+**If SECRETS_FOUND=false:**
+
 Continue to commit_codebase_map.
 </step>
 
 <step name="commit_codebase_map">
 Commit the codebase map:
 
-**Check planning config:**
-
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
-```
-
-**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
-
-**If `COMMIT_PLANNING_DOCS=true` (default):**
-
-```bash
-git add .planning/codebase/*.md
-git commit -m "$(cat <<'EOF'
-docs: map existing codebase
-
-- STACK.md - Technologies and dependencies
-- ARCHITECTURE.md - System design and patterns
-- STRUCTURE.md - Directory layout
-- CONVENTIONS.md - Code style and patterns
-- TESTING.md - Test structure
-- INTEGRATIONS.md - External services
-- CONCERNS.md - Technical debt and issues
-EOF
-)"
+node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "docs: map existing codebase" --files .planning/codebase/*.md
 ```
 
 Continue to offer_next.
@@ -292,16 +297,16 @@ Created .planning/codebase/:
 
 **Initialize project** — use codebase context for planning
 
-`/gsd-new-project`
+`/gsd:new-project`
 
-*`/new` first → fresh context window*
+<sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- Re-run mapping: `/gsd-map-codebase`
+- Re-run mapping: `/gsd:map-codebase`
 - Review specific file: `cat .planning/codebase/STACK.md`
-- edit any document before proceeding
+- Edit any document before proceeding
 
 ---
 ```
@@ -315,7 +320,7 @@ End workflow.
 - .planning/codebase/ directory created
 - 4 parallel gsd-codebase-mapper agents spawned with run_in_background=true
 - Agents write documents directly (orchestrator doesn't receive document contents)
-- read agent output files to collect confirmations
+- Read agent output files to collect confirmations
 - All 7 codebase documents exist
 - Clear completion summary with line counts
 - User offered clear next steps in GSD style

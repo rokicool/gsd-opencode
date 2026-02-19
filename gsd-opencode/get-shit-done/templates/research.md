@@ -1,8 +1,8 @@
 # Research Template
 
-Template for `.planning/phases/XX-name/{phase}-RESEARCH.md` - comprehensive ecosystem research before planning.
+Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive ecosystem research before planning.
 
-**Purpose:** Document what OpenCode needs to know to implement a phase well - not just "which library" but "how do experts build this."
+**Purpose:** Document what Claude needs to know to implement a phase well - not just "which library" but "how do experts build this."
 
 ---
 
@@ -14,6 +14,29 @@ Template for `.planning/phases/XX-name/{phase}-RESEARCH.md` - comprehensive ecos
 **Researched:** [date]
 **Domain:** [primary technology/problem domain]
 **Confidence:** [HIGH/MEDIUM/LOW]
+
+<user_constraints>
+## User Constraints (from CONTEXT.md)
+
+**CRITICAL:** If CONTEXT.md exists from /gsd:discuss-phase, copy locked decisions here verbatim. These MUST be honored by the planner.
+
+### Locked Decisions
+[Copy from CONTEXT.md `## Decisions` section - these are NON-NEGOTIABLE]
+- [Decision 1]
+- [Decision 2]
+
+### Claude's Discretion
+[Copy from CONTEXT.md - areas where researcher/planner can choose]
+- [Area 1]
+- [Area 2]
+
+### Deferred Ideas (OUT OF SCOPE)
+[Copy from CONTEXT.md - do NOT research or plan these]
+- [Deferred 1]
+- [Deferred 2]
+
+**If no CONTEXT.md exists:** Write "No user constraints - all decisions at Claude's discretion"
+</user_constraints>
 
 <research_summary>
 ## Summary
@@ -189,10 +212,10 @@ Things that couldn't be fully resolved:
 - [Official docs URL] - [what was checked]
 
 ### Secondary (MEDIUM confidence)
-- [webfetch verified with official source] - [finding + verification]
+- [WebSearch verified with official source] - [finding + verification]
 
 ### Tertiary (LOW confidence - needs validation)
-- [webfetch only] - [finding, marked for validation during implementation]
+- [WebSearch only] - [finding, marked for validation during implementation]
 </sources>
 
 <metadata>
@@ -501,7 +524,7 @@ function useVehicleControls(rigidBodyRef) {
 
 **When to create:**
 - Before planning phases in niche/complex domains
-- When OpenCode's training data is likely stale or sparse
+- When Claude's training data is likely stale or sparse
 - When "how do experts do this" matters more than "which library"
 
 **Structure:**
@@ -524,6 +547,6 @@ function useVehicleControls(rigidBodyRef) {
 - Code examples can be referenced in task actions
 
 **After creation:**
-- File lives in phase directory: `.planning/phases/XX-name/{phase}-RESEARCH.md`
+- File lives in phase directory: `.planning/phases/XX-name/{phase_num}-RESEARCH.md`
 - Referenced during planning workflow
 - plan-phase loads it automatically when present

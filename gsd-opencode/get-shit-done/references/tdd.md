@@ -91,15 +91,15 @@ After completion, create SUMMARY.md with:
 <execution_flow>
 ## Red-Green-Refactor Cycle
 
-**RED - write failing test:**
+**RED - Write failing test:**
 1. Create test file following project conventions
-2. write test describing expected behavior (from `<behavior>` element)
+2. Write test describing expected behavior (from `<behavior>` element)
 3. Run test - it MUST fail
 4. If test passes: feature exists or test is wrong. Investigate.
 5. Commit: `test({phase}-{plan}): add failing test for [feature]`
 
 **GREEN - Implement to pass:**
-1. write minimal code to make test pass
+1. Write minimal code to make test pass
 2. No cleverness, no optimization - just make it work
 3. Run test - it MUST pass
 4. Commit: `feat({phase}-{plan}): implement [feature]`

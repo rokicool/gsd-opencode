@@ -13,7 +13,7 @@ Standard format for presenting next steps after completing a command or workflow
 
 `{command to copy-paste}`
 
-*`/new` first → fresh context window*
+<sub>`/clear` first → fresh context window</sub>
 
 ---
 
@@ -29,7 +29,7 @@ Standard format for presenting next steps after completing a command or workflow
 1. **Always show what it is** — name + description, never just a command path
 2. **Pull context from source** — ROADMAP.md for phases, PLAN.md `<objective>` for plans
 3. **Command in inline code** — backticks, easy to copy-paste, renders as clickable link
-4. **`/new` explanation** — always include, keeps it concise but explains why
+4. **`/clear` explanation** — always include, keeps it concise but explains why
 5. **"Also available" not "Other options"** — sounds more app-like
 6. **Visual separators** — `---` above and below to make it stand out
 
@@ -44,15 +44,15 @@ Standard format for presenting next steps after completing a command or workflow
 
 **02-03: Refresh Token Rotation** — Add /api/auth/refresh with sliding expiry
 
-`/gsd-execute-phase 2`
+`/gsd:execute-phase 2`
 
-*`/new` first → fresh context window*
+<sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
 - Review plan before executing
-- `/gsd-list-phase-assumptions 2` — check assumptions
+- `/gsd:list-phase-assumptions 2` — check assumptions
 
 ---
 ```
@@ -67,11 +67,11 @@ Add note that this is the last plan and what comes after:
 ## ▶ Next Up
 
 **02-03: Refresh Token Rotation** — Add /api/auth/refresh with sliding expiry
-*Final plan in Phase 2*
+<sub>Final plan in Phase 2</sub>
 
-`/gsd-execute-phase 2`
+`/gsd:execute-phase 2`
 
-*`/new` first → fresh context window*
+<sub>`/clear` first → fresh context window</sub>
 
 ---
 
@@ -91,15 +91,15 @@ Add note that this is the last plan and what comes after:
 
 **Phase 2: Authentication** — JWT login flow with refresh tokens
 
-`/gsd-plan-phase 2`
+`/gsd:plan-phase 2`
 
-*`/new` first → fresh context window*
+<sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd-discuss-phase 2` — gather context first
-- `/gsd-research-phase 2` — investigate unknowns
+- `/gsd:discuss-phase 2` — gather context first
+- `/gsd:research-phase 2` — investigate unknowns
 - Review roadmap
 
 ---
@@ -120,15 +120,15 @@ Show completion status before next action:
 
 **Phase 3: Core Features** — User dashboard, settings, and data export
 
-`/gsd-plan-phase 3`
+`/gsd:plan-phase 3`
 
-*`/new` first → fresh context window*
+<sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd-discuss-phase 3` — gather context first
-- `/gsd-research-phase 3` — investigate unknowns
+- `/gsd:discuss-phase 3` — gather context first
+- `/gsd:research-phase 3` — investigate unknowns
 - Review what Phase 2 built
 
 ---
@@ -145,13 +145,13 @@ When there's no clear primary action:
 
 **Phase 3: Core Features** — User dashboard, settings, and data export
 
-**To plan directly:** `/gsd-plan-phase 3`
+**To plan directly:** `/gsd:plan-phase 3`
 
-**To discuss context first:** `/gsd-discuss-phase 3`
+**To discuss context first:** `/gsd:discuss-phase 3`
 
-**To research unknowns:** `/gsd-research-phase 3`
+**To research unknowns:** `/gsd:research-phase 3`
 
-*`/new` first → fresh context window*
+<sub>`/clear` first → fresh context window</sub>
 
 ---
 ```
@@ -169,9 +169,9 @@ All 4 phases shipped
 
 **Start v1.1** — questioning → research → requirements → roadmap
 
-`/gsd-new-milestone`
+`/gsd:new-milestone`
 
-*`/new` first → fresh context window*
+<sub>`/clear` first → fresh context window</sub>
 
 ---
 ```
@@ -213,18 +213,18 @@ Extract: `**02-03: Refresh Token Rotation** — Add /api/auth/refresh with slidi
 ```
 ## To Continue
 
-Run `/new`, then paste:
-/gsd-execute-phase 2
+Run `/clear`, then paste:
+/gsd:execute-phase 2
 ```
 
 User has no idea what 02-03 is about.
 
-### Don't: Missing /new explanation
+### Don't: Missing /clear explanation
 
 ```
-`/gsd-plan-phase 3`
+`/gsd:plan-phase 3`
 
-Run /new first.
+Run /clear first.
 ```
 
 Doesn't explain why. User might skip it.
@@ -242,7 +242,7 @@ Sounds like an afterthought. Use "Also available:" instead.
 
 ```
 ```
-/gsd-plan-phase 3
+/gsd:plan-phase 3
 ```
 ```
 

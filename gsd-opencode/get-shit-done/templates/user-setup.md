@@ -1,8 +1,8 @@
 # User Setup Template
 
-Template for `.planning/phases/XX-name/{phase}-USER-SETUP.md` - human-required configuration that OpenCode cannot automate.
+Template for `.planning/phases/XX-name/{phase}-USER-SETUP.md` - human-required configuration that Claude cannot automate.
 
-**Purpose:** Document setup tasks that literally require human action - account creation, dashboard configuration, secret retrieval. OpenCode automates everything possible; this file captures only what remains.
+**Purpose:** Document setup tasks that literally require human action - account creation, dashboard configuration, secret retrieval. Claude automates everything possible; this file captures only what remains.
 
 ---
 
@@ -15,7 +15,7 @@ Template for `.planning/phases/XX-name/{phase}-USER-SETUP.md` - human-required c
 **Phase:** {phase-name}
 **Status:** Incomplete
 
-Complete these items for the integration to function. OpenCode automated everything possible; these items require human access to external dashboards/accounts.
+Complete these items for the integration to function. Claude automated everything possible; these items require human access to external dashboards/accounts.
 
 ## Environment Variables
 
@@ -97,20 +97,20 @@ user_setup:
 
 ## The Automation-First Rule
 
-**USER-SETUP.md contains ONLY what OpenCode literally cannot do.**
+**USER-SETUP.md contains ONLY what Claude literally cannot do.**
 
-| OpenCode CAN Do (not in USER-SETUP) | OpenCode CANNOT Do (→ USER-SETUP) |
+| Claude CAN Do (not in USER-SETUP) | Claude CANNOT Do (→ USER-SETUP) |
 |-----------------------------------|--------------------------------|
 | `npm install stripe` | Create Stripe account |
-| write webhook handler code | Get API keys from dashboard |
+| Write webhook handler code | Get API keys from dashboard |
 | Create `.env.local` file structure | Copy actual secret values |
 | Run `stripe listen` | Authenticate Stripe CLI (browser OAuth) |
 | Configure package.json | Access external service dashboards |
-| write any code | Retrieve secrets from third-party systems |
+| Write any code | Retrieve secrets from third-party systems |
 
-**The test:** "Does this require a human in a browser, accessing an account OpenCode doesn't have credentials for?"
+**The test:** "Does this require a human in a browser, accessing an account Claude doesn't have credentials for?"
 - Yes → USER-SETUP.md
-- No → OpenCode does it automatically
+- No → Claude does it automatically
 
 ---
 
@@ -304,20 +304,8 @@ curl -X POST http://localhost:3000/api/test-email \
 
 ## Guidelines
 
-**Include in USER-SETUP.md:**
-- Environment variable names and where to find values
-- Account creation URLs (if new service)
-- Dashboard configuration steps
-- Verification commands to confirm setup works
-- Local development alternatives (e.g., `stripe listen`)
-
-**Do NOT include:**
-- Actual secret values (never)
-- Steps OpenCode can automate (package installs, code changes, file creation)
-- Generic instructions ("set up your environment")
+**Never include:** Actual secret values. Steps Claude can automate (package installs, code changes).
 
 **Naming:** `{phase}-USER-SETUP.md` matches the phase number pattern.
-
 **Status tracking:** User marks checkboxes and updates status line when complete.
-
 **Searchability:** `grep -r "USER-SETUP" .planning/` finds all phases with user requirements.

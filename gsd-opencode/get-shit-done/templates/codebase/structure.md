@@ -15,7 +15,7 @@ Template for `.planning/codebase/STRUCTURE.md` - captures physical file organiza
 
 ## Directory Layout
 
-[ASCII tree of top-level directories with purpose]
+[ASCII box-drawing tree of top-level directories with purpose - use ├── └── │ characters for tree structure only]
 
 ```
 [project-root]/
@@ -146,7 +146,7 @@ get-shit-done/
 - Subdirectories: None
 
 **commands/gsd/**
-- Purpose: Slash command definitions for OpenCode
+- Purpose: Slash command definitions for Claude Code
 - Contains: *.md files (one per command)
 - Key files: new-project.md, plan-phase.md, execute-plan.md
 - Subdirectories: None (flat structure)
@@ -186,7 +186,7 @@ get-shit-done/
 
 **Documentation:**
 - `README.md` - User-facing installation and usage guide
-- `CLAUDE.md` - Instructions for OpenCode when working in this repo
+- `CLAUDE.md` - Instructions for Claude Code when working in this repo
 
 ## Naming Conventions
 
@@ -216,7 +216,7 @@ get-shit-done/
 
 **New Workflow:**
 - Implementation: `get-shit-done/workflows/{name}.md`
-- Usage: Reference from command with `@~/.config/opencode/get-shit-done/workflows/{name}.md`
+- Usage: Reference from command with `@~/.claude/get-shit-done/workflows/{name}.md`
 
 **New Reference Document:**
 - Implementation: `get-shit-done/references/{name}.md`
@@ -229,12 +229,12 @@ get-shit-done/
 ## Special Directories
 
 **get-shit-done/**
-- Purpose: Resources installed to ~/.config/opencode/
+- Purpose: Resources installed to ~/.claude/
 - Source: Copied by bin/install.js during installation
 - Committed: Yes (source of truth)
 
 **commands/**
-- Purpose: Slash commands installed to ~/.config/opencode/commands/
+- Purpose: Slash commands installed to ~/.claude/commands/
 - Source: Copied by bin/install.js during installation
 - Committed: Yes (source of truth)
 
@@ -247,7 +247,7 @@ get-shit-done/
 
 <guidelines>
 **What belongs in STRUCTURE.md:**
-- Directory layout (ASCII tree)
+- Directory layout (ASCII box-drawing tree for structure visualization)
 - Purpose of each directory
 - Key file locations (entry points, configs, core logic)
 - Naming conventions
@@ -267,7 +267,7 @@ get-shit-done/
 - Locate entry points, configs, and main logic areas
 - Keep directory tree concise (max 2-3 levels)
 
-**ASCII tree format:**
+**Tree format (ASCII box-drawing characters for structure only):**
 ```
 root/
 ├── dir1/           # Purpose

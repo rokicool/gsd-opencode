@@ -1,0 +1,470 @@
+{
+  "_description": "Translation config for Claude Code → OpenCode migration (v1.20.4)",
+  "_version": "1.20.4",
+  "_source": "Claude Code get-shit-done",
+  "_target": "OpenCode gsd-opencode",
+  "patterns": ["**/*.md", "**/*.js", "**/*.json", "**/*.yaml", "**/*.yml"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "gsd-opencode/bin/**",
+    "gsd-opencode/lib/**",
+    "gsd-opencode/src/**",
+    "gsd-opencode/test/**"
+  ],
+  "include": ["gsd-opencode/**"],
+  "maxFileSize": 10485760,
+  "rules": [
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand (colon to dash)",
+      "pattern": "gsd:plan-phase",
+      "replacement": "gsd-plan-phase",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:execute-phase",
+      "replacement": "gsd-execute-phase",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:research-phase",
+      "replacement": "gsd-research-phase",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:verify-phase",
+      "replacement": "gsd-verify-phase",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:discuss-phase",
+      "replacement": "gsd-discuss-phase",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:new-project",
+      "replacement": "gsd-new-project",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:new-milestone",
+      "replacement": "gsd-new-milestone",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:complete-milestone",
+      "replacement": "gsd-complete-milestone",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:add-phase",
+      "replacement": "gsd-add-phase",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:insert-phase",
+      "replacement": "gsd-insert-phase",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:remove-phase",
+      "replacement": "gsd-remove-phase",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:add-todo",
+      "replacement": "gsd-add-todo",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:check-todos",
+      "replacement": "gsd-check-todos",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:debug",
+      "replacement": "gsd-debug",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:map-codebase",
+      "replacement": "gsd-map-codebase",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:verify-work",
+      "replacement": "gsd-verify-work",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:progress",
+      "replacement": "gsd-progress",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:settings",
+      "replacement": "gsd-settings",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:set-profile",
+      "replacement": "gsd-set-profile",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:update",
+      "replacement": "gsd-update",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:pause-work",
+      "replacement": "gsd-pause-work",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:resume-work",
+      "replacement": "gsd-resume-work",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:quick",
+      "replacement": "gsd-quick",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:whats-new",
+      "replacement": "gsd-whats-new",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:help",
+      "replacement": "gsd-help",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:audit-milestone",
+      "replacement": "gsd-audit-milestone",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:plan-milestone-gaps",
+      "replacement": "gsd-plan-milestone-gaps",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command names: gsd:subcommand → gsd-subcommand",
+      "pattern": "gsd:list-phase-assumptions",
+      "replacement": "gsd-list-phase-assumptions",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Slash commands: /gsd:command → /gsd-command",
+      "pattern": "/gsd:",
+      "replacement": "/gsd-",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Frontmatter: name: gsd:command → name: gsd-command (case: lower)",
+      "pattern": "name: gsd:",
+      "replacement": "name: gsd-",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Config paths: ~/.claude/ → ~/.config/opencode/",
+      "pattern": "~/.claude/",
+      "replacement": "~/.config/opencode/",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Config paths: ~/.claude → ~/.config/opencode (without trailing slash)",
+      "pattern": "~/.claude",
+      "replacement": "~/.config/opencode",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "Read",
+      "replacement": "read",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "Write",
+      "replacement": "write",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "Bash",
+      "replacement": "bash",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "Glob",
+      "replacement": "glob",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "Grep",
+      "replacement": "grep",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "Edit",
+      "replacement": "edit",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "WebFetch",
+      "replacement": "webfetch",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "Patch",
+      "replacement": "patch",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "Skill",
+      "replacement": "skill",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "TodoWrite",
+      "replacement": "todowrite",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "TodoRead",
+      "replacement": "todoread",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools",
+      "pattern": "Question",
+      "replacement": "question",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Project reference: get-shit-done-cc → gsd-opencode",
+      "pattern": "get-shit-done-cc",
+      "replacement": "gsd-opencode",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "GitHub URLs: glittercowboy → rokicool",
+      "pattern": "github.com/glittercowboy/get-shit-done",
+      "replacement": "github.com/rokicool/gsd-opencode",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "GitHub URLs: gsd-build → rokicool",
+      "pattern": "github.com/gsd-build/get-shit-done",
+      "replacement": "github.com/rokicool/gsd-opencode",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Raw GitHub URLs: glittercowboy → rokicool",
+      "pattern": "raw.githubusercontent.com/glittercowboy/get-shit-done",
+      "replacement": "raw.githubusercontent.com/rokicool/gsd-opencode",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Raw GitHub URLs: gsd-build → rokicool",
+      "pattern": "raw.githubusercontent.com/gsd-build/get-shit-done",
+      "replacement": "raw.githubusercontent.com/rokicool/gsd-opencode",
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Command reference: /clear → /new",
+      "pattern": "/clear",
+      "replacement": "/new",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tag syntax: <sub>text</sub> → *text* (opening tag)",
+      "pattern": "<sub>",
+      "replacement": "*",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Tag syntax: </sub> → * (closing tag)",
+      "pattern": "</sub>",
+      "replacement": "*",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Folder paths: ./original/ → ./gsd-opencode/ (context-aware)",
+      "pattern": "./original/get-shit-done",
+      "replacement": "./gsd-opencode",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Config paths in frontmatter: allowed-tools uppercase → lowercase",
+      "pattern": "allowed-tools: [Read",
+      "replacement": "allowed-tools: [read",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Config paths in frontmatter: allowed-tools uppercase → lowercase",
+      "pattern": "allowed-tools: [Write",
+      "replacement": "allowed-tools: [write",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Config paths in frontmatter: allowed-tools uppercase → lowercase",
+      "pattern": "allowed-tools: [Bash",
+      "replacement": "allowed-tools: [bash",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Config paths in frontmatter: allowed-tools uppercase → lowercase",
+      "pattern": "allowed-tools: [Glob",
+      "replacement": "allowed-tools: [glob",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Config paths in frontmatter: allowed-tools uppercase → lowercase",
+      "pattern": "allowed-tools: [Grep",
+      "replacement": "allowed-tools: [grep",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Task tool mapping: Task → @ mention (simple text replacement)",
+      "pattern": "Tool: Task",
+      "replacement": "Tool: Use agents directly with @ mentions",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Agent tool mapping: tools: list format",
+      "pattern": "tools: read, write",
+      "replacement": "tools:\\n  read: true\\n  write: true",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Color format: cyan → hex",
+      "pattern": "color: cyan",
+      "replacement": "color: \"#00FFFF\"",
+      "caseSensitive": true
+    },
+    {
+      "_comment": "Get Claude Code metadata out",
+      "pattern": "** Claude Code **",
+      "replacement": "",
+      "caseSensitive": true
+    }
+  ],
+  "_transformation_groups": {
+    "command_names": {
+      "description": "gsd:subcommand → gsd-subcommand",
+      "count": 28
+    },
+    "slash_commands": {
+      "description": "/gsd:command → /gsd-command",
+      "count": 1
+    },
+    "config_paths": {
+      "description": "~/.claude/* → ~/.config/opencode/*",
+      "count": 2
+    },
+    "tools_lowercase": {
+      "description": "Read,Write,Bash,... → read,write,bash,...",
+      "count": 11
+    },
+    "project_refs": {
+      "description": "get-shit-done-cc → gsd-opencode",
+      "count": 1
+    },
+    "github_urls": {
+      "description": "glittercowboy/gsd-build → rokicool",
+      "count": 4
+    },
+    "commands": {
+      "description": "/clear → /new",
+      "count": 1
+    },
+    "tag_syntax": {
+      "description": "<sub>text</sub> → *text*",
+      "count": 2
+    },
+    "folder_paths": {
+      "description": "./original/* → ./gsd-opencode/*",
+      "count": 1
+    }
+  },
+  "_usage": "node assets/bin/translate.js 1-20-4.json [--apply] [--show-diff]",
+  "_forbidden_strings_after_translation": [
+    "~/.claude",
+    "github.com/glittercowboy",
+    "github.com/gsd-build/get-shit-done",
+    "get-shit-done-cc",
+    "gsd:plan-phase",
+    "gsd:execute-phase",
+    "gsd:research-phase",
+    "gsd:verify-phase",
+    "gsd:discuss-phase",
+    "gsd:new-project",
+    "gsd:new-milestone",
+    "gsd:complete-milestone",
+    "gsd:add-phase",
+    "gsd:insert-phase",
+    "gsd:remove-phase",
+    "gsd:add-todo",
+    "gsd:check-todos",
+    "gsd:debug",
+    "gsd:map-codebase",
+    "gsd:verify-work",
+    "gsd:progress",
+    "gsd:settings",
+    "gsd:set-profile",
+    "gsd:update",
+    "gsd:pause-work",
+    "gsd:resume-work",
+    "gsd:quick",
+    "gsd:whats-new",
+    "gsd:help",
+    "gsd:audit-milestone",
+    "gsd:plan-milestone-gaps",
+    "gsd:list-phase-assumptions",
+    "/clear",
+    "/gsd:",
+    "<sub>",
+    "</sub>"
+  ],
+  "_verification": "Run node assets/bin/check-forbidden-strings.js after translation"
+}

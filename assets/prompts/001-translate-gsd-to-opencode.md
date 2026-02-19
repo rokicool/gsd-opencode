@@ -15,7 +15,7 @@ Translate the entire get-shit-done metaprompt system from Claude Code to OpenCod
 **Key differences to address**:
 - Claude Code config: ~/.claude → OpenCode config: ~/.config/opencode or .opencode/
 - Command syntax: /gsd:subcommand → /gsd-subcommand (colon not supported)
-- Folder structure: commands/ → command/
+- Folder structure: commands/ → commands/
 - Agent names and tool references need OpenCode equivalents
 - Tag syntax: <sub>text</sub> → *text*
 - Commands: /clear → /new
@@ -25,13 +25,13 @@ Translate the entire get-shit-done metaprompt system from Claude Code to OpenCod
 - OpenCode agents: https://opencode.ai/docs/agents/
 
 **Files to translate**:
-1. Commands: ./original/get-shit-done/commands/gsd/*.md → ./gsd-opencode/command/gsd/*.md
+1. Commands: ./original/get-shit-done/commands/gsd/*.md → ./gsd-opencode/commands/gsd/*.md
 2. References: ./original/get-shit-done/get-shit-done/references/*.md → ./gsd-opencode/get-shit-done/references/*.md
 3. Templates: ./original/get-shit-done/get-shit-done/templates/*.md → ./gsd-opencode/get-shit-done/templates/*.md
 4. Workflows: ./original/get-shit-done/get-shit-done/workflows/*.md → ./gsd-opencode/get-shit-done/workflows/*.md
 5. Agents: ./original/agents/*.md → ./gsd-opencode/agents/*.md
 
-**Author attribution**: Original system by TACHES (https://github.com/glittercowboy/get-shit-done)
+**Author attribution**: Original system by TACHES (https://github.com/gsd-build/get-shit-done)
 </context>
 
 <transformation_rules>
@@ -39,8 +39,8 @@ Translate the entire get-shit-done metaprompt system from Claude Code to OpenCod
    - Example: `name: gsd:plan-phase` → `name: gsd-plan-phase`
 
 2. **Config paths**:
-   - `~/.claude/` → `~/.config/opencode/` or `.opencode/`
-   - `~/.claude/get-shit-done/` → `~/.config/opencode/get-shit-done/` or `.opencode/get-shit-done/`
+   - `~/.claude/` → `~/.config/opencode/`
+   - `~/.claude/get-shit-done/` → `~/.config/opencode/get-shit-done/`
 
 3. **Project references**:
    - `get-shit-done-cc` → `gsd-opencode`
@@ -62,11 +62,13 @@ Translate the entire get-shit-done metaprompt system from Claude Code to OpenCod
    - When metaprompt expects "All arguments", update to use `$ARGUMENTS` variable
 
 8. **Folder paths**:
-   - ./original/get-shit-done/commands/gsd/ → ./gsd-opencode/command/gsd/
+   - ./original/get-shit-done/commands/gsd/ → ./gsd-opencode/commands/gsd/
    - ./original/get-shit-done/get-shit-done/references/ → ./gsd-opencode/get-shit-done/references/
    - ./original/get-shit-done/get-shit-done/templates/ → ./gsd-opencode/get-shit-done/templates/
    - ./original/get-shit-done/get-shit-done/workflows/ → ./gsd-opencode/get-shit-done/workflows/
+   - ./original/get-shit-done/get-shit-done/bin/ → ./gsd-opencode/get-shit-done/bin/
    - ./original/agents/ → ./gsd-opencode/agents/
+   - ./original/docs/ → ./gsd-opencode/docs/
 
 9. **Forbidden strings**: Ensure none of these appear in translated files:
    - Claude Code specific paths (~/.claude)
@@ -79,6 +81,9 @@ Translate the entire get-shit-done metaprompt system from Claude Code to OpenCod
     - ./assets/*
     - ./gsd-opencode/bin/*
     - ./gsd-opencode/package.json
+    - ./gsd-opencode/src/*
+    - ./gsd-opencode/lib/*
+    - ./gsd-opencode/test/*
     - ./original/*
 </transformation_rules>
 
@@ -215,7 +220,7 @@ Create `./assets/prompts/TRANSLATION-SUMMARY.md` documenting:
 **Create/modify these files**:
 - `./assets/prompts/TRANSLATION-MAPPING.md` - Document all transformations
 - `./assets/prompts/TRANSLATION-SUMMARY.md` - Summary of translation work
-- `./gsd-opencode/command/gsd/*.md` - Translated commands
+- `./gsd-opencode/commands/gsd/*.md` - Translated commands
 - `./gsd-opencode/get-shit-done/references/*.md` - Translated references
 - `./gsd-opencode/get-shit-done/templates/*.md` - Translated templates
 - `./gsd-opencode/get-shit-done/workflows/*.md` - Translated workflows
@@ -230,7 +235,7 @@ Before declaring complete, verify:
    ```bash
    # Count source and target files to ensure completeness
    find ./original/get-shit-done/commands/gsd -name "*.md" | wc -l
-   find ./gsd-opencode/command/gsd -name "*.md" | wc -l
+   find ./gsd-opencode/commands/gsd -name "*.md" | wc -l
    ```
 
 2. **No forbidden strings**:

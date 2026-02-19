@@ -105,7 +105,7 @@ color: "#00FFFF"
 |-------------|----------|
 | ~/.claude/ | ~/.config/opencode/ |
 | ~/.claude/get-shit-done/ | ~/.config/opencode/get-shit-done/ |
-| ./original/get-shit-done/commands/gsd/ | ./gsd-opencode/command/gsd/ |
+| ./original/get-shit-done/commands/gsd/ | ./gsd-opencode/commands/gsd/ |
 | ./original/get-shit-done/get-shit-done/references/ | ./gsd-opencode/get-shit-done/references/ |
 | ./original/get-shit-done/get-shit-done/templates/ | ./gsd-opencode/get-shit-done/templates/ |
 | ./original/get-shit-done/get-shit-done/workflows/ | ./gsd-opencode/get-shit-done/workflows/ |
@@ -130,13 +130,14 @@ color: "#00FFFF"
 |-------------|----------|
 | https://raw.githubusercontent.com/glittercowboy/get-shit-done | https://raw.githubusercontent.com/rokicool/gsd-opencode |
 | https://github.com/glittercowboy/get-shit-done | https://github.com/rokicool/gsd-opencode |
+| https://raw.githubusercontent.com/gsd-build/get-shit-done | https://raw.githubusercontent.com/rokicool/gsd-opencode |
+| https://github.com/gsd-build/get-shit-done | https://github.com/rokicool/gsd-opencode |
 
 ## Project References
 
 | Claude Code | OpenCode |
 |-------------|----------|
 | get-shit-done-cc | gsd-opencode |
-| get-shit-done | get-shit-done (preserved in references as original name) |
 
 ## Frontmatter Field Changes
 

@@ -1,12 +1,12 @@
 ---
-name: gsd-debug
+name: gsd:debug
 description: Systematic debugging with persistent state across context resets
 argument-hint: [issue description]
-tools:
-  - read
-  - bash
-
-  - question
+allowed-tools:
+  - Read
+  - Bash
+  - Task
+  - AskUserQuestion
 ---
 
 <objective>
@@ -18,7 +18,7 @@ Debug issues using scientific method with subagent isolation.
 </objective>
 
 <context>
-User's issue: `$ARGUMENTS`
+User's issue: $ARGUMENTS
 
 Check for active sessions:
 ```bash
@@ -28,36 +28,29 @@ ls .planning/debug/*.md 2>/dev/null | grep -v resolved | head -5
 
 <process>
 
-## 0. Resolve Model Profile
-
-read model profile for agent spawning:
+## 0. Initialize Context
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs state load)
 ```
 
-Default to "balanced" if not set.
-
-**Model lookup table:**
-
-| Agent | quality | balanced | budget |
-|-------|---------|----------|--------|
-| gsd-debugger | opus | sonnet | sonnet |
-
-Store resolved model for use in Task calls below.
+Extract `commit_docs` from init JSON. Resolve debugger model:
+```bash
+DEBUGGER_MODEL=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs resolve-model gsd-debugger --raw)
+```
 
 ## 1. Check Active Sessions
 
-If active sessions exist AND no `$ARGUMENTS`:
+If active sessions exist AND no $ARGUMENTS:
 - List sessions with status, hypothesis, next action
 - User picks number to resume OR describes new issue
 
-If `$ARGUMENTS` provided OR user describes new issue:
+If $ARGUMENTS provided OR user describes new issue:
 - Continue to symptom gathering
 
 ## 2. Gather Symptoms (if new issue)
 
-Use question for each:
+Use AskUserQuestion for each:
 
 1. **Expected behavior** - What should happen?
 2. **Actual behavior** - What happens instead?
@@ -111,7 +104,7 @@ Task(
 - Display root cause and evidence summary
 - Offer options:
   - "Fix now" - spawn fix subagent
-  - "Plan fix" - suggest /gsd-plan-phase --gaps
+  - "Plan fix" - suggest /gsd:plan-phase --gaps
   - "Manual fix" - done
 
 **If `## CHECKPOINT REACHED`:**

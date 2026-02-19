@@ -238,10 +238,10 @@ Template for `.planning/codebase/ARCHITECTURE.md` - captures conceptual code org
 - Implementation details of specific features
 
 **File paths ARE welcome:**
-Include file paths as concrete examples of abstractions. Use backtick formatting: `src/services/user.ts`. This makes the architecture document actionable for OpenCode when planning.
+Include file paths as concrete examples of abstractions. Use backtick formatting: `src/services/user.ts`. This makes the architecture document actionable for Claude when planning.
 
 **When filling this template:**
-- read main entry points (index, server, main)
+- Read main entry points (index, server, main)
 - Identify layers by reading imports/dependencies
 - Trace a typical request/command execution
 - Note recurring patterns (services, controllers, repositories)

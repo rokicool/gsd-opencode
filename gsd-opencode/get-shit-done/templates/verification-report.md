@@ -1,6 +1,6 @@
 # Verification Report Template
 
-Template for `.planning/phases/XX-name/{phase}-VERIFICATION.md` — phase goal verification results.
+Template for `.planning/phases/XX-name/{phase_num}-VERIFICATION.md` — phase goal verification results.
 
 ---
 
@@ -154,7 +154,7 @@ None — all verifiable items checked programmatically.
 
 ---
 *Verified: {timestamp}*
-*Verifier: OpenCode (subagent)*
+*Verifier: Claude (subagent)*
 ```
 
 ---
@@ -318,5 +318,5 @@ None needed until automated gaps are fixed.
 
 ---
 *Verified: 2025-01-15T14:30:00Z*
-*Verifier: OpenCode (subagent)*
+*Verifier: Claude (subagent)*
 ```

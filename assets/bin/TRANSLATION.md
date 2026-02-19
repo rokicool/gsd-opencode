@@ -26,6 +26,7 @@ The translation utility (`assets/bin/translate.js`) provides:
 - **Git integration** with uncommitted change warnings
 - **Post-translation validation** to detect remaining patterns
 - **Binary file detection** to skip non-text files
+- **Include option** for whitelist filtering (v1.1.0+)
 
 ## Installation
 
@@ -40,6 +41,7 @@ npm install  # Install tinyglobby dependency
 
 ### 1. Create a Configuration File
 
+**Basic config** (`config.json`):
 ```json
 {
   "patterns": ["**/*.md", "**/*.js"],
@@ -47,6 +49,17 @@ npm install  # Install tinyglobby dependency
   "rules": [
     {"pattern": "gsd", "replacement": "gsd-opencode"},
     {"pattern": "get-shit-done", "replacement": "gsd-opencode"}
+  ]
+}
+```
+
+**Config with include** (`selective-config.json`) - only process specific files:
+```json
+{
+  "include": ["src/**/*.js", "docs/**/*.md"],
+  "exclude": ["**/*.test.js"],
+  "rules": [
+    {"pattern": "gsd", "replacement": "gsd-opencode"}
   ]
 }
 ```
@@ -209,10 +222,21 @@ node bin/translate.js migration-config.json --apply
 
 **Task:** Only process markdown documentation files.
 
-**Config file** (`docs-only.json`):
+**Using patterns (blacklist approach):**
 ```json
 {
   "patterns": ["docs/**/*.md", "**/*.md"],
+  "exclude": ["node_modules/**"],
+  "rules": [
+    {"pattern": "gsd", "replacement": "gsd-opencode"}
+  ]
+}
+```
+
+**Using include (whitelist approach):**
+```json
+{
+  "include": ["docs/**/*.md"],
   "exclude": ["node_modules/**"],
   "rules": [
     {"pattern": "gsd", "replacement": "gsd-opencode"}
@@ -355,6 +379,13 @@ fi
 The `include` option acts as a whitelist, allowing you to specify exactly which files should be considered for translation. When `include` is specified, the `patterns` option is ignored.
 
 **Processing order:** `include` (whitelist) -> `exclude` (blacklist) -> translate
+
+**When to use `include` vs `patterns`:**
+
+| Approach | Use When | Example |
+|----------|----------|---------|
+| `patterns` + `exclude` | Most files should be processed, with a few exceptions | Translate all source files except tests |
+| `include` + `exclude` | Only specific files should be processed | Translate only docs and src, exclude internal docs |
 
 #### Example: Only process specific directories
 
@@ -563,7 +594,8 @@ npm test
 ```
 
 Test coverage:
-- **91 tests** covering all modules
+- **94 tests** covering all modules
 - Unit tests for each service
 - Integration tests for CLI workflow
 - Edge case handling (binary files, permissions, etc.)
+- Include/exclude filtering tests

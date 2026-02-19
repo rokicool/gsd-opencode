@@ -110,13 +110,13 @@ Always at end of major completions.
 
 `{copy-paste command}`
 
-*`/new` first → fresh context window*
+<sub>`/clear` first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- `/gsd-alternative-1` — description
-- `/gsd-alternative-2` — description
+- `/gsd:alternative-1` — description
+- `/gsd:alternative-2` — description
 
 ───────────────────────────────────────────────────────────────
 ```

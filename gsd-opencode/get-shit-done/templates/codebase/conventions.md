@@ -2,7 +2,7 @@
 
 Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and patterns.
 
-**Purpose:** Document how code is written in this codebase. Prescriptive guide for OpenCode to match existing style.
+**Purpose:** Document how code is written in this codebase. Prescriptive guide for Claude to match existing style.
 
 ---
 
@@ -301,7 +301,7 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 **Analysis approach:**
 - Scan src/ directory for file naming patterns
 - Check package.json scripts for lint/format commands
-- read 5-10 files to identify function naming, error handling
+- Read 5-10 files to identify function naming, error handling
 - Look for config files (.prettierrc, eslint.config.js)
 - Note patterns in imports, comments, function signatures
 </guidelines>

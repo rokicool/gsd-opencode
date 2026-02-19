@@ -318,6 +318,12 @@ v1 is successful when:
 |---------|-------|------|
 | 2026-02-09 | Fix Next Up section formatting in command output | general |
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Add include option to translate.js config | 2026-02-19 | 6830b95 | [1-add-include-option-to-translate-js-confi](./quick/1-add-include-option-to-translate-js-confi/) |
+
 ---
 
 *State initialized: 2026-02-09*  

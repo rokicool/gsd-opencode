@@ -1,0 +1,53 @@
+{
+  "name": "gsd-opencode",
+  "version": "1.10.0",
+  "description": "GSD-OpenCode distribution manager - install, verify, and maintain your GSD-OpenCode installation",
+  "type": "module",
+  "main": "bin/gsd.js",
+  "homepage": "https://github.com/rokicool/gsd-opencode#readme",
+  "bugs": {
+    "url": "https://github.com/rokicool/gsd-opencode/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rokicool/gsd-opencode.git"
+  },
+  "bin": {
+    "gsd-opencode": "bin/gsd.js",
+    "gsd-install": "bin/gsd-install.js"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "opencode",
+    "ai",
+    "meta-prompting",
+    "context-engineering",
+    "spec-driven-development"
+  ],
+  "author": "TÂCHES & rokicool",
+  "license": "MIT",
+  "files": [
+    "agents",
+    "bin",
+    "commands",
+    "get-shit-done",
+    "src",
+    "lib"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "@inquirer/prompts": "^8.2.0",
+    "chalk": "^5.6.2",
+    "commander": "^12.1.0",
+    "ora": "^9.3.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,13 +1,13 @@
 <purpose>
-Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /new, and feeds gaps into /gsd-plan-phase --gaps.
+Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /clear, and feeds gaps into /gsd:plan-phase --gaps.
 
-User tests, OpenCode records. One test at a time. Plain text responses.
+User tests, Claude records. One test at a time. Plain text responses.
 </purpose>
 
 <philosophy>
 **Show expected, ask if reality matches.**
 
-OpenCode presents what SHOULD happen. User confirms or describes what's different.
+Claude presents what SHOULD happen. User confirms or describes what's different.
 - "yes" / "y" / "next" / empty → pass
 - Anything else → logged as issue, severity inferred
 
@@ -15,28 +15,19 @@ No Pass/Fail buttons. No severity questions. Just: "Here's what should happen. D
 </philosophy>
 
 <template>
-@~/.config/opencode/get-shit-done/templates/UAT.md
+@~/.claude/get-shit-done/templates/UAT.md
 </template>
 
 <process>
 
-<step name="resolve_model_profile" priority="first">
-read model profile for agent spawning:
+<step name="initialize" priority="first">
+If $ARGUMENTS contains a phase number, load context:
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init verify-work "${PHASE_ARG}")
 ```
 
-Default to "balanced" if not set.
-
-**Model lookup table:**
-
-| Agent | quality | balanced | budget |
-|-------|---------|----------|--------|
-| gsd-planner | opus | opus | sonnet |
-| gsd-plan-checker | sonnet | sonnet | haiku |
-
-Store resolved models for use in Task calls below.
+Parse JSON for: `planner_model`, `checker_model`, `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `has_verification`.
 </step>
 
 <step name="check_active_session">
@@ -46,9 +37,9 @@ Store resolved models for use in Task calls below.
 find .planning/phases -name "*-UAT.md" -type f 2>/dev/null | head -5
 ```
 
-**If active sessions exist AND no `$ARGUMENTS` provided:**
+**If active sessions exist AND no $ARGUMENTS provided:**
 
-read each file's frontmatter (status, phase) and Current Test section.
+Read each file's frontmatter (status, phase) and Current Test section.
 
 Display inline:
 
@@ -68,20 +59,20 @@ Wait for user response.
 - If user replies with number (1, 2) → Load that file, go to `resume_from_file`
 - If user replies with phase number → Treat as new session, go to `create_uat_file`
 
-**If active sessions exist AND `$ARGUMENTS` provided:**
+**If active sessions exist AND $ARGUMENTS provided:**
 
 Check if session exists for that phase. If yes, offer to resume or restart.
 If no, continue to `create_uat_file`.
 
-**If no active sessions AND no `$ARGUMENTS`:**
+**If no active sessions AND no $ARGUMENTS:**
 
 ```
 No active UAT sessions.
 
-Provide a phase number to start testing (e.g., /gsd-verify-work 4)
+Provide a phase number to start testing (e.g., /gsd:verify-work 4)
 ```
 
-**If no active sessions AND `$ARGUMENTS` provided:**
+**If no active sessions AND $ARGUMENTS provided:**
 
 Continue to `create_uat_file`.
 </step>
@@ -89,18 +80,13 @@ Continue to `create_uat_file`.
 <step name="find_summaries">
 **Find what to test:**
 
-Parse `$ARGUMENTS` as phase number (e.g., "4") or plan number (e.g., "04-02").
+Use `phase_dir` from init (or run init if not already done).
 
 ```bash
-# Find phase directory (match both zero-padded and unpadded)
-PADDED_PHASE=$(printf "%02d" ${PHASE_ARG} 2>/dev/null || echo "${PHASE_ARG}")
-PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE_ARG}-* 2>/dev/null | head -1)
-
-# Find SUMMARY files
-ls "$PHASE_DIR"/*-SUMMARY.md 2>/dev/null
+ls "$phase_dir"/*-SUMMARY.md 2>/dev/null
 ```
 
-read each SUMMARY.md to extract testable deliverables.
+Read each SUMMARY.md to extract testable deliverables.
 </step>
 
 <step name="extract_tests">
@@ -178,7 +164,7 @@ skipped: 0
 [none yet]
 ```
 
-write to `.planning/phases/XX-name/{phase}-UAT.md`
+Write to `.planning/phases/XX-name/{phase_num}-UAT.md`
 
 Proceed to `present_test`.
 </step>
@@ -186,7 +172,7 @@ Proceed to `present_test`.
 <step name="present_test">
 **Present current test to user:**
 
-read Current Test section from UAT file.
+Read Current Test section from UAT file.
 
 Display using checkpoint box format:
 
@@ -204,7 +190,7 @@ Display using checkpoint box format:
 ──────────────────────────────────────────────────────────────
 ```
 
-Wait for user response (plain text, no question).
+Wait for user response (plain text, no AskUserQuestion).
 </step>
 
 <step name="process_response">
@@ -273,7 +259,7 @@ If no more tests → Go to `complete_session`
 <step name="resume_from_file">
 **Resume testing from UAT file:**
 
-read the full UAT file.
+Read the full UAT file.
 
 Find first test with `result: [pending]`.
 
@@ -304,21 +290,9 @@ Clear Current Test section:
 [testing complete]
 ```
 
-**Check planning config:**
-
-```bash
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
-```
-
-**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
-
-**If `COMMIT_PLANNING_DOCS=true` (default):**
-
 Commit the UAT file:
 ```bash
-git add ".planning/phases/XX-name/{phase}-UAT.md"
-git commit -m "test({phase}): complete UAT - {passed} passed, {issues} issues"
+node ~/.claude/get-shit-done/bin/gsd-tools.cjs commit "test({phase_num}): complete UAT - {passed} passed, {issues} issues" --files ".planning/phases/XX-name/{phase_num}-UAT.md"
 ```
 
 Present summary:
@@ -343,8 +317,8 @@ Present summary:
 ```
 All tests passed. Ready to continue.
 
-- `/gsd-plan-phase {next}` — Plan next phase
-- `/gsd-execute-phase {next}` — Execute next phase
+- `/gsd:plan-phase {next}` — Plan next phase
+- `/gsd:execute-phase {next}` — Execute next phase
 ```
 </step>
 
@@ -360,7 +334,7 @@ Spawning parallel debug agents to investigate each issue.
 ```
 
 - Load diagnose-issues workflow
-- Follow @~/.config/opencode/get-shit-done/workflows/diagnose-issues.md
+- Follow @~/.claude/get-shit-done/workflows/diagnose-issues.md
 - Spawn parallel debug agents for each issue
 - Collect root causes
 - Update UAT.md with root causes
@@ -392,7 +366,7 @@ Task(
 **Mode:** gap_closure
 
 **UAT with diagnoses:**
-@.planning/phases/{phase_dir}/{phase}-UAT.md
+@.planning/phases/{phase_dir}/{phase_num}-UAT.md
 
 **Project State:**
 @.planning/STATE.md
@@ -403,7 +377,7 @@ Task(
 </planning_context>
 
 <downstream_consumer>
-Output consumed by /gsd-execute-phase
+Output consumed by /gsd:execute-phase
 Plans must be executable prompts.
 </downstream_consumer>
 """,
@@ -490,7 +464,7 @@ Task(
 </revision_context>
 
 <instructions>
-read existing PLAN.md files. Make targeted updates to address checker issues.
+Read existing PLAN.md files. Make targeted updates to address checker issues.
 Do NOT replan from scratch unless issues are fundamental.
 </instructions>
 """,
@@ -510,7 +484,7 @@ Display: `Max iterations reached. {N} issues remain.`
 Offer options:
 1. Force proceed (execute despite issues)
 2. Provide guidance (user gives direction, retry)
-3. Abandon (exit, user runs /gsd-plan-phase manually)
+3. Abandon (exit, user runs /gsd:plan-phase manually)
 
 Wait for user response.
 </step>
@@ -538,7 +512,7 @@ Plans verified and ready for execution.
 
 **Execute fixes** — run fix plans
 
-`/new` then `/gsd-execute-phase {phase} --gaps-only`
+`/clear` then `/gsd:execute-phase {phase} --gaps-only`
 
 ───────────────────────────────────────────────────────────────
 ```
@@ -549,7 +523,7 @@ Plans verified and ready for execution.
 <update_rules>
 **Batched writes for efficiency:**
 
-Keep results in memory. write to file only when:
+Keep results in memory. Write to file only when:
 1. **Issue found** — Preserve the problem immediately
 2. **Session complete** — Final write before commit
 3. **Checkpoint** — Every 5 passed tests (safety net)
@@ -592,5 +566,5 @@ Default to **major** if unclear. User can correct if needed.
 - [ ] If issues: gsd-planner creates fix plans (gap_closure mode)
 - [ ] If issues: gsd-plan-checker verifies fix plans
 - [ ] If issues: revision loop until plans pass (max 3 iterations)
-- [ ] Ready for `/gsd-execute-phase --gaps-only` when complete
+- [ ] Ready for `/gsd:execute-phase --gaps-only` when complete
 </success_criteria>

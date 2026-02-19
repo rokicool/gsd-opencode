@@ -1,6 +1,6 @@
 # UAT Template
 
-Template for `.planning/phases/XX-name/{phase}-UAT.md` — persistent UAT session tracking.
+Template for `.planning/phases/XX-name/{phase_num}-UAT.md` — persistent UAT session tracking.
 
 ---
 
@@ -98,7 +98,7 @@ skipped: [N]
 **Gaps:**
 - APPEND only when issue found (YAML format)
 - After diagnosis: fill `root_cause`, `artifacts`, `missing`, `debug_session`
-- This section feeds directly into /gsd-plan-phase --gaps
+- This section feeds directly into /gsd:plan-phase --gaps
 
 </section_rules>
 
@@ -112,7 +112,7 @@ skipped: [N]
 4. UAT.md Gaps section updated with diagnosis:
    - Each gap gets `root_cause`, `artifacts`, `missing`, `debug_session` filled
 5. status → "diagnosed"
-6. Ready for /gsd-plan-phase --gaps with root causes
+6. Ready for /gsd:plan-phase --gaps with root causes
 
 **After diagnosis:**
 ```yaml
@@ -136,7 +136,7 @@ skipped: [N]
 
 <lifecycle>
 
-**Creation:** When /gsd-verify-work starts new session
+**Creation:** When /gsd:verify-work starts new session
 - Extract tests from SUMMARY.md files
 - Set status to "testing"
 - Current Test points to test 1
@@ -156,9 +156,9 @@ skipped: [N]
 - Commit file
 - Present summary with next steps
 
-**Resume after /new:**
-1. read frontmatter → know phase and status
-2. read Current Test → know where we are
+**Resume after /clear:**
+1. Read frontmatter → know phase and status
+2. Read Current Test → know where we are
 3. Find first [pending] result → continue from there
 4. Summary shows progress so far
 

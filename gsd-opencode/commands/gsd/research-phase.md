@@ -1,17 +1,17 @@
 ---
-name: gsd-research-phase
-description: Research how to implement a phase (standalone - usually use /gsd-plan-phase instead)
+name: gsd:research-phase
+description: Research how to implement a phase (standalone - usually use /gsd:plan-phase instead)
 argument-hint: "[phase]"
-tools:
-  - read
-  - bash
-
+allowed-tools:
+  - Read
+  - Bash
+  - Task
 ---
 
 <objective>
 Research how to implement a phase. Spawns gsd-phase-researcher agent with phase context.
 
-**Note:** This is a standalone research command. For most workflows, use `/gsd-plan-phase` which integrates research automatically.
+**Note:** This is a standalone research command. For most workflows, use `/gsd:plan-phase` which integrates research automatically.
 
 **Use this command when:**
 - You want to research without planning yet
@@ -20,51 +20,37 @@ Research how to implement a phase. Spawns gsd-phase-researcher agent with phase 
 
 **Orchestrator role:** Parse phase, validate against roadmap, check existing research, gather context, spawn researcher agent, present results.
 
-**Why subagent:** Research burns context fast (webfetch, Context7 queries, source verification). Fresh 200k context for investigation. Main context stays lean for user interaction.
+**Why subagent:** Research burns context fast (WebSearch, Context7 queries, source verification). Fresh 200k context for investigation. Main context stays lean for user interaction.
 </objective>
 
 <context>
-Phase number: `$ARGUMENTS` (required)
+Phase number: $ARGUMENTS (required)
 
 Normalize phase input in step 1 before any directory lookups.
 </context>
 
 <process>
 
-## 0. Resolve Model Profile
-
-read model profile for agent spawning:
+## 0. Initialize Context
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+INIT=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs init phase-op "$ARGUMENTS")
 ```
 
-Default to "balanced" if not set.
+Extract from init JSON: `phase_dir`, `phase_number`, `phase_name`, `phase_found`, `commit_docs`, `has_research`.
 
-**Model lookup table:**
+Resolve researcher model:
+```bash
+RESEARCHER_MODEL=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs resolve-model gsd-phase-researcher --raw)
+```
 
-| Agent | quality | balanced | budget |
-|-------|---------|----------|--------|
-| gsd-phase-researcher | opus | sonnet | haiku |
-
-Store resolved model for use in Task calls below.
-
-## 1. Normalize and Validate Phase
+## 1. Validate Phase
 
 ```bash
-# Normalize phase number (8 → 08, but preserve decimals like 2.1 → 02.1)
-if [[ "$ARGUMENTS" =~ ^[0-9]+$ ]]; then
-  PHASE=$(printf "%02d" "$ARGUMENTS")
-elif [[ "$ARGUMENTS" =~ ^([0-9]+)\.([0-9]+)$ ]]; then
-  PHASE=$(printf "%02d.%s" "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}")
-else
-  PHASE="$ARGUMENTS"
-fi
-
-grep -A5 "Phase ${PHASE}:" .planning/ROADMAP.md 2>/dev/null
+PHASE_INFO=$(node ~/.claude/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "${phase_number}")
 ```
 
-**If not found:** Error and exit. **If found:** Extract phase number, name, description.
+**If `found` is false:** Error and exit. **If `found` is true:** Extract `phase_number`, `phase_name`, `goal` from JSON.
 
 ## 2. Check Existing Research
 
@@ -79,9 +65,10 @@ ls .planning/phases/${PHASE}-*/RESEARCH.md 2>/dev/null
 ## 3. Gather Phase Context
 
 ```bash
-grep -A20 "Phase ${PHASE}:" .planning/ROADMAP.md
+# Phase section already loaded in PHASE_INFO
+echo "$PHASE_INFO" | jq -r '.section'
 cat .planning/REQUIREMENTS.md 2>/dev/null
-cat .planning/phases/${PHASE}-*/${PHASE}-CONTEXT.md 2>/dev/null
+cat .planning/phases/${PHASE}-*/*-CONTEXT.md 2>/dev/null
 grep -A30 "### Decisions Made" .planning/STATE.md 2>/dev/null
 ```
 
@@ -105,7 +92,7 @@ For this phase, discover:
 - What's the established architecture pattern?
 - What libraries form the standard stack?
 - What problems do people commonly hit?
-- What's SOTA vs what OpenCode's training thinks is SOTA?
+- What's SOTA vs what Claude's training thinks is SOTA?
 - What should NOT be hand-rolled?
 </key_insight>
 
@@ -122,7 +109,7 @@ Mode: ecosystem
 </context>
 
 <downstream_consumer>
-Your RESEARCH.md will be loaded by `/gsd-plan-phase` which uses specific sections:
+Your RESEARCH.md will be loaded by `/gsd:plan-phase` which uses specific sections:
 - `## Standard Stack` → Plans use these libraries
 - `## Architecture Patterns` → Task structure follows these
 - `## Don't Hand-Roll` → Tasks NEVER build custom solutions for listed problems
@@ -142,14 +129,14 @@ Before declaring complete, verify:
 </quality_gate>
 
 <output>
-write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
+Write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 </output>
 ```
 
 ```
 Task(
-  prompt=filled_prompt,
-  subagent_type="gsd-phase-researcher",
+  prompt="First, read ~/.claude/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + filled_prompt,
+  subagent_type="general-purpose",
   model="{researcher_model}",
   description="Research Phase {phase}"
 )
@@ -182,8 +169,8 @@ Research file: @.planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 
 ```
 Task(
-  prompt=continuation_prompt,
-  subagent_type="gsd-phase-researcher",
+  prompt="First, read ~/.claude/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + continuation_prompt,
+  subagent_type="general-purpose",
   model="{researcher_model}",
   description="Continue research Phase {phase}"
 )

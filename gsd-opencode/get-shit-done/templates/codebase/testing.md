@@ -457,7 +457,7 @@ it('mocks file system', () => {
 **When filling this template:**
 - Check package.json scripts for test commands
 - Find test config file (jest.config.js, vitest.config.ts)
-- read 3-5 existing test files to identify patterns
+- Read 3-5 existing test files to identify patterns
 - Look for test utilities in tests/ or test-utils/
 - Check for coverage configuration
 - Document actual patterns used, not ideal patterns
@@ -471,7 +471,7 @@ it('mocks file system', () => {
 
 **Analysis approach:**
 - Check package.json for test framework and scripts
-- read test config file for coverage, setup
+- Read test config file for coverage, setup
 - Examine test file organization (collocated vs separate)
 - Review 5 test files for patterns (mocking, structure, assertions)
 - Look for test utilities, fixtures, factories

@@ -1,46 +1,34 @@
 ---
-name: gsd-set-profile
+name: gsd:set-profile
 description: Switch model profile for GSD agents (quality/balanced/budget)
-arguments:
-  - name: profile
-    description: "Profile name: quality, balanced, or budget"
-    required: true
-agent: gsd-set-profile
-tools:
-  - read
-  - write
-  - bash
-  - question
+argument-hint: <profile>
+allowed-tools:
+  - Read
+  - Write
+  - Bash
 ---
 
 <objective>
-Switch the project’s active model profile (quality/balanced/budget).
+Switch the model profile used by GSD agents. Controls which Claude model each agent uses, balancing quality vs token spend.
 
-Implementation lives in the `gsd-set-profile` agent so we don’t duplicate the full switching/migration logic in multiple places.
+Routes to the set-profile workflow which handles:
+- Argument validation (quality/balanced/budget)
+- Config file creation if missing
+- Profile update in config.json
+- Confirmation with model table display
 </objective>
 
+<execution_context>
+@~/.claude/get-shit-done/workflows/set-profile.md
+</execution_context>
+
 <process>
+**Follow the set-profile workflow** from `@~/.claude/get-shit-done/workflows/set-profile.md`.
 
-Run the profile switch using the `gsd-set-profile` agent.
-
+The workflow handles all logic including:
+1. Profile argument validation
+2. Config file ensuring
+3. Config reading and updating
+4. Model table generation from MODEL_PROFILES
+5. Confirmation display
 </process>
-
-<examples>
-
-**Switch to budget profile:**
-
-```text
-/gsd-set-profile budget
-
-✓ Active profile set to: budget
-```
-
-**Switch to quality profile:**
-
-```text
-/gsd-set-profile quality
-
-✓ Active profile set to: quality
-```
-
-</examples>

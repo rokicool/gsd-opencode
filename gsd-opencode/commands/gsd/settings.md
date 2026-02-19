@@ -1,33 +1,36 @@
 ---
-name: gsd-settings
-description: Configure GSD model profiles and workflow settings
-agent: gsd-settings
-tools:
-  - read
-  - write
-  - bash
-  - question
+name: gsd:settings
+description: Configure GSD workflow toggles and model profile
+allowed-tools:
+  - Read
+  - Write
+  - Bash
+  - AskUserQuestion
 ---
 
 <objective>
-Open an interactive settings menu.
+Interactive configuration of GSD workflow agents and model profile via multi-question prompt.
 
-This delegates the implementation to the `gsd-settings` agent, which manages `.planning/config.json` and regenerates `opencode.json` when needed.
+Routes to the settings workflow which handles:
+- Config existence ensuring
+- Current settings reading and parsing
+- Interactive 5-question prompt (model, research, plan_check, verifier, branching)
+- Config merging and writing
+- Confirmation display with quick command references
 </objective>
 
+<execution_context>
+@~/.claude/get-shit-done/workflows/settings.md
+</execution_context>
+
 <process>
+**Follow the settings workflow** from `@~/.claude/get-shit-done/workflows/settings.md`.
 
-Run the interactive settings flow using the `gsd-settings` agent.
-
+The workflow handles all logic including:
+1. Config file creation with defaults if missing
+2. Current config reading
+3. Interactive settings presentation with pre-selection
+4. Answer parsing and config merging
+5. File writing
+6. Confirmation display
 </process>
-
-<success_criteria>
-
-- [ ] `.planning/` is validated as an existing GSD project (or a clear error is shown)
-- [ ] Current settings are displayed (active profile, effective models, workflow toggles)
-- [ ] User can update profile and workflow toggles via interactive UI
-- [ ] Updates are persisted to `.planning/config.json`
-- [ ] `opencode.json` is regenerated/updated to reflect effective models
-- [ ] A clear confirmation is shown ("GSD ► SETTINGS UPDATED")
-
-</success_criteria>
