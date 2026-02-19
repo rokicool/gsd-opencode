@@ -317,6 +317,80 @@ describe('translate.js CLI', () => {
       expect(result.stdout).toContain('include.md');
       expect(result.stdout).not.toContain('skip.md');
     });
+
+    it('should use include patterns as whitelist', async () => {
+      // Create multiple files
+      await writeFile(join(testDir, 'test.md'), 'gsd is great', 'utf-8');
+      await mkdir(join(testDir, 'docs'), { recursive: true });
+      await writeFile(join(testDir, 'docs', 'readme.md'), 'gsd docs', 'utf-8');
+      await mkdir(join(testDir, 'src'), { recursive: true });
+      await writeFile(join(testDir, 'src', 'code.js'), 'gsd code', 'utf-8');
+      await writeFile(join(testDir, 'skip.txt'), 'gsd text', 'utf-8');
+
+      const configPath = join(testDir, 'config.json');
+      await writeFile(configPath, JSON.stringify({
+        include: ['**/*.md', 'src/*.js'],
+        patterns: ['**/*'], // Should be ignored when include is specified
+        rules: [{ pattern: 'gsd', replacement: 'gsd-opencode' }]
+      }), 'utf-8');
+
+      const result = await runTranslate([configPath, '--no-color'], testDir);
+
+      // Should process .md files and src/code.js
+      expect(result.stdout).toContain('test.md');
+      expect(result.stdout).toContain('docs/readme.md');
+      expect(result.stdout).toContain('src/code.js');
+      // Should NOT process skip.txt
+      expect(result.stdout).not.toContain('skip.txt');
+      // Check processed count (expecting 3 files)
+      expect(result.stdout).toMatch(/Found 3 file\(s\) to process/);
+    });
+
+    it('should apply exclude after include patterns', async () => {
+      // Create files
+      await mkdir(join(testDir, 'docs'), { recursive: true });
+      await writeFile(join(testDir, 'docs', 'test.md'), 'gsd test', 'utf-8');
+      await writeFile(join(testDir, 'docs', 'internal.md'), 'gsd internal', 'utf-8');
+      await mkdir(join(testDir, 'src'), { recursive: true });
+      await writeFile(join(testDir, 'src', 'readme.md'), 'gsd readme', 'utf-8');
+
+      const configPath = join(testDir, 'config.json');
+      await writeFile(configPath, JSON.stringify({
+        include: ['docs/**/*.md', 'src/**/*.md'],
+        exclude: ['docs/internal.md'],
+        rules: [{ pattern: 'gsd', replacement: 'gsd-opencode' }]
+      }), 'utf-8');
+
+      const result = await runTranslate([configPath, '--no-color'], testDir);
+
+      // Should process docs/test.md and src/readme.md
+      expect(result.stdout).toContain('docs/test.md');
+      expect(result.stdout).toContain('src/readme.md');
+      // Should NOT process docs/internal.md (excluded)
+      expect(result.stdout).not.toContain('docs/internal.md');
+      // Check processed count (expecting 2 files: docs/test.md and src/readme.md)
+      expect(result.stdout).toMatch(/Found 2 file\(s\) to process/);
+    });
+
+    it('should fall back to patterns when include is empty', async () => {
+      await writeFile(join(testDir, 'test.md'), 'gsd is great', 'utf-8');
+      await writeFile(join(testDir, 'skip.txt'), 'gsd text', 'utf-8');
+
+      const configPath = join(testDir, 'config.json');
+      await writeFile(configPath, JSON.stringify({
+        include: [],
+        patterns: ['**/*.md'],
+        rules: [{ pattern: 'gsd', replacement: 'gsd-opencode' }]
+      }), 'utf-8');
+
+      const result = await runTranslate([configPath, '--no-color'], testDir);
+
+      // Should process only .md files (patterns behavior)
+      expect(result.stdout).toContain('test.md');
+      expect(result.stdout).not.toContain('skip.txt');
+      // Check processed count (expecting 1 file)
+      expect(result.stdout).toMatch(/Found 1 file\(s\) to process/);
+    });
   });
 
   describe('post-translation validation', () => {
