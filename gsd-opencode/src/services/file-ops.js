@@ -481,8 +481,12 @@ export class FileOperations {
       if (PATH_PATTERNS.absoluteReference) {
         PATH_PATTERNS.absoluteReference.lastIndex = 0; // Reset regex
       }
+      const hasTildeRef = PATH_PATTERNS.tildeConfigReference && PATH_PATTERNS.tildeConfigReference.test(content);
+      if (PATH_PATTERNS.tildeConfigReference) {
+        PATH_PATTERNS.tildeConfigReference.lastIndex = 0; // Reset regex
+      }
 
-      if (!hasGsdRef && !hasAbsRef) {
+      if (!hasGsdRef && !hasAbsRef && !hasTildeRef) {
         await fs.copyFile(sourcePath, targetPath, fsConstants.COPYFILE_FICLONE);
         return;
       }
@@ -497,8 +501,18 @@ export class FileOperations {
         () => targetDir + '/'
       );
 
+      // Replace bare ~/.config/opencode/ references with actual path
+      // This handles workflow files that call: node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs
+      // This applies to BOTH global and local installs to ensure correct paths
+      if (PATH_PATTERNS.tildeConfigReference) {
+        content = content.replace(
+          PATH_PATTERNS.tildeConfigReference,
+          () => targetDir + '/'
+        );
+      }
+
       // For local installs, also replace @~/.config/opencode/ with local path
-      // This handles files that have hardcoded global references
+      // This handles files that have hardcoded global references with @ prefix
       if (this.scopeManager.scope === 'local' && PATH_PATTERNS.absoluteReference) {
         content = content.replace(
           PATH_PATTERNS.absoluteReference,

@@ -52,7 +52,13 @@ export const PATH_PATTERNS = {
    * These are absolute references to the global config that need to be
    * replaced for local installs.
    */
-  absoluteReference: /@~\/\.config\/opencode\//g
+  absoluteReference: /@~\/\.config\/opencode\//g,
+  /**
+   * Pattern to match bare ~/.config/opencode/ references (without @ prefix).
+   * These appear in workflow files that call gsd-tools.cjs directly.
+   * Must be replaced for both global and local installs to ensure correct paths.
+   */
+  tildeConfigReference: /~\/\.config\/opencode\//g
 };
 
 /**
