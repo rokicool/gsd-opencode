@@ -35,7 +35,8 @@
     "commands",
     "get-shit-done",
     "src",
-    "lib"
+    "lib",
+    "skills"
   ],
   "engines": {
     "node": ">=18.0.0"

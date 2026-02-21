@@ -289,7 +289,7 @@
     {
       "_comment": "Tool mapping: lowercase tools - AskUserQuestion",
       "pattern": "AskUserQuestion",
-      "replacement": "askuserquestion",
+      "replacement": "question",
       "caseSensitive": true
     },
     {
@@ -313,7 +313,7 @@
     {
       "_comment": "Subagent type: general-purpose",
       "pattern": "subagent_type=\"general-purpose\"",
-      "replacement": "subagent_type=\"general_purpose\"",
+      "replacement": "subagent_type=\"general\"",
       "caseSensitive": true
     },
     {
