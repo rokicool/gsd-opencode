@@ -143,6 +143,63 @@ const MODEL_PROFILES = {
   'gsd-integration-checker':  { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
 };
 
+// ─── Stage-to-Agent Mapping for Profile Model Resolution ──────────────────────
+
+const STAGE_AGENTS = {
+  planning: ['gsd-planner', 'gsd-plan-checker', 'gsd-phase-researcher', 'gsd-roadmapper',
+             'gsd-project-researcher', 'gsd-research-synthesizer', 'gsd-codebase-mapper'],
+  execution: ['gsd-executor', 'gsd-debugger'],
+  verification: ['gsd-verifier', 'gsd-integration-checker']
+};
+
+// Reverse mapping: agent -> stage
+const AGENT_STAGE = {};
+for (const [stage, agents] of Object.entries(STAGE_AGENTS)) {
+  for (const agent of agents) {
+    AGENT_STAGE[agent] = stage;
+  }
+}
+
+// Valid profile types for the new schema
+const VALID_PROFILE_TYPES = ['simple', 'smart', 'custom'];
+
+/**
+ * Validate the new profile config schema
+ * @param {object} profiles - The profiles object from config.json
+ * @returns {{ valid: boolean, error?: string }}
+ */
+function validateProfileConfig(profiles) {
+  if (!profiles) return { valid: false, error: 'No profiles object' };
+
+  const { profile_type, models } = profiles;
+
+  if (!VALID_PROFILE_TYPES.includes(profile_type)) {
+    return { valid: false, error: `Invalid profile_type: ${profile_type}` };
+  }
+
+  if (!models || typeof models !== 'object') {
+    return { valid: false, error: 'Missing models object' };
+  }
+
+  const requiredStages = ['planning', 'execution', 'verification'];
+  for (const stage of requiredStages) {
+    if (!models[stage]) {
+      return { valid: false, error: `Missing model for stage: ${stage}` };
+    }
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Get the stage (planning/execution/verification) for a given agent type
+ * @param {string} agentType - The agent type (e.g., 'gsd-planner')
+ * @returns {string} The stage name, defaults to 'planning' for unknown agents
+ */
+function getAgentStage(agentType) {
+  return AGENT_STAGE[agentType] || 'planning'; // Default to planning for unknown agents
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function parseIncludeFlag(args) {
@@ -1437,18 +1494,37 @@ function cmdResolveModel(cwd, agentType, raw) {
   }
 
   const config = loadConfig(cwd);
-  const profile = config.model_profile || 'balanced';
 
+  // NEW: Check new profile schema first
+  if (config.profiles?.models) {
+    const validationResult = validateProfileConfig(config.profiles);
+    if (validationResult.valid) {
+      const stage = getAgentStage(agentType);
+      const model = config.profiles.models[stage];
+      const result = {
+        model,
+        profile_type: config.profiles.profile_type,
+        stage,
+        source: 'new_schema'
+      };
+      output(result, raw, model);
+      return;
+    }
+  }
+
+  // FALLBACK: Old MODEL_PROFILES table for backward compat
+  const profile = config.model_profile || 'balanced';
   const agentModels = MODEL_PROFILES[agentType];
+
   if (!agentModels) {
-    const result = { model: 'sonnet', profile, unknown_agent: true };
+    const result = { model: 'sonnet', profile, unknown_agent: true, source: 'fallback_default' };
     output(result, raw, 'sonnet');
     return;
   }
 
   const resolved = agentModels[profile] || agentModels['balanced'] || 'sonnet';
   const model = resolved === 'opus' ? 'inherit' : resolved;
-  const result = { model, profile };
+  const result = { model, profile, source: 'legacy_table' };
   output(result, raw, model);
 }
 
