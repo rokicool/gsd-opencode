@@ -257,7 +257,7 @@ async function detectChanges() {
 // Source: Phase 10 patterns + project directory structure
 const DIRECTORY_MAPPING = {
   'agents/': 'gsd-opencode/agents/',
-  'commands/gsd/': 'gsd-opencode/command/gsd/',  // Note: singular
+  'commands/gsd/': 'gsd-opencode/commands/gsd/',
   'get-shit-done/references/': 'gsd-opencode/get-shit-done/references/',
   'get-shit-done/templates/': 'gsd-opencode/get-shit-done/templates/',
   'get-shit-done/workflows/': 'gsd-opencode/get-shit-done/workflows/'
