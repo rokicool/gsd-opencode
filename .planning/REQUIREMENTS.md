@@ -104,8 +104,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Distribution Manager Migration (Phase 11)
 
 - [x] **MIGRATE-04**: Files are moved with git mv preserving history
-- [ ] **MIGRATE-05**: Entry point imports and package.json are updated
-- [ ] **MIGRATE-06**: All tests pass and CLI commands work after migration
+- [x] **MIGRATE-05**: Entry point imports and package.json are updated
+- [x] **MIGRATE-06**: All tests pass and CLI commands work after migration
 
 ## v2 Requirements
 

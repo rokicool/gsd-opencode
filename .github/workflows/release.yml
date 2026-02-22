@@ -180,8 +180,6 @@ jobs:
           # Copy essential files
           cp -r skills dist/
           cp -r bin dist/
-          cp -r src dist/
-          cp -r lib dist/
           cp -r agents dist/
           cp -r commands dist/
           cp -r get-shit-done dist/
