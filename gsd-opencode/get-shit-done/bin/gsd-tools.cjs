@@ -371,6 +371,150 @@ const PROFILE_TYPES = {
 };
 
 /**
+ * Analyze which models can be reused when switching profile types
+ * 
+ * @param {object} currentModels - Current models { planning, execution, verification }
+ * @param {string} newProfileType - Target profile type (simple/smart/custom)
+ * @returns {object} - Reuse analysis with stages needing new models
+ */
+function analyzeModelReuse(currentModels, newProfileType) {
+  if (!currentModels) {
+    return { canReuse: false, reason: 'no_current_models' };
+  }
+  
+  const result = {
+    canReuse: true,
+    currentModels,
+    newProfileType,
+    stagesToPrompt: [],
+    reuseMap: {}
+  };
+  
+  switch (newProfileType) {
+    case 'simple':
+      // Simple uses same model for all stages
+      // User picks one model, or we can suggest existing planning model
+      result.stagesToPrompt = ['all'];
+      result.suggestedModel = currentModels.planning;
+      result.reuseNote = 'Will use selected model for all stages';
+      break;
+      
+    case 'smart':
+      // Smart: advanced for planning+execution, cheaper for verification
+      // Can reuse planning model for planning+execution, verify model for verification
+      result.stagesToPrompt = ['planning_execution', 'verification'];
+      result.reuseMap = {
+        planning_execution: currentModels.planning, // Suggest reusing planning
+        verification: currentModels.verification    // Suggest reusing verification
+      };
+      result.reuseNote = 'Planning+Execution uses advanced model, Verification uses cheaper model';
+      break;
+      
+    case 'custom':
+      // Custom: all 3 stages can be different
+      // Can reuse all existing models
+      result.stagesToPrompt = ['planning', 'execution', 'verification'];
+      result.reuseMap = {
+        planning: currentModels.planning,
+        execution: currentModels.execution,
+        verification: currentModels.verification
+      };
+      result.reuseNote = 'Each stage can have different model';
+      break;
+  }
+  
+  return result;
+}
+
+/**
+ * Generate the new models object based on profile type and selections
+ * 
+ * @param {string} profileType - Target profile type
+ * @param {object} selections - User's model selections per stage
+ * @returns {object} - Complete models object { planning, execution, verification }
+ */
+function buildProfileModels(profileType, selections) {
+  switch (profileType) {
+    case 'simple':
+      // All stages use the same model
+      return {
+        planning: selections.all,
+        execution: selections.all,
+        verification: selections.all
+      };
+      
+    case 'smart':
+      // planning+execution uses one model, verification uses another
+      return {
+        planning: selections.planning_execution,
+        execution: selections.planning_execution,
+        verification: selections.verification
+      };
+      
+    case 'custom':
+      // Each stage has its own model
+      return {
+        planning: selections.planning,
+        execution: selections.execution,
+        verification: selections.verification
+      };
+      
+    default:
+      throw new Error(`Unknown profile type: ${profileType}`);
+  }
+}
+
+/**
+ * Create switch profile request for interactive handling
+ * Returns data needed for the wizard to handle the switch
+ */
+function prepareProfileSwitch(config, newProfileType, reuseModels = false) {
+  const currentModels = config.profiles?.models;
+  const reuseAnalysis = reuseModels ? analyzeModelReuse(currentModels, newProfileType) : null;
+  
+  return {
+    currentProfileType: config.profiles?.profile_type || null,
+    newProfileType,
+    reuseModels,
+    reuseAnalysis,
+    stagesToPrompt: reuseAnalysis?.stagesToPrompt || 
+      (newProfileType === 'simple' ? ['all'] :
+       newProfileType === 'smart' ? ['planning_execution', 'verification'] :
+       ['planning', 'execution', 'verification'])
+  };
+}
+
+/**
+ * Complete the profile switch after model selections
+ * Saves config and derives opencode.json
+ */
+function completeProfileSwitch(cwd, profileType, modelSelections) {
+  const models = buildProfileModels(profileType, modelSelections);
+  
+  const profiles = {
+    profile_type: profileType,
+    models
+  };
+  
+  const configPath = saveProfileConfig(cwd, profiles);
+  
+  // Derive and save opencode.json
+  const config = loadConfig(cwd);
+  const opencodeConfig = deriveOpencodeJson(config);
+  const opencodePath = path.join(cwd, 'opencode.json');
+  fs.writeFileSync(opencodePath, JSON.stringify(opencodeConfig, null, 2));
+  
+  return {
+    success: true,
+    profile_type: profileType,
+    models,
+    config_path: configPath,
+    opencode_path: opencodePath,
+    reminder: 'Quit and relaunch OpenCode to apply changes'
+  };
+}
+
+/**
  * Get skill directory path for gsd-oc-select-model
  * Searches common installation locations
  */

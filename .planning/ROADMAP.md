@@ -494,7 +494,7 @@ Plans:
 
 **Goal:** Simple profiles system for OpenCode model configuration with Simple/Smart/Custom profile types
 **Depends on:** Phase 11
-**Plans:** 2/4 plans executed
+**Plans:** 3/4 plans executed
 
 **Requirements:**
 | ID | Requirement |
