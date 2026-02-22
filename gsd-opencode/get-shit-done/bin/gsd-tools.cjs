@@ -14,6 +14,7 @@
  *   state get [section]                Get STATE.md content or section
  *   state patch --field val ...        Batch update STATE.md fields
  *   resolve-model <agent-type>         Get model for agent based on profile
+ *   derive-opencode-json               Generate opencode.json from profile config
  *   find-phase <phase>                 Find phase directory by number
  *   commit <message> [--files f1 f2]   Commit planning docs
  *   verify-summary <path>              Verify a SUMMARY.md file
@@ -198,6 +199,144 @@ function validateProfileConfig(profiles) {
  */
 function getAgentStage(agentType) {
   return AGENT_STAGE[agentType] || 'planning'; // Default to planning for unknown agents
+}
+
+// ─── Profile Migration (Old Config Format Support) ────────────────────────────
+
+// Old profile names that need migration
+const OLD_PROFILE_NAMES = ['quality', 'balanced', 'budget'];
+
+// Old profile to model mapping (from MODEL_PROFILES table)
+const OLD_PROFILE_MODEL_MAP = {
+  quality: {
+    planning: 'inherit',   // opus -> inherit
+    execution: 'inherit',  // opus -> inherit
+    verification: 'sonnet'
+  },
+  balanced: {
+    planning: 'inherit',   // opus -> inherit
+    execution: 'sonnet',
+    verification: 'sonnet'
+  },
+  budget: {
+    planning: 'sonnet',
+    execution: 'sonnet',
+    verification: 'haiku'
+  }
+};
+
+/**
+ * Detect if config uses old profile format
+ * Old format: has model_profile with quality/balanced/budget but no profiles object
+ * @param {object} config - The config object
+ * @returns {{ needs_migration: boolean, old_profile?: string, reason?: string }}
+ */
+function detectOldProfileConfig(config) {
+  if (config.profiles?.profile_type) {
+    return { needs_migration: false };
+  }
+  
+  const oldProfile = config.model_profile;
+  if (OLD_PROFILE_NAMES.includes(oldProfile)) {
+    return { 
+      needs_migration: true, 
+      old_profile: oldProfile,
+      reason: `Found old model_profile: ${oldProfile}`
+    };
+  }
+  
+  return { needs_migration: false };
+}
+
+/**
+ * Migrate old config format to new profile schema
+ * Returns new config with profiles object added
+ * @param {object} config - The config object
+ * @returns {{ migrated: boolean, config: object, old_profile?: string }}
+ */
+function migrateProfileConfig(config) {
+  const detection = detectOldProfileConfig(config);
+  
+  if (!detection.needs_migration) {
+    return { migrated: false, config };
+  }
+  
+  const oldProfile = detection.old_profile;
+  const models = OLD_PROFILE_MODEL_MAP[oldProfile];
+  
+  const migratedConfig = {
+    ...config,
+    profiles: {
+      profile_type: 'custom', // Old configs had 3 distinct models
+      models
+    },
+    // Keep old field for backward compat during transition
+    model_profile: oldProfile
+  };
+  
+  return { 
+    migrated: true, 
+    config: migratedConfig,
+    old_profile: oldProfile 
+  };
+}
+
+/**
+ * Derive opencode.json agent assignments from profile config
+ * Returns JSON object for opencode.json
+ * @param {object} config - The config object
+ * @returns {object} opencode.json configuration object
+ */
+function deriveOpencodeJson(config) {
+  // Handle migration if needed
+  let workingConfig = config;
+  const migration = detectOldProfileConfig(config);
+  if (migration.needs_migration) {
+    const result = migrateProfileConfig(config);
+    workingConfig = result.config;
+  }
+  
+  // Get models from profile
+  const models = workingConfig.profiles?.models || {
+    planning: 'sonnet',
+    execution: 'sonnet', 
+    verification: 'sonnet'
+  };
+  
+  // Build agent assignments
+  const agents = {};
+  
+  // Planning stage agents
+  for (const agent of STAGE_AGENTS.planning) {
+    agents[agent] = { model: models.planning };
+  }
+  
+  // Execution stage agents
+  for (const agent of STAGE_AGENTS.execution) {
+    agents[agent] = { model: models.execution };
+  }
+  
+  // Verification stage agents
+  for (const agent of STAGE_AGENTS.verification) {
+    agents[agent] = { model: models.verification };
+  }
+  
+  return {
+    '$schema': 'https://opencode.ai/config.json',
+    agent: agents
+  };
+}
+
+/**
+ * CLI command: derive-opencode-json
+ * Output opencode.json content derived from current profile config
+ * @param {string} cwd - Current working directory
+ * @param {boolean} raw - Whether to output raw format
+ */
+function cmdDeriveOpencodeJson(cwd, raw) {
+  const config = loadConfig(cwd);
+  const opencodeConfig = deriveOpencodeJson(config);
+  output(opencodeConfig, raw, JSON.stringify(opencodeConfig, null, 2));
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -4995,7 +5134,7 @@ async function main() {
   const cwd = process.cwd();
 
   if (!command) {
-    error('Usage: gsd-tools <command> [args] [--raw]\nCommands: state, resolve-model, find-phase, commit, verify-summary, verify, frontmatter, template, generate-slug, current-timestamp, list-todos, verify-path-exists, config-ensure-section, init');
+    error('Usage: gsd-tools <command> [args] [--raw]\nCommands: state, resolve-model, derive-opencode-json, find-phase, commit, verify-summary, verify, frontmatter, template, generate-slug, current-timestamp, list-todos, verify-path-exists, config-ensure-section, init');
   }
 
   switch (command) {
@@ -5062,6 +5201,11 @@ async function main() {
 
     case 'resolve-model': {
       cmdResolveModel(cwd, args[1], raw);
+      break;
+    }
+
+    case 'derive-opencode-json': {
+      cmdDeriveOpencodeJson(cwd, raw);
       break;
     }
 

@@ -490,7 +490,37 @@ Plans:
 - [ ] 11-02-PLAN.md — Update entry point imports and package.json
 - [ ] 11-03-PLAN.md — Verify tests pass and CLI works
 
+### Phase 12: Simple Profiles System
+
+**Goal:** Simple profiles system for OpenCode model configuration with Simple/Smart/Custom profile types
+**Depends on:** Phase 11
+**Plans:** 1/4 plans executed
+
+**Requirements:**
+| ID | Requirement |
+|----|-------------|
+| PROF-01 | Define profile config schema in `.planning/config.json` |
+| PROF-02 | Implement first-run wizard triggered by settings/new-project/set-profile |
+| PROF-03 | Create profile switching with model reuse option |
+| PROF-04 | Auto-migrate old quality/balanced/budget configs |
+| PROF-05 | Update gsd-tools.cjs resolveModel to read new schema |
+| PROF-06 | Derive opencode.json agent assignments from profile |
+
+**Wave Structure:**
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 12-01 | Schema and model resolution foundation |
+| 2 | 12-02 | Migration and opencode.json derivation |
+| 3 | 12-03 | First-run wizard infrastructure |
+| 4 | 12-04 | Profile switching with verification checkpoint |
+
+Plans:
+- [ ] 12-01-PLAN.md — Profile schema and resolveModel update
+- [ ] 12-02-PLAN.md — Migration logic and opencode.json derivation
+- [ ] 12-03-PLAN.md — First-run wizard infrastructure
+- [ ] 12-04-PLAN.md — Profile switching with model reuse
+
 ---
 
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-21 (Phase 11 planned — migrate distribution manager code)*
+*Last updated: 2026-02-22 (Phase 12 planned — simple profiles system)*
