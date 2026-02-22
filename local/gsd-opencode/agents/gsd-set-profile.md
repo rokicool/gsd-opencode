@@ -1,16 +1,19 @@
 ---
 name: gsd-set-profile
-description: Switch between model profiles with confirmation workflow
+description: Switch between model profiles (simple/smart/custom) with model reuse option
 tools:
-  question: true
+  - read: true
+  - write: true
+  - bash: true
+  - question: true
 ---
 
 <role>
-You are executing the `/gsd-set-profile` command. Switch the project's active model profile (quality/balanced/budget) with a clear before/after preview and confirmation workflow.
+You are executing the `/gsd-set-profile` command. Switch the project's active model profile (simple/smart/custom) with optional model reuse.
 
-This command reads/writes two files:
-- `.planning/config.json` — profile state (active_profile, presets, custom_overrides)
-- `opencode.json` — agent model assignments (OpenCode's native config)
+This command reads/writes:
+- `.planning/config.json` — profile state (profile_type, models)
+- `opencode.json` — agent model assignments (derived from profile)
 
 Do NOT modify agent .md files. Profile switching updates `opencode.json` in the project root.
 </role>
@@ -18,11 +21,9 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 <context>
 **Invocation styles:**
 
-1. No args (interactive picker): `/gsd-set-profile`
-2. Positional: `/gsd-set-profile quality` or `balanced` or `budget`
-3. Flags: `--quality` or `-q`, `--balanced` or `-b`, `--budget` or `-u`
-
-Precedence: Positional > Flags > Interactive picker
+1. No args (interactive wizard): `/gsd-set-profile`
+2. Positional with type: `/gsd-set-profile simple|smart|custom`
+3. With reuse flag: `/gsd-set-profile smart --reuse`
 
 **Stage-to-agent mapping (11 agents):**
 
@@ -32,208 +33,248 @@ Precedence: Positional > Flags > Interactive picker
 | Execution    | gsd-executor, gsd-debugger |
 | Verification | gsd-verifier, gsd-integration-checker, gsd-set-profile, gsd-settings, gsd-set-model |
 
-**Profile presets:** Defined in `.planning/config.json` (user-configurable via `/gsd-settings`). No hardcoded defaults—presets are discovered dynamically on first run.
+**Profile types:**
+
+- **Simple**: 1 model total — all stages use same model
+- **Smart**: 2 models — planning+execution share model, verification uses different
+- **Custom**: 3 models — each stage can have different model
+
+**Migration:** Old configs with `model_profile: quality/balanced/budget` are auto-migrated to Custom profile.
 </context>
 
 <behavior>
 
-## Step 1: Read config file
+## Step 1: Load and validate config
 
 Read `.planning/config.json`. Handle these cases:
 
-**Case A: File missing or no `profiles.presets` key**
-- Print: `Error: No model presets configured. Run /gsd-settings first to set up your profiles.`
+**Case A: File missing or invalid**
+- Print: `Error: No GSD project found. Run /gsd-new-project first.`
 - Stop.
 
-**Case B: File exists with `profiles.presets` key**
-- Use as-is
+**Case B: Legacy config (has model_profile but no profiles.profile_type)**
+- Auto-migrate to Custom profile
+- Use OLD_PROFILE_MODEL_MAP to convert quality/balanced/budget → Custom
+
+**Case C: Current config**
+- Use `profiles.profile_type` and `profiles.models`
 
 **Also check `opencode.json`:**
-- If missing, it will be created when changes are saved
-- If exists, it will be merged (preserve non-agent keys)
+- If missing, it will be created
+- If exists, merge agent assignments (preserve other keys)
 
-## Step 2: Compute effective models for current profile
+## Step 2: Check for migration
 
-1. Get `currentProfile` = `config.profiles.active_profile` (default: "balanced")
-2. Get `preset` = `config.profiles.presets[currentProfile]`
-3. Get `overrides` = `config.profiles.custom_overrides[currentProfile]` (may be undefined)
-4. Compute effective models:
-   - `planning` = overrides?.planning || preset.planning
-   - `execution` = overrides?.execution || preset.execution
-   - `verification` = overrides?.verification || preset.verification
+```bash
+node gsd-opencode/get-shit-done/bin/gsd-tools.cjs set-profile --status --raw
+```
+
+Parse JSON. If `needs_wizard: true` or `has_old_config: true`:
+- Run migration first
+- Then continue to profile selection
 
 ## Step 3: Display current state
 
-Print:
+If profile exists:
 
 ```
-Active profile: {currentProfile}
+Active profile: {profile_type}
 
 Current configuration:
 | Stage        | Model |
 |--------------|-------|
-| planning     | {current.planning} |
-| execution    | {current.execution} |
-| verification | {current.verification} |
+| planning     | {models.planning} |
+| execution    | {models.execution} |
+| verification | {models.verification} |
 ```
 
 ## Step 4: Determine requested profile
 
 **A) Check for positional argument:**
-- If user typed `/gsd-set-profile quality` (or balanced/budget), use that as `newProfile`
+- If user typed `/gsd-set-profile simple|smart|custom`, use that as `newProfileType`
 
-**B) Check for flags:**
-- `--quality` or `-q` → quality
-- `--balanced` or `-b` → balanced
-- `--budget` or `-u` → budget
-
-**C) Interactive picker (no args/flags):**
-
-Build options dynamically from `config.profiles.presets`:
+**B) Interactive picker (no args):**
 
 Use Question tool:
 
 ```
-header: "Model profile"
-question: "Select a profile"
+header: "Profile Type"
+question: "Select a profile type for model configuration"
 options:
-  - label: "Quality"
-    description: "{preset.quality.planning} / {preset.quality.execution} / {preset.quality.verification}"
-  - label: "Balanced"
-    description: "{preset.balanced.planning} / {preset.balanced.execution} / {preset.balanced.verification}"
-  - label: "Budget"
-    description: "{preset.budget.planning} / {preset.budget.execution} / {preset.budget.verification}"
+  - label: "Simple"
+    description: "1 model for all stages (easiest setup)"
+  - label: "Smart"
+    description: "2 models: advanced for planning+execution, cheaper for verification"
+  - label: "Custom"
+    description: "3 models: full control with different model per stage"
   - label: "Cancel"
     description: "Exit without changes"
 ```
 
-(Substitute actual model IDs from `config.profiles.presets` for each profile.)
+If Cancel selected, print cancellation message and stop.
 
-Input rules:
-- OpenCode's Question UI may display a "Type your own answer" option.
-- For this command, custom/freeform answers are NOT allowed.
-- If the user's selection is not exactly one of the option labels, print an error and re-run the same Question prompt.
+**C) Invalid profile handling:**
 
-If user selects Cancel, print the cancellation message (Step 5) and stop.
-
-**D) Invalid profile handling:**
-
-If an invalid profile name is provided:
-- Print: `Unknown profile '{name}'. Valid options: quality, balanced, budget`
+If invalid profile name:
+- Print: `Unknown profile type '{name}'. Valid options: simple, smart, custom`
 - Fall back to interactive picker
 
-## Step 5: Handle edge cases
+## Step 5: Handle --reuse flag
 
-**If user selected Cancel:**
-```
-Profile change cancelled. Current profile: {currentProfile}
-```
-Stop.
-
-**If newProfile === currentProfile:**
-```
-Profile '{currentProfile}' is already active.
-```
-Re-print current configuration table and stop.
-
-## Step 5.5: Validate selected models exist in OpenCode
-
-Before writing any files, validate that the effective models for `newProfile` are actually available in the current OpenCode installation.
-
-Run:
+If `--reuse` flag present and current profile exists:
 
 ```bash
-opencode models
+node gsd-opencode/get-shit-done/bin/gsd-tools.cjs profile-switch {newProfileType} --reuse --raw
 ```
 
-Parse the output and extract valid model IDs in `provider/model` format.
+Parse the reuse analysis:
+- Shows which stages can reuse existing models
+- Displays suggestions for each stage
 
-Validate that all three effective model IDs exist in that list:
+Present to user:
 
-- `{new.planning}`
-- `{new.execution}`
-- `{new.verification}`
+```
+Model Reuse Analysis for {newProfileType} profile:
 
-If `opencode models` fails, or any model is missing:
+Current models:
+- Planning: {current.planning}
+- Execution: {current.execution}
+- Verification: {current.verification}
 
-Print an error like:
+Suggested reuse:
+{reuse analysis from tool}
 
-```text
-Error: One or more selected models are not available in OpenCode.
-
-Missing:
-- {missingModel1}
-- {missingModel2}
-
-Run `opencode models` to see what is available, then update presets/overrides via /gsd-settings.
+Use these suggestions? (yes/no)
 ```
 
-Stop. Do NOT write `.planning/config.json` and do NOT update `opencode.json`.
+If yes, proceed with suggested models.
+If no, run full model selection wizard.
 
-## Step 6: Apply changes
+## Step 6: Model selection wizard
 
-Use the **write tool directly** to update both files. Do NOT use bash, python, or other scripts—use native file writing.
+Based on profile type, prompt for models:
 
-1. **Update .planning/config.json:**
+### Simple Profile (1 model)
 
-    - Set `config.profiles.active_profile` to `newProfile`
-    - Also set `config.model_profile` to `newProfile` (for orchestrators that read this key)
-    - Write the config file (preserve all other keys)
+Use gsd-oc-select-model skill:
 
-2. **Update opencode.json:**
+```
+header: "Simple Profile - Select Model"
+question: "Choose a model for all stages"
+```
 
-Build agent config from effective stage models for `newProfile`:
+Or call:
+```bash
+node gsd-opencode/get-shit-done/bin/gsd-tools.cjs wizard-model-select --providers --raw
+```
+
+Then for selected provider:
+```bash
+node gsd-opencode/get-shit-done/bin/gsd-tools.cjs wizard-model-select --provider "{provider}" --raw
+```
+
+Store selected model. All stages will use this model.
+
+### Smart Profile (2 models)
+
+**First model** (planning + execution):
+```
+header: "Smart Profile - Planning & Execution"
+question: "Choose a model for planning and execution agents"
+```
+
+**Second model** (verification):
+```
+header: "Smart Profile - Verification"
+question: "Choose a model for verification agents (can be cheaper)"
+```
+
+### Custom Profile (3 models)
+
+Prompt for each stage separately:
+```
+header: "Custom Profile - Planning"
+question: "Choose model for planning agents"
+
+header: "Custom Profile - Execution"
+question: "Choose model for execution agents"
+
+header: "Custom Profile - Verification"
+question: "Choose model for verification agents"
+```
+
+## Step 7: Validate selected models
+
+Before writing files, validate models exist:
+
+```bash
+opencode models | grep -q "^{model}$" && echo "valid" || echo "invalid"
+```
+
+If any model invalid:
+- Print error with list of missing models
+- Stop. Do NOT write config files.
+
+## Step 8: Apply changes
+
+### Save config.json
+
+```bash
+node gsd-opencode/get-shit-done/bin/gsd-tools.cjs profile-switch {profile_type} --complete '{"stage":"model",...}' --raw
+```
+
+Or build and save manually:
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
-  "agent": {
-    "gsd-planner": { "model": "{new.planning}" },
-    "gsd-plan-checker": { "model": "{new.planning}" },
-    "gsd-phase-researcher": { "model": "{new.planning}" },
-    "gsd-roadmapper": { "model": "{new.planning}" },
-    "gsd-project-researcher": { "model": "{new.planning}" },
-    "gsd-research-synthesizer": { "model": "{new.planning}" },
-    "gsd-codebase-mapper": { "model": "{new.planning}" },
-    "gsd-executor": { "model": "{new.execution}" },
-    "gsd-debugger": { "model": "{new.execution}" },
-    "gsd-verifier": { "model": "{new.verification}" },
-    "gsd-integration-checker": { "model": "{new.verification}" },
-    "gsd-set-profile": { "model": "{new.verification}" },
-    "gsd-settings": { "model": "{new.verification}" },
-    "gsd-set-model": { "model": "{new.verification}" }
+  "profiles": {
+    "profile_type": "{simple|smart|custom}",
+    "models": {
+      "planning": "{model}",
+      "execution": "{model}",
+      "verification": "{model}"
+    }
   }
 }
 ```
 
-If `opencode.json` already exists, merge the `agent` key (preserve other top-level keys).
+### Generate and save opencode.json
 
-3. **Report success:**
-
-```text
-✓ Active profile set to: {newProfile}
-
-Current configuration:
-| Stage        | Model |
-|--------------|-------|
-| planning     | {new.planning} |
-| execution    | {new.execution} |
-| verification | {new.verification} |
-
-Note: OpenCode loads `opencode.json` at startup and does not hot-reload model/agent assignments. Fully quit and relaunch OpenCode to apply this profile change.
+```bash
+node gsd-opencode/get-shit-done/bin/gsd-tools.cjs derive-opencode-json --raw
 ```
 
-Important: Do NOT print any tooling transcript (e.g., `python -m json.tool ...`) or a separate `Updated:` file list. The success message above is the complete user-facing output.
+Parse output and write to `opencode.json`, merging with existing content.
+
+## Step 9: Report success
+
+```
+✓ Active profile set to: {profile_type}
+
+Configuration:
+| Stage        | Model |
+|--------------|-------|
+| planning     | {models.planning} |
+| execution    | {models.execution} |
+| verification | {models.verification} |
+
+Note: Quit and relaunch OpenCode to apply model changes.
+```
+
+If migration occurred:
+```
+⚡ Auto-migrated from {old_profile} to custom profile
+```
 
 </behavior>
 
 <notes>
-- Use the Question tool for ALL user input (never ask user to type numbers)
+- Use Question tool for ALL user input
 - Always show full model IDs (e.g., `opencode/glm-4.7-free`)
-- Preserve all other config.json keys when writing (deep merge)
+- Preserve all other config.json keys when writing
 - Do NOT rewrite agent .md files — only update opencode.json
 - If opencode.json doesn't exist, create it
-- Overrides are scoped per profile at `profiles.custom_overrides.{profile}.{stage}`
-- **Source of truth:** `config.json` stores profiles/presets/overrides; `opencode.json` is **derived** from the effective models
-- When regenerating `opencode.json`, read the new profile from `config.json`, compute effective models (preset + overrides), then write the agent mappings
+- **Source of truth:** `config.json` stores profile_type and models; `opencode.json` is derived
+- When migrating, preserve old model_profile field for backward compat during transition
+- Model selection uses gsd-oc-select-model skill via gsd-tools.cjs wizard-model-select command
 </notes>
