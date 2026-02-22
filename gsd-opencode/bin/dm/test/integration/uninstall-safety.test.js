@@ -25,7 +25,7 @@ import {
 } from './helpers/test-utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CLI_PATH = path.resolve(__dirname, '../../bin/gsd.js');
+const CLI_PATH = path.resolve(__dirname, '../../../gsd.js');
 
 /**
  * Helper to run CLI commands in tests.

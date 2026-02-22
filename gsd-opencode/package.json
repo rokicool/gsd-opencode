@@ -31,7 +31,10 @@
   "license": "MIT",
   "files": [
     "agents",
-    "bin",
+    "bin/gsd.js",
+    "bin/gsd-install.js",
+    "bin/dm/lib",
+    "bin/dm/src",
     "commands",
     "get-shit-done",
     "skills"

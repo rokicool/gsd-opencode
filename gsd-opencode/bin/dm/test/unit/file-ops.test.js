@@ -43,7 +43,7 @@ describe('FileOperations._copyFile path replacement', () => {
 
   beforeEach(async () => {
     tempDir = await createTempDir();
-    fixturesDir = path.join(process.cwd(), 'test/fixtures/path-replacement');
+    fixturesDir = path.join(process.cwd(), 'bin/dm/test/fixtures/path-replacement');
   });
 
   afterEach(async () => {
