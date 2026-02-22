@@ -155,6 +155,7 @@ None currently.
 | 2026-02-18 | Phase 10 added | Create Node.js script to translate gsd to gsd-opencode — utility for migration/translation |
 | 2026-02-21 | Phase 11 added | Migrate Distribution manager code — migrate Distribution manager codebase |
 | 2026-02-21 | Phase 12 added | Simple profiles system |
+| 2026-02-22 | Phase 13 added | copy-from-original script |
 
 ---
 

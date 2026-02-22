@@ -386,6 +386,11 @@ Plans:
 | 6 | Integration & Polish | 2 | 🟢 Completed | 2026-02-10 | 2026-02-11 |
 | 7 | Make Uninstall Safe and User-Friendly | 5 | 🟢 Completed | 2026-02-11 | 2026-02-11 |
 | 8 | Support for opencode/commands/ Directory Structure | 6 | 🟢 Completed | 2026-02-11 | 2026-02-11 |
+| 9 | Fix Support for Local Install | 4 | 🟢 Completed | 2026-02-17 | 2026-02-17 |
+| 10 | Create Node.js script to translate gsd to gsd-opencode | 6 | 🟢 Completed | 2026-02-18 | 2026-02-18 |
+| 11 | Migrate Distribution Manager Code | 3 | 🟢 Completed | 2026-02-21 | 2026-02-21 |
+| 12 | Simple Profiles System | 6 | 🟡 In Progress | 2026-02-22 | — |
+| 13 | copy-from-original script | 12 | 🔵 Planned | — | — |
 
 **Legend:** 🔵 Planned | 🟡 In Progress | 🟢 Completed | ⭕ Blocked
 
@@ -394,9 +399,9 @@ Plans:
 ## Coverage
 
 **v1 Requirements:** 52 total
-**Phase 8 Requirements:** 6 new
-**Total Requirements:** 58
-**Mapped to Phases:** 58
+**Phase 8-13 Requirements:** 37 new
+**Total Requirements:** 89
+**Mapped to Phases:** 89
 **Unmapped:** 0 ✓
 
 ### By Phase
@@ -411,7 +416,11 @@ Plans:
 | Phase 6 | INST-04 (comprehensive testing) | 2 |
 | Phase 7 | UNIN-06 to UNIN-10 (safety enhancements) | 5 |
 | Phase 8 | INST-11, UPDATE-07, CHECK-06, MIGRATE-01-03 | 6 |
-| Phase 8 | TBD (support opencode/commands/ directory) | TBD |
+| Phase 9 | LOCAL-01 to LOCAL-04 | 4 |
+| Phase 10 | TRANS-01 to TRANS-06 | 6 |
+| Phase 11 | MIGRATE-04 to MIGRATE-06 | 3 |
+| Phase 12 | PROF-01 to PROF-06 | 6 |
+| Phase 13 | CFOS-01 to CFOS-12 | 12 |
 
 ### Phase 9: fix support for local install
 
@@ -520,7 +529,54 @@ Plans:
 - [ ] 12-03-PLAN.md — First-run wizard infrastructure
 - [ ] 12-04-PLAN.md — Profile switching with model reuse
 
+### Phase 13: copy-from-original script
+
+**Goal:** Create a CLI script that synchronizes changes from the original TÂCHES repository (git submodule) to the OpenCode adaptation with CC→OC transformations
+
+**Depends on:** Phase 12
+
+**Requirements:**
+| ID | Requirement |
+|----|-------------|
+| CFOS-01 | Script detects changes between git submodule and adaptation using git diff-tree |
+| CFOS-02 | Script copies files from original to gsd-opencode preserving directory structure |
+| CFOS-03 | Script applies Claude Code → OpenCode transformations (reuses Phase 10 translate.js) |
+| CFOS-04 | Script tracks sync state in a JSON manifest file |
+| CFOS-05 | Script supports dry-run mode to preview changes |
+| CFOS-06 | Script supports force mode to auto-overwrite diverged files |
+| CFOS-07 | Script shows diff of changes before syncing |
+| CFOS-08 | Script detects diverged files (local modifications) and warns |
+| CFOS-09 | Script skips binary files automatically |
+| CFOS-10 | Script creates backup before modifications |
+| CFOS-11 | Script uses atomic operations (temp-then-move) for safety |
+| CFOS-12 | Script reports orphans (files in gsd-opencode not in original) |
+
+**Success Criteria:**
+1. User can run `gsd-opencode copy-from-original` to sync changes
+2. Script detects upstream changes using git diff-tree
+3. Script applies CC→OC transformations during copy
+4. Script tracks sync state in JSON manifest
+5. --dry-run shows preview without changes
+6. --force overwrites diverged files
+7. --show-diff displays file diffs
+8. Binary files are automatically skipped
+9. Backups created before modifications
+10. Orphan files are reported
+
+**Plans:** 3 plans in 3 waves
+
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 13-01 | Foundation: SubmoduleService and SyncManifest |
+| 2 | 13-02 | Core: SyncService and TransformationEngine |
+| 3 | 13-03 | CLI: copy-from-original command and integration tests |
+
+Plans:
+- [ ] 13-01-PLAN.md — Create SubmoduleService and SyncManifest for change detection and state tracking
+- [ ] 13-02-PLAN.md — Create SyncService and TransformationEngine for file copying with CC→OC transformations
+- [ ] 13-03-PLAN.md — Create copy-from-original CLI command with dry-run, force, diff, and orphan reporting
+
 ---
 
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-22 (Phase 12 planned — simple profiles system)*
+*Last updated: 2026-02-22 (Phase 13 planned — copy-from-original script with 3 plans)*

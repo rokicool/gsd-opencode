@@ -5,7 +5,6 @@ tools:
   - read
   - bash
   - write
-
   - question
 ---
 
@@ -323,38 +322,21 @@ questions: [
     ]
   },
   {
-    header: "Model Profile",
-    question: "Which AI models for planning agents?",
-    multiSelect: false,
-    options: [
-      { label: "Balanced", description: "planning/verifier: opencode/glm-4.7-free, execution: opencode/minimax-m2.1-free" },
-      { label: "Quality", description: "All stages: opencode/glm-4.7-free" },
-      { label: "Budget", description: "planning/verifier: opencode/minimax-m2.1-free, execution: opencode/grok-code" }
-    ]
-  }
-]
-```
-
-Create `.planning/config.json` with all settings:
-
-**Profile Selection (in workflow preferences):**
-
-In Round 2, after the "Verifier" question, add:
-
-```
-questions: [
-  {
     "header": "Model Profile",
     "question": "Which model profile type?",
     "multiSelect": false,
     "options": [
       { "label": "Simple", "description": "1 model for all stages (easiest setup)" },
       { "label": "Smart", "description": "2 models: advanced for planning+execution, cheaper for verification" },
-      { "label": "Custom", "description": "3 models: full control per stage" }
+      { "label": "Custom", "description": "3 models: best control per stage" }
     ]
   }
 ]
 ```
+
+Create `.planning/config.json` with all settings.
+
+**Profile Selection (in workflow preferences):**
 
 Then run model selection wizard using `/gsd-set-profile {selected_type}` to configure models.
 
@@ -386,7 +368,7 @@ The resulting `.planning/config.json`:
 
 - **Simple**: 1 model for all stages (planning, execution, verification all same)
 - **Smart**: 2 models (planning+execution share model, verification uses different)
-- **Custom**: 3 models (each stage can have different model)
+- **Custom**: 3 models (each stage type can have different model)
 
 **Legacy migration:** Old configs with `model_profile: quality/balanced/budget` are auto-migrated to Custom profile on first use of `/gsd-set-profile` or `/gsd-settings`.
 ```
