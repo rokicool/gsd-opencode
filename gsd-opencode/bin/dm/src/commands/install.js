@@ -106,10 +106,10 @@ async function getPackageVersion(sourceDir) {
 function getSourceDirectory() {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  const packageRoot = path.resolve(__dirname, "../..");
+  const packageRoot = path.resolve(__dirname, "../../../..");
 
-  // Source is the package root directory
-  // This contains the distribution files (agents, command, get-shit-done)
+  // Source is the package root directory (4 levels up from commands/ to gsd-opencode/)
+  // This contains the distribution files (agents, commands, get-shit-done, skills)
   return packageRoot;
 }
 
