@@ -15,6 +15,8 @@
  *   state patch --field val ...        Batch update STATE.md fields
  *   resolve-model <agent-type>         Get model for agent based on profile
  *   derive-opencode-json               Generate opencode.json from profile config
+ *   set-profile [type] [--status] [--migrate]  Manage profile configuration
+ *   wizard-model-select --providers|--provider  Model selection helper for wizard
  *   find-phase <phase>                 Find phase directory by number
  *   commit <message> [--files f1 f2]   Commit planning docs
  *   verify-summary <path>              Verify a SUMMARY.md file
@@ -333,13 +335,236 @@ function deriveOpencodeJson(config) {
  * @param {string} cwd - Current working directory
  * @param {boolean} raw - Whether to output raw format
  */
+/**
+ * CLI command: derive-opencode-json
+ */
 function cmdDeriveOpencodeJson(cwd, raw) {
   const config = loadConfig(cwd);
   const opencodeConfig = deriveOpencodeJson(config);
   output(opencodeConfig, raw, JSON.stringify(opencodeConfig, null, 2));
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Profile Wizard Infrastructure ─────────────────────────────────────────────
+
+/**
+ * Profile type definitions
+ */
+const PROFILE_TYPES = {
+  simple: { 
+    name: 'Simple', 
+    models: 1, 
+    description: 'Same model for all stages (1 model total)',
+    stages: ['all'] // All stages use same model
+  },
+  smart: { 
+    name: 'Smart', 
+    models: 2, 
+    description: 'Advanced model for Planning+Execution, cheaper for Verification (2 models)',
+    stages: ['planning_execution', 'verification']
+  },
+  custom: { 
+    name: 'Custom', 
+    models: 3, 
+    description: 'Different model for each stage (3 models)',
+    stages: ['planning', 'execution', 'verification']
+  }
+};
+
+/**
+ * Get skill directory path for gsd-oc-select-model
+ * Searches common installation locations
+ */
+function getSelectModelSkillDir(cwd) {
+  const possiblePaths = [
+    path.join(cwd, 'gsd-opencode/skills/gsd-oc-select-model'),
+    path.join(cwd, 'skills/gsd-oc-select-model'),
+    path.join(process.env.HOME || '', '.config/opencode/skills/gsd-oc-select-model'),
+  ];
+  
+  for (const p of possiblePaths) {
+    if (fs.existsSync(path.join(p, 'scripts/select-models.cjs'))) {
+      return p;
+    }
+  }
+  return null;
+}
+
+/**
+ * Call gsd-oc-select-model skill to get providers list
+ */
+function getProvidersFromSkill(skillDir) {
+  const scriptPath = path.join(skillDir, 'scripts/select-models.cjs');
+  const result = execSync(`node "${scriptPath}" --providers-only`, { encoding: 'utf-8' });
+  return JSON.parse(result);
+}
+
+/**
+ * Call gsd-oc-select-model skill to get models for a provider
+ */
+function getModelsFromSkill(skillDir, provider, subProvider = null) {
+  const scriptPath = path.join(skillDir, 'scripts/select-models.cjs');
+  let cmd = `node "${scriptPath}" --provider "${provider}"`;
+  if (subProvider) {
+    cmd += ` --sub-provider "${subProvider}"`;
+  }
+  const result = execSync(cmd, { encoding: 'utf-8' });
+  return JSON.parse(result);
+}
+
+/**
+ * Save config with profiles to .planning/config.json
+ */
+function saveProfileConfig(cwd, profiles) {
+  const configPath = path.join(cwd, '.planning', 'config.json');
+  
+  let config = {};
+  try {
+    const raw = fs.readFileSync(configPath, 'utf-8');
+    config = JSON.parse(raw);
+  } catch {
+    // Config doesn't exist, start fresh
+  }
+  
+  config.profiles = profiles;
+  
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  return configPath;
+}
+
+/**
+ * Check if wizard should be triggered
+ * Returns true if no profile config exists
+ */
+function needsProfileWizard(config) {
+  return !config.profiles?.profile_type;
+}
+
+/**
+ * CLI command: set-profile
+ * 
+ * Usage:
+ *   set-profile                    - Interactive profile setup (runs wizard if no config)
+ *   set-profile simple             - Switch to Simple profile
+ *   set-profile smart              - Switch to Smart profile  
+ *   set-profile custom             - Switch to Custom profile
+ *   set-profile --status           - Show current profile status
+ *   set-profile --migrate          - Force migration of old config
+ */
+function cmdSetProfile(cwd, args, raw) {
+  const config = loadConfig(cwd);
+  
+  // Handle --status flag
+  if (args.includes('--status')) {
+    const current = config.profiles?.profile_type || 'not configured';
+    const models = config.profiles?.models || {};
+    const result = {
+      profile_type: current,
+      models,
+      needs_wizard: needsProfileWizard(config)
+    };
+    output(result, raw, JSON.stringify(result, null, 2));
+    return;
+  }
+  
+  // Handle --migrate flag
+  if (args.includes('--migrate')) {
+    const detection = detectOldProfileConfig(config);
+    if (detection.needs_migration) {
+      const result = migrateProfileConfig(config);
+      if (result.migrated) {
+        saveProfileConfig(cwd, result.config.profiles);
+        const output_result = { 
+          migrated: true, 
+          old_profile: result.old_profile,
+          new_profile: 'custom',
+          models: result.config.profiles.models
+        };
+        output(output_result, raw, `Migrated from ${result.old_profile} to custom profile`);
+        return;
+      }
+    }
+    output({ migrated: false, reason: 'No migration needed' }, raw, 'No migration needed');
+    return;
+  }
+  
+  // Get profile type argument
+  const profileArg = args.find(a => ['simple', 'smart', 'custom'].includes(a));
+  
+  if (profileArg) {
+    // Direct profile switch - output instructions for wizard
+    const profileDef = PROFILE_TYPES[profileArg];
+    const result = {
+      action: 'switch_profile',
+      profile_type: profileArg,
+      models_needed: profileDef.models,
+      description: profileDef.description,
+      current_models: config.profiles?.models || null,
+      instruction: 'Use /gsd-set-profile command in opencode to run interactive wizard'
+    };
+    output(result, raw, `Switch to ${profileDef.name} profile: ${profileDef.description}`);
+    return;
+  }
+  
+  // No argument - check if wizard needed or show status
+  if (needsProfileWizard(config)) {
+    const migration = detectOldProfileConfig(config);
+    const result = {
+      action: 'run_wizard',
+      reason: migration.needs_migration ? 'old_config_detected' : 'no_profile_config',
+      old_profile: migration.old_profile || null,
+      instruction: 'Use /gsd-set-profile command in opencode to run interactive wizard'
+    };
+    output(result, raw, 'Profile wizard needed');
+    return;
+  }
+  
+  // Show current status
+  const current = config.profiles;
+  const result = {
+    action: 'status',
+    profile_type: current.profile_type,
+    models: current.models,
+    instruction: 'Use /gsd-set-profile <simple|smart|custom> to switch profiles'
+  };
+  output(result, raw, JSON.stringify(result, null, 2));
+}
+
+/**
+ * CLI command: wizard-model-select
+ * Helper for interactive model selection - returns providers or models
+ * 
+ * Usage:
+ *   wizard-model-select --providers              List all providers
+ *   wizard-model-select --provider <name>        Get models for provider
+ *   wizard-model-select --provider <p> --sub <s> Get models for sub-provider
+ */
+function cmdWizardModelSelect(cwd, args, raw) {
+  const skillDir = getSelectModelSkillDir(cwd);
+  
+  if (!skillDir) {
+    output({ error: 'gsd-oc-select-model skill not found' }, raw, '');
+    return;
+  }
+  
+  if (args.includes('--providers')) {
+    const providers = getProvidersFromSkill(skillDir);
+    output(providers, raw, JSON.stringify(providers, null, 2));
+    return;
+  }
+  
+  const providerIdx = args.indexOf('--provider');
+  if (providerIdx !== -1 && args[providerIdx + 1]) {
+    const provider = args[providerIdx + 1];
+    const subIdx = args.indexOf('--sub');
+    const subProvider = subIdx !== -1 && args[subIdx + 1] ? args[subIdx + 1] : null;
+    
+    const models = getModelsFromSkill(skillDir, provider, subProvider);
+    output(models, raw, JSON.stringify(models, null, 2));
+    return;
+  }
+  
+  output({ error: 'Usage: --providers or --provider <name> [--sub <sub-provider>]' }, raw, '');
+}
 
 function parseIncludeFlag(args) {
   const includeIndex = args.indexOf('--include');
@@ -5206,6 +5431,16 @@ async function main() {
 
     case 'derive-opencode-json': {
       cmdDeriveOpencodeJson(cwd, raw);
+      break;
+    }
+
+    case 'set-profile': {
+      cmdSetProfile(cwd, args.slice(1), raw);
+      break;
+    }
+
+    case 'wizard-model-select': {
+      cmdWizardModelSelect(cwd, args.slice(1), raw);
       break;
     }
 
