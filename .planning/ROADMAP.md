@@ -390,7 +390,7 @@ Plans:
 | 10 | Create Node.js script to translate gsd to gsd-opencode | 6 | 🟢 Completed | 2026-02-18 | 2026-02-18 |
 | 11 | Migrate Distribution Manager Code | 3 | 🟢 Completed | 2026-02-21 | 2026-02-21 |
 | 12 | Simple Profiles System | 6 | 🟡 In Progress | 2026-02-22 | — |
-| 13 | copy-from-original script | 12 | 🔵 Planned | — | — |
+| 13 | copy-from-original script | 12 | 🟡 In Progress | 2026-02-22 | — |
 
 **Legend:** 🔵 Planned | 🟡 In Progress | 🟢 Completed | ⭕ Blocked
 
@@ -572,11 +572,11 @@ Plans:
 | 3 | 13-03 | CLI: copy-from-original command and integration tests |
 
 Plans:
-- [ ] 13-01-PLAN.md — Create SubmoduleService and SyncManifest for change detection and state tracking
-- [ ] 13-02-PLAN.md — Create SyncService and TransformationEngine for file copying with CC→OC transformations
-- [ ] 13-03-PLAN.md — Create copy-from-original CLI command with dry-run, force, diff, and orphan reporting
+- [x] 13-01-PLAN.md — Create SubmoduleService and SyncManifest for change detection and state tracking
+- [x] 13-02-PLAN.md — Create SyncService for file copying with safety features
+- [x] 13-03-PLAN.md — Create copy-from-original CLI command with dry-run, force, diff, and orphan reporting
 
 ---
 
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-22 (Phase 13 planned — copy-from-original script with 3 plans)*
+*Last updated: 2026-02-22 (Phase 13 planning complete — 3 plans ready for execution)*
