@@ -34,8 +34,6 @@
     "bin",
     "commands",
     "get-shit-done",
-    "src",
-    "lib",
     "skills"
   ],
   "engines": {
