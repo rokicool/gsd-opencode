@@ -1,1 +1,0 @@
-// Fallback mode install command
