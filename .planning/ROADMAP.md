@@ -456,7 +456,41 @@ Plans:
 Plans:
 - [x] 10-01-PLAN.md — Create translation utility with TextTranslator service, CLI command, standalone script, and comprehensive tests
 
+### Phase 11: Migrate Distribution manager code
+
+**Goal:** Consolidate gsd-opencode/lib, gsd-opencode/src, and gsd-opencode/test into gsd-opencode/bin/dm
+
+**Depends on:** Phase 10
+
+**Requirements:**
+| ID | Requirement |
+|----|-------------|
+| MIGRATE-04 | Files are moved with git mv preserving history |
+| MIGRATE-05 | Entry point imports and package.json are updated |
+| MIGRATE-06 | All tests pass and CLI commands work after migration |
+
+**Success Criteria:**
+1. All files moved from lib/, src/, test/ to bin/dm/ subdirectories
+2. Entry points (bin/gsd.js) import from correct new paths
+3. package.json files array reflects new structure
+4. All tests pass after migration
+5. CLI commands work correctly (install, list, check, etc.)
+6. npm pack produces correct package contents
+
+**Plans:** 1/3 plans executed
+
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 11-01 | Create directory structure and move files with git mv |
+| 2 | 11-02 | Update entry point imports and package.json |
+| 3 | 11-03 | Verification and testing |
+
+Plans:
+- [ ] 11-01-PLAN.md — Create directory structure and move files with git mv
+- [ ] 11-02-PLAN.md — Update entry point imports and package.json
+- [ ] 11-03-PLAN.md — Verify tests pass and CLI works
+
 ---
 
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-19 (Phase 10 complete — translation script with 91 tests)*
+*Last updated: 2026-02-21 (Phase 11 planned — migrate distribution manager code)*
