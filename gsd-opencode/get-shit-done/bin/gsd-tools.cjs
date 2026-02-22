@@ -15,8 +15,9 @@
  *   state patch --field val ...        Batch update STATE.md fields
  *   resolve-model <agent-type>         Get model for agent based on profile
  *   derive-opencode-json               Generate opencode.json from profile config
- *   set-profile [type] [--status] [--migrate]  Manage profile configuration
+ *   set-profile [type] [--status] [--migrate] [--wizard]  Manage profile configuration
  *   wizard-model-select --providers|--provider  Model selection helper for wizard
+ *   profile-switch <type> [--reuse|--complete]  Profile switching orchestration
  *   find-phase <phase>                 Find phase directory by number
  *   commit <message> [--files f1 f2]   Commit planning docs
  *   verify-summary <path>              Verify a SUMMARY.md file
@@ -593,6 +594,7 @@ function needsProfileWizard(config) {
  *   set-profile custom             - Switch to Custom profile
  *   set-profile --status           - Show current profile status
  *   set-profile --migrate          - Force migration of old config
+ *   set-profile --wizard           - Get wizard configuration for interactive setup
  */
 function cmdSetProfile(cwd, args, raw) {
   const config = loadConfig(cwd);
@@ -628,6 +630,33 @@ function cmdSetProfile(cwd, args, raw) {
       }
     }
     output({ migrated: false, reason: 'No migration needed' }, raw, 'No migration needed');
+    return;
+  }
+  
+  // Handle --wizard flag for interactive profile setup
+  if (args.includes('--wizard')) {
+    const skillDir = getSelectModelSkillDir(cwd);
+    if (!skillDir) {
+      output({ error: 'gsd-oc-select-model skill not found' }, raw, '');
+      return;
+    }
+    
+    // This is meant to be called by the interactive agent
+    // Returns wizard configuration
+    const result = {
+      action: 'start_wizard',
+      profile_types: Object.entries(PROFILE_TYPES).map(([key, val]) => ({
+        id: key,
+        name: val.name,
+        models: val.models,
+        description: val.description
+      })),
+      skill_dir: skillDir,
+      current_profile: config.profiles?.profile_type || null,
+      current_models: config.profiles?.models || null,
+      has_old_config: detectOldProfileConfig(config).needs_migration
+    };
+    output(result, raw, JSON.stringify(result, null, 2));
     return;
   }
   
@@ -671,6 +700,44 @@ function cmdSetProfile(cwd, args, raw) {
     instruction: 'Use /gsd-set-profile <simple|smart|custom> to switch profiles'
   };
   output(result, raw, JSON.stringify(result, null, 2));
+}
+
+/**
+ * CLI command: profile-switch
+ * Orchestrates profile switching with model reuse option
+ * 
+ * Usage:
+ *   profile-switch <type>                    - Prepare switch, returns stages to prompt
+ *   profile-switch <type> --reuse            - Prepare with model reuse suggestions
+ *   profile-switch <type> --complete <json>  - Complete switch with model selections
+ */
+function cmdProfileSwitch(cwd, args, raw) {
+  const config = loadConfig(cwd);
+  
+  const profileType = args.find(a => ['simple', 'smart', 'custom'].includes(a));
+  if (!profileType) {
+    output({ error: 'Profile type required: simple, smart, or custom' }, raw, '');
+    return;
+  }
+  
+  // Handle --complete flag with JSON selections
+  const completeIdx = args.indexOf('--complete');
+  if (completeIdx !== -1 && args[completeIdx + 1]) {
+    try {
+      const selections = JSON.parse(args[completeIdx + 1]);
+      const result = completeProfileSwitch(cwd, profileType, selections);
+      output(result, raw, `Switched to ${profileType} profile`);
+    } catch (e) {
+      output({ error: 'Invalid JSON for selections', details: e.message }, raw, '');
+    }
+    return;
+  }
+  
+  // Prepare switch - return info for wizard
+  const reuseModels = args.includes('--reuse');
+  const prep = prepareProfileSwitch(config, profileType, reuseModels);
+  
+  output(prep, raw, JSON.stringify(prep, null, 2));
 }
 
 /**
@@ -5585,6 +5652,11 @@ async function main() {
 
     case 'wizard-model-select': {
       cmdWizardModelSelect(cwd, args.slice(1), raw);
+      break;
+    }
+
+    case 'profile-switch': {
+      cmdProfileSwitch(cwd, args.slice(1), raw);
       break;
     }
 
