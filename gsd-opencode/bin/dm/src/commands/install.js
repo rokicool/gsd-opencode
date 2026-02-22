@@ -109,7 +109,7 @@ function getSourceDirectory() {
   const packageRoot = path.resolve(__dirname, "../../../..");
 
   // Source is the package root directory (4 levels up from commands/ to gsd-opencode/)
-  // This contains the distribution files (agents, commands, get-shit-done, skills)
+  // This contains the distribution files (agents, commands, get-shit-done, rules, skills)
   return packageRoot;
 }
 
@@ -315,6 +315,7 @@ async function cleanupEmptyDirectories(targetDir, namespaces, logger) {
     "agents/gsd-roadmapper",
     "agents/gsd-set-model",
     "agents/gsd-verifier",
+    "skills/gsd-oc-select-model",
   ];
 
   for (const dir of dirsToCheck) {

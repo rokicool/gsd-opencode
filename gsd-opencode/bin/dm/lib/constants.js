@@ -71,7 +71,7 @@ export const PATH_PATTERNS = {
  * 
  * @type {string[]}
  */
-export const DIRECTORIES_TO_COPY = ['agents', 'commands', 'get-shit-done'];
+export const DIRECTORIES_TO_COPY = ['agents', 'commands', 'get-shit-done', 'rules', 'skills'];
 
 /**
  * Command directory mapping for source-to-destination path transformation.
@@ -155,6 +155,7 @@ export const ALLOWED_NAMESPACES = [
   /^agents\/gsd-/,      // agents/gsd-* directories
   /^command\/gsd\//,    // command/gsd/* files (legacy structure)
   /^commands\/gsd\//,   // commands/gsd/* files (new structure)
+  /^rules\/gsd-/,       // rules/gsd-* directories
   /^skills\/gsd-/,      // skills/gsd-* directories
   /^get-shit-done\//    // get-shit-done/ directory - fully owned
 ];

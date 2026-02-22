@@ -268,7 +268,9 @@ export class HealthChecker {
     const sampleFiles = [
       { dir: 'agents', file: 'gsd-executor.md' },
       { dir: 'command', file: 'gsd/help.md' },
-      { dir: 'get-shit-done', file: 'templates/summary.md' }
+      { dir: 'get-shit-done', file: 'templates/summary.md' },
+      { dir: 'rules', file: 'gsd-oc-work-hard.md' },
+      { dir: 'skills', file: 'gsd-oc-select-model/SKILL.md' }
     ];
 
     for (const { dir, file } of sampleFiles) {

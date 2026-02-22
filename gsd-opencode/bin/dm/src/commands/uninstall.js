@@ -284,6 +284,7 @@ async function buildFallbackManifest(targetDir) {
     "agents",
     "command/gsd", // Old structure (singular)
     "commands/gsd", // New structure (plural)
+    "rules",
     "skills",
     "get-shit-done",
   ];
@@ -392,12 +393,13 @@ async function categorizeItems(files, targetDir) {
   }
 
   // Ensure top-level directories in allowed namespaces are tracked for cleanup
-  // This includes get-shit-done, agents, command, commands, skills
+  // This includes get-shit-done, agents, command, commands, rules, skills
   // Include both old (command) and new (commands) structures
   const topLevelDirs = [
     "agents",
     "command",
     "commands",
+    "rules",
     "skills",
     "get-shit-done",
   ];

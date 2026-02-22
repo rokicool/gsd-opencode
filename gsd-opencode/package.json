@@ -37,6 +37,7 @@
     "bin/dm/src",
     "commands",
     "get-shit-done",
+    "rules",
     "skills"
   ],
   "engines": {
