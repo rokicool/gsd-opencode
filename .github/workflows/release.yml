@@ -178,6 +178,7 @@ jobs:
           mkdir -p dist
 
           # Copy essential files
+          cp -r skills dist/
           cp -r bin dist/
           cp -r src dist/
           cp -r lib dist/
@@ -232,9 +233,9 @@ jobs:
         working-directory: ./gsd-opencode
         run: |
           echo "Preparing changelog..."
-          
+
           CURRENT_TAG="v${{ needs.update_version.outputs.version }}"
-          
+
           # Use existing CHANGELOG.md from repo root
           if [ -f "CHANGELOG.md" ]; then
             echo "Using existing CHANGELOG.md..."
@@ -248,10 +249,10 @@ jobs:
             echo "" >> dist/CHANGELOG.md
             echo "See repository for full changelog history." >> dist/CHANGELOG.md
           fi
-          
+
           # Also copy to release root for metadata
           cp dist/CHANGELOG.md ./CHANGELOG-release.md
-          
+
           echo "✓ Changelog prepared"
 
       - name: Generate checksums

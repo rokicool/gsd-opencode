@@ -11,7 +11,7 @@ allowed-tools:
   - bash
   - Task
   - todowrite
-  - askuserquestion
+  - question
 ---
 <objective>
 Execute all plans in a phase using wave-based parallel execution.

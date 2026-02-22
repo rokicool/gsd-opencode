@@ -64,7 +64,7 @@ git init
 
 **If `needs_codebase_map` is true** (from init — existing code detected but no codebase map):
 
-Use askuserquestion:
+Use question:
 - header: "Codebase"
 - question: "I detected existing code in this directory. Would you like to map the codebase first?"
 - options:
@@ -88,7 +88,7 @@ YOLO mode is implicit (auto = YOLO). Ask remaining config questions:
 **Round 1 — Core settings (3 questions, no Mode question):**
 
 ```
-askuserquestion([
+question([
   {
     header: "Depth",
     question: "How thorough should planning be?",
@@ -123,7 +123,7 @@ askuserquestion([
 **Round 2 — Workflow agents (same as Step 5):**
 
 ```
-askuserquestion([
+question([
   {
     header: "Research",
     question: "Research before planning each phase? (adds tokens/time)",
@@ -213,7 +213,7 @@ Proceed to Step 4 (skip Steps 3 and 5).
 
 **Open the conversation:**
 
-Ask inline (freeform, NOT askuserquestion):
+Ask inline (freeform, NOT question):
 
 "What do you want to build?"
 
@@ -221,7 +221,7 @@ Wait for their response. This gives you the context needed to ask intelligent fo
 
 **Follow the thread:**
 
-Based on what they said, ask follow-up questions that dig into their response. Use askuserquestion with options that probe what they mentioned — interpretations, clarifications, concrete examples.
+Based on what they said, ask follow-up questions that dig into their response. Use question with options that probe what they mentioned — interpretations, clarifications, concrete examples.
 
 Keep following threads. Each answer opens new threads to explore. Ask about:
 - What excited them
@@ -243,7 +243,7 @@ As you go, mentally check the context checklist from `questioning.md`. If gaps r
 
 **Decision gate:**
 
-When you could write a clear PROJECT.md, use askuserquestion:
+When you could write a clear PROJECT.md, use question:
 
 - header: "Ready?"
 - question: "I think I understand what you're after. Ready to create PROJECT.md?"
@@ -348,7 +348,7 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: initialize
 **Check for global defaults** at `~/.gsd/defaults.json`. If the file exists, offer to use saved defaults:
 
 ```
-askuserquestion([
+question([
   {
     question: "Use your saved default settings? (from ~/.gsd/defaults.json)",
     header: "Defaults",
@@ -503,7 +503,7 @@ Use models from init: `researcher_model`, `synthesizer_model`, `roadmapper_model
 
 **If auto mode:** Default to "Research first" without asking.
 
-Use askuserquestion:
+Use question:
 - header: "Research"
 - question: "Research the domain ecosystem before defining requirements?"
 - options:
@@ -768,7 +768,7 @@ read PROJECT.md and extract:
 - Auto-include all table stakes features (users expect these)
 - Include features explicitly mentioned in provided document
 - Auto-defer differentiators not mentioned in document
-- Skip per-category askuserquestion loops
+- Skip per-category question loops
 - Skip "Any additions?" question
 - Skip requirements approval gate
 - Generate REQUIREMENTS.md and commit directly
@@ -809,7 +809,7 @@ For each capability mentioned:
 
 **Scope each category:**
 
-For each category, use askuserquestion:
+For each category, use question:
 
 - header: "[Category]" (max 12 chars)
 - question: "Which [category] features are in v1?"
@@ -827,7 +827,7 @@ Track responses:
 
 **Identify gaps:**
 
-Use askuserquestion:
+Use question:
 - header: "Additions"
 - question: "Any requirements research missed? (Features specific to your vision)"
 - options:
@@ -987,7 +987,7 @@ Success criteria:
 
 **CRITICAL: Ask for approval before committing (interactive mode only):**
 
-Use askuserquestion:
+Use question:
 - header: "Roadmap"
 - question: "Does this roadmap structure work for you?"
 - options:

@@ -290,7 +290,13 @@
       "_comment": "Tool mapping: lowercase tools - AskUserQuestion",
       "pattern": "AskUserQuestion",
       "replacement": "question",
-      "caseSensitive": true
+      "caseSensitive": false
+    },
+    {
+      "_comment": "Tool mapping: lowercase tools - AskQuestion",
+      "pattern": "AskQuestion",
+      "replacement": "question",
+      "caseSensitive": false
     },
     {
       "_comment": "Tool mapping: lowercase tools - SlashCommand",

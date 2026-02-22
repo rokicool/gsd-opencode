@@ -7,7 +7,7 @@ allowed-tools:
   - bash
   - write
   - Task
-  - askuserquestion
+  - question
 ---
 <context>
 **Flags:**

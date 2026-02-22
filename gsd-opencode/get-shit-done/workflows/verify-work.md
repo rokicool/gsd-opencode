@@ -190,7 +190,7 @@ Display using checkpoint box format:
 ──────────────────────────────────────────────────────────────
 ```
 
-Wait for user response (plain text, no askuserquestion).
+Wait for user response (plain text, no question).
 </step>
 
 <step name="process_response">

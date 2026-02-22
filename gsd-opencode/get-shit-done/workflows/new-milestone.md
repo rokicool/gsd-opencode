@@ -28,7 +28,7 @@ read all files referenced by the invoking prompt's execution_context before star
 **If no context file:**
 - Present what shipped in last milestone
 - Ask: "What do you want to build next?"
-- Use askuserquestion to explore features, priorities, constraints, scope
+- Use question to explore features, priorities, constraints, scope
 
 ## 3. Determine Milestone Version
 
@@ -84,7 +84,7 @@ Extract from init JSON: `researcher_model`, `synthesizer_model`, `roadmapper_mod
 
 ## 8. Research Decision
 
-askuserquestion: "Research the domain ecosystem for new features before defining requirements?"
+question: "Research the domain ecosystem for new features before defining requirements?"
 - "Research first (Recommended)" — Discover patterns, features, architecture for NEW capabilities
 - "Skip research" — Go straight to requirements
 
@@ -200,14 +200,14 @@ Present features by category:
 
 **If no research:** Gather requirements through conversation. Ask: "What are the main things users need to do with [new features]?" Clarify, probe for related capabilities, group into categories.
 
-**Scope each category** via askuserquestion (multiSelect: true, header max 12 chars):
+**Scope each category** via question (multiSelect: true, header max 12 chars):
 - "[Feature 1]" — [brief description]
 - "[Feature 2]" — [brief description]
 - "None for this milestone" — Defer entire category
 
 Track: Selected → this milestone. Unselected table stakes → future. Unselected differentiators → out of scope.
 
-**Identify gaps** via askuserquestion:
+**Identify gaps** via question:
 - "No, research covered it" — Proceed
 - "Yes, let me add some" — Capture additions
 
@@ -311,7 +311,7 @@ Success criteria:
 2. [criterion]
 ```
 
-**Ask for approval** via askuserquestion:
+**Ask for approval** via question:
 - "Approve" — Commit and continue
 - "Adjust phases" — Tell me what to change
 - "Review full file" — Show raw ROADMAP.md

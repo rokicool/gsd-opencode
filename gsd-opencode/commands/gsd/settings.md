@@ -5,7 +5,7 @@ allowed-tools:
   - read
   - write
   - bash
-  - askuserquestion
+  - question
 ---
 
 <objective>

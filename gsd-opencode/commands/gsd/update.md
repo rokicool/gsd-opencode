@@ -3,7 +3,7 @@ name: gsd-update
 description: Update GSD to latest version with changelog display
 allowed-tools:
   - bash
-  - askuserquestion
+  - question
 ---
 
 <objective>

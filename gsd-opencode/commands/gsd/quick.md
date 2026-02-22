@@ -10,7 +10,7 @@ allowed-tools:
   - grep
   - bash
   - Task
-  - askuserquestion
+  - question
 ---
 <objective>
 Execute small, ad-hoc tasks with GSD guarantees (atomic commits, STATE.md tracking).

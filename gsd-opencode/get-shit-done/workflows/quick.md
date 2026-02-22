@@ -18,7 +18,7 @@ Parse `$ARGUMENTS` for:
 If `$DESCRIPTION` is empty after parsing, prompt user interactively:
 
 ```
-askuserquestion(
+question(
   header: "Quick Task",
   question: "What do you want to do?",
   followUp: null

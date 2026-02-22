@@ -33,10 +33,10 @@ Parse current values (default to `true` if not present):
 </step>
 
 <step name="present_settings">
-Use askuserquestion with current values pre-selected:
+Use question with current values pre-selected:
 
 ```
-askuserquestion([
+question([
   {
     question: "Which model profile for agents?",
     header: "Model",
@@ -123,7 +123,7 @@ write updated config to `.planning/config.json`.
 Ask whether to save these settings as global defaults for future projects:
 
 ```
-askuserquestion([
+question([
   {
     question: "Save these as default settings for all new projects?",
     header: "Defaults",

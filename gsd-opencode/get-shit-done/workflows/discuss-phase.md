@@ -135,7 +135,7 @@ ls ${phase_dir}/*-CONTEXT.md 2>/dev/null
 ```
 
 **If exists:**
-Use askuserquestion:
+Use question:
 - header: "Context"
 - question: "Phase [X] already has context. What do you want to do?"
 - options:
@@ -151,7 +151,7 @@ If "Skip": Exit workflow
 
 Check `has_plans` and `plan_count` from init. **If `has_plans` is true:**
 
-Use askuserquestion:
+Use question:
 - header: "Plans exist"
 - question: "Phase [X] already has {plan_count} plan(s) created without user context. Your decisions here won't affect existing plans unless you replan."
 - options:
@@ -203,7 +203,7 @@ We'll clarify HOW to implement this.
 (New capabilities belong in other phases.)
 ```
 
-**Then use askuserquestion (multiSelect: true):**
+**Then use question (multiSelect: true):**
 - header: "Discuss"
 - question: "Which areas do you want to discuss for [phase name]?"
 - options: Generate 3-4 phase-specific gray areas, each formatted as:
@@ -255,10 +255,10 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
    Let's talk about [Area].
    ```
 
-2. **Ask 4 questions using askuserquestion:**
+2. **Ask 4 questions using question:**
    - header: "[Area]" (max 12 chars — abbreviate if needed)
    - question: Specific decision for this area
-   - options: 2-3 concrete choices (askuserquestion adds "Other" automatically)
+   - options: 2-3 concrete choices (question adds "Other" automatically)
    - Include "You decide" as an option when reasonable — captures The assistant discretion
 
 3. **After 4 questions, check:**

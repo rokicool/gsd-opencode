@@ -101,7 +101,7 @@ If `.planning/ROADMAP.md` exists:
 <step name="offer_actions">
 **If todo maps to a roadmap phase:**
 
-Use askuserquestion:
+Use question:
 - header: "Action"
 - question: "This todo relates to Phase [N]: [name]. What would you like to do?"
 - options:
@@ -112,7 +112,7 @@ Use askuserquestion:
 
 **If no roadmap match:**
 
-Use askuserquestion:
+Use question:
 - header: "Action"
 - question: "What would you like to do with this todo?"
 - options:

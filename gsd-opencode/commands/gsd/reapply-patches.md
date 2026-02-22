@@ -1,7 +1,7 @@
 ---
 name: gsd-reapply-patches
 description: Reapply local modifications after a GSD update
-allowed-tools: read, write, edit, bash, glob, grep, askuserquestion
+allowed-tools: read, write, edit, bash, glob, grep, question
 ---
 
 <objective>

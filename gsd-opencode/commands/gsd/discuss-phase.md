@@ -8,7 +8,7 @@ allowed-tools:
   - bash
   - glob
   - grep
-  - askuserquestion
+  - question
   - Task
 ---
 

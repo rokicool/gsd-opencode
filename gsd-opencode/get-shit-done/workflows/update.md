@@ -133,7 +133,7 @@ Your custom files in other locations are preserved:
 If you've modified any GSD files directly, they'll be automatically backed up to `gsd-local-patches/` and can be reapplied with `/gsd-reapply-patches` after the update.
 ```
 
-Use askuserquestion:
+Use question:
 - question: "Proceed with update?"
 - Options:
   - "Yes, update now"

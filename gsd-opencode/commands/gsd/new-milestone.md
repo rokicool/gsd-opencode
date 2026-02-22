@@ -7,7 +7,7 @@ allowed-tools:
   - write
   - bash
   - Task
-  - askuserquestion
+  - question
 ---
 <objective>
 Start a new milestone: questioning → research (optional) → requirements → roadmap.

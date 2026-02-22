@@ -6,7 +6,7 @@ allowed-tools:
   - read
   - bash
   - Task
-  - askuserquestion
+  - question
 ---
 
 <objective>
@@ -50,7 +50,7 @@ If $ARGUMENTS provided OR user describes new issue:
 
 ## 2. Gather Symptoms (if new issue)
 
-Use askuserquestion for each:
+Use question for each:
 
 1. **Expected behavior** - What should happen?
 2. **Actual behavior** - What happens instead?

@@ -63,7 +63,7 @@ If `context_content` is not null, display: `Using phase context from: ${PHASE_DI
 
 **If `context_content` is null (no CONTEXT.md exists):**
 
-Use askuserquestion:
+Use question:
 - header: "No context"
 - question: "No CONTEXT.md found for Phase {X}. Plans will use research and requirements only — your design preferences won't be included. Continue or capture context first?"
 - options:

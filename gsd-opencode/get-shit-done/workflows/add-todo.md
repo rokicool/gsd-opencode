@@ -69,7 +69,7 @@ If potential duplicate found:
 1. read the existing todo
 2. Compare scope
 
-If overlapping, use askuserquestion:
+If overlapping, use question:
 - header: "Duplicate?"
 - question: "Similar todo exists: [title]. What would you like to do?"
 - options:

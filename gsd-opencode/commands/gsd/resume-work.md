@@ -5,7 +5,7 @@ allowed-tools:
   - read
   - bash
   - write
-  - askuserquestion
+  - question
   - slashcommand
 ---
 
