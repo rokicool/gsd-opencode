@@ -186,7 +186,7 @@ export const ERROR_CODES = {
  * Useful for importing all constants at once.
  * 
  * @example
- * import constants from './lib/constants.js';
+ * import constants from './dm/lib/constants.js';
  * console.log(constants.DEFAULT_CONFIG_DIR);
  */
 export default {
