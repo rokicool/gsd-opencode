@@ -3,7 +3,9 @@
 /**
  * translate.js - CLI entry point for GSD text translation
  *
- * Usage: node translate.js <config-file> [options]
+ * Usage: node translate.js <config-file-1> [config-file-2] [...] [options]
+ *
+ * Multiple configs are merged in order (later files override earlier ones).
  *
  * Options:
  *   --apply          Apply changes in-place (default is dry-run)
@@ -58,7 +60,7 @@ const EXIT_RUNTIME_ERROR = 2;
  */
 function parseArgs(args) {
   const result = {
-    configFile: null,
+    configFiles: [],
     apply: false,
     showDiff: false,
     useColor: true,
@@ -76,8 +78,9 @@ function parseArgs(args) {
       result.useColor = false;
     } else if (arg === '--help' || arg === '-h') {
       result.help = true;
-    } else if (!arg.startsWith('--') && !result.configFile) {
-      result.configFile = arg;
+    } else if (!arg.startsWith('--')) {
+      // Collect all non-option arguments as config file paths
+      result.configFiles.push(arg);
     }
   }
 
@@ -85,11 +88,11 @@ function parseArgs(args) {
 }
 
 /**
- * Load and validate config file
+ * Load a single config file (without validation)
  * @param {string} configPath
  * @returns {Promise<Object>}
  */
-async function loadConfig(configPath) {
+async function loadSingleConfig(configPath) {
   const resolvedPath = resolve(configPath);
 
   try {
@@ -112,45 +115,158 @@ async function loadConfig(configPath) {
     throw new Error(`Invalid JSON in config file: ${error.message}`);
   }
 
+  return config;
+}
+
+/**
+ * Validate a config object
+ * @param {Object} config
+ * @param {string} configPath - for error messages
+ */
+function validateConfig(config, configPath) {
   // Validate required fields
   if (!config.rules || !Array.isArray(config.rules)) {
-    throw new Error('Config must have a "rules" array');
+    throw new Error(`Config must have a "rules" array: ${configPath}`);
   }
 
   if (config.rules.length === 0) {
-    throw new Error('Config must have at least one rule');
+    throw new Error(`Config must have at least one rule: ${configPath}`);
   }
 
   // Validate each rule
   for (let i = 0; i < config.rules.length; i++) {
     const rule = config.rules[i];
     if (!rule.pattern) {
-      throw new Error(`Rule ${i + 1} must have a "pattern"`);
+      throw new Error(`Rule ${i + 1} must have a "pattern" in ${configPath}`);
     }
     if (typeof rule.replacement !== 'string') {
-      throw new Error(`Rule ${i + 1} must have a "replacement" string`);
+      throw new Error(`Rule ${i + 1} must have a "replacement" string in ${configPath}`);
     }
   }
 
-  // Set defaults
-  config.patterns = config.patterns || ['**/*'];
-  config.include = config.include || [];
-  config.exclude = config.exclude || ['node_modules/**', '.git/**', '.translate-backups/**'];
-  config.maxFileSize = config.maxFileSize || 10 * 1024 * 1024;
-
   // Validate include option if present
-  if (config.include.length > 0) {
+  if (config.include && config.include.length > 0) {
     if (!Array.isArray(config.include)) {
-      throw new Error('Config "include" must be an array of strings');
+      throw new Error(`Config "include" must be an array of strings: ${configPath}`);
     }
     for (let i = 0; i < config.include.length; i++) {
       if (typeof config.include[i] !== 'string') {
-        throw new Error(`Config "include" item ${i + 1} must be a string`);
+        throw new Error(`Config "include" item ${i + 1} must be a string in ${configPath}`);
+      }
+    }
+  }
+}
+
+/**
+ * Set defaults for a config object
+ * @param {Object} config
+ * @returns {Object}
+ */
+function setConfigDefaults(config) {
+  return {
+    patterns: config.patterns || ['**/*'],
+    include: config.include || [],
+    exclude: config.exclude || ['node_modules/**', '.git/**', '.translate-backups/**'],
+    maxFileSize: config.maxFileSize || 10 * 1024 * 1024,
+    rules: config.rules || [],
+    _forbidden_strings_after_translation: config._forbidden_strings_after_translation || [],
+    ...config
+  };
+}
+
+/**
+ * Merge multiple config objects into one
+ * @param {Object[]} configs - Array of config objects (already parsed and validated)
+ * @returns {Object}
+ */
+function mergeConfigs(configs) {
+  if (!Array.isArray(configs) || configs.length === 0) {
+    throw new Error('At least one config is required');
+  }
+
+  if (configs.length === 1) {
+    return setConfigDefaults(configs[0]);
+  }
+
+  // Start with defaults, then apply first config
+  const merged = setConfigDefaults(configs[0]);
+
+  // Merge in subsequent configs
+  for (let i = 1; i < configs.length; i++) {
+    const config = configs[i];
+
+    // Merge rules: concatenate (earlier first)
+    if (config.rules && config.rules.length > 0) {
+      merged.rules = [...merged.rules, ...config.rules];
+    }
+
+    // Merge include: combine and deduplicate
+    if (config.include && config.include.length > 0) {
+      merged.include = [...new Set([...merged.include, ...config.include])];
+    }
+
+    // Merge exclude: combine and deduplicate
+    if (config.exclude && config.exclude.length > 0) {
+      merged.exclude = [...new Set([...merged.exclude, ...config.exclude])];
+    }
+
+    // Merge _forbidden_strings_after_translation: combine and deduplicate
+    if (config._forbidden_strings_after_translation && config._forbidden_strings_after_translation.length > 0) {
+      merged._forbidden_strings_after_translation = [...new Set([
+        ...merged._forbidden_strings_after_translation,
+        ...config._forbidden_strings_after_translation
+      ])];
+    }
+
+    // patterns: use first config's patterns (they're defaults)
+    // Keep the first config's patterns
+
+    // maxFileSize: use the largest value from all configs
+    if (config.maxFileSize !== undefined) {
+      merged.maxFileSize = Math.max(merged.maxFileSize, config.maxFileSize);
+    }
+
+    // Any other custom properties: last config wins
+    const knownKeys = ['patterns', 'include', 'exclude', 'maxFileSize', 'rules', '_forbidden_strings_after_translation'];
+    for (const key of Object.keys(config)) {
+      if (!knownKeys.includes(key)) {
+        merged[key] = config[key];
       }
     }
   }
 
-  return config;
+  return merged;
+}
+
+/**
+ * Load and validate multiple config files, merging them in order
+ * @param {string[]} configPaths
+ * @returns {Promise<Object>}
+ */
+async function loadConfigs(configPaths) {
+  if (!Array.isArray(configPaths) || configPaths.length === 0) {
+    throw new Error('At least one config file is required');
+  }
+
+  // Load all configs
+  const configs = [];
+  for (const configPath of configPaths) {
+    const config = await loadSingleConfig(configPath);
+    validateConfig(config, configPath);
+    configs.push(config);
+  }
+
+  // Merge them
+  return mergeConfigs(configs);
+}
+
+/**
+ * Load and validate config file (deprecated, use loadConfigs for multiple files)
+ * @param {string} configPath
+ * @returns {Promise<Object>}
+ */
+async function loadConfig(configPath) {
+  return loadConfigs([configPath]);
 }
 
 /**
@@ -166,22 +282,22 @@ async function main() {
   });
 
   // Show help
-  if (args.help || (!args.configFile && process.argv.length <= 2)) {
+  if (args.help || (args.configFiles.length === 0 && process.argv.length <= 2)) {
     console.log(formatter.formatHelp());
     process.exit(EXIT_SUCCESS);
   }
 
   // Validate config file argument
-  if (!args.configFile) {
-    console.error(formatter.formatError('Config file is required'));
+  if (args.configFiles.length === 0) {
+    console.error(formatter.formatError('At least one config file is required'));
     console.log(formatter.formatHelp());
     process.exit(EXIT_VALIDATION_ERROR);
   }
 
-  // Load config
+  // Load and merge configs
   let config;
   try {
-    config = await loadConfig(args.configFile);
+    config = await loadConfigs(args.configFiles);
   } catch (error) {
     console.error(formatter.formatError(error.message));
     process.exit(EXIT_VALIDATION_ERROR);
