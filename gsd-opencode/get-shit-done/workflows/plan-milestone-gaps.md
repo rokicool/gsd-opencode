@@ -3,7 +3,7 @@ Create all phases necessary to close gaps identified by `/gsd-audit-milestone`. 
 </purpose>
 
 <required_reading>
-read all files referenced by the invoking prompt's execution_context before starting.
+Read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>

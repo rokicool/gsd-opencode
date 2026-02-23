@@ -1,0 +1,358 @@
+{
+  "name": "TACHES 1.20.5 to OpenCode Translation",
+  "version": "1.20.5",
+  "description": "Converts Claude Code syntax to OpenCode syntax for GSD prompts",
+  "patterns": ["gsd-opencode/**/*"],
+  "include": [],
+  "exclude": ["node_modules/**", ".git/**", ".translate-backups/**", "*.json"],
+  "maxFileSize": 10485760,
+  "rules": [
+    {
+      "name": "Command name: gsd:plan-phase -> gsd-plan-phase",
+      "pattern": "gsd:plan-phase",
+      "replacement": "gsd-plan-phase"
+    },
+    {
+      "name": "Command name: gsd:execute-phase -> gsd-execute-phase",
+      "pattern": "gsd:execute-phase",
+      "replacement": "gsd-execute-phase"
+    },
+    {
+      "name": "Command name: gsd:research-phase -> gsd-research-phase",
+      "pattern": "gsd:research-phase",
+      "replacement": "gsd-research-phase"
+    },
+    {
+      "name": "Command name: gsd:verify-phase -> gsd-verify-phase",
+      "pattern": "gsd:verify-phase",
+      "replacement": "gsd-verify-phase"
+    },
+    {
+      "name": "Command name: gsd:discuss-phase -> gsd-discuss-phase",
+      "pattern": "gsd:discuss-phase",
+      "replacement": "gsd-discuss-phase"
+    },
+    {
+      "name": "Command name: gsd:new-project -> gsd-new-project",
+      "pattern": "gsd:new-project",
+      "replacement": "gsd-new-project"
+    },
+    {
+      "name": "Command name: gsd:new-milestone -> gsd-new-milestone",
+      "pattern": "gsd:new-milestone",
+      "replacement": "gsd-new-milestone"
+    },
+    {
+      "name": "Command name: gsd:complete-milestone -> gsd-complete-milestone",
+      "pattern": "gsd:complete-milestone",
+      "replacement": "gsd-complete-milestone"
+    },
+    {
+      "name": "Command name: gsd:add-phase -> gsd-add-phase",
+      "pattern": "gsd:add-phase",
+      "replacement": "gsd-add-phase"
+    },
+    {
+      "name": "Command name: gsd:insert-phase -> gsd-insert-phase",
+      "pattern": "gsd:insert-phase",
+      "replacement": "gsd-insert-phase"
+    },
+    {
+      "name": "Command name: gsd:remove-phase -> gsd-remove-phase",
+      "pattern": "gsd:remove-phase",
+      "replacement": "gsd-remove-phase"
+    },
+    {
+      "name": "Command name: gsd:add-todo -> gsd-add-todo",
+      "pattern": "gsd:add-todo",
+      "replacement": "gsd-add-todo"
+    },
+    {
+      "name": "Command name: gsd:check-todos -> gsd-check-todos",
+      "pattern": "gsd:check-todos",
+      "replacement": "gsd-check-todos"
+    },
+    {
+      "name": "Command name: gsd:debug -> gsd-debug",
+      "pattern": "gsd:debug",
+      "replacement": "gsd-debug"
+    },
+    {
+      "name": "Command name: gsd:map-codebase -> gsd-map-codebase",
+      "pattern": "gsd:map-codebase",
+      "replacement": "gsd-map-codebase"
+    },
+    {
+      "name": "Command name: gsd:verify-work -> gsd-verify-work",
+      "pattern": "gsd:verify-work",
+      "replacement": "gsd-verify-work"
+    },
+    {
+      "name": "Command name: gsd:progress -> gsd-progress",
+      "pattern": "gsd:progress",
+      "replacement": "gsd-progress"
+    },
+    {
+      "name": "Command name: gsd:settings -> gsd-settings",
+      "pattern": "gsd:settings",
+      "replacement": "gsd-settings"
+    },
+    {
+      "name": "Command name: gsd:set-profile -> gsd-set-profile",
+      "pattern": "gsd:set-profile",
+      "replacement": "gsd-set-profile"
+    },
+    {
+      "name": "Command name: gsd:update -> gsd-update",
+      "pattern": "gsd:update",
+      "replacement": "gsd-update"
+    },
+    {
+      "name": "Command name: gsd:pause-work -> gsd-pause-work",
+      "pattern": "gsd:pause-work",
+      "replacement": "gsd-pause-work"
+    },
+    {
+      "name": "Command name: gsd:resume-work -> gsd-resume-work",
+      "pattern": "gsd:resume-work",
+      "replacement": "gsd-resume-work"
+    },
+    {
+      "name": "Command name: gsd:quick -> gsd-quick",
+      "pattern": "gsd:quick",
+      "replacement": "gsd-quick"
+    },
+    {
+      "name": "Command name: gsd:whats-new -> gsd-whats-new",
+      "pattern": "gsd:whats-new",
+      "replacement": "gsd-whats-new"
+    },
+    {
+      "name": "Command name: gsd:help -> gsd-help",
+      "pattern": "gsd:help",
+      "replacement": "gsd-help"
+    },
+    {
+      "name": "Command name: gsd:audit-milestone -> gsd-audit-milestone",
+      "pattern": "gsd:audit-milestone",
+      "replacement": "gsd-audit-milestone"
+    },
+    {
+      "name": "Command name: gsd:plan-milestone-gaps -> gsd-plan-milestone-gaps",
+      "pattern": "gsd:plan-milestone-gaps",
+      "replacement": "gsd-plan-milestone-gaps"
+    },
+    {
+      "name": "Command name: gsd:list-phase-assumptions -> gsd-list-phase-assumptions",
+      "pattern": "gsd:list-phase-assumptions",
+      "replacement": "gsd-list-phase-assumptions"
+    },
+    {
+      "name": "Command prefix: /gsd: -> /gsd-",
+      "pattern": "/gsd:",
+      "replacement": "/gsd-"
+    },
+    {
+      "name": "Tool: Read -> read",
+      "pattern": "Read",
+      "replacement": "read"
+    },
+    {
+      "name": "Tool: Write -> write",
+      "pattern": "Write",
+      "replacement": "write"
+    },
+    {
+      "name": "Tool: Bash -> bash",
+      "pattern": "Bash",
+      "replacement": "bash"
+    },
+    {
+      "name": "Tool: Glob -> glob",
+      "pattern": "Glob",
+      "replacement": "glob"
+    },
+    {
+      "name": "Tool: Grep -> grep",
+      "pattern": "Grep",
+      "replacement": "grep"
+    },
+    {
+      "name": "Tool: Edit -> edit",
+      "pattern": "Edit",
+      "replacement": "edit"
+    },
+    {
+      "name": "Tool: WebFetch -> webfetch",
+      "pattern": "WebFetch",
+      "replacement": "webfetch"
+    },
+    {
+      "name": "Tool: Patch -> patch",
+      "pattern": "Patch",
+      "replacement": "patch"
+    },
+    {
+      "name": "Tool: Skill -> skill",
+      "pattern": "Skill",
+      "replacement": "skill"
+    },
+    {
+      "name": "Tool: TodoWrite -> todowrite",
+      "pattern": "TodoWrite",
+      "replacement": "todowrite"
+    },
+    {
+      "name": "Tool: TodoRead -> todoread",
+      "pattern": "TodoRead",
+      "replacement": "todoread"
+    },
+    {
+      "name": "Tool: Question -> question",
+      "pattern": "Question",
+      "replacement": "question"
+    },
+    {
+      "name": "Path: ~/.claude/ -> ~/.config/opencode/",
+      "pattern": "~/.claude/",
+      "replacement": "~/.config/opencode/"
+    },
+    {
+      "name": "Path: ~/.claude/get-shit-done/ -> ~/.config/opencode/get-shit-done/",
+      "pattern": "~/.claude/get-shit-done/",
+      "replacement": "~/.config/opencode/get-shit-done/"
+    },
+    {
+      "name": "URL: glittercowboy/get-shit-done -> rokicool/gsd-opencode (raw)",
+      "pattern": "https://raw.githubusercontent.com/glittercowboy/get-shit-done",
+      "replacement": "https://raw.githubusercontent.com/rokicool/gsd-opencode"
+    },
+    {
+      "name": "URL: glittercowboy/get-shit-done -> rokicool/gsd-opencode (github)",
+      "pattern": "https://github.com/glittercowboy/get-shit-done",
+      "replacement": "https://github.com/rokicool/gsd-opencode"
+    },
+    {
+      "name": "URL: gsd-build/get-shit-done -> rokicool/gsd-opencode (raw)",
+      "pattern": "https://raw.githubusercontent.com/gsd-build/get-shit-done",
+      "replacement": "https://raw.githubusercontent.com/rokicool/gsd-opencode"
+    },
+    {
+      "name": "URL: gsd-build/get-shit-done -> rokicool/gsd-opencode (github)",
+      "pattern": "https://github.com/gsd-build/get-shit-done",
+      "replacement": "https://github.com/rokicool/gsd-opencode"
+    },
+    {
+      "name": "Project reference: get-shit-done-cc -> gsd-opencode",
+      "pattern": "get-shit-done-cc",
+      "replacement": "gsd-opencode"
+    },
+    {
+      "name": "Command: /clear -> /new",
+      "pattern": "/clear",
+      "replacement": "/new"
+    },
+    {
+      "name": "Tag: <sub>text</sub> -> *text*",
+      "pattern": "<sub>([^<]*)</sub>",
+      "replacement": "*$1*",
+      "isRegex": true,
+      "flags": "g"
+    },
+    {
+      "name": "Frontmatter: name with colon -> name with hyphen",
+      "pattern": "name: gsd:(\\w+(-\\w+)*)",
+      "replacement": "name: gsd-$1",
+      "isRegex": true
+    },
+    {
+      "name": "Color: cyan -> hex",
+      "pattern": "color: cyan",
+      "replacement": "color: \"#00FFFF\""
+    },
+    {
+      "name": "Color: orange -> hex",
+      "pattern": "color: orange",
+      "replacement": "color: \"#FFA500\""
+    },
+    {
+      "name": "Color: yellow -> hex",
+      "pattern": "color: yellow",
+      "replacement": "color: \"#FFFF00\""
+    },
+    {
+      "name": "Color: blue -> hex",
+      "pattern": "color: blue",
+      "replacement": "color: \"#0000FF\""
+    },
+    {
+      "name": "Color: green -> hex",
+      "pattern": "color: green",
+      "replacement": "color: \"#008000\""
+    },
+    {
+      "name": "Color: purple -> hex",
+      "pattern": "color: purple",
+      "replacement": "color: \"#800080\""
+    },
+    {
+      "name": "Tool: WebSearch -> websearch",
+      "pattern": "WebSearch",
+      "replacement": "websearch"
+    },
+    {
+      "name": "Tool: AskUserQuestion -> question",
+      "pattern": "AskUserQuestion",
+      "replacement": "question"
+    },
+    {
+      "name": "Tool: SlashCommand -> slashcommand",
+      "pattern": "SlashCommand",
+      "replacement": "slashcommand"
+    },
+    {
+      "name": "Reference: Claude Code -> OpenCode",
+      "pattern": "Claude Code",
+      "replacement": "OpenCode"
+    },
+    {
+      "name": "Reference: Claude -> OpenCode",
+      "pattern": "Claude",
+      "replacement": "OpenCode"
+    },
+    {
+      "name": "Subagent type: general-purpose",
+      "pattern": "subagent_type=\"general-purpose\"",
+      "replacement": "subagent_type=\"explore\""
+    },
+    {
+      "name": "All arguments become",
+      "pattern": "All arguments become",
+      "replacement": "All arguments are used as"
+    }
+  ],
+  "_forbidden_strings_after_translation": [
+    "Claude",
+    "Claude Code",
+    "<sub>",
+    "~/.claude",
+    "/gsd:",
+    "get-shit-done-cc",
+    "glittercowboy",
+    "AskUserQuestion",
+    "/clear",
+    "SlashCommand",
+    "TodoWrite",
+    "WebSearch",
+    "WebFetch",
+    "BashOutput",
+    "rokicool/get-shit-done",
+    "color: cyan",
+    "color: orange",
+    "color: yellow",
+    "color: blue",
+    "color: green",
+    "color: purple",
+    "name: set-profile"
+  ]
+}

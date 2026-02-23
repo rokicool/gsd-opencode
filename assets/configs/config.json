@@ -1,0 +1,725 @@
+{
+  "_description": "Translation config for Claude Code → OpenCode migration",
+  "_source": "Claude Code (get-shit-done-cc)",
+  "_target": "OpenCode (gsd-opencode)",
+  "_mapping_reference": "assets/prompts/TRANSLATION-MAPPING.md",
+  "_usage": "node assets/bin/translate.js assets/configs/config.json [--apply] [--show-diff]",
+  "patterns": [
+    "**/*.md",
+    "**/*.js",
+    "**/*.json",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.toml"
+  ],
+  "include": [
+    "gsd-opencode/**"
+  ],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "assets/**",
+    "**/*.bak",
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.gif",
+    "**/*.ico",
+    "**/*.svg"
+  ],
+  "maxFileSize": 10485760,
+  "rules": [
+    {
+      "pattern": "https://raw.githubusercontent.com/glittercowboy/get-shit-done",
+      "replacement": "https://raw.githubusercontent.com/rokicool/gsd-opencode",
+      "description": "Transform raw GitHub URLs from glittercowboy org"
+    },
+    {
+      "pattern": "https://github.com/glittercowboy/get-shit-done",
+      "replacement": "https://github.com/rokicool/gsd-opencode",
+      "description": "Transform GitHub URLs from glittercowboy org"
+    },
+    {
+      "pattern": "https://raw.githubusercontent.com/gsd-build/get-shit-done",
+      "replacement": "https://raw.githubusercontent.com/rokicool/gsd-opencode",
+      "description": "Transform raw GitHub URLs from gsd-build org"
+    },
+    {
+      "pattern": "https://github.com/gsd-build/get-shit-done",
+      "replacement": "https://github.com/rokicool/gsd-opencode",
+      "description": "Transform GitHub URLs from gsd-build org"
+    },
+    {
+      "pattern": "rokicool/get-shit-done",
+      "replacement": "rokicool/gsd-opencode",
+      "description": "Fix any remaining rokicool/get-shit-done references"
+    },
+    {
+      "pattern": "glittercowboy",
+      "replacement": "rokicool",
+      "description": "Catch-all for remaining glittercowboy username references"
+    },
+    {
+      "pattern": "get-shit-done-cc",
+      "replacement": "gsd-opencode",
+      "description": "Replace project reference get-shit-done-cc with gsd-opencode"
+    },
+    {
+      "pattern": "./original/get-shit-done/commands/gsd/",
+      "replacement": "./gsd-opencode/commands/gsd/",
+      "description": "Transform original commands path to gsd-opencode"
+    },
+    {
+      "pattern": "./original/get-shit-done/get-shit-done/references/",
+      "replacement": "./gsd-opencode/get-shit-done/references/",
+      "description": "Transform original references path to gsd-opencode"
+    },
+    {
+      "pattern": "./original/get-shit-done/get-shit-done/templates/",
+      "replacement": "./gsd-opencode/get-shit-done/templates/",
+      "description": "Transform original templates path to gsd-opencode"
+    },
+    {
+      "pattern": "./original/get-shit-done/get-shit-done/workflows/",
+      "replacement": "./gsd-opencode/get-shit-done/workflows/",
+      "description": "Transform original workflows path to gsd-opencode"
+    },
+    {
+      "pattern": "./original/get-shit-done/agents/",
+      "replacement": "./gsd-opencode/agents/",
+      "description": "Transform original agents path to gsd-opencode"
+    },
+    {
+      "pattern": "./original/get-shit-done",
+      "replacement": "./gsd-opencode",
+      "description": "Catch-all for remaining ./original/get-shit-done path references"
+    },
+    {
+      "pattern": "~/.claude/get-shit-done/",
+      "replacement": "~/.config/opencode/get-shit-done/",
+      "caseSensitive": true,
+      "description": "Transform Claude path with get-shit-done subdirectory"
+    },
+    {
+      "pattern": "~/.claude/",
+      "replacement": "~/.config/opencode/",
+      "caseSensitive": true,
+      "description": "Transform Claude config path to OpenCode (with trailing slash)"
+    },
+    {
+      "pattern": "~/.claude",
+      "replacement": "~/.config/opencode",
+      "caseSensitive": true,
+      "description": "Transform Claude config path to OpenCode (without trailing slash)"
+    },
+    {
+      "pattern": "/gsd:plan-phase",
+      "replacement": "/gsd-plan-phase",
+      "description": "Transform command /gsd:plan-phase"
+    },
+    {
+      "pattern": "/gsd:execute-phase",
+      "replacement": "/gsd-execute-phase",
+      "description": "Transform command /gsd:execute-phase"
+    },
+    {
+      "pattern": "/gsd:research-phase",
+      "replacement": "/gsd-research-phase",
+      "description": "Transform command /gsd:research-phase"
+    },
+    {
+      "pattern": "/gsd:verify-phase",
+      "replacement": "/gsd-verify-phase",
+      "description": "Transform command /gsd:verify-phase"
+    },
+    {
+      "pattern": "/gsd:discuss-phase",
+      "replacement": "/gsd-discuss-phase",
+      "description": "Transform command /gsd:discuss-phase"
+    },
+    {
+      "pattern": "/gsd:new-project",
+      "replacement": "/gsd-new-project",
+      "description": "Transform command /gsd:new-project"
+    },
+    {
+      "pattern": "/gsd:new-milestone",
+      "replacement": "/gsd-new-milestone",
+      "description": "Transform command /gsd:new-milestone"
+    },
+    {
+      "pattern": "/gsd:complete-milestone",
+      "replacement": "/gsd-complete-milestone",
+      "description": "Transform command /gsd:complete-milestone"
+    },
+    {
+      "pattern": "/gsd:add-phase",
+      "replacement": "/gsd-add-phase",
+      "description": "Transform command /gsd:add-phase"
+    },
+    {
+      "pattern": "/gsd:insert-phase",
+      "replacement": "/gsd-insert-phase",
+      "description": "Transform command /gsd:insert-phase"
+    },
+    {
+      "pattern": "/gsd:remove-phase",
+      "replacement": "/gsd-remove-phase",
+      "description": "Transform command /gsd:remove-phase"
+    },
+    {
+      "pattern": "/gsd:add-todo",
+      "replacement": "/gsd-add-todo",
+      "description": "Transform command /gsd:add-todo"
+    },
+    {
+      "pattern": "/gsd:check-todos",
+      "replacement": "/gsd-check-todos",
+      "description": "Transform command /gsd:check-todos"
+    },
+    {
+      "pattern": "/gsd:debug",
+      "replacement": "/gsd-debug",
+      "description": "Transform command /gsd:debug"
+    },
+    {
+      "pattern": "/gsd:map-codebase",
+      "replacement": "/gsd-map-codebase",
+      "description": "Transform command /gsd:map-codebase"
+    },
+    {
+      "pattern": "/gsd:verify-work",
+      "replacement": "/gsd-verify-work",
+      "description": "Transform command /gsd:verify-work"
+    },
+    {
+      "pattern": "/gsd:progress",
+      "replacement": "/gsd-progress",
+      "description": "Transform command /gsd:progress"
+    },
+    {
+      "pattern": "/gsd:settings",
+      "replacement": "/gsd-settings",
+      "description": "Transform command /gsd:settings"
+    },
+    {
+      "pattern": "/gsd:set-profile",
+      "replacement": "/gsd-set-profile",
+      "description": "Transform command /gsd:set-profile"
+    },
+    {
+      "pattern": "/gsd:update",
+      "replacement": "/gsd-update",
+      "description": "Transform command /gsd:update"
+    },
+    {
+      "pattern": "/gsd:pause-work",
+      "replacement": "/gsd-pause-work",
+      "description": "Transform command /gsd:pause-work"
+    },
+    {
+      "pattern": "/gsd:resume-work",
+      "replacement": "/gsd-resume-work",
+      "description": "Transform command /gsd:resume-work"
+    },
+    {
+      "pattern": "/gsd:quick",
+      "replacement": "/gsd-quick",
+      "description": "Transform command /gsd:quick"
+    },
+    {
+      "pattern": "/gsd:whats-new",
+      "replacement": "/gsd-whats-new",
+      "description": "Transform command /gsd:whats-new"
+    },
+    {
+      "pattern": "/gsd:help",
+      "replacement": "/gsd-help",
+      "description": "Transform command /gsd:help"
+    },
+    {
+      "pattern": "/gsd:audit-milestone",
+      "replacement": "/gsd-audit-milestone",
+      "description": "Transform command /gsd:audit-milestone"
+    },
+    {
+      "pattern": "/gsd:plan-milestone-gaps",
+      "replacement": "/gsd-plan-milestone-gaps",
+      "description": "Transform command /gsd:plan-milestone-gaps"
+    },
+    {
+      "pattern": "/gsd:list-phase-assumptions",
+      "replacement": "/gsd-list-phase-assumptions",
+      "description": "Transform command /gsd:list-phase-assumptions"
+    },
+    {
+      "pattern": "/gsd:command",
+      "replacement": "/gsd-command",
+      "description": "Transform generic /gsd:command reference"
+    },
+    {
+      "pattern": "/gsd:",
+      "replacement": "/gsd-",
+      "description": "Catch-all for remaining /gsd: slash commands"
+    },
+    {
+      "pattern": "gsd:plan-phase",
+      "replacement": "gsd-plan-phase",
+      "description": "Transform bare gsd:plan-phase reference"
+    },
+    {
+      "pattern": "gsd:execute-phase",
+      "replacement": "gsd-execute-phase",
+      "description": "Transform bare gsd:execute-phase reference"
+    },
+    {
+      "pattern": "gsd:research-phase",
+      "replacement": "gsd-research-phase",
+      "description": "Transform bare gsd:research-phase reference"
+    },
+    {
+      "pattern": "gsd:verify-phase",
+      "replacement": "gsd-verify-phase",
+      "description": "Transform bare gsd:verify-phase reference"
+    },
+    {
+      "pattern": "gsd:discuss-phase",
+      "replacement": "gsd-discuss-phase",
+      "description": "Transform bare gsd:discuss-phase reference"
+    },
+    {
+      "pattern": "gsd:new-project",
+      "replacement": "gsd-new-project",
+      "description": "Transform bare gsd:new-project reference"
+    },
+    {
+      "pattern": "gsd:new-milestone",
+      "replacement": "gsd-new-milestone",
+      "description": "Transform bare gsd:new-milestone reference"
+    },
+    {
+      "pattern": "gsd:complete-milestone",
+      "replacement": "gsd-complete-milestone",
+      "description": "Transform bare gsd:complete-milestone reference"
+    },
+    {
+      "pattern": "gsd:add-phase",
+      "replacement": "gsd-add-phase",
+      "description": "Transform bare gsd:add-phase reference"
+    },
+    {
+      "pattern": "gsd:insert-phase",
+      "replacement": "gsd-insert-phase",
+      "description": "Transform bare gsd:insert-phase reference"
+    },
+    {
+      "pattern": "gsd:remove-phase",
+      "replacement": "gsd-remove-phase",
+      "description": "Transform bare gsd:remove-phase reference"
+    },
+    {
+      "pattern": "gsd:add-todo",
+      "replacement": "gsd-add-todo",
+      "description": "Transform bare gsd:add-todo reference"
+    },
+    {
+      "pattern": "gsd:check-todos",
+      "replacement": "gsd-check-todos",
+      "description": "Transform bare gsd:check-todos reference"
+    },
+    {
+      "pattern": "gsd:debug",
+      "replacement": "gsd-debug",
+      "description": "Transform bare gsd:debug reference"
+    },
+    {
+      "pattern": "gsd:map-codebase",
+      "replacement": "gsd-map-codebase",
+      "description": "Transform bare gsd:map-codebase reference"
+    },
+    {
+      "pattern": "gsd:verify-work",
+      "replacement": "gsd-verify-work",
+      "description": "Transform bare gsd:verify-work reference"
+    },
+    {
+      "pattern": "gsd:progress",
+      "replacement": "gsd-progress",
+      "description": "Transform bare gsd:progress reference"
+    },
+    {
+      "pattern": "gsd:settings",
+      "replacement": "gsd-settings",
+      "description": "Transform bare gsd:settings reference"
+    },
+    {
+      "pattern": "gsd:set-profile",
+      "replacement": "gsd-set-profile",
+      "description": "Transform bare gsd:set-profile reference"
+    },
+    {
+      "pattern": "gsd:update",
+      "replacement": "gsd-update",
+      "description": "Transform bare gsd:update reference"
+    },
+    {
+      "pattern": "gsd:pause-work",
+      "replacement": "gsd-pause-work",
+      "description": "Transform bare gsd:pause-work reference"
+    },
+    {
+      "pattern": "gsd:resume-work",
+      "replacement": "gsd-resume-work",
+      "description": "Transform bare gsd:resume-work reference"
+    },
+    {
+      "pattern": "gsd:quick",
+      "replacement": "gsd-quick",
+      "description": "Transform bare gsd:quick reference"
+    },
+    {
+      "pattern": "gsd:whats-new",
+      "replacement": "gsd-whats-new",
+      "description": "Transform bare gsd:whats-new reference"
+    },
+    {
+      "pattern": "gsd:help",
+      "replacement": "gsd-help",
+      "description": "Transform bare gsd:help reference"
+    },
+    {
+      "pattern": "gsd:audit-milestone",
+      "replacement": "gsd-audit-milestone",
+      "description": "Transform bare gsd:audit-milestone reference"
+    },
+    {
+      "pattern": "gsd:plan-milestone-gaps",
+      "replacement": "gsd-plan-milestone-gaps",
+      "description": "Transform bare gsd:plan-milestone-gaps reference"
+    },
+    {
+      "pattern": "gsd:list-phase-assumptions",
+      "replacement": "gsd-list-phase-assumptions",
+      "description": "Transform bare gsd:list-phase-assumptions reference"
+    },
+    {
+      "pattern": "gsd:command",
+      "replacement": "gsd-command",
+      "description": "Transform generic bare gsd:command reference"
+    },
+    {
+      "pattern": "name: set-profile",
+      "replacement": "name: gsd-set-profile",
+      "caseSensitive": true,
+      "description": "Fix set-profile frontmatter name to include gsd- prefix"
+    },
+    {
+      "pattern": "name: gsd:",
+      "replacement": "name: gsd-",
+      "caseSensitive": true,
+      "description": "Transform frontmatter name field from colon to dash"
+    },
+    {
+      "pattern": "/clear",
+      "replacement": "/new",
+      "description": "Transform /clear command to /new"
+    },
+    {
+      "pattern": "AskUserQuestion",
+      "replacement": "question",
+      "caseSensitive": true,
+      "description": "Transform AskUserQuestion tool to question"
+    },
+    {
+      "pattern": "SlashCommand",
+      "replacement": "command",
+      "caseSensitive": true,
+      "description": "Transform SlashCommand reference to command"
+    },
+    {
+      "pattern": "BashOutput",
+      "replacement": "bash output",
+      "caseSensitive": true,
+      "description": "Transform BashOutput reference to bash output"
+    },
+    {
+      "pattern": "TodoWrite",
+      "replacement": "todowrite",
+      "caseSensitive": true,
+      "description": "Transform TodoWrite tool to lowercase todowrite"
+    },
+    {
+      "pattern": "TodoRead",
+      "replacement": "todoread",
+      "caseSensitive": true,
+      "description": "Transform TodoRead tool to lowercase todoread"
+    },
+    {
+      "pattern": "WebFetch",
+      "replacement": "webfetch",
+      "caseSensitive": true,
+      "description": "Transform WebFetch tool to lowercase webfetch"
+    },
+    {
+      "pattern": "WebSearch",
+      "replacement": "websearch",
+      "caseSensitive": true,
+      "description": "Transform WebSearch tool to lowercase websearch"
+    },
+    {
+      "pattern": "Bash",
+      "replacement": "bash",
+      "caseSensitive": true,
+      "description": "Transform Bash tool to lowercase bash"
+    },
+    {
+      "pattern": "Read",
+      "replacement": "read",
+      "caseSensitive": true,
+      "description": "Transform Read tool to lowercase read"
+    },
+    {
+      "pattern": "Write",
+      "replacement": "write",
+      "caseSensitive": true,
+      "description": "Transform Write tool to lowercase write"
+    },
+    {
+      "pattern": "Edit",
+      "replacement": "edit",
+      "caseSensitive": true,
+      "description": "Transform Edit tool to lowercase edit"
+    },
+    {
+      "pattern": "Patch",
+      "replacement": "patch",
+      "caseSensitive": true,
+      "description": "Transform Patch tool to lowercase patch"
+    },
+    {
+      "pattern": "Glob",
+      "replacement": "glob",
+      "caseSensitive": true,
+      "description": "Transform Glob tool to lowercase glob"
+    },
+    {
+      "pattern": "Grep",
+      "replacement": "grep",
+      "caseSensitive": true,
+      "description": "Transform Grep tool to lowercase grep"
+    },
+    {
+      "pattern": "Skill",
+      "replacement": "skill",
+      "caseSensitive": true,
+      "description": "Transform Skill tool to lowercase skill"
+    },
+    {
+      "pattern": "Question",
+      "replacement": "question",
+      "caseSensitive": true,
+      "description": "Transform Question tool to lowercase question"
+    },
+    {
+      "pattern": "Task",
+      "replacement": "task",
+      "caseSensitive": true,
+      "description": "Transform Task tool to lowercase task"
+    },
+    {
+      "pattern": "tools: Read, Bash, Grep, Glob, Write",
+      "replacement": "tools:\\n  read: true\\n  bash: true\\n  grep: true\\n  glob: true\\n  write: true",
+      "description": "Convert tools list to YAML map (gsd-codebase-mapper pattern)"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash, Glob, Grep, Webfetch, mcp__context7__\\*",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  glob: true\\n  grep: true\\n  webfetch: true\\n  mcp__context7__*: true",
+      "description": "Convert tools list to YAML map (gsd-planner pattern)"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash, Glob, Grep, Websearch, Webfetch, mcp__context7__\\*",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  glob: true\\n  grep: true\\n  websearch: true\\n  webfetch: true\\n  mcp__context7__*: true",
+      "description": "Convert tools list to YAML map (gsd-project-researcher pattern)"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash, Grep, Glob, Websearch, Webfetch, mcp__context7__\\*",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  grep: true\\n  glob: true\\n  websearch: true\\n  webfetch: true\\n  mcp__context7__*: true",
+      "description": "Convert tools list to YAML map (gsd-phase-researcher pattern)"
+    },
+    {
+      "pattern": "tools: Read, Write, Edit, Bash, Grep, Glob, Websearch",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  edit: true\\n  bash: true\\n  grep: true\\n  glob: true\\n  websearch: true",
+      "description": "Convert tools list to YAML map (gsd-debugger pattern)"
+    },
+    {
+      "pattern": "tools: Read, Write, Edit, Bash, Grep, Glob",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  edit: true\\n  bash: true\\n  grep: true\\n  glob: true",
+      "description": "Convert tools list to YAML map (gsd-executor pattern)"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash, Grep, Glob",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  grep: true\\n  glob: true",
+      "description": "Convert tools list to YAML map (gsd-verifier pattern)"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash, Glob, Grep",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  glob: true\\n  grep: true",
+      "description": "Convert tools list to YAML map (gsd-roadmapper pattern)"
+    },
+    {
+      "pattern": "tools: Read, Bash, Glob, Grep",
+      "replacement": "tools:\\n  read: true\\n  bash: true\\n  glob: true\\n  grep: true",
+      "description": "Convert tools list to YAML map (gsd-plan-checker/integration-checker pattern)"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true",
+      "description": "Convert tools list to YAML map (gsd-research-synthesizer pattern)"
+    },
+    {
+      "_comment": "Generic regex fallback for any remaining tools: lines",
+      "pattern": "^tools: ([a-z0-9_*, ]+)$",
+      "replacement": "tools:\\n  $1: true",
+      "caseSensitive": true,
+      "isRegex": true,
+      "transform": "tools_list_to_yaml",
+      "description": "Generic regex to convert any remaining tools list to YAML map"
+    },
+    {
+      "pattern": "<sub>",
+      "replacement": "*",
+      "caseSensitive": true,
+      "description": "Transform opening <sub> tag to italic markdown asterisk"
+    },
+    {
+      "pattern": "</sub>",
+      "replacement": "*",
+      "caseSensitive": true,
+      "description": "Transform closing </sub> tag to italic markdown asterisk"
+    },
+    {
+      "pattern": "color: cyan",
+      "replacement": "color: \"#00FFFF\"",
+      "caseSensitive": true,
+      "description": "Transform named color cyan to hex"
+    },
+    {
+      "pattern": "color: orange",
+      "replacement": "color: \"#FFA500\"",
+      "caseSensitive": true,
+      "description": "Transform named color orange to hex"
+    },
+    {
+      "pattern": "color: yellow",
+      "replacement": "color: \"#FFFF00\"",
+      "caseSensitive": true,
+      "description": "Transform named color yellow to hex"
+    },
+    {
+      "pattern": "color: blue",
+      "replacement": "color: \"#0000FF\"",
+      "caseSensitive": true,
+      "description": "Transform named color blue to hex"
+    },
+    {
+      "pattern": "color: green",
+      "replacement": "color: \"#008000\"",
+      "caseSensitive": true,
+      "description": "Transform named color green to hex"
+    },
+    {
+      "pattern": "color: purple",
+      "replacement": "color: \"#800080\"",
+      "caseSensitive": true,
+      "description": "Transform named color purple to hex"
+    },
+    {
+      "pattern": "All arguments become",
+      "replacement": "$ARGUMENTS become",
+      "caseSensitive": true,
+      "description": "Transform 'All arguments' variable reference to $ARGUMENTS"
+    },
+    {
+      "pattern": "subagent_type=\"general-purpose\"",
+      "replacement": "subagent_type=\"task\"",
+      "caseSensitive": true,
+      "description": "Transform general-purpose subagent type to task"
+    },
+    {
+      "pattern": "subagent_type=\"Explore\"",
+      "replacement": "subagent_type=\"explore\"",
+      "caseSensitive": true,
+      "description": "Transform Explore subagent type to lowercase explore"
+    },
+    {
+      "pattern": "CLAUDE.md",
+      "replacement": "OPENCODE.md",
+      "caseSensitive": true,
+      "description": "Transform CLAUDE.md project instructions file to OPENCODE.md"
+    },
+    {
+      "pattern": "~/.claude/config.json",
+      "replacement": "~/.config/opencode/opencode.json",
+      "caseSensitive": true,
+      "description": "Transform Claude config file path to OpenCode config file"
+    },
+    {
+      "pattern": "Claude Code",
+      "replacement": "OpenCode",
+      "description": "Transform Claude Code references to OpenCode"
+    },
+    {
+      "pattern": "Claude's",
+      "replacement": "OpenCode's",
+      "caseSensitive": true,
+      "description": "Transform Claude's possessive to OpenCode's"
+    },
+    {
+      "pattern": "Claude",
+      "replacement": "OpenCode",
+      "description": "Transform standalone Claude references to OpenCode"
+    }
+  ],
+  "_forbidden_strings_after_translation": [
+    "Claude",
+    "Claude Code",
+    "Claude's",
+    "<sub>",
+    "</sub>",
+    "~/.claude",
+    "/gsd:",
+    "gsd:plan-phase",
+    "gsd:execute-phase",
+    "gsd:research-phase",
+    "gsd:verify-phase",
+    "gsd:discuss-phase",
+    "gsd:new-project",
+    "gsd:new-milestone",
+    "gsd:complete-milestone",
+    "gsd:add-phase",
+    "gsd:insert-phase",
+    "gsd:remove-phase",
+    "get-shit-done-cc",
+    "glittercowboy",
+    "rokicool/get-shit-done",
+    "AskUserQuestion",
+    "SlashCommand",
+    "BashOutput",
+    "TodoWrite",
+    "TodoRead",
+    "WebFetch",
+    "WebSearch",
+    "All arguments become",
+    "/clear",
+    "color: cyan",
+    "color: orange",
+    "color: yellow",
+    "color: blue",
+    "color: green",
+    "color: purple",
+    "name: set-profile",
+    "subagent_type=\"general-purpose\"",
+    "subagent_type=\"Explore\"",
+    "CLAUDE.md"
+  ]
+}

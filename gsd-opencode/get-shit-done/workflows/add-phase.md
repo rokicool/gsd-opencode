@@ -3,14 +3,14 @@ Add a new integer phase to the end of the current milestone in the roadmap. Auto
 </purpose>
 
 <required_reading>
-read all files referenced by the invoking prompt's execution_context before starting.
+Read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
 
 <step name="parse_arguments">
 Parse the command arguments:
-- Arguments become the phase description
+- $ARGUMENTS become the phase description
 - Example: `/gsd-add-phase Add authentication` → description = "Add authentication"
 - Example: `/gsd-add-phase Fix critical performance issues` → description = "Fix critical performance issues"
 
@@ -60,7 +60,7 @@ Extract from result: `phase_number`, `padded`, `name`, `slug`, `directory`.
 <step name="update_project_state">
 Update STATE.md to reflect the new phase:
 
-1. read `.planning/STATE.md`
+1. Read `.planning/STATE.md`
 2. Under "## Accumulated Context" → "### Roadmap Evolution" add entry:
    ```
    - Phase {N} added: {description}

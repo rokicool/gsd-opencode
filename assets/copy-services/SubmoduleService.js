@@ -1,5 +1,5 @@
 /**
- * SubmoduleService - Git submodule operations for copy-from-original script
+ * SubmoduleService - Git submodule operations for gsd-copy-from-original script
  *
  * Handles all git operations on the original/get-shit-done submodule:
  * - Verify submodule initialization

@@ -104,13 +104,26 @@ export class SyncService {
 
   /**
    * Get the target path for a source file using directory mapping
+   * Files in commands/gsd/ directory get 'gsd-' prefix added to their name
    * @param {string} sourcePath - Relative path from original submodule root
    * @returns {string|null} Target path relative to project root, or null if not mapped
    */
   getTargetPath(sourcePath) {
     for (const [from, to] of Object.entries(DIRECTORY_MAPPING)) {
       if (sourcePath.startsWith(from)) {
-        return sourcePath.replace(from, to);
+        let targetPath = sourcePath.replace(from, to);
+        
+        // Add 'gsd-' prefix to files in commands/gsd/ directory
+        if (to === 'gsd-opencode/commands/gsd/') {
+          const dir = dirname(targetPath);
+          const filename = basename(targetPath);
+          // Only add prefix if filename doesn't already start with 'gsd-'
+          if (!filename.startsWith('gsd-')) {
+            targetPath = join(dir, `gsd-${filename}`);
+          }
+        }
+        
+        return targetPath;
       }
     }
     return null;
@@ -118,13 +131,26 @@ export class SyncService {
 
   /**
    * Get the source path from a target file (reverse mapping)
+   * Files in commands/gsd/ directory have 'gsd-' prefix removed for reverse lookup
    * @param {string} targetPath - Relative path in gsd-opencode
    * @returns {string|null} Source path relative to original, or null if not mapped
    */
   getSourcePath(targetPath) {
     for (const [from, to] of Object.entries(DIRECTORY_MAPPING)) {
       if (targetPath.startsWith(to)) {
-        return targetPath.replace(to, from);
+        let sourcePath = targetPath.replace(to, from);
+        
+        // Remove 'gsd-' prefix from files in commands/gsd/ directory for reverse mapping
+        if (to === 'gsd-opencode/commands/gsd/') {
+          const dir = dirname(sourcePath);
+          const filename = basename(sourcePath);
+          // Remove 'gsd-' prefix if present
+          if (filename.startsWith('gsd-')) {
+            sourcePath = join(dir, filename.slice(4)); // Remove 'gsd-' prefix
+          }
+        }
+        
+        return sourcePath;
       }
     }
     return null;

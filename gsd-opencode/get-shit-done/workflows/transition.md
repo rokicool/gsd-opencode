@@ -1,6 +1,6 @@
 <required_reading>
 
-**read these files NOW:**
+**Read these files NOW:**
 
 1. `.planning/STATE.md`
 2. `.planning/PROJECT.md`
@@ -148,7 +148,7 @@ The `completed/` subfolder pattern from create-meta-prompts handles archival.
 
 Evolve PROJECT.md to reflect learnings from completed phase.
 
-**read phase summaries:**
+**Read phase summaries:**
 
 ```bash
 cat .planning/phases/XX-current/*-SUMMARY.md
@@ -356,7 +356,7 @@ This returns all phases with goals, disk status, and completion info.
 
 **Route A: More phases remain in milestone**
 
-read ROADMAP.md to get the next phase's name and goal.
+Read ROADMAP.md to get the next phase's name and goal.
 
 **Check if next phase has CONTEXT.md:**
 
@@ -378,7 +378,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Plan Phase [X+1] in detail
 ```
 
-Exit skill and invoke command("/gsd-plan-phase [X+1] --auto")
+Exit skill and invoke Command("/gsd-plan-phase [X+1] --auto")
 
 **If CONTEXT.md does NOT exist:**
 
@@ -390,7 +390,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Discuss Phase [X+1] first
 ```
 
-Exit skill and invoke command("/gsd-discuss-phase [X+1] --auto")
+Exit skill and invoke Command("/gsd-discuss-phase [X+1] --auto")
 
 </if>
 
@@ -466,7 +466,7 @@ Phase {X} marked complete.
 ⚡ Auto-continuing: Complete milestone and archive
 ```
 
-Exit skill and invoke command("/gsd-complete-milestone {version}")
+Exit skill and invoke Command("/gsd-complete-milestone {version}")
 
 </if>
 

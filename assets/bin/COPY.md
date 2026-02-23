@@ -16,7 +16,7 @@ A CLI tool for synchronizing files from the original TÂCHES repository (git sub
 
 ## Overview
 
-The `copy-from-original.js` script syncs files from the original TÂCHES repository (tracked as a git submodule at `original/get-shit-done/`) to the OpenCode adaptation (`gsd-opencode/`).
+The `gsd-copy-from-original.js` script syncs files from the original TÂCHES repository (tracked as a git submodule at `original/get-shit-done/`) to the OpenCode adaptation (`gsd-opencode/`).
 
 **Important:** This script does **NOT** apply Claude Code to OpenCode transformations. Transformations are handled separately by `translate.js` (Phase 10). This script only copies files.
 
@@ -73,7 +73,7 @@ Required packages:
 See what files are different without making changes:
 
 ```bash
-node bin/copy-from-original.js
+node bin/gsd-copy-from-original.js
 ```
 
 **Example output:**
@@ -100,7 +100,7 @@ Run with --apply to copy files.
 After reviewing the preview, copy the files:
 
 ```bash
-node bin/copy-from-original.js --apply
+node bin/gsd-copy-from-original.js --apply
 ```
 
 **Example output:**
@@ -127,19 +127,19 @@ To sync only specific files, use the `--filter` option:
 
 ```bash
 # Preview only files matching pattern
-node bin/copy-from-original.js --filter "execute*"
+node bin/gsd-copy-from-original.js --filter "execute*"
 
 # Apply only files starting with "execute"
-node bin/copy-from-original.js --apply --filter "execute*"
+node bin/gsd-copy-from-original.js --apply --filter "execute*"
 
 # Preview files containing "phase"
-node bin/copy-from-original.js --filter "*phase*"
+node bin/gsd-copy-from-original.js --filter "*phase*"
 ```
 
 ## Command Line Options
 
 ```bash
-node copy-from-original.js [options]
+node gsd-copy-from-original.js [options]
 ```
 
 | Option | Short | Description |
@@ -154,43 +154,43 @@ node copy-from-original.js [options]
 
 **Preview (default):**
 ```bash
-node bin/copy-from-original.js
+node bin/gsd-copy-from-original.js
 ```
 
 **Preview with verbose output:**
 ```bash
-node bin/copy-from-original.js --verbose
+node bin/gsd-copy-from-original.js --verbose
 ```
 
 **Apply changes:**
 ```bash
-node bin/copy-from-original.js --apply
+node bin/gsd-copy-from-original.js --apply
 ```
 
 **Force overwrite diverged files:**
 ```bash
-node bin/copy-from-original.js --apply --force
+node bin/gsd-copy-from-original.js --apply --force
 ```
 
 **Filter by pattern:**
 ```bash
 # Preview files starting with "execute"
-node bin/copy-from-original.js --filter "execute*"
+node bin/gsd-copy-from-original.js --filter "execute*"
 
 # Apply only .md files
-node bin/copy-from-original.js --apply --filter "*.md"
+node bin/gsd-copy-from-original.js --apply --filter "*.md"
 
 # Preview files containing "phase"
-node bin/copy-from-original.js --filter "*phase*"
+node bin/gsd-copy-from-original.js --filter "*phase*"
 ```
 
 **Combine options:**
 ```bash
 # Preview filtered files with verbose output
-node bin/copy-from-original.js --filter "execute*" --verbose
+node bin/gsd-copy-from-original.js --filter "execute*" --verbose
 
 # Apply filtered files with force
-node bin/copy-from-original.js --apply --force --filter "commands/*"
+node bin/gsd-copy-from-original.js --apply --force --filter "commands/*"
 ```
 
 ## Directory Mapping
@@ -300,11 +300,11 @@ These are OpenCode-specific additions and are preserved.
 Use in scripts:
 
 ```bash
-node bin/copy-from-original.js
+node bin/gsd-copy-from-original.js
 if [ $? -eq 0 ]; then
   echo "Preview successful"
   # Now apply
-  node bin/copy-from-original.js --apply
+  node bin/gsd-copy-from-original.js --apply
 else
   echo "Preview failed"
   exit 1
@@ -328,19 +328,19 @@ git commit -m "chore: update TACHES submodule"
 ### Step 2: Preview Changes
 
 ```bash
-node assets/bin/copy-from-original.js
+node assets/bin/gsd-copy-from-original.js
 ```
 
 ### Step 3: Apply Changes
 
 ```bash
-node assets/bin/copy-from-original.js --apply
+node assets/bin/gsd-copy-from-original.js --apply
 ```
 
 Or apply only specific files:
 
 ```bash
-node assets/bin/copy-from-original.js --apply --filter "execute*"
+node assets/bin/gsd-copy-from-original.js --apply --filter "execute*"
 ```
 
 ### Step 4: Apply Transformations
@@ -425,7 +425,7 @@ If the script shows this but you expect changes:
 
 **Options:**
 1. Review local changes: `git diff gsd-opencode/commands/gsd/ro-commit.js`
-2. Force overwrite: `node bin/copy-from-original.js --apply --force`
+2. Force overwrite: `node bin/gsd-copy-from-original.js --apply --force`
 3. Preserve local changes: Don't sync, or restore from backup after
 
 ### "Forgot --apply"
@@ -440,7 +440,7 @@ Run with --apply to copy files.
 **Fix:**
 ```bash
 # Run again with --apply
-node bin/copy-from-original.js --apply
+node bin/gsd-copy-from-original.js --apply
 ```
 
 ### Filter not matching files
@@ -529,7 +529,7 @@ The script uses a service-based architecture:
 
 ```
 ┌─────────────────────────────────────────┐
-│  copy-from-original.js (CLI)           │
+│  gsd-copy-from-original.js (CLI)       │
 │  - Parses arguments                     │
 │  - Coordinates services                │
 │  - Formats output                      │
@@ -551,7 +551,7 @@ The script uses a service-based architecture:
 
 ### Files
 
-- `assets/bin/copy-from-original.js` - CLI entry point
+- `assets/bin/gsd-copy-from-original.js` - CLI entry point
 - `assets/copy-services/SubmoduleService.js` - Git operations
 - `assets/copy-services/SyncService.js` - File sync orchestration
 - `assets/copy-services/SyncManifest.js` - State persistence
@@ -571,7 +571,7 @@ The script uses a service-based architecture:
 node --test assets/copy-services/__tests__/*.test.js
 
 # Integration tests
-node --test assets/bin/__tests__/copy-from-original.integration.test.js
+node --test assets/bin/__tests__/gsd-copy-from-original.integration.test.js
 ```
 
 **Test coverage:** 36 tests covering all sync scenarios

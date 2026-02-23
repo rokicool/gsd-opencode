@@ -71,7 +71,7 @@ Gray areas are **implementation decisions the user cares about** — things that
 
 **How to identify gray areas:**
 
-1. **read the phase goal** from ROADMAP.md
+1. **Read the phase goal** from ROADMAP.md
 2. **Understand the domain** — What kind of thing is being built?
    - Something users SEE → visual presentation, interactions, states matter
    - Something users CALL → interface contracts, responses, errors matter
@@ -135,7 +135,7 @@ ls ${phase_dir}/*-CONTEXT.md 2>/dev/null
 ```
 
 **If exists:**
-Use question:
+Use Question:
 - header: "Context"
 - question: "Phase [X] already has context. What do you want to do?"
 - options:
@@ -151,7 +151,7 @@ If "Skip": Exit workflow
 
 Check `has_plans` and `plan_count` from init. **If `has_plans` is true:**
 
-Use question:
+Use Question:
 - header: "Plans exist"
 - question: "Phase [X] already has {plan_count} plan(s) created without user context. Your decisions here won't affect existing plans unless you replan."
 - options:
@@ -169,7 +169,7 @@ If "Cancel": Exit workflow.
 <step name="analyze_phase">
 Analyze the phase to identify gray areas worth discussing.
 
-**read the phase description from ROADMAP.md and determine:**
+**Read the phase description from ROADMAP.md and determine:**
 
 1. **Domain boundary** — What capability is this phase delivering? State it clearly.
 
@@ -203,7 +203,7 @@ We'll clarify HOW to implement this.
 (New capabilities belong in other phases.)
 ```
 
-**Then use question (multiSelect: true):**
+**Then use Question (multiSelect: true):**
 - header: "Discuss"
 - question: "Which areas do you want to discuss for [phase name]?"
 - options: Generate 3-4 phase-specific gray areas, each with:
@@ -256,10 +256,10 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
    Let's talk about [Area].
    ```
 
-2. **Ask 4 questions using question:**
+2. **Ask 4 questions using Question:**
    - header: "[Area]" (max 12 chars — abbreviate if needed)
    - question: Specific decision for this area
-   - options: 2-3 concrete choices (question adds "Other" automatically), with the recommended choice highlighted and brief explanation why
+   - options: 2-3 concrete choices (Question adds "Other" automatically), with the recommended choice highlighted and brief explanation why
    - Include "You decide" as an option when reasonable — captures OpenCode discretion
 
 3. **After 4 questions, check:**
@@ -273,7 +273,7 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
 
 4. **After all initially-selected areas complete:**
    - Summarize what was captured from the discussion so far
-   - question:
+   - Question:
      - header: "Done"
      - question: "We've discussed [list areas]. Which gray areas remain unclear?"
      - options: "Explore more gray areas" / "I'm ready for context"
@@ -283,7 +283,7 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
      - Loop: discuss new areas, then prompt again
    - If "I'm ready for context": Proceed to write_context
 
-**question design:**
+**Question design:**
 - Options should be concrete, not abstract ("Cards" not "Option A")
 - Each answer should inform the next question
 - If user picks "Other", receive their input, reflect it back, confirm
@@ -368,7 +368,7 @@ mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 *Context gathered: [date]*
 ```
 
-write file.
+Write file.
 </step>
 
 <step name="confirm_creation">
@@ -439,7 +439,7 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs(state): rec
 Check for auto-advance trigger:
 
 1. Parse `--auto` flag from $ARGUMENTS
-2. read `workflow.auto_advance` from config:
+2. Read `workflow.auto_advance` from config:
    ```bash
    AUTO_CFG=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
@@ -460,9 +460,9 @@ Display banner:
 Context captured. Spawning plan-phase...
 ```
 
-Spawn plan-phase as task with direct workflow file reference (do NOT use skill tool — Skills don't resolve inside task subagents):
+Spawn plan-phase as Task with direct workflow file reference (do NOT use Skill tool — Skills don't resolve inside Task subagents):
 ```
-task(
+Task(
   prompt="
     <objective>
     You are the plan-phase orchestrator. Create executable plans for Phase ${PHASE}: ${PHASE_NAME}, then auto-advance to execution.
@@ -480,15 +480,15 @@ task(
     </arguments>
 
     <instructions>
-    1. read plan-phase.md from execution_context for your complete workflow
+    1. Read plan-phase.md from execution_context for your complete workflow
     2. Follow ALL steps: initialize, validate, load context, research, plan, verify, auto-advance
-    3. When spawning agents (gsd-phase-researcher, gsd-planner, gsd-plan-checker), use task with specified subagent_type and model
-    4. For step 14 (auto-advance to execute): spawn execute-phase as a task with DIRECT file reference — tell it to read execute-phase.md. Include @file refs to execute-phase.md, checkpoints.md, tdd.md, model-profile-resolution.md. Pass --no-transition flag so execute-phase returns results instead of chaining further.
-    5. Do NOT use the skill tool or /gsd- commands. read workflow .md files directly.
+    3. When spawning agents (gsd-phase-researcher, gsd-planner, gsd-plan-checker), use Task with specified subagent_type and model
+    4. For step 14 (auto-advance to execute): spawn execute-phase as a Task with DIRECT file reference — tell it to read execute-phase.md. Include @file refs to execute-phase.md, checkpoints.md, tdd.md, model-profile-resolution.md. Pass --no-transition flag so execute-phase returns results instead of chaining further.
+    5. Do NOT use the Skill tool or /gsd- commands. Read workflow .md files directly.
     6. Return: PHASE COMPLETE (full pipeline success), PLANNING COMPLETE (planning done but execute failed/skipped), PLANNING INCONCLUSIVE, or GAPS FOUND
     </instructions>
   ",
-  subagent_type="task",
+  subagent_type="general purpose",
   description="Plan Phase ${PHASE}"
 )
 ```

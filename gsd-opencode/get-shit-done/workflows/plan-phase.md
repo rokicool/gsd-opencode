@@ -3,7 +3,7 @@ Create executable phase prompts (PLAN.md files) for a roadmap phase with integra
 </purpose>
 
 <required_reading>
-read all files referenced by the invoking prompt's execution_context before starting.
+Read all files referenced by the invoking prompt's execution_context before starting.
 
 @~/.config/opencode/get-shit-done/references/ui-brand.md
 </required_reading>
@@ -53,7 +53,7 @@ If `context_path` is not null, display: `Using phase context from: ${context_pat
 
 **If `context_path` is null (no CONTEXT.md exists):**
 
-Use question:
+Use Question:
 - header: "No context"
 - question: "No CONTEXT.md found for Phase {X}. Plans will use research and requirements only — your design preferences won't be included. Continue or capture context first?"
 - options:
@@ -105,19 +105,19 @@ Answer: "What do I need to know to PLAN this phase well?"
 **Phase description:** {phase_description}
 **Phase requirement IDs (MUST address):** {phase_req_ids}
 
-**Project instructions:** read ./OPENCODE.md if exists — follow project-specific guidelines
+**Project instructions:** Read ./OPENCODE.md if exists — follow project-specific guidelines
 **Project skills:** Check .agents/skills/ directory (if exists) — read SKILL.md files, research should account for project skill patterns
 </additional_context>
 
 <output>
-write to: {phase_dir}/{phase_num}-RESEARCH.md
+Write to: {phase_dir}/{phase_num}-RESEARCH.md
 </output>
 ```
 
 ```
-task(
+Task(
   prompt="First, read ~/.config/opencode/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + research_prompt,
-  subagent_type="task",
+  subagent_type="general purpose",
   model="{researcher_model}",
   description="Research Phase {phase}"
 )
@@ -139,8 +139,8 @@ grep -l "## Validation Architecture" "${PHASE_DIR}"/*-RESEARCH.md 2>/dev/null
 ```
 
 **If found:**
-1. read validation template from `~/.config/opencode/get-shit-done/templates/VALIDATION.md`
-2. write to `${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md`
+1. Read validation template from `~/.config/opencode/get-shit-done/templates/VALIDATION.md`
+2. Write to `${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md`
 3. Fill frontmatter: replace `{N}` with phase number, `{phase-slug}` with phase slug, `{date}` with current date
 4. If `commit_docs` is true:
 ```bash
@@ -205,7 +205,7 @@ Planner prompt:
 
 **Phase requirement IDs (every ID MUST appear in a plan's `requirements` field):** {phase_req_ids}
 
-**Project instructions:** read ./OPENCODE.md if exists — follow project-specific guidelines
+**Project instructions:** Read ./OPENCODE.md if exists — follow project-specific guidelines
 **Project skills:** Check .agents/skills/ directory (if exists) — read SKILL.md files, plans should account for project skill rules
 </planning_context>
 
@@ -228,9 +228,9 @@ Output consumed by /gsd-execute-phase. Plans need:
 ```
 
 ```
-task(
+Task(
   prompt="First, read ~/.config/opencode/agents/gsd-planner.md for your role and instructions.\n\n" + filled_prompt,
-  subagent_type="task",
+  subagent_type="general purpose",
   model="{planner_model}",
   description="Plan Phase {phase}"
 )
@@ -270,7 +270,7 @@ Checker prompt:
 
 **Phase requirement IDs (MUST ALL be covered):** {phase_req_ids}
 
-**Project instructions:** read ./OPENCODE.md if exists — verify plans honor project guidelines
+**Project instructions:** Read ./OPENCODE.md if exists — verify plans honor project guidelines
 **Project skills:** Check .agents/skills/ directory (if exists) — verify plans account for project skill rules
 </verification_context>
 
@@ -281,7 +281,7 @@ Checker prompt:
 ```
 
 ```
-task(
+Task(
   prompt=checker_prompt,
   subagent_type="gsd-plan-checker",
   model="{checker_model}",
@@ -325,9 +325,9 @@ Return what changed.
 ```
 
 ```
-task(
+Task(
   prompt="First, read ~/.config/opencode/agents/gsd-planner.md for your role and instructions.\n\n" + revision_prompt,
-  subagent_type="task",
+  subagent_type="general purpose",
   model="{planner_model}",
   description="Revise Phase {phase} plans"
 )
@@ -350,7 +350,7 @@ Route to `<offer_next>` OR `auto_advance` depending on flags/config.
 Check for auto-advance trigger:
 
 1. Parse `--auto` flag from $ARGUMENTS
-2. read `workflow.auto_advance` from config:
+2. Read `workflow.auto_advance` from config:
    ```bash
    AUTO_CFG=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
@@ -366,9 +366,9 @@ Display banner:
 Plans ready. Spawning execute-phase...
 ```
 
-Spawn execute-phase as task with direct workflow file reference (do NOT use skill tool — Skills don't resolve inside task subagents):
+Spawn execute-phase as Task with direct workflow file reference (do NOT use Skill tool — Skills don't resolve inside Task subagents):
 ```
-task(
+Task(
   prompt="
     <objective>
     You are the execute-phase orchestrator. Execute all plans for Phase ${PHASE}: ${PHASE_NAME}.
@@ -387,16 +387,16 @@ task(
     </arguments>
 
     <instructions>
-    1. read execute-phase.md from execution_context for your complete workflow
+    1. Read execute-phase.md from execution_context for your complete workflow
     2. Follow ALL steps: initialize, handle_branching, validate_phase, discover_and_group_plans, execute_waves, aggregate_results, close_parent_artifacts, verify_phase_goal, update_roadmap
     3. The --no-transition flag means: after verification + roadmap update, STOP and return status. Do NOT run transition.md.
     4. When spawning executor agents, use subagent_type='gsd-executor' with the existing @file pattern from the workflow
     5. When spawning verifier agents, use subagent_type='gsd-verifier'
     6. Preserve the classifyHandoffIfNeeded workaround (spot-check on that specific error)
-    7. Do NOT use the skill tool or /gsd- commands
+    7. Do NOT use the Skill tool or /gsd- commands
     </instructions>
   ",
-  subagent_type="task",
+  subagent_type="general purpose",
   description="Execute Phase ${PHASE}"
 )
 ```

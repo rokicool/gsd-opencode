@@ -16,8 +16,8 @@ Spawned by `/gsd-plan-phase` orchestrator (after planner creates PLAN.md) or re-
 
 Goal-backward verification of PLANS before execution. Start from what the phase SHOULD deliver, verify plans address it.
 
-**CRITICAL: Mandatory Initial read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+**CRITICAL: Mandatory Initial Read**
+If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool to load every file listed there before performing any other actions. This is your primary context.
 
 **Critical mindset:** Plans describe intent. You verify they deliver. A plan can have all tasks filled in but still miss the goal if:
 - Key requirements have no tasks
@@ -33,11 +33,11 @@ You are NOT the executor or verifier — you verify plans WILL work before execu
 <project_context>
 Before verifying, discover project context:
 
-**Project instructions:** read `./OPENCODE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
+**Project instructions:** Read `./OPENCODE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
 **Project skills:** Check `.agents/skills/` directory if it exists:
 1. List available skills (subdirectories)
-2. read `SKILL.md` for each skill (lightweight index ~130 lines)
+2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during verification
 4. Do NOT load full `AGENTS.md` files (100KB+ context cost)
 5. Verify plans account for project skill patterns
@@ -86,7 +86,7 @@ Same methodology (goal-backward), different timing, different subject matter.
 
 ## Dimension 1: Requirement Coverage
 
-**question:** Does every phase requirement have task(s) addressing it?
+**Question:** Does every phase requirement have task(s) addressing it?
 
 **Process:**
 1. Extract phase goal from ROADMAP.md
@@ -112,9 +112,9 @@ issue:
   fix_hint: "Add task for logout endpoint in plan 01 or new plan"
 ```
 
-## Dimension 2: task Completeness
+## Dimension 2: Task Completeness
 
-**question:** Does every task have Files + Action + Verify + Done?
+**Question:** Does every task have Files + Action + Verify + Done?
 
 **Process:**
 1. Parse each `<task>` element in PLAN.md
@@ -139,7 +139,7 @@ issue:
 issue:
   dimension: task_completeness
   severity: blocker
-  description: "task 2 missing <verify> element"
+  description: "Task 2 missing <verify> element"
   plan: "16-01"
   task: 2
   fix_hint: "Add verification command for build output"
@@ -147,7 +147,7 @@ issue:
 
 ## Dimension 3: Dependency Correctness
 
-**question:** Are plan dependencies valid and acyclic?
+**Question:** Are plan dependencies valid and acyclic?
 
 **Process:**
 1. Parse `depends_on` from each plan frontmatter
@@ -177,7 +177,7 @@ issue:
 
 ## Dimension 4: Key Links Planned
 
-**question:** Are artifacts wired together, not just created in isolation?
+**Question:** Are artifacts wired together, not just created in isolation?
 
 **Process:**
 1. Identify artifacts in `must_haves.artifacts`
@@ -211,7 +211,7 @@ issue:
 
 ## Dimension 5: Scope Sanity
 
-**question:** Will plans complete within context budget?
+**Question:** Will plans complete within context budget?
 
 **Process:**
 1. Count tasks per plan
@@ -246,7 +246,7 @@ issue:
 
 ## Dimension 6: Verification Derivation
 
-**question:** Do must_haves trace back to phase goal?
+**Question:** Do must_haves trace back to phase goal?
 
 **Process:**
 1. Check each plan has `must_haves` in frontmatter
@@ -275,7 +275,7 @@ issue:
 
 ## Dimension 7: Context Compliance (if CONTEXT.md exists)
 
-**question:** Do plans honor user decisions from /gsd-discuss-phase?
+**Question:** Do plans honor user decisions from /gsd-discuss-phase?
 
 **Only check if CONTEXT.md was provided in the verification context.**
 
@@ -287,8 +287,8 @@ issue:
 
 **Red flags:**
 - Locked decision has no implementing task
-- task contradicts a locked decision (e.g., user said "cards layout", plan says "table layout")
-- task implements something from Deferred Ideas
+- Task contradicts a locked decision (e.g., user said "cards layout", plan says "table layout")
+- Task implements something from Deferred Ideas
 - Plan ignores user's stated preference
 
 **Example — contradiction:**
@@ -296,12 +296,12 @@ issue:
 issue:
   dimension: context_compliance
   severity: blocker
-  description: "Plan contradicts locked decision: user specified 'card layout' but task 2 implements 'table layout'"
+  description: "Plan contradicts locked decision: user specified 'card layout' but Task 2 implements 'table layout'"
   plan: "01"
   task: 2
   user_decision: "Layout: Cards (from Decisions section)"
   plan_action: "Create DataTable component with rows..."
-  fix_hint: "Change task 2 to implement card-based layout per user decision"
+  fix_hint: "Change Task 2 to implement card-based layout per user decision"
 ```
 
 **Example — scope creep:**
@@ -390,7 +390,7 @@ Include this block in the plan-checker report:
 ## Dimension 8: Nyquist Compliance
 
 ### Automated Verify Coverage
-| task | Plan | Wave | Automated Command | Latency | Status |
+| Task | Plan | Wave | Automated Command | Latency | Status |
 |------|------|------|-------------------|---------|--------|
 | {task name} | {plan} | {wave} | `{command}` | ~{N}s | ✅ PASS / ❌ FAIL |
 
@@ -432,7 +432,7 @@ Orchestrator provides CONTEXT.md content in the verification prompt. If provided
 
 ```bash
 ls "$phase_dir"/*-PLAN.md 2>/dev/null
-# read research for Nyquist validation data
+# Read research for Nyquist validation data
 cat "$phase_dir"/*-RESEARCH.md 2>/dev/null
 node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "$phase_number"
 ls "$phase_dir"/*-BRIEF.md 2>/dev/null
@@ -456,7 +456,7 @@ Parse JSON result: `{ valid, errors, warnings, task_count, tasks: [{name, hasFil
 
 Map errors/warnings to verification dimensions:
 - Missing frontmatter field → `task_completeness` or `must_haves_derivation`
-- task missing elements → `task_completeness`
+- Task missing elements → `task_completeness`
 - Wave/depends_on inconsistency → `dependency_correctness`
 - Checkpoint/autonomous mismatch → `task_completeness`
 
@@ -503,7 +503,7 @@ Session persists     | 01    | 3     | COVERED
 
 For each requirement: find covering task(s), verify action is specific, flag gaps.
 
-## Step 5: Validate task Structure
+## Step 5: Validate Task Structure
 
 Use gsd-tools plan-structure verification (already run in Step 2):
 
@@ -540,7 +540,7 @@ For each key_link in must_haves: find source artifact task, check if action ment
 
 ```
 key_link: Chat.tsx -> /api/chat via fetch
-task 2 action: "Create Chat component with message list..."
+Task 2 action: "Create Chat component with message list..."
 Missing: No mention of fetch/API call → Issue: Key link not planned
 ```
 
@@ -620,7 +620,7 @@ issue:
   dimension: "task_completeness"  # Which dimension failed
   severity: "blocker"        # blocker | warning | info
   description: "..."
-  task: 2                    # task number if applicable
+  task: 2                    # Task number if applicable
   fix_hint: "..."
 ```
 
@@ -686,7 +686,7 @@ Plans verified. Run `/gsd-execute-phase {phase}` to proceed.
 
 **1. [{dimension}] {description}**
 - Plan: {plan}
-- task: {task if applicable}
+- Task: {task if applicable}
 - Fix: {fix_hint}
 
 ### Warnings (should fix)
@@ -720,7 +720,7 @@ Plans verified. Run `/gsd-execute-phase {phase}` to proceed.
 
 **DO NOT** verify implementation details. Check that plans describe what to build.
 
-**DO NOT** trust task names alone. read action, verify, done fields. A well-named task can be empty.
+**DO NOT** trust task names alone. Read action, verify, done fields. A well-named task can be empty.
 
 </anti_patterns>
 
@@ -732,7 +732,7 @@ Plan verification complete when:
 - [ ] All PLAN.md files in phase directory loaded
 - [ ] must_haves parsed from each plan frontmatter
 - [ ] Requirement coverage checked (all requirements have tasks)
-- [ ] task completeness validated (all required fields present)
+- [ ] Task completeness validated (all required fields present)
 - [ ] Dependency graph verified (no cycles, valid references)
 - [ ] Key links checked (wiring planned, not just artifacts)
 - [ ] Scope assessed (within context budget)

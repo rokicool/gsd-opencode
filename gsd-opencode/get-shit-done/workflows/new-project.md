@@ -3,7 +3,7 @@ Initialize a new project through unified flow: questioning, research (optional),
 </purpose>
 
 <required_reading>
-read all files referenced by the invoking prompt's execution_context before starting.
+Read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <auto_mode>
@@ -64,7 +64,7 @@ git init
 
 **If `needs_codebase_map` is true** (from init — existing code detected but no codebase map):
 
-Use question:
+Use Question:
 - header: "Codebase"
 - question: "I detected existing code in this directory. Would you like to map the codebase first?"
 - options:
@@ -88,7 +88,7 @@ YOLO mode is implicit (auto = YOLO). Ask remaining config questions:
 **Round 1 — Core settings (3 questions, no Mode question):**
 
 ```
-question([
+Question([
   {
     header: "Depth",
     question: "How thorough should planning be?",
@@ -123,7 +123,7 @@ question([
 **Round 2 — Workflow agents (same as Step 5):**
 
 ```
-question([
+Question([
   {
     header: "Research",
     question: "Research before planning each phase? (adds tokens/time)",
@@ -213,7 +213,7 @@ Proceed to Step 4 (skip Steps 3 and 5).
 
 **Open the conversation:**
 
-Ask inline (freeform, NOT question):
+Ask inline (freeform, NOT Question):
 
 "What do you want to build?"
 
@@ -221,7 +221,7 @@ Wait for their response. This gives you the context needed to ask intelligent fo
 
 **Follow the thread:**
 
-Based on what they said, ask follow-up questions that dig into their response. Use question with options that probe what they mentioned — interpretations, clarifications, concrete examples.
+Based on what they said, ask follow-up questions that dig into their response. Use Question with options that probe what they mentioned — interpretations, clarifications, concrete examples.
 
 Keep following threads. Each answer opens new threads to explore. Ask about:
 - What excited them
@@ -243,7 +243,7 @@ As you go, mentally check the context checklist from `questioning.md`. If gaps r
 
 **Decision gate:**
 
-When you could write a clear PROJECT.md, use question:
+When you could write a clear PROJECT.md, use Question:
 
 - header: "Ready?"
 - question: "I think I understand what you're after. Ready to create PROJECT.md?"
@@ -255,7 +255,7 @@ If "Keep exploring" — ask what they want to add, or identify gaps and probe na
 
 Loop until "Create PROJECT.md" selected.
 
-## 4. write PROJECT.md
+## 4. Write PROJECT.md
 
 **If auto mode:** Synthesize from provided document. No "Ready?" gate was shown — proceed directly to commit.
 
@@ -290,7 +290,7 @@ All Active requirements are hypotheses until shipped and validated.
 
 Infer Validated requirements from existing code:
 
-1. read `.planning/codebase/ARCHITECTURE.md` and `STACK.md`
+1. Read `.planning/codebase/ARCHITECTURE.md` and `STACK.md`
 2. Identify what the codebase already does
 3. These become the initial Validated set
 
@@ -348,7 +348,7 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: initialize
 **Check for global defaults** at `~/.gsd/defaults.json`. If the file exists, offer to use saved defaults:
 
 ```
-question([
+Question([
   {
     question: "Use your saved default settings? (from ~/.gsd/defaults.json)",
     header: "Defaults",
@@ -503,7 +503,7 @@ Use models from init: `researcher_model`, `synthesizer_model`, `roadmapper_model
 
 **If auto mode:** Default to "Research first" without asking.
 
-Use question:
+Use Question:
 - header: "Research"
 - question: "Research the domain ecosystem before defining requirements?"
 - options:
@@ -544,7 +544,7 @@ Display spawning indicator:
 Spawn 4 parallel gsd-project-researcher agents with path references:
 
 ```
-task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
+Task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
 <research_type>
 Project Research — Stack dimension for [domain].
@@ -579,12 +579,12 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 </quality_gate>
 
 <output>
-write to: .planning/research/STACK.md
+Write to: .planning/research/STACK.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/STACK.md
 </output>
-", subagent_type="task", model="{researcher_model}", description="Stack research")
+", subagent_type="general purpose", model="{researcher_model}", description="Stack research")
 
-task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
+Task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
 <research_type>
 Project Research — Features dimension for [domain].
@@ -619,12 +619,12 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 </quality_gate>
 
 <output>
-write to: .planning/research/FEATURES.md
+Write to: .planning/research/FEATURES.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/FEATURES.md
 </output>
-", subagent_type="task", model="{researcher_model}", description="Features research")
+", subagent_type="general purpose", model="{researcher_model}", description="Features research")
 
-task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
+Task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
 <research_type>
 Project Research — Architecture dimension for [domain].
@@ -659,12 +659,12 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 </quality_gate>
 
 <output>
-write to: .planning/research/ARCHITECTURE.md
+Write to: .planning/research/ARCHITECTURE.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
-", subagent_type="task", model="{researcher_model}", description="Architecture research")
+", subagent_type="general purpose", model="{researcher_model}", description="Architecture research")
 
-task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
+Task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
 <research_type>
 Project Research — Pitfalls dimension for [domain].
@@ -699,16 +699,16 @@ Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
 </quality_gate>
 
 <output>
-write to: .planning/research/PITFALLS.md
+Write to: .planning/research/PITFALLS.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/PITFALLS.md
 </output>
-", subagent_type="task", model="{researcher_model}", description="Pitfalls research")
+", subagent_type="general purpose", model="{researcher_model}", description="Pitfalls research")
 ```
 
 After all 4 agents complete, spawn synthesizer to create SUMMARY.md:
 
 ```
-task(prompt="
+Task(prompt="
 <task>
 Synthesize research outputs into SUMMARY.md.
 </task>
@@ -721,7 +721,7 @@ Synthesize research outputs into SUMMARY.md.
 </files_to_read>
 
 <output>
-write to: .planning/research/SUMMARY.md
+Write to: .planning/research/SUMMARY.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 </output>
@@ -756,18 +756,18 @@ Display stage banner:
 
 **Load context:**
 
-read PROJECT.md and extract:
+Read PROJECT.md and extract:
 - Core value (the ONE thing that must work)
 - Stated constraints (budget, timeline, tech limitations)
 - Any explicit scope boundaries
 
-**If research exists:** read research/FEATURES.md and extract feature categories.
+**If research exists:** Read research/FEATURES.md and extract feature categories.
 
 **If auto mode:**
 - Auto-include all table stakes features (users expect these)
 - Include features explicitly mentioned in provided document
 - Auto-defer differentiators not mentioned in document
-- Skip per-category question loops
+- Skip per-category Question loops
 - Skip "Any additions?" question
 - Skip requirements approval gate
 - Generate REQUIREMENTS.md and commit directly
@@ -808,7 +808,7 @@ For each capability mentioned:
 
 **Scope each category:**
 
-For each category, use question:
+For each category, use Question:
 
 - header: "[Category]" (max 12 chars)
 - question: "Which [category] features are in v1?"
@@ -826,7 +826,7 @@ Track responses:
 
 **Identify gaps:**
 
-Use question:
+Use Question:
 - header: "Additions"
 - question: "Any requirements research missed? (Features specific to your vision)"
 - options:
@@ -904,7 +904,7 @@ Display stage banner:
 Spawn gsd-roadmapper agent with path references:
 
 ```
-task(prompt="
+Task(prompt="
 <planning_context>
 
 <files_to_read>
@@ -922,10 +922,10 @@ Create roadmap:
 2. Map every v1 requirement to exactly one phase
 3. Derive 2-5 success criteria per phase (observable user behaviors)
 4. Validate 100% coverage
-5. write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
+5. Write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
 6. Return ROADMAP CREATED with summary
 
-write files first, then return. This ensures artifacts persist even if context is lost.
+Write files first, then return. This ensures artifacts persist even if context is lost.
 </instructions>
 ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
 ```
@@ -939,7 +939,7 @@ write files first, then return. This ensures artifacts persist even if context i
 
 **If `## ROADMAP CREATED`:**
 
-read the created ROADMAP.md and present it nicely inline:
+Read the created ROADMAP.md and present it nicely inline:
 
 ```
 ---
@@ -981,7 +981,7 @@ Success criteria:
 
 **CRITICAL: Ask for approval before committing (interactive mode only):**
 
-Use question:
+Use Question:
 - header: "Roadmap"
 - question: "Does this roadmap structure work for you?"
 - options:
@@ -995,7 +995,7 @@ Use question:
 - Get user's adjustment notes
 - Re-spawn roadmapper with revision context:
   ```
-  task(prompt="
+  Task(prompt="
   <revision>
   User feedback on roadmap:
   [user's notes]
@@ -1004,7 +1004,7 @@ Use question:
   - .planning/ROADMAP.md (Current roadmap to revise)
   </files_to_read>
 
-  Update the roadmap based on feedback. edit files in place.
+  Update the roadmap based on feedback. Edit files in place.
   Return ROADMAP REVISED with changes made.
   </revision>
   ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Revise roadmap")
@@ -1050,7 +1050,7 @@ Present completion summary:
 ╚══════════════════════════════════════════╝
 ```
 
-Exit skill and invoke command("/gsd-discuss-phase 1 --auto")
+Exit skill and invoke Command("/gsd-discuss-phase 1 --auto")
 
 **If interactive mode:**
 

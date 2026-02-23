@@ -27,6 +27,10 @@ The translation utility (`assets/bin/translate.js`) provides:
 - **Post-translation validation** to detect remaining patterns
 - **Binary file detection** to skip non-text files
 - **Include option** for whitelist filtering (v1.1.0+)
+- **Multiple config files** for modular configuration (v1.2.0+)
+- **Profile system migration** — See [Example 6](#example-6-profile-system-migration-qualitybalancedbudget--simplesmartcustom)
+
+For profile system details, see [`assets/prompts/Simple-Profile-System.md`](../prompts/Simple-Profile-System.md).
 
 ## Installation
 
@@ -67,13 +71,21 @@ npm install  # Install tinyglobby dependency
 ### 2. Preview Changes (Dry-Run)
 
 ```bash
+# Single config
 node bin/translate.js config.json
+
+# Multiple configs (merged)
+node bin/translate.js base-config.json overrides.json
 ```
 
 ### 3. Apply Changes
 
 ```bash
+# Single config
 node bin/translate.js config.json --apply
+
+# Multiple configs
+node bin/translate.js base-config.json overrides.json --apply
 ```
 
 ## Configuration File
@@ -109,6 +121,8 @@ The configuration file is a JSON file with the following structure:
 | `rules` | `Rule[]` | Yes | - | Array of translation rules |
 | `maxFileSize` | `number` | No | `10485760` (10MB) | Maximum file size in bytes |
 
+**Note:** When using multiple config files, these fields are merged. See [Multiple Configuration Files](#multiple-configuration-files) for details.
+
 ### Rule Object
 
 ```json
@@ -130,7 +144,7 @@ The configuration file is a JSON file with the following structure:
 ## Command Line Options
 
 ```bash
-node translate.js <config-file> [options]
+node translate.js <config-file-1> [config-file-2] [...] [options]
 ```
 
 | Option | Description |
@@ -140,20 +154,38 @@ node translate.js <config-file> [options]
 | `--no-color` | Disable ANSI color codes in output |
 | `--help`, `-h` | Show help message |
 
+### Multiple Config Files
+
+You can specify multiple config files. They are merged in order with later configs overriding earlier ones:
+
+```bash
+# Merge base config with project-specific overrides
+node bin/translate.js base-config.json project-overrides.json --apply
+```
+
+**Merge behavior:**
+- `rules`: Concatenated from all configs (earlier configs first)
+- `patterns`/`include`/`exclude`: Merged and deduplicated
+- `maxFileSize`: Largest value from all configs is used
+- Other properties: Last config wins
+
 ### Examples
 
 ```bash
 # Dry-run (preview changes)
-node bin/translate.js config.json
+node bin/translate.js 1-20-5.json
 
 # Apply changes with backup
-node bin/translate.js config.json --apply
+node bin/translate.js 1-20-5.json --apply
 
 # Show detailed diffs
-node bin/translate.js config.json --show-diff
+node bin/translate.js 1-20-5.json --show-diff
 
 # No colors (for piping to other tools)
-node bin/translate.js config.json --no-color
+node bin/translate.js 1-20-5.json --no-color
+
+# Multiple configs (base + overrides)
+node bin/translate.js base.json overrides.json --apply
 ```
 
 ## Real-World Examples
@@ -183,7 +215,7 @@ node bin/translate.js config.json --no-color
 
 **Step 1: Preview**
 ```bash
-node bin/translate.js migration-config.json
+node bin/translate.js 1-20-5.json
 ```
 
 **Output:**
@@ -282,6 +314,107 @@ node bin/translate.js docs-only.json --apply
 }
 ```
 
+### Example 5: Using Multiple Config Files
+
+**Task:** Apply organization-wide standards with project-specific overrides.
+
+**Config 1** (`company-standards.json`):
+```json
+{
+  "exclude": ["node_modules/**", ".git/**", ".translate-backups/**"],
+  "rules": [
+    {"pattern": "gsd", "replacement": "gsd-opencode"},
+    {"pattern": "get-shit-done", "replacement": "gsd-opencode"}
+  ]
+}
+```
+
+**Config 2** (`project-overrides.json`):
+```json
+{
+  "include": ["src/**", "docs/**"],
+  "rules": [
+    {"pattern": "legacy-api", "replacement": "new-api"}
+  ],
+  "maxFileSize": 5242880
+}
+```
+
+**Preview changes**:
+```bash
+node bin/translate.js company-standards.json project-overrides.json
+```
+
+**Apply with merged config**:
+```bash
+node bin/translate.js company-standards.json project-overrides.json --apply
+```
+
+**Resulting merged config**:
+- Files: Only `src/**` and `docs/**` (from overrides)
+- Excludes: `node_modules/**`, `.git/**`, `.translate-backups/**` (from base)
+- Rules: All 3 rules (company rules first, then project rules)
+- Max file size: 5242880 bytes (from overrides)
+
+### Example 6: Profile System Migration (Quality/Balanced/Budget → Simple/Smart/Custom)
+
+**Task:** Migrate from the old Cloud Code profile system to the new OpenCode profile system.
+
+**Background:** The old system used three profile types:
+- `quality` — High quality model
+- `balanced` — Balanced quality/speed
+- `budget` — Cost-optimized
+
+The new system uses:
+- `simple` — Single model for all stages (1 model)
+- `smart` — Two models: advanced for planning + execution, less advanced for verification (2 models)
+- `custom` — Three models: user assigns specific models to Planning / Execution / Verification stages (3 models)
+
+**Migration Path:**
+- Old `active_profile: quality` → `profile_type: simple`
+- Old `active_profile: balanced` → `profile_type: smart`
+- Old `active_profile: budget` → `profile_type: custom`
+- Configs with 3 models automatically convert to Custom profile
+
+**Config file** (`profile-migration.json`):
+```json
+{
+  "patterns": ["**/*.md", "**/*.json", "**/*.js", "**/*.toml"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**"
+  ],
+  "rules": [
+    {"pattern": "quality", "replacement": "simple", "caseSensitive": false},
+    {"pattern": "balanced", "replacement": "smart", "caseSensitive": false},
+    {"pattern": "budget", "replacement": "custom", "caseSensitive": false},
+    {"pattern": "Quality", "replacement": "Simple", "caseSensitive": true},
+    {"pattern": "Balanced", "replacement": "Smart", "caseSensitive": true},
+    {"pattern": "Budget", "replacement": "Custom", "caseSensitive": true}
+  ]
+}
+```
+
+**Step 1: Preview changes**
+```bash
+node bin/translate.js profile-migration.json
+```
+
+**Step 2: Apply with backup**
+```bash
+node bin/translate.js profile-migration.json --apply
+```
+
+**Post-migration validation:**
+- Check `.planning/config.json` for updated `profile_type` field (simple/smart/custom)
+- Verify `opencode.json` uses new profile terminology
+- Test `/gsd-set-profile simple|smart|custom` commands work correctly
+- Ensure model assignments map correctly to new profile structure:
+  - Simple: 1 model assigned to all stages
+  - Smart: Model 1 → Planning+Execution, Model 2 → Verification
+  - Custom: Model 1 → Planning, Model 2 → Execution, Model 3 → Verification
+
 ## Safety Features
 
 ### 1. Automatic Backups
@@ -373,6 +506,67 @@ fi
 ```
 
 ## Advanced Usage
+
+### Multiple Configuration Files
+
+You can compose translation configurations by specifying multiple JSON config files. This enables modular configuration management:
+
+- **Base configurations** with common rules
+- **Project-specific overrides** for custom settings
+- **Incremental rule additions** across multiple files
+
+#### Merge Behavior
+
+When multiple configs are specified, they are merged with the following rules:
+
+| Property | Merge Behavior |
+|----------|----------------|
+| `rules` | Concatenated from all configs in order (earlier configs first) |
+| `include` | Merged and deduplicated using Set |
+| `exclude` | Merged and deduplicated using Set |
+| `patterns` | Merged and deduplicated using Set |
+| `maxFileSize` | Largest value from all configs |
+| Other properties | Last config wins |
+
+#### Example: Base Config + Project Overrides
+
+**base-config.json**:
+```json
+{
+  "rules": [
+    {"pattern": "gsd", "replacement": "gsd-opencode"}
+  ],
+  "exclude": ["node_modules/**", ".git/**"]
+}
+```
+
+**project-overrides.json**:
+```json
+{
+  "rules": [
+    {"pattern": "old-api", "replacement": "new-api"}
+  ],
+  "include": ["src/**"]
+}
+```
+
+**Merged result**:
+- `rules`: Both rules (base first, then overrides)
+- `include`: `["src/**"]`
+- `exclude`: `["node_modules/**", ".git/**"]`
+
+**Usage**:
+```bash
+node bin/translate.js base-config.json project-overrides.json --apply
+```
+
+#### Use Cases
+
+| Use Case | Config 1 | Config 2 | Result |
+|----------|----------|----------|--------|
+| Organization standards | `company-standards.json` | `project-specific.json` | Company rules + project overrides |
+| Environment-specific | `base-config.json` | `production-rules.json` | Different rules per environment |
+| Incremental migration | `phase-1.json` | `phase-2.json` | Add rules in stages |
 
 ### Include Option
 

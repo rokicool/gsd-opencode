@@ -1,0 +1,138 @@
+{
+  "patterns": [
+    "**/*.md",
+    "**/*.js",
+    "**/*.json",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.sh",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "**/*.lock",
+    "**/dist/**",
+    "**/build/**",
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml"
+  ],
+  "rules": [
+    {
+      "pattern": "gsd:",
+      "replacement": "gsd-"
+    },
+    {
+      "pattern": "/clear",
+      "replacement": "/new"
+    },
+    {
+      "pattern": "Read",
+      "replacement": "read"
+    },
+    {
+      "pattern": "Write",
+      "replacement": "write"
+    },
+    {
+      "pattern": "Bash",
+      "replacement": "bash"
+    },
+    {
+      "pattern": "Glob",
+      "replacement": "glob"
+    },
+    {
+      "pattern": "Grep",
+      "replacement": "grep"
+    },
+    {
+      "pattern": "Edit",
+      "replacement": "edit"
+    },
+    {
+      "pattern": "WebFetch",
+      "replacement": "webfetch"
+    },
+    {
+      "pattern": "Task",
+      "replacement": "task"
+    },
+    {
+      "pattern": "Patch",
+      "replacement": "patch"
+    },
+    {
+      "pattern": "Skill",
+      "replacement": "skill"
+    },
+    {
+      "pattern": "TodoWrite",
+      "replacement": "todowrite"
+    },
+    {
+      "pattern": "TodoRead",
+      "replacement": "todoread"
+    },
+    {
+      "pattern": "Question",
+      "replacement": "question"
+    },
+    {
+      "pattern": "~/.claude/",
+      "replacement": "~/.config/opencode/"
+    },
+    {
+      "pattern": "~/.claude/get-shit-done/",
+      "replacement": "~/.config/opencode/get-shit-done/"
+    },
+    {
+      "pattern": "./original/get-shit-done/commands/gsd/",
+      "replacement": "./gsd-opencode/commands/gsd/"
+    },
+    {
+      "pattern": "./original/get-shit-done/get-shit-done/references/",
+      "replacement": "./gsd-opencode/get-shit-done/references/"
+    },
+    {
+      "pattern": "./original/get-shit-done/get-shit-done/templates/",
+      "replacement": "./gsd-opencode/get-shit-done/templates/"
+    },
+    {
+      "pattern": "./original/get-shit-done/get-shit-done/workflows/",
+      "replacement": "./gsd-opencode/get-shit-done/workflows/"
+    },
+    {
+      "pattern": "./original/get-shit-done/agents/",
+      "replacement": "./gsd-opencode/agents/"
+    },
+    {
+      "pattern": "https://raw.githubusercontent.com/glittercowboy/get-shit-done",
+      "replacement": "https://raw.githubusercontent.com/rokicool/gsd-opencode"
+    },
+    {
+      "pattern": "https://github.com/glittercowboy/get-shit-done",
+      "replacement": "https://github.com/rokicool/gsd-opencode"
+    },
+    {
+      "pattern": "https://raw.githubusercontent.com/gsd-build/get-shit-done",
+      "replacement": "https://raw.githubusercontent.com/rokicool/gsd-opencode"
+    },
+    {
+      "pattern": "https://github.com/gsd-build/get-shit-done",
+      "replacement": "https://github.com/rokicool/gsd-opencode"
+    },
+    {
+      "pattern": "get-shit-done-cc",
+      "replacement": "gsd-opencode"
+    },
+    {
+      "pattern": "get-shit-done",
+      "replacement": "gsd-opencode"
+    }
+  ],
+  "maxFileSize": 10485760
+}

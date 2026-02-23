@@ -6,7 +6,7 @@ Start a new milestone cycle for an existing project. Loads project context, gath
 
 <required_reading>
 
-read all files referenced by the invoking prompt's execution_context before starting.
+Read all files referenced by the invoking prompt's execution_context before starting.
 
 </required_reading>
 
@@ -14,9 +14,9 @@ read all files referenced by the invoking prompt's execution_context before star
 
 ## 1. Load Context
 
-- read PROJECT.md (existing project, validated requirements, decisions)
-- read MILESTONES.md (what shipped previously)
-- read STATE.md (pending todos, blockers)
+- Read PROJECT.md (existing project, validated requirements, decisions)
+- Read MILESTONES.md (what shipped previously)
+- Read STATE.md (pending todos, blockers)
 - Check for MILESTONE-CONTEXT.md (from /gsd-discuss-milestone)
 
 ## 2. Gather Milestone Goals
@@ -28,7 +28,7 @@ read all files referenced by the invoking prompt's execution_context before star
 **If no context file:**
 - Present what shipped in last milestone
 - Ask: "What do you want to build next?"
-- Use question to explore features, priorities, constraints, scope
+- Use Question to explore features, priorities, constraints, scope
 
 ## 3. Determine Milestone Version
 
@@ -84,7 +84,7 @@ Extract from init JSON: `researcher_model`, `synthesizer_model`, `roadmapper_mod
 
 ## 8. Research Decision
 
-question: "Research the domain ecosystem for new features before defining requirements?"
+Question: "Research the domain ecosystem for new features before defining requirements?"
 - "Research first (Recommended)" — Discover patterns, features, architecture for NEW capabilities
 - "Skip research" — Go straight to requirements
 
@@ -117,7 +117,7 @@ Spawn 4 parallel gsd-project-researcher agents. Each uses this template with dim
 
 **Common structure for all 4 researchers:**
 ```
-task(prompt="
+Task(prompt="
 <research_type>Project Research — {DIMENSION} for [new features].</research_type>
 
 <milestone_context>
@@ -137,7 +137,7 @@ Focus ONLY on what's needed for the NEW features.
 <quality_gate>{GATES}</quality_gate>
 
 <output>
-write to: .planning/research/{FILE}
+Write to: .planning/research/{FILE}
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/{FILE}
 </output>
 ", subagent_type="gsd-project-researcher", model="{researcher_model}", description="{DIMENSION} research")
@@ -156,7 +156,7 @@ Use template: ~/.config/opencode/get-shit-done/templates/research-project/{FILE}
 After all 4 complete, spawn synthesizer:
 
 ```
-task(prompt="
+Task(prompt="
 Synthesize research outputs into SUMMARY.md.
 
 <files_to_read>
@@ -166,7 +166,7 @@ Synthesize research outputs into SUMMARY.md.
 - .planning/research/PITFALLS.md
 </files_to_read>
 
-write to: .planning/research/SUMMARY.md
+Write to: .planning/research/SUMMARY.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 ", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
@@ -193,9 +193,9 @@ Display key findings from SUMMARY.md:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-read PROJECT.md: core value, current milestone goals, validated requirements (what exists).
+Read PROJECT.md: core value, current milestone goals, validated requirements (what exists).
 
-**If research exists:** read FEATURES.md, extract feature categories.
+**If research exists:** Read FEATURES.md, extract feature categories.
 
 Present features by category:
 ```
@@ -207,14 +207,14 @@ Present features by category:
 
 **If no research:** Gather requirements through conversation. Ask: "What are the main things users need to do with [new features]?" Clarify, probe for related capabilities, group into categories.
 
-**Scope each category** via question (multiSelect: true, header max 12 chars):
+**Scope each category** via Question (multiSelect: true, header max 12 chars):
 - "[Feature 1]" — [brief description]
 - "[Feature 2]" — [brief description]
 - "None for this milestone" — Defer entire category
 
 Track: Selected → this milestone. Unselected table stakes → future. Unselected differentiators → out of scope.
 
-**Identify gaps** via question:
+**Identify gaps** via Question:
 - "No, research covered it" — Proceed
 - "Yes, let me add some" — Capture additions
 
@@ -266,10 +266,10 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: define mil
 ◆ Spawning roadmapper...
 ```
 
-**Starting phase number:** read MILESTONES.md for last phase number. Continue from there (v1.0 ended at phase 5 → v1.1 starts at phase 6).
+**Starting phase number:** Read MILESTONES.md for last phase number. Continue from there (v1.0 ended at phase 5 → v1.1 starts at phase 6).
 
 ```
-task(prompt="
+Task(prompt="
 <planning_context>
 <files_to_read>
 - .planning/PROJECT.md
@@ -287,10 +287,10 @@ Create roadmap for milestone v[X.Y]:
 3. Map every requirement to exactly one phase
 4. Derive 2-5 success criteria per phase (observable user behaviors)
 5. Validate 100% coverage
-6. write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
+6. Write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
 7. Return ROADMAP CREATED with summary
 
-write files first, then return.
+Write files first, then return.
 </instructions>
 ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
 ```
@@ -299,7 +299,7 @@ write files first, then return.
 
 **If `## ROADMAP BLOCKED`:** Present blocker, work with user, re-spawn.
 
-**If `## ROADMAP CREATED`:** read ROADMAP.md, present inline:
+**If `## ROADMAP CREATED`:** Read ROADMAP.md, present inline:
 
 ```
 ## Proposed Roadmap
@@ -320,7 +320,7 @@ Success criteria:
 2. [criterion]
 ```
 
-**Ask for approval** via question:
+**Ask for approval** via Question:
 - "Approve" — Commit and continue
 - "Adjust phases" — Tell me what to change
 - "Review full file" — Show raw ROADMAP.md

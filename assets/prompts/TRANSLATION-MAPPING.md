@@ -1,6 +1,6 @@
 # Translation Mapping: Claude Code → OpenCode
 
-## Command Names
+## Command Names Examples (NOT ALL OF THEM)
 
 | Claude Code | OpenCode |
 |-------------|----------|
@@ -15,23 +15,7 @@
 | gsd:add-phase | gsd-add-phase |
 | gsd:insert-phase | gsd-insert-phase |
 | gsd:remove-phase | gsd-remove-phase |
-| gsd:add-todo | gsd-add-todo |
-| gsd:check-todos | gsd-check-todos |
-| gsd:debug | gsd-debug |
-| gsd:map-codebase | gsd-map-codebase |
-| gsd:verify-work | gsd-verify-work |
-| gsd:progress | gsd-progress |
-| gsd:settings | gsd-settings |
-| gsd:set-profile | gsd-set-profile |
-| gsd:update | gsd-update |
-| gsd:pause-work | gsd-pause-work |
-| gsd:resume-work | gsd-resume-work |
-| gsd:quick | gsd-quick |
-| gsd:whats-new | gsd-whats-new |
-| gsd:help | gsd-help |
-| gsd:audit-milestone | gsd-audit-milestone |
-| gsd:plan-milestone-gaps | gsd-plan-milestone-gaps |
-| gsd:list-phase-assumptions | gsd-list-phase-assumptions |
+
 
 ## Tool Mapping
 
@@ -146,13 +130,13 @@ color: "#00FFFF"
 | name: gsd:command | name: gsd-command |
 | agent: gsd-xxx | agent: gsd-xxx |
 | tools: Read, Write, ... | tools: read, write, ... (lowercase) |
-| allowed-tools: [Read, Write] | allowed-tools: [read, write] (lowercase) |
+
 
 ## Variable Usage
 
 | Claude Code | OpenCode |
 |-------------|----------|
-| All arguments | $ARGUMENTS (preserved) |
+| All arguments | $ARGUMENTS |
 
 ## Config File
 

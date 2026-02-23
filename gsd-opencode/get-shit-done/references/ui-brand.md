@@ -69,7 +69,7 @@ User action required. 62-character width.
 Progress: ████████░░ 80%
 ```
 
-**task level:**
+**Task level:**
 ```
 Tasks: 2/4 complete
 ```
