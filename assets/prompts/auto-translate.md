@@ -1,0 +1,47 @@
+We have a fully functional system of meta prompts, created by TACHES in original/ folder.
+
+The Goal is to 'migrate' all original prompts to gsd-opencode/ folder. 
+
+The challange is the original/ is created for Cloude Code and supports a specific syntax. However, the target system in gsd-opencode/ is for OpenCode.
+
+There is a file assets/prompts/TRANSLATION-MAPPING.md that defines most of the differences between the systmes. 
+
+So, the prompts and scripts in gsd-opencode/ folder must be prompts with similar functionality as prompts and scripts in original/ folder, but with changes performed according assets/prompts/TRANSLATION-MAPPING.md file.
+
+There are two automated scripts you can use:
+
+1. assets/bin/copy-from-original.js - it can copy files from original/ folder to gsd-opencode/ folder
+2. assets/bin/translate.js - it can translate the files in gsd-opencode/ folder to be opencode compatible.
+3. assets/bin/check-forbidden-strings.js - it can check if there are incorrect strings left in the gsd-opencode/ folder
+
+To perform translation the assets/bin/translate.js file uses json based format.
+
+
+Task 1.
+
+Use assets/bin/copy-from-original.js with the correct parameters to copy original/ files to gsd-opencode/
+
+
+Task 2.
+
+Generate a suitable json based conversion config file to comply with assets/prompts/TRANSLATION-MAPPING.md. Let's say the name is the current source version of the TACHES system. Currently it is 1-20-5.json.
+
+Task 3. 
+
+Perform the translation using assets/bin/translate.js with 1-20-5.json file as parameter. 
+
+Task 4.
+
+Check if there are any forbiden string remaining in the gsd-opencode/ folder using assets/bin/check-forbidden-strings.js script with assets/antipatterns.toml as parameter.
+
+Task 5.
+
+Make changes to 1-20-5.json to fix the rules to remove the forbidden strings. And Go to Task 3.
+
+Task 6.
+
+Check all the files in gsd-opencode/ folder and make sure that they comply with assets/prompts/TRANSLATION-MAPPING.md requirements. If there are inconsistancies - make changes to 1-20-5.json file. And Go to Task 3.
+
+Task 7.
+
+Provide CONV-REPORT.md with details of the converion

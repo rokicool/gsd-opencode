@@ -5,7 +5,7 @@ Display the complete GSD command reference. Output ONLY the reference content. D
 <reference>
 # GSD Command Reference
 
-**GSD** (Get Shit Done) creates hierarchical project plans optimized for solo agentic development with The assistant.
+**GSD** (Get Shit Done) creates hierarchical project plans optimized for solo agentic development with OpenCode.
 
 ## Quick Start
 
@@ -80,10 +80,10 @@ Comprehensive ecosystem research for niche/complex domains.
 Usage: `/gsd-research-phase 3`
 
 **`/gsd-list-phase-assumptions <number>`**
-See what The assistant is planning to do before it starts.
+See what OpenCode is planning to do before it starts.
 
-- Shows The assistant's intended approach for a phase
-- Lets you course-correct if The assistant misunderstood your vision
+- Shows OpenCode's intended approach for a phase
+- Lets you course-correct if OpenCode misunderstood your vision
 - No files created - conversational output only
 
 Usage: `/gsd-list-phase-assumptions 3`
@@ -105,7 +105,7 @@ Result: Creates `.planning/phases/01-foundation/01-01-PLAN.md`
 Execute all plans in a phase.
 
 - Groups plans by wave (from frontmatter), executes waves sequentially
-- Plans within each wave run in parallel via Task tool
+- Plans within each wave run in parallel via task tool
 - Verifies phase goal after all plans complete
 - Updates REQUIREMENTS.md, ROADMAP.md, STATE.md
 

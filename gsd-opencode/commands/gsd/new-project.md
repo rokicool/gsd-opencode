@@ -6,7 +6,7 @@ allowed-tools:
   - read
   - bash
   - write
-  - Task
+  - task
   - question
 ---
 <context>

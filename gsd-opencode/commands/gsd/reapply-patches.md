@@ -1,12 +1,11 @@
 ---
-name: gsd-reapply-patches
 description: Reapply local modifications after a GSD update
 allowed-tools: read, write, edit, bash, glob, grep, question
 ---
 
-<objective>
+<purpose>
 After a GSD update wipes and reinstalls files, this command merges user's previously saved local modifications back into the new version. Uses intelligent comparison to handle cases where the upstream file also changed.
-</objective>
+</purpose>
 
 <process>
 
@@ -19,7 +18,7 @@ Check for local patches directory:
 PATCHES_DIR=~/.config/opencode/gsd-local-patches
 # Local install fallback
 if [ ! -d "$PATCHES_DIR" ]; then
-  PATCHES_DIR=./.the assistant/gsd-local-patches
+  PATCHES_DIR=./.OpenCode/gsd-local-patches
 fi
 ```
 

@@ -1,13 +1,13 @@
 <overview>
 Plans execute autonomously. Checkpoints formalize interaction points where human verification or decisions are needed.
 
-**Core principle:** The assistant automates everything with CLI/API. Checkpoints are for verification and decisions, not manual work.
+**Core principle:** OpenCode automates everything with CLI/API. Checkpoints are for verification and decisions, not manual work.
 
 **Golden rules:**
-1. **If The assistant can run it, The assistant runs it** - Never ask user to execute CLI commands, start servers, or run builds
-2. **The assistant sets up the verification environment** - Start dev servers, seed databases, configure env vars
+1. **If OpenCode can run it, OpenCode runs it** - Never ask user to execute CLI commands, start servers, or run builds
+2. **OpenCode sets up the verification environment** - Start dev servers, seed databases, configure env vars
 3. **User only does what requires human judgment** - Visual checks, UX evaluation, "does this feel right?"
-4. **Secrets come from user, automation comes from The assistant** - Ask for API keys, then The assistant uses them via CLI
+4. **Secrets come from user, automation comes from OpenCode** - Ask for API keys, then OpenCode uses them via CLI
 5. **Auto-mode bypasses verification/decision checkpoints** — When `workflow.auto_advance` is true in config: human-verify auto-approves, decision auto-selects first option, human-action still stops (auth gates cannot be automated)
 </overview>
 
@@ -16,7 +16,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 <type name="human-verify">
 ## checkpoint:human-verify (Most Common - 90%)
 
-**When:** The assistant completed automated work, human confirms it works correctly.
+**When:** OpenCode completed automated work, human confirms it works correctly.
 
 **Use for:**
 - Visual UI checks (layout, styling, responsiveness)
@@ -29,7 +29,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 **Structure:**
 ```xml
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>[What The assistant automated and deployed/built]</what-built>
+  <what-built>[What OpenCode automated and deployed/built]</what-built>
   <how-to-verify>
     [Exact steps to test - URLs, commands, expected behavior]
   </how-to-verify>
@@ -37,7 +37,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 </task>
 ```
 
-**Example: UI Component (shows key pattern: The assistant starts server BEFORE checkpoint)**
+**Example: UI Component (shows key pattern: OpenCode starts server BEFORE checkpoint)**
 ```xml
 <task type="auto">
   <name>Build responsive dashboard layout</name>
@@ -185,10 +185,10 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 <type name="human-action">
 ## checkpoint:human-action (1% - Rare)
 
-**When:** Action has NO CLI/API and requires human-only interaction, OR The assistant hit an authentication gate during automation.
+**When:** Action has NO CLI/API and requires human-only interaction, OR OpenCode hit an authentication gate during automation.
 
 **Use ONLY for:**
-- **Authentication gates** - The assistant tried CLI/API but needs credentials (this is NOT a failure)
+- **Authentication gates** - OpenCode tried CLI/API but needs credentials (this is NOT a failure)
 - Email verification links (clicking email)
 - SMS 2FA codes (phone verification)
 - Manual account approvals (platform requires human review)
@@ -204,12 +204,12 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 **Structure:**
 ```xml
 <task type="checkpoint:human-action" gate="blocking">
-  <action>[What human must do - The assistant already did everything automatable]</action>
+  <action>[What human must do - OpenCode already did everything automatable]</action>
   <instructions>
-    [What The assistant already automated]
+    [What OpenCode already automated]
     [The ONE thing requiring human action]
   </instructions>
-  <verification>[What The assistant can check afterward]</verification>
+  <verification>[What OpenCode can check afterward]</verification>
   <resume-signal>[How to continue]</resume-signal>
 </task>
 ```
@@ -243,7 +243,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
   <verify>vercel ls shows deployment, curl returns 200</verify>
 </task>
 
-<!-- If vercel returns "Error: Not authenticated", The assistant creates checkpoint on the fly -->
+<!-- If vercel returns "Error: Not authenticated", OpenCode creates checkpoint on the fly -->
 
 <task type="checkpoint:human-action" gate="blocking">
   <action>Authenticate Vercel CLI so I can continue deployment</action>
@@ -256,7 +256,7 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
   <resume-signal>Type "done" when authenticated</resume-signal>
 </task>
 
-<!-- After authentication, The assistant retries the deployment -->
+<!-- After authentication, OpenCode retries the deployment -->
 
 <task type="auto">
   <name>Retry Vercel deployment</name>
@@ -265,13 +265,13 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 </task>
 ```
 
-**Key distinction:** Auth gates are created dynamically when The assistant encounters auth errors. NOT pre-planned — The assistant automates first, asks for credentials only when blocked.
+**Key distinction:** Auth gates are created dynamically when OpenCode encounters auth errors. NOT pre-planned — OpenCode automates first, asks for credentials only when blocked.
 </type>
 </checkpoint_types>
 
 <execution_protocol>
 
-When The assistant encounters `type="checkpoint:*"`:
+When OpenCode encounters `type="checkpoint:*"`:
 
 1. **Stop immediately** - do not proceed to next task
 2. **Display checkpoint clearly** using the format below
@@ -286,7 +286,7 @@ When The assistant encounters `type="checkpoint:*"`:
 ╚═══════════════════════════════════════════════════════╝
 
 Progress: 5/8 tasks complete
-Task: Responsive dashboard layout
+task: Responsive dashboard layout
 
 Built: Responsive dashboard at /dashboard
 
@@ -308,7 +308,7 @@ How to verify:
 ╚═══════════════════════════════════════════════════════╝
 
 Progress: 2/6 tasks complete
-Task: Select authentication provider
+task: Select authentication provider
 
 Decision: Which auth provider should we use?
 
@@ -339,7 +339,7 @@ Options:
 ╚═══════════════════════════════════════════════════════╝
 
 Progress: 3/8 tasks complete
-Task: Deploy to Vercel
+task: Deploy to Vercel
 
 Attempted: vercel --yes
 Error: Not authenticated. Please run 'vercel login'
@@ -359,9 +359,9 @@ I'll verify: vercel whoami returns your account
 
 <authentication_gates>
 
-**Auth gate = The assistant tried CLI/API, got auth error.** Not a failure — a gate requiring human input to unblock.
+**Auth gate = OpenCode tried CLI/API, got auth error.** Not a failure — a gate requiring human input to unblock.
 
-**Pattern:** The assistant tries automation → auth error → creates checkpoint:human-action → user authenticates → The assistant retries → continues
+**Pattern:** OpenCode tries automation → auth error → creates checkpoint:human-action → user authenticates → OpenCode retries → continues
 
 **Gate protocol:**
 1. Recognize it's not a failure - missing auth is expected
@@ -373,14 +373,14 @@ I'll verify: vercel whoami returns your account
 7. Continue normally
 
 **Key distinction:**
-- Pre-planned checkpoint: "I need you to do X" (wrong - The assistant should automate)
+- Pre-planned checkpoint: "I need you to do X" (wrong - OpenCode should automate)
 - Auth gate: "I tried to automate X but need credentials" (correct - unblocks automation)
 
 </authentication_gates>
 
 <automation_reference>
 
-**The rule:** If it has CLI/API, The assistant does it. Never ask human to perform automatable work.
+**The rule:** If it has CLI/API, OpenCode does it. Never ask human to perform automatable work.
 
 ## Service CLI Reference
 
@@ -420,7 +420,7 @@ I'll verify: vercel whoami returns your account
   <instructions>Go to dashboard.convex.dev → Settings → Environment Variables → Add</instructions>
 </task>
 
-<!-- RIGHT: The assistant asks for value, then adds via CLI -->
+<!-- RIGHT: OpenCode asks for value, then adds via CLI -->
 <task type="checkpoint:human-action">
   <action>Provide your OpenAI API key</action>
   <instructions>
@@ -513,7 +513,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 
 ## Automatable Quick Reference
 
-| Action | Automatable? | The assistant does it? |
+| Action | Automatable? | OpenCode does it? |
 |--------|--------------|-----------------|
 | Deploy to Vercel | Yes (`vercel`) | YES |
 | Create Stripe webhook | Yes (API) | YES |
@@ -542,13 +542,13 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 - Provide context: why this checkpoint exists
 
 **DON'T:**
-- Ask human to do work The assistant can automate ❌
+- Ask human to do work OpenCode can automate ❌
 - Assume knowledge: "Configure the usual settings" ❌
 - Skip steps: "Set up database" (too vague) ❌
 - Mix multiple verifications in one checkpoint ❌
 
 **Placement:**
-- **After automation completes** - not before The assistant does the work
+- **After automation completes** - not before OpenCode does the work
 - **After UI buildout** - before declaring phase complete
 - **Before dependent work** - decisions before implementation
 - **At integration points** - after configuring external services
@@ -578,7 +578,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
   <done>Redis database created and configured</done>
 </task>
 
-<!-- NO CHECKPOINT NEEDED - The assistant automated everything and verified programmatically -->
+<!-- NO CHECKPOINT NEEDED - OpenCode automated everything and verified programmatically -->
 ```
 
 ### Example 2: Full Auth Flow (Single checkpoint at end)
@@ -643,9 +643,9 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 </task>
 ```
 
-**Why bad:** The assistant can run `npm run dev`. User should only visit URLs, not execute commands.
+**Why bad:** OpenCode can run `npm run dev`. User should only visit URLs, not execute commands.
 
-### ✅ GOOD: The assistant starts server, user visits
+### ✅ GOOD: OpenCode starts server, user visits
 
 ```xml
 <task type="auto">
@@ -664,7 +664,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 </task>
 ```
 
-### ❌ BAD: Asking human to deploy / ✅ GOOD: The assistant automates
+### ❌ BAD: Asking human to deploy / ✅ GOOD: OpenCode automates
 
 ```xml
 <!-- BAD: Asking user to deploy via dashboard -->
@@ -673,7 +673,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
   <instructions>Visit vercel.com/new → Import repo → Click Deploy → Copy URL</instructions>
 </task>
 
-<!-- GOOD: The assistant deploys, user verifies -->
+<!-- GOOD: OpenCode deploys, user verifies -->
 <task type="auto">
   <name>Deploy to Vercel</name>
   <action>Run `vercel --yes`. Capture URL.</action>
@@ -742,7 +742,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 </task>
 ```
 
-**Why bad:** The assistant can run these commands. User should never execute CLI commands.
+**Why bad:** OpenCode can run these commands. User should never execute CLI commands.
 
 ### ❌ BAD: Asking user to copy values between services
 
@@ -753,7 +753,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 </task>
 ```
 
-**Why bad:** Stripe has an API. The assistant should create the webhook via API and write to .env directly.
+**Why bad:** Stripe has an API. OpenCode should create the webhook via API and write to .env directly.
 
 </anti_patterns>
 
@@ -761,16 +761,16 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 
 Checkpoints formalize human-in-the-loop points for verification and decisions, not manual work.
 
-**The golden rule:** If The assistant CAN automate it, The assistant MUST automate it.
+**The golden rule:** If OpenCode CAN automate it, OpenCode MUST automate it.
 
 **Checkpoint priority:**
-1. **checkpoint:human-verify** (90%) - The assistant automated everything, human confirms visual/functional correctness
+1. **checkpoint:human-verify** (90%) - OpenCode automated everything, human confirms visual/functional correctness
 2. **checkpoint:decision** (9%) - Human makes architectural/technology choices
 3. **checkpoint:human-action** (1%) - Truly unavoidable manual steps with no API/CLI
 
 **When NOT to use checkpoints:**
-- Things The assistant can verify programmatically (tests, builds)
-- File operations (The assistant can read files)
+- Things OpenCode can verify programmatically (tests, builds)
+- File operations (OpenCode can read files)
 - Code correctness (tests and static analysis)
 - Anything automatable via CLI/API
 </summary>

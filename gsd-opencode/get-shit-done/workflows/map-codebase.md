@@ -17,7 +17,7 @@ Output: .planning/codebase/ folder with 7 structured documents about the codebas
 Include enough detail to be useful as reference. Prioritize practical examples (especially code patterns) over arbitrary brevity.
 
 **Always include file paths:**
-Documents are reference material for The assistant when planning/executing. Always include actual file paths formatted with backticks: `src/services/user.ts`.
+Documents are reference material for OpenCode when planning/executing. Always include actual file paths formatted with backticks: `src/services/user.ts`.
 </philosophy>
 
 <process>
@@ -84,23 +84,19 @@ Continue to spawn_agents.
 <step name="spawn_agents">
 Spawn 4 parallel gsd-codebase-mapper agents.
 
-Use Task tool with `subagent_type="gsd-codebase-mapper"`, `model="{mapper_model}"`, and `run_in_background=true` for parallel execution.
+Use task tool with `subagent_type="gsd-codebase-mapper"`, `model="{mapper_model}"`, and `run_in_background=true` for parallel execution.
 
 **CRITICAL:** Use the dedicated `gsd-codebase-mapper` agent, NOT `Explore`. The mapper agent writes documents directly.
 
 **Agent 1: Tech Focus**
 
-Task tool parameters:
 ```
-subagent_type: "gsd-codebase-mapper"
-model: "{mapper_model}"
-run_in_background: true
-description: "Map codebase tech stack"
-```
-
-Prompt:
-```
-Focus: tech
+task(
+  subagent_type="gsd-codebase-mapper",
+  model="{mapper_model}",
+  run_in_background=true,
+  description="Map codebase tech stack",
+  prompt="Focus: tech
 
 Analyze this codebase for technology stack and external integrations.
 
@@ -108,22 +104,19 @@ write these documents to .planning/codebase/:
 - STACK.md - Languages, runtime, frameworks, dependencies, configuration
 - INTEGRATIONS.md - External APIs, databases, auth providers, webhooks
 
-Explore thoroughly. write documents directly using templates. Return confirmation only.
+Explore thoroughly. write documents directly using templates. Return confirmation only."
+)
 ```
 
 **Agent 2: Architecture Focus**
 
-Task tool parameters:
 ```
-subagent_type: "gsd-codebase-mapper"
-model: "{mapper_model}"
-run_in_background: true
-description: "Map codebase architecture"
-```
-
-Prompt:
-```
-Focus: arch
+task(
+  subagent_type="gsd-codebase-mapper",
+  model="{mapper_model}",
+  run_in_background=true,
+  description="Map codebase architecture",
+  prompt="Focus: arch
 
 Analyze this codebase architecture and directory structure.
 
@@ -131,22 +124,19 @@ write these documents to .planning/codebase/:
 - ARCHITECTURE.md - Pattern, layers, data flow, abstractions, entry points
 - STRUCTURE.md - Directory layout, key locations, naming conventions
 
-Explore thoroughly. write documents directly using templates. Return confirmation only.
+Explore thoroughly. write documents directly using templates. Return confirmation only."
+)
 ```
 
 **Agent 3: Quality Focus**
 
-Task tool parameters:
 ```
-subagent_type: "gsd-codebase-mapper"
-model: "{mapper_model}"
-run_in_background: true
-description: "Map codebase conventions"
-```
-
-Prompt:
-```
-Focus: quality
+task(
+  subagent_type="gsd-codebase-mapper",
+  model="{mapper_model}",
+  run_in_background=true,
+  description="Map codebase conventions",
+  prompt="Focus: quality
 
 Analyze this codebase for coding conventions and testing patterns.
 
@@ -154,29 +144,27 @@ write these documents to .planning/codebase/:
 - CONVENTIONS.md - Code style, naming, patterns, error handling
 - TESTING.md - Framework, structure, mocking, coverage
 
-Explore thoroughly. write documents directly using templates. Return confirmation only.
+Explore thoroughly. write documents directly using templates. Return confirmation only."
+)
 ```
 
 **Agent 4: Concerns Focus**
 
-Task tool parameters:
 ```
-subagent_type: "gsd-codebase-mapper"
-model: "{mapper_model}"
-run_in_background: true
-description: "Map codebase concerns"
-```
-
-Prompt:
-```
-Focus: concerns
+task(
+  subagent_type="gsd-codebase-mapper",
+  model="{mapper_model}",
+  run_in_background=true,
+  description="Map codebase concerns",
+  prompt="Focus: concerns
 
 Analyze this codebase for technical debt, known issues, and areas of concern.
 
 write this document to .planning/codebase/:
 - CONCERNS.md - Tech debt, bugs, security, performance, fragile areas
 
-Explore thoroughly. write document directly using template. Return confirmation only.
+Explore thoroughly. write document directly using template. Return confirmation only."
+)
 ```
 
 Continue to collect_confirmations.
@@ -246,7 +234,7 @@ This would expose credentials if committed.
 **Action required:**
 1. Review the flagged content above
 2. If these are real secrets, they must be removed before committing
-3. Consider adding sensitive files to The assistant "Deny" permissions
+3. Consider adding sensitive files to OpenCode "Deny" permissions
 
 Pausing before commit. Reply "safe to proceed" if the flagged content is not actually sensitive, or edit the files first.
 ```

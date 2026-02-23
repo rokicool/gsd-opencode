@@ -5,7 +5,7 @@ argument-hint: [issue description]
 allowed-tools:
   - read
   - bash
-  - Task
+  - task
   - question
 ---
 
@@ -90,7 +90,7 @@ Create: .planning/debug/{slug}.md
 ```
 
 ```
-Task(
+task(
   prompt=filled_prompt,
   subagent_type="gsd-debugger",
   model="{debugger_model}",
@@ -129,7 +129,9 @@ Continue debugging {slug}. Evidence is in the debug file.
 </objective>
 
 <prior_state>
-Debug file: @.planning/debug/{slug}.md
+<files_to_read>
+- .planning/debug/{slug}.md (Debug session state)
+</files_to_read>
 </prior_state>
 
 <checkpoint_response>
@@ -143,7 +145,7 @@ goal: find_and_fix
 ```
 
 ```
-Task(
+task(
   prompt=continuation_prompt,
   subagent_type="gsd-debugger",
   model="{debugger_model}",

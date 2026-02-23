@@ -12,11 +12,14 @@
  * Usage: node copy-from-original.js [options]
  *
  * Options:
- *   -d, --dry-run      Preview changes without copying files
+ *   --apply            Apply changes (copy files)
  *   -f, --force        Overwrite diverged files without warning
- *   --show-diff        Show file diffs before syncing
+ *   --filter <pattern> Filter files by name pattern (e.g., "VALID*")
  *   -v, --verbose      Show detailed output
  *   -h, --help         Show help message
+ *
+ * By default, the script runs in preview mode (dry-run) and shows what would be copied.
+ * Use --apply to actually copy files.
  *
  * Exit codes:
  *   0  Success
@@ -27,7 +30,7 @@
 import { program } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 
@@ -84,6 +87,33 @@ function pluralize(count, singular, plural = null) {
 }
 
 /**
+ * Filter files by pattern
+ * @param {string[]} files - List of file paths
+ * @param {string} pattern - Pattern to match (e.g., "VALID*")
+ * @returns {string[]} Filtered files
+ */
+function filterFilesByPattern(files, pattern) {
+  if (!pattern) return files;
+  
+  // Convert simple glob pattern to regex
+  // "VALID*" -> /^VALID.*$/
+  // "*test*" -> /^.*test.*$/
+  const regex = new RegExp(
+    '^' + 
+    pattern
+      .replace(/\*/g, '.*')
+      .replace(/\?/g, '.') + 
+    '$',
+    'i'
+  );
+  
+  return files.filter(file => {
+    const filename = basename(file);
+    return regex.test(filename);
+  });
+}
+
+/**
  * Main CLI action
  * @param {Object} options - CLI options
  */
@@ -105,15 +135,18 @@ async function main(options) {
   });
 
   const verbose = options.verbose;
-  const dryRun = options.dryRun;
+  const apply = options.apply;
   const force = options.force;
-  const showDiff = options.showDiff;
+  const filter = options.filter;
+
+  // By default, run in preview mode (dry-run)
+  const dryRun = !apply;
 
   // Header
-  if (!dryRun) {
-    console.log(chalk.bold('\n🔄 Copy from Original\n'));
+  if (dryRun) {
+    console.log(chalk.bold('\n🔄 Copy from Original (PREVIEW)\n'));
   } else {
-    console.log(chalk.bold('\n🔄 Copy from Original (DRY RUN)\n'));
+    console.log(chalk.bold('\n🔄 Copy from Original\n'));
   }
 
   // Step 1: Verify submodule
@@ -144,46 +177,43 @@ async function main(options) {
     process.exit(EXIT_ERROR);
   }
 
-  // Step 3: Check for changes
-  const detectSpinner = ora('Detecting changes...').start();
-  let changes;
+  // Step 3: Find all diverged files (always resync mode)
+  const detectSpinner = ora('Scanning for differences...').start();
+  let diverged;
 
   try {
-    const lastSync = await syncManifest.getLastSync();
-    changes = await submoduleService.detectChanges(lastSync?.commit || null);
-    detectSpinner.succeed(`Found ${changes.files.length} changed ${pluralize(changes.files.length, 'file')}`);
+    diverged = await syncService.findDivergedFiles();
+    detectSpinner.succeed(`Found ${diverged.files.length} ${pluralize(diverged.files.length, 'file')} with differences`);
   } catch (error) {
-    detectSpinner.fail('Failed to detect changes');
+    detectSpinner.fail('Failed to scan for differences');
     console.error(chalk.red(`\n  Error: ${error.message}`));
     process.exit(EXIT_ERROR);
   }
 
-  // If no changes, exit early
-  if (!changes.hasChanges) {
-    console.log(chalk.green('\n✓ Already up to date\n'));
+  // Apply filter if specified
+  let filesToSync = diverged.files;
+  if (filter) {
+    const beforeFilter = filesToSync.length;
+    filesToSync = filterFilesByPattern(filesToSync, filter);
+    console.log(chalk.gray(`\nFilter "${filter}": ${beforeFilter} → ${filesToSync.length} files`));
+  }
+
+  // If no differences, exit early
+  if (filesToSync.length === 0) {
+    console.log(chalk.green('\n✓ All files are up to date\n'));
     process.exit(EXIT_SUCCESS);
   }
 
-  // Filter to mapped files
-  const mappedFiles = changes.files.filter(f => syncService.isMapped(f));
-
-  if (mappedFiles.length === 0) {
-    console.log(chalk.yellow('\n⚠ No mapped files to sync'));
-    console.log(chalk.gray('  (Files changed but none are in sync directories)\n'));
-    process.exit(EXIT_SUCCESS);
-  }
-
-  if (verbose) {
-    console.log(chalk.gray('\nChanged files:'));
-    console.log(formatFileList(mappedFiles, 20));
-  }
+  // Show files that will be copied
+  console.log(chalk.gray('\nFiles to sync:'));
+  console.log(formatFileList(filesToSync, verbose ? 50 : 20));
 
   // Step 4: Perform sync
   const syncSpinner = ora(dryRun ? 'Previewing sync...' : 'Syncing files...').start();
 
   let result;
   try {
-    result = await syncService.sync({ dryRun, force, showDiff });
+    result = await syncService.sync({ dryRun, force, files: filesToSync });
     syncSpinner.succeed(dryRun ? 'Preview complete' : 'Sync complete');
   } catch (error) {
     syncSpinner.fail('Sync failed');
@@ -225,52 +255,8 @@ async function main(options) {
     console.log('');
   }
 
-  // Show divergences
-  const divergenceKeys = Object.keys(result.divergences);
-  if (divergenceKeys.length > 0) {
-    console.log(chalk.yellow(`⚠ ${divergenceKeys.length} diverged ${pluralize(divergenceKeys.length, 'file')}:`));
-    for (const [path, message] of Object.entries(result.divergences)) {
-      console.log(chalk.yellow(`  - ${path}`));
-      if (verbose) {
-        console.log(chalk.gray(`    ${message}`));
-      }
-    }
-    console.log('');
-    if (!force) {
-      console.log(chalk.gray('  Use --force to overwrite diverged files'));
-      console.log('');
-    }
-  }
-
-  // Show diffs
-  const diffKeys = Object.keys(result.diffs);
-  if (showDiff && diffKeys.length > 0) {
-    console.log(chalk.cyan('📄 Diffs:\n'));
-    for (const [path, diff] of Object.entries(result.diffs)) {
-      console.log(chalk.bold(`  ${path}:`));
-      // Limit diff output
-      const lines = diff.split('\n').slice(0, 50);
-      for (const line of lines) {
-        if (line.startsWith('+') && !line.startsWith('+++')) {
-          console.log(chalk.green(`    ${line}`));
-        } else if (line.startsWith('-') && !line.startsWith('---')) {
-          console.log(chalk.red(`    ${line}`));
-        } else if (line.startsWith('@@')) {
-          console.log(chalk.cyan(`    ${line}`));
-        } else {
-          console.log(chalk.gray(`    ${line}`));
-        }
-      }
-      if (diff.split('\n').length > 50) {
-        console.log(chalk.gray('    ... (truncated)'));
-      }
-      console.log('');
-    }
-  }
-
   // Show warnings
   if (result.warnings.length > 0) {
-    // Filter out DRY RUN warnings for cleaner output
     const nonDryRunWarnings = result.warnings.filter(w => !w.startsWith('DRY RUN'));
     if (nonDryRunWarnings.length > 0) {
       console.log(chalk.yellow('⚠ Warnings:'));
@@ -293,8 +279,8 @@ async function main(options) {
 
   // Summary
   if (dryRun) {
-    console.log(chalk.gray('This was a dry run. No files were modified.'));
-    console.log(chalk.gray('Run without --dry-run to apply changes.\n'));
+    console.log(chalk.gray('This is a preview. No files were modified.'));
+    console.log(chalk.gray('Run with --apply to copy files.\n'));
   } else {
     // Update manifest with sync info
     try {
@@ -316,9 +302,9 @@ async function main(options) {
 program
   .name('copy-from-original')
   .description('Sync files from original TÂCHES repository to gsd-opencode')
-  .option('-d, --dry-run', 'Preview changes without copying files', false)
+  .option('--apply', 'Apply changes (copy files)', false)
   .option('-f, --force', 'Overwrite diverged files without warning', false)
-  .option('--show-diff', 'Show file diffs before syncing', false)
+  .option('--filter <pattern>', 'Filter files by name pattern (e.g., "VALID*")')
   .option('-v, --verbose', 'Show detailed output', false)
   .option('--project-root <path>', 'Project root directory', process.cwd())
   .action(main);

@@ -1,13 +1,13 @@
 <purpose>
 Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /new, and feeds gaps into /gsd-plan-phase --gaps.
 
-User tests, The assistant records. One test at a time. Plain text responses.
+User tests, OpenCode records. One test at a time. Plain text responses.
 </purpose>
 
 <philosophy>
 **Show expected, ask if reality matches.**
 
-The assistant presents what SHOULD happen. User confirms or describes what's different.
+OpenCode presents what SHOULD happen. User confirms or describes what's different.
 - "yes" / "y" / "next" / empty → pass
 - Anything else → logged as issue, severity inferred
 
@@ -358,21 +358,18 @@ Display:
 Spawn gsd-planner in --gaps mode:
 
 ```
-Task(
+task(
   prompt="""
 <planning_context>
 
 **Phase:** {phase_number}
 **Mode:** gap_closure
 
-**UAT with diagnoses:**
-@.planning/phases/{phase_dir}/{phase_num}-UAT.md
-
-**Project State:**
-@.planning/STATE.md
-
-**Roadmap:**
-@.planning/ROADMAP.md
+<files_to_read>
+- {phase_dir}/{phase_num}-UAT.md (UAT with diagnoses)
+- .planning/STATE.md (Project State)
+- .planning/ROADMAP.md (Roadmap)
+</files_to_read>
 
 </planning_context>
 
@@ -409,15 +406,16 @@ Initialize: `iteration_count = 1`
 Spawn gsd-plan-checker:
 
 ```
-Task(
+task(
   prompt="""
 <verification_context>
 
 **Phase:** {phase_number}
 **Phase Goal:** Close diagnosed gaps from UAT
 
-**Plans to verify:**
-@.planning/phases/{phase_dir}/*-PLAN.md
+<files_to_read>
+- {phase_dir}/*-PLAN.md (Plans to verify)
+</files_to_read>
 
 </verification_context>
 
@@ -448,15 +446,16 @@ Display: `Sending back to planner for revision... (iteration {N}/3)`
 Spawn gsd-planner with revision context:
 
 ```
-Task(
+task(
   prompt="""
 <revision_context>
 
 **Phase:** {phase_number}
 **Mode:** revision
 
-**Existing plans:**
-@.planning/phases/{phase_dir}/*-PLAN.md
+<files_to_read>
+- {phase_dir}/*-PLAN.md (Existing plans)
+</files_to_read>
 
 **Checker issues:**
 {structured_issues_from_checker}

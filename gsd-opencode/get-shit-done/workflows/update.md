@@ -14,8 +14,8 @@ Detect whether GSD is installed locally or globally by checking both locations:
 ```bash
 # Check local first (takes priority)
 # Paths templated at install time for runtime compatibility
-if [ -f ./.the assistant/get-shit-done/VERSION ]; then
-  cat ./.the assistant/get-shit-done/VERSION
+if [ -f ./.OpenCode/get-shit-done/VERSION ]; then
+  cat ./.OpenCode/get-shit-done/VERSION
   echo "LOCAL"
 elif [ -f ~/.config/opencode/get-shit-done/VERSION ]; then
   cat ~/.config/opencode/get-shit-done/VERSION
@@ -122,13 +122,13 @@ Exit.
 - `get-shit-done/` will be wiped and replaced
 - `agents/gsd-*` files will be replaced
 
-(Paths are relative to your install location: `~/.config/opencode/` for global, `./.the assistant/` for local)
+(Paths are relative to your install location: `~/.config/opencode/` for global, `./.OpenCode/` for local)
 
 Your custom files in other locations are preserved:
 - Custom commands not in `commands/gsd/` ✓
 - Custom agents not prefixed with `gsd-` ✓
 - Custom hooks ✓
-- Your THE ASSISTANT.md files ✓
+- Your OPENCODE.md files ✓
 
 If you've modified any GSD files directly, they'll be automatically backed up to `gsd-local-patches/` and can be reapplied with `/gsd-reapply-patches` after the update.
 ```
@@ -161,7 +161,7 @@ Clear the update cache so statusline indicator disappears:
 
 **If LOCAL install:**
 ```bash
-rm -f ./.the assistant/cache/gsd-update-check.json
+rm -f ./.OpenCode/cache/gsd-update-check.json
 ```
 
 **If GLOBAL install:**
@@ -179,7 +179,7 @@ Format completion message (changelog was already shown in confirmation step):
 ║  GSD Updated: v1.5.10 → v1.5.15                           ║
 ╚═══════════════════════════════════════════════════════════╝
 
-⚠️  Restart The assistant to pick up the new commands.
+⚠️  Restart OpenCode to pick up the new commands.
 
 [View full changelog](https://github.com/rokicool/gsd-opencode/blob/main/CHANGELOG.md)
 ```

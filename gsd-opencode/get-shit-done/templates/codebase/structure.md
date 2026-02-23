@@ -146,7 +146,7 @@ get-shit-done/
 - Subdirectories: None
 
 **commands/gsd/**
-- Purpose: Slash command definitions for The assistant
+- Purpose: Slash command definitions for OpenCode
 - Contains: *.md files (one per command)
 - Key files: new-project.md, plan-phase.md, execute-plan.md
 - Subdirectories: None (flat structure)
@@ -186,14 +186,14 @@ get-shit-done/
 
 **Documentation:**
 - `README.md` - User-facing installation and usage guide
-- `THE ASSISTANT.md` - Instructions for The assistant when working in this repo
+- `OPENCODE.md` - Instructions for OpenCode when working in this repo
 
 ## Naming Conventions
 
 **Files:**
 - kebab-case.md: Markdown documents
 - kebab-case.js: JavaScript source files
-- UPPERCASE.md: Important project files (README, THE ASSISTANT, CHANGELOG)
+- UPPERCASE.md: Important project files (README, OPENCODE, CHANGELOG)
 
 **Directories:**
 - kebab-case: All directories

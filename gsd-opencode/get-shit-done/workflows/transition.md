@@ -378,7 +378,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Plan Phase [X+1] in detail
 ```
 
-Exit skill and invoke slashcommand("/gsd-plan-phase [X+1] --auto")
+Exit skill and invoke command("/gsd-plan-phase [X+1] --auto")
 
 **If CONTEXT.md does NOT exist:**
 
@@ -390,7 +390,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Discuss Phase [X+1] first
 ```
 
-Exit skill and invoke slashcommand("/gsd-discuss-phase [X+1] --auto")
+Exit skill and invoke command("/gsd-discuss-phase [X+1] --auto")
 
 </if>
 
@@ -466,7 +466,7 @@ Phase {X} marked complete.
 ⚡ Auto-continuing: Complete milestone and archive
 ```
 
-Exit skill and invoke slashcommand("/gsd-complete-milestone {version}")
+Exit skill and invoke command("/gsd-complete-milestone {version}")
 
 </if>
 

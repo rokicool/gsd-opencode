@@ -2,7 +2,7 @@
 
 Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive ecosystem research before planning.
 
-**Purpose:** Document what The assistant needs to know to implement a phase well - not just "which library" but "how do experts build this."
+**Purpose:** Document what OpenCode needs to know to implement a phase well - not just "which library" but "how do experts build this."
 
 ---
 
@@ -25,7 +25,7 @@ Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive 
 - [Decision 1]
 - [Decision 2]
 
-### The assistant's Discretion
+### OpenCode's Discretion
 [Copy from CONTEXT.md - areas where researcher/planner can choose]
 - [Area 1]
 - [Area 2]
@@ -35,7 +35,7 @@ Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive 
 - [Deferred 1]
 - [Deferred 2]
 
-**If no CONTEXT.md exists:** write "No user constraints - all decisions at The assistant's discretion"
+**If no CONTEXT.md exists:** write "No user constraints - all decisions at OpenCode's discretion"
 </user_constraints>
 
 <research_summary>
@@ -524,7 +524,7 @@ function useVehicleControls(rigidBodyRef) {
 
 **When to create:**
 - Before planning phases in niche/complex domains
-- When The assistant's training data is likely stale or sparse
+- When OpenCode's training data is likely stale or sparse
 - When "how do experts do this" matters more than "which library"
 
 **Structure:**

@@ -13,7 +13,7 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 
 2. **gsd-planner** — Reads CONTEXT.md to know WHAT decisions are locked
    - "Pull-to-refresh on mobile" → planner includes that in task specs
-   - "The assistant's Discretion: loading skeleton" → planner can decide approach
+   - "OpenCode's Discretion: loading skeleton" → planner can decide approach
 
 **Your job:** Capture decisions clearly enough that downstream agents can act on them without asking the user again.
 
@@ -21,7 +21,7 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 </downstream_awareness>
 
 <philosophy>
-**User = founder/visionary. The assistant = builder.**
+**User = founder/visionary. OpenCode = builder.**
 
 The user knows:
 - How they imagine it working
@@ -98,7 +98,7 @@ Phase: "API documentation"
 
 **The key question:** What decisions would change the outcome that the user should weigh in on?
 
-**The assistant handles these (don't ask):**
+**OpenCode handles these (don't ask):**
 - Technical implementation details
 - Architecture patterns
 - Performance optimization
@@ -206,9 +206,10 @@ We'll clarify HOW to implement this.
 **Then use question (multiSelect: true):**
 - header: "Discuss"
 - question: "Which areas do you want to discuss for [phase name]?"
-- options: Generate 3-4 phase-specific gray areas, each formatted as:
+- options: Generate 3-4 phase-specific gray areas, each with:
   - "[Specific area]" (label) — concrete, not generic
   - [1-2 questions this covers] (description)
+  - **Highlight the recommended choice with brief explanation why**
 
 **Do NOT include a "skip" or "you decide" option.** User ran this command to discuss — give them real choices.
 
@@ -258,8 +259,8 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
 2. **Ask 4 questions using question:**
    - header: "[Area]" (max 12 chars — abbreviate if needed)
    - question: Specific decision for this area
-   - options: 2-3 concrete choices (question adds "Other" automatically)
-   - Include "You decide" as an option when reasonable — captures The assistant discretion
+   - options: 2-3 concrete choices (question adds "Other" automatically), with the recommended choice highlighted and brief explanation why
+   - Include "You decide" as an option when reasonable — captures OpenCode discretion
 
 3. **After 4 questions, check:**
    - header: "[Area]" (max 12 chars)
@@ -270,10 +271,17 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
    If "Next area" → proceed to next selected area
    If "Other" (free text) → interpret intent: continuation phrases ("chat more", "keep going", "yes", "more") map to "More questions"; advancement phrases ("done", "move on", "next", "skip") map to "Next area". If ambiguous, ask: "Continue with more questions about [area], or move to the next area?"
 
-4. **After all areas complete:**
-   - header: "Done"
-   - question: "That covers [list areas]. Ready to create context?"
-   - options: "Create context" / "Revisit an area"
+4. **After all initially-selected areas complete:**
+   - Summarize what was captured from the discussion so far
+   - question:
+     - header: "Done"
+     - question: "We've discussed [list areas]. Which gray areas remain unclear?"
+     - options: "Explore more gray areas" / "I'm ready for context"
+   - If "Explore more gray areas":
+     - Identify 2-4 additional gray areas based on what was learned
+     - Return to present_gray_areas logic with these new areas
+     - Loop: discuss new areas, then prompt again
+   - If "I'm ready for context": Proceed to write_context
 
 **question design:**
 - Options should be concrete, not abstract ("Cards" not "Option A")
@@ -331,8 +339,8 @@ mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 ### [Category 2 that was discussed]
 - [Decision or preference captured]
 
-### The assistant's Discretion
-[Areas where user said "you decide" — note that The assistant has flexibility here]
+### OpenCode's Discretion
+[Areas where user said "you decide" — note that OpenCode has flexibility here]
 
 </decisions>
 
@@ -452,23 +460,65 @@ Display banner:
 Context captured. Spawning plan-phase...
 ```
 
-Spawn plan-phase as Task:
+Spawn plan-phase as task with direct workflow file reference (do NOT use skill tool — Skills don't resolve inside task subagents):
 ```
-Task(
-  prompt="Run /gsd-plan-phase ${PHASE} --auto",
-  subagent_type="general_purpose",
+task(
+  prompt="
+    <objective>
+    You are the plan-phase orchestrator. Create executable plans for Phase ${PHASE}: ${PHASE_NAME}, then auto-advance to execution.
+    </objective>
+
+    <execution_context>
+    @~/.config/opencode/get-shit-done/workflows/plan-phase.md
+    @~/.config/opencode/get-shit-done/references/ui-brand.md
+    @~/.config/opencode/get-shit-done/references/model-profile-resolution.md
+    </execution_context>
+
+    <arguments>
+    PHASE=${PHASE}
+    ARGUMENTS='${PHASE} --auto'
+    </arguments>
+
+    <instructions>
+    1. read plan-phase.md from execution_context for your complete workflow
+    2. Follow ALL steps: initialize, validate, load context, research, plan, verify, auto-advance
+    3. When spawning agents (gsd-phase-researcher, gsd-planner, gsd-plan-checker), use task with specified subagent_type and model
+    4. For step 14 (auto-advance to execute): spawn execute-phase as a task with DIRECT file reference — tell it to read execute-phase.md. Include @file refs to execute-phase.md, checkpoints.md, tdd.md, model-profile-resolution.md. Pass --no-transition flag so execute-phase returns results instead of chaining further.
+    5. Do NOT use the skill tool or /gsd- commands. read workflow .md files directly.
+    6. Return: PHASE COMPLETE (full pipeline success), PLANNING COMPLETE (planning done but execute failed/skipped), PLANNING INCONCLUSIVE, or GAPS FOUND
+    </instructions>
+  ",
+  subagent_type="task",
   description="Plan Phase ${PHASE}"
 )
 ```
 
 **Handle plan-phase return:**
-- **PLANNING COMPLETE** → Plan-phase handles chaining to execute-phase (via its own auto_advance step)
-- **PLANNING INCONCLUSIVE / CHECKPOINT** → Display result, stop chain:
+- **PHASE COMPLETE** → Full chain succeeded. Display:
+  ```
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   GSD ► PHASE ${PHASE} COMPLETE
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Auto-advance pipeline finished: discuss → plan → execute
+
+  Next: /gsd-discuss-phase ${NEXT_PHASE} --auto
+  */new first → fresh context window*
+  ```
+- **PLANNING COMPLETE** → Planning done, execution didn't complete:
+  ```
+  Auto-advance partial: Planning complete, execution did not finish.
+  Continue: /gsd-execute-phase ${PHASE}
+  ```
+- **PLANNING INCONCLUSIVE / CHECKPOINT** → Stop chain:
   ```
   Auto-advance stopped: Planning needs input.
-
-  Review the output above and continue manually:
-  /gsd-plan-phase ${PHASE}
+  Continue: /gsd-plan-phase ${PHASE}
+  ```
+- **GAPS FOUND** → Stop chain:
+  ```
+  Auto-advance stopped: Gaps found during execution.
+  Continue: /gsd-plan-phase ${PHASE} --gaps
   ```
 
 **If neither `--auto` nor config enabled:**

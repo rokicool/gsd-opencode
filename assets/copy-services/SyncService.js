@@ -139,6 +139,76 @@ export class SyncService {
   }
 
   /**
+   * Get all mapped files from the original directory
+   * @returns {Promise<string[]>} List of mapped source file paths
+   */
+  async getAllMappedFiles() {
+    const mappedFiles = [];
+
+    for (const from of Object.keys(DIRECTORY_MAPPING)) {
+      const sourceDir = join(this.originalPath, from);
+      if (!existsSync(sourceDir)) {
+        continue;
+      }
+
+      const files = await this.findFiles(sourceDir);
+      for (const file of files) {
+        const fullSourcePath = join(from, file);
+        mappedFiles.push(fullSourcePath);
+      }
+    }
+
+    return mappedFiles;
+  }
+
+  /**
+   * Find diverged files by comparing current source to destination
+   * @returns {Promise<{hasChanges: boolean, files: string[], divergences: Object}>} Changed files and divergences
+   */
+  async findDivergedFiles() {
+    const mappedFiles = await this.getAllMappedFiles();
+    const divergedFiles = [];
+    const divergences = {};
+
+    for (const sourcePath of mappedFiles) {
+      const targetPath = this.getTargetPath(sourcePath);
+      if (!targetPath) continue;
+
+      // originalPath is already resolved to absolute path in constructor
+      const sourceFullPath = join(this.originalPath, sourcePath);
+      const destFullPath = join(this.projectRoot, targetPath);
+
+      // Skip if source doesn't exist
+      if (!existsSync(sourceFullPath)) continue;
+
+      // If destination doesn't exist, it's a new file
+      if (!existsSync(destFullPath)) {
+        divergedFiles.push(sourcePath);
+        continue;
+      }
+
+      // Check if files differ
+      const sourceHash = await computeHash(sourceFullPath);
+      const destHash = await computeHash(destFullPath);
+
+      if (sourceHash !== destHash) {
+        divergedFiles.push(sourcePath);
+        // Get file status from manifest
+        const fileStatus = await this.syncManifest.getFileStatus(targetPath);
+        if (fileStatus && fileStatus.destHash !== destHash) {
+          divergences[sourcePath] = 'Local modifications detected';
+        }
+      }
+    }
+
+    return {
+      hasChanges: divergedFiles.length > 0,
+      files: divergedFiles,
+      divergences
+    };
+  }
+
+  /**
    * Find all files in a directory recursively
    * @param {string} dir - Directory to scan
    * @param {string} baseDir - Base directory for relative paths
@@ -284,7 +354,7 @@ export class SyncService {
    * @returns {Promise<SyncResult>}
    */
   async sync(options = {}) {
-    const { dryRun = false, force = false, showDiff = false } = options;
+    const { dryRun = false, force = false, showDiff = false, files = null } = options;
 
     const result = {
       copied: [],
@@ -298,17 +368,24 @@ export class SyncService {
     // Verify submodule is initialized
     await this.submoduleService.verifySubmodule();
 
-    // Get changed files from submodule
-    const lastSync = await this.syncManifest.getLastSync();
-    const changes = await this.submoduleService.detectChanges(lastSync?.commit || null);
+    let mappedFiles;
 
-    if (!changes.hasChanges && lastSync) {
-      result.warnings.push('Already up to date - no changes since last sync');
-      return result;
+    if (files && files.length > 0) {
+      // Use provided files (resync mode)
+      mappedFiles = files.filter(f => this.isMapped(f));
+    } else {
+      // Get changed files from submodule
+      const lastSync = await this.syncManifest.getLastSync();
+      const changes = await this.submoduleService.detectChanges(lastSync?.commit || null);
+
+      if (!changes.hasChanges && lastSync) {
+        result.warnings.push('Already up to date - no changes since last sync');
+        return result;
+      }
+
+      // Filter to only mapped files
+      mappedFiles = changes.files.filter(f => this.isMapped(f));
     }
-
-    // Filter to only mapped files
-    const mappedFiles = changes.files.filter(f => this.isMapped(f));
 
     if (mappedFiles.length === 0) {
       result.warnings.push('No mapped files to sync');
@@ -374,11 +451,18 @@ export class SyncService {
         }
       }
 
-      // If dry run, return what would happen
+      // If dry run, return what would happen (including orphans)
       if (dryRun) {
         result.copied = stagedFiles.map(f => f.targetPath);
         result.warnings.push(`DRY RUN: Would sync ${stagedFiles.length} file(s)`);
         result.warnings.push(`DRY RUN: Would skip ${result.skipped.length} file(s)`);
+        
+        // Find orphaned files even in dry-run
+        result.orphans = await this.findOrphanedFiles();
+        if (result.orphans.length > 0) {
+          result.warnings.push(`Found ${result.orphans.length} orphaned file(s) in gsd-opencode`);
+        }
+        
         return result;
       }
 

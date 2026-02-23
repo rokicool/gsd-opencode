@@ -49,7 +49,7 @@ The document should describe what you want to build.
 INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init new-project)
 ```
 
-Parse JSON for: `researcher_model`, `synthesizer_model`, `roadmapper_model`, `commit_docs`, `project_exists`, `has_codebase_map`, `planning_exists`, `has_existing_code`, `has_package_file`, `is_brownfield`, `needs_codebase_map`, `has_git`.
+Parse JSON for: `researcher_model`, `synthesizer_model`, `roadmapper_model`, `commit_docs`, `project_exists`, `has_codebase_map`, `planning_exists`, `has_existing_code`, `has_package_file`, `is_brownfield`, `needs_codebase_map`, `has_git`, `project_path`.
 
 **If `project_exists` is true:** Error — project already initialized. Use `/gsd-progress`.
 
@@ -541,10 +541,10 @@ Display spawning indicator:
   → Pitfalls research
 ```
 
-Spawn 4 parallel gsd-project-researcher agents with rich context:
+Spawn 4 parallel gsd-project-researcher agents with path references:
 
 ```
-Task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
+task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
 <research_type>
 Project Research — Stack dimension for [domain].
@@ -561,9 +561,9 @@ Subsequent: Research what's needed to add [target features] to an existing [doma
 What's the standard 2025 stack for [domain]?
 </question>
 
-<project_context>
-[PROJECT.md summary - core value, constraints, what they're building]
-</project_context>
+<files_to_read>
+- {project_path} (Project context and goals)
+</files_to_read>
 
 <downstream_consumer>
 Your STACK.md feeds into roadmap creation. Be prescriptive:
@@ -582,9 +582,9 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 write to: .planning/research/STACK.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/STACK.md
 </output>
-", subagent_type="general_purpose", model="{researcher_model}", description="Stack research")
+", subagent_type="task", model="{researcher_model}", description="Stack research")
 
-Task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
+task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
 <research_type>
 Project Research — Features dimension for [domain].
@@ -601,9 +601,9 @@ Subsequent: How do [target features] typically work? What's expected behavior?
 What features do [domain] products have? What's table stakes vs differentiating?
 </question>
 
-<project_context>
-[PROJECT.md summary]
-</project_context>
+<files_to_read>
+- {project_path} (Project context)
+</files_to_read>
 
 <downstream_consumer>
 Your FEATURES.md feeds into requirements definition. Categorize clearly:
@@ -622,9 +622,9 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 write to: .planning/research/FEATURES.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/FEATURES.md
 </output>
-", subagent_type="general_purpose", model="{researcher_model}", description="Features research")
+", subagent_type="task", model="{researcher_model}", description="Features research")
 
-Task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
+task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
 <research_type>
 Project Research — Architecture dimension for [domain].
@@ -641,9 +641,9 @@ Subsequent: How do [target features] integrate with existing [domain] architectu
 How are [domain] systems typically structured? What are major components?
 </question>
 
-<project_context>
-[PROJECT.md summary]
-</project_context>
+<files_to_read>
+- {project_path} (Project context)
+</files_to_read>
 
 <downstream_consumer>
 Your ARCHITECTURE.md informs phase structure in roadmap. Include:
@@ -662,9 +662,9 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 write to: .planning/research/ARCHITECTURE.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
-", subagent_type="general_purpose", model="{researcher_model}", description="Architecture research")
+", subagent_type="task", model="{researcher_model}", description="Architecture research")
 
-Task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
+task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
 <research_type>
 Project Research — Pitfalls dimension for [domain].
@@ -681,9 +681,9 @@ Subsequent: What are common mistakes when adding [target features] to [domain]?
 What do [domain] projects commonly get wrong? Critical mistakes?
 </question>
 
-<project_context>
-[PROJECT.md summary]
-</project_context>
+<files_to_read>
+- {project_path} (Project context)
+</files_to_read>
 
 <downstream_consumer>
 Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
@@ -702,24 +702,23 @@ Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
 write to: .planning/research/PITFALLS.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/PITFALLS.md
 </output>
-", subagent_type="general_purpose", model="{researcher_model}", description="Pitfalls research")
+", subagent_type="task", model="{researcher_model}", description="Pitfalls research")
 ```
 
 After all 4 agents complete, spawn synthesizer to create SUMMARY.md:
 
 ```
-Task(prompt="
+task(prompt="
 <task>
 Synthesize research outputs into SUMMARY.md.
 </task>
 
-<research_files>
-read these files:
+<files_to_read>
 - .planning/research/STACK.md
 - .planning/research/FEATURES.md
 - .planning/research/ARCHITECTURE.md
 - .planning/research/PITFALLS.md
-</research_files>
+</files_to_read>
 
 <output>
 write to: .planning/research/SUMMARY.md
@@ -902,23 +901,18 @@ Display stage banner:
 ◆ Spawning roadmapper...
 ```
 
-Spawn gsd-roadmapper agent with context:
+Spawn gsd-roadmapper agent with path references:
 
 ```
-Task(prompt="
+task(prompt="
 <planning_context>
 
-**Project:**
-@.planning/PROJECT.md
-
-**Requirements:**
-@.planning/REQUIREMENTS.md
-
-**Research (if exists):**
-@.planning/research/SUMMARY.md
-
-**Config:**
-@.planning/config.json
+<files_to_read>
+- .planning/PROJECT.md (Project context)
+- .planning/REQUIREMENTS.md (v1 Requirements)
+- .planning/research/SUMMARY.md (Research findings - if exists)
+- .planning/config.json (Depth and mode settings)
+</files_to_read>
 
 </planning_context>
 
@@ -1001,12 +995,14 @@ Use question:
 - Get user's adjustment notes
 - Re-spawn roadmapper with revision context:
   ```
-  Task(prompt="
+  task(prompt="
   <revision>
   User feedback on roadmap:
   [user's notes]
 
-  Current ROADMAP.md: @.planning/ROADMAP.md
+  <files_to_read>
+  - .planning/ROADMAP.md (Current roadmap to revise)
+  </files_to_read>
 
   Update the roadmap based on feedback. edit files in place.
   Return ROADMAP REVISED with changes made.
@@ -1054,7 +1050,7 @@ Present completion summary:
 ╚══════════════════════════════════════════╝
 ```
 
-Exit skill and invoke slashcommand("/gsd-discuss-phase 1 --auto")
+Exit skill and invoke command("/gsd-discuss-phase 1 --auto")
 
 **If interactive mode:**
 

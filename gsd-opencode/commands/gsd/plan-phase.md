@@ -9,7 +9,7 @@ allowed-tools:
   - bash
   - glob
   - grep
-  - Task
+  - task
   - webfetch
   - mcp__context7__*
 ---

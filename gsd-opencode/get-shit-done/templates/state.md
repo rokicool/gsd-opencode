@@ -120,7 +120,7 @@ Points to PROJECT.md for full context. Includes:
 - Current focus (which phase)
 - Last update date (triggers re-read if stale)
 
-The assistant reads PROJECT.md directly for requirements, constraints, and decisions.
+OpenCode reads PROJECT.md directly for requirements, constraints, and decisions.
 
 ### Current Position
 Where we are right now:

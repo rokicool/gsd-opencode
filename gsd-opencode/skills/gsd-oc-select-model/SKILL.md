@@ -3,7 +3,7 @@ name: gsd-oc-select-model
 description: Interactive model selection workflow with paginated navigation. Use when users want to select a model interactively - guides them through provider selection then model selection using the question tool with pagination support for large lists.
 ---
 
-# Select Model Skill
+# Select Model skill
 
 Interactive workflow to select an AI model from opencode's available providers and models.
 
@@ -56,7 +56,7 @@ Use the question tool with paginated options. **Show 10 providers per page.**
 
 **Example for page 0 (first 10 providers):**
 ```
-Question: "Select a provider (page 1/N, showing 1-10 of M):"
+question: "Select a provider (page 1/N, showing 1-10 of M):"
 Options:
 - "google (28 models)"
 - "google-vertex (27 models)"
@@ -121,7 +121,7 @@ node <skill-dir>/scripts/select-models.cjs --provider "provider-name"
 
 **Example for page 0:**
 ```
-Question: "Provider: synthetic > Select a sub-provider (page 1/1, showing 1-3 of 3):"
+question: "Provider: synthetic > Select a sub-provider (page 1/1, showing 1-3 of 3):"
 Options:
 - "deepseek-ai (5 models)"
 - "nvidia (4 models)"
@@ -165,7 +165,7 @@ Returns JSON:
 
 **Example for 2-level flow (page 0):**
 ```
-Question: "Provider: openai > Select a model (page 1/1, showing 1-5 of 5):"
+question: "Provider: openai > Select a model (page 1/1, showing 1-5 of 5):"
 Options:
 - "gpt-4"
 - "gpt-3.5-turbo"
@@ -175,7 +175,7 @@ Options:
 
 **Example for 3-level flow (page 0):**
 ```
-Question: "Provider: synthetic > Sub-provider: deepseek-ai > Select a model (page 1/1, showing 1-5 of 5):"
+question: "Provider: synthetic > Sub-provider: deepseek-ai > Select a model (page 1/1, showing 1-5 of 5):"
 Options:
 - "DeepSeek-R1"
 - "DeepSeek-V3"
@@ -269,15 +269,15 @@ This is the standard flow for providers without sub-providers (e.g., openai, xai
 
 ```
 1. LLM: Run select-models --providers-only
-2. LLM: Question: "Select a provider (page 1/2, showing 1-10 of 15):"
+2. LLM: question: "Select a provider (page 1/2, showing 1-10 of 15):"
    Options: [google, google-vertex, ..., → Next]
 3. User: Selects "→ Next"
-4. LLM: Question: "Select a provider (page 2/2, showing 11-15 of 15):"
+4. LLM: question: "Select a provider (page 2/2, showing 11-15 of 15):"
    Options: [← Previous, vercel, xai, zai-coding-plan]
 5. User: Selects "xai (22 models)"
 6. LLM: Run select-models --provider xai
    Response: {"provider": "xai", "model_count": 22, "models": [...]}
-7. LLM: Question: "Provider: xai > Select a model (page 1/2, showing 1-15 of 22):"
+7. LLM: question: "Provider: xai > Select a model (page 1/2, showing 1-15 of 22):"
    Options: [grok-2, grok-2-1212, ..., → Next, ← Back]
 8. User: Selects "grok-2"
 9. LLM: Returns "Selected model: xai/grok-2"
@@ -295,28 +295,28 @@ This flow demonstrates hierarchical provider selection with back navigation (e.g
 ```
 1. LLM: Run select-models --providers-only
    Response includes: {"name": "synthetic", "model_count": 100, "has_sub_providers": true, ...}
-2. LLM: Question: "Select a provider (page 1/3, showing 1-10 of 25):"
+2. LLM: question: "Select a provider (page 1/3, showing 1-10 of 25):"
    Options: [google, synthetic (100 models, 12 sub-providers), ..., → Next]
 3. User: Selects "synthetic"
    State: provider_page = 0, selected_provider = "synthetic", has_sub_providers = true
 4. LLM: Run select-models --provider synthetic
    Response: {"provider": "synthetic", "has_sub_providers": true, "sub_providers": [...]}
-5. LLM: Question: "Provider: synthetic > Select a sub-provider (page 1/2, showing 1-10 of 12):"
+5. LLM: question: "Provider: synthetic > Select a sub-provider (page 1/2, showing 1-10 of 12):"
    Options: [deepseek-ai (5 models), nvidia (4 models), ..., → Next, ← Back]
 6. User: Selects "deepseek-ai"
    State: sub_provider_page = 0, selected_sub_provider = "deepseek-ai"
 7. LLM: Run select-models --provider synthetic --sub-provider deepseek-ai
    Response: {"provider": "synthetic", "sub_provider": "deepseek-ai", "model_count": 5, "models": [...]}
-8. LLM: Question: "Provider: synthetic > Sub-provider: deepseek-ai > Select a model (page 1/1, showing 1-5 of 5):"
+8. LLM: question: "Provider: synthetic > Sub-provider: deepseek-ai > Select a model (page 1/1, showing 1-5 of 5):"
    Options: [DeepSeek-R1, DeepSeek-V3, ..., ← Back]
 9. User: Selects "← Back" (wants to choose different sub-provider)
-10. LLM: Question: "Provider: synthetic > Select a sub-provider (page 1/2, showing 1-10 of 12):"
+10. LLM: question: "Provider: synthetic > Select a sub-provider (page 1/2, showing 1-10 of 12):"
     Options: [deepseek-ai (5 models), nvidia (4 models), ..., → Next, ← Back]
     (Note: Returns to same page due to preserved sub_provider_page = 0)
 11. User: Selects "nvidia"
     State: sub_provider_page = 0 (preserved), selected_sub_provider = "nvidia"
 12. LLM: Run select-models --provider synthetic --sub-provider nvidia
-13. LLM: Question: "Provider: synthetic > Sub-provider: nvidia > Select a model (page 1/1, showing 1-4 of 4):"
+13. LLM: question: "Provider: synthetic > Sub-provider: nvidia > Select a model (page 1/1, showing 1-4 of 4):"
     Options: [Llama-3.1-8B, ..., ← Back]
 14. User: Selects "Llama-3.1-8B"
 15. LLM: Returns "Selected model: synthetic/nvidia/Llama-3.1-8B"
@@ -328,18 +328,18 @@ Demonstrates state preservation when navigating back in a 2-level flow.
 
 ```
 1. LLM: Run select-models --providers-only
-2. LLM: Question: "Select a provider (page 1/3, showing 1-10 of 28):"
+2. LLM: question: "Select a provider (page 1/3, showing 1-10 of 28):"
    Options: [google, ..., → Next]
 3. User: Selects "→ Next" (twice) to reach page 3
-4. LLM: Question: "Select a provider (page 3/3, showing 21-28 of 28):"
+4. LLM: question: "Select a provider (page 3/3, showing 21-28 of 28):"
    Options: [← Previous, xai, zai-coding-plan]
    State: provider_page = 2
 5. User: Selects "xai"
 6. LLM: Run select-models --provider xai
-7. LLM: Question: "Provider: xai > Select a model (page 1/2, showing 1-15 of 22):"
+7. LLM: question: "Provider: xai > Select a model (page 1/2, showing 1-15 of 22):"
    Options: [grok-2, ..., → Next, ← Back]
 8. User: Selects "← Back" (wants to choose different provider)
-9. LLM: Question: "Select a provider (page 3/3, showing 21-28 of 28):"
+9. LLM: question: "Select a provider (page 3/3, showing 21-28 of 28):"
    Options: [← Previous, xai, zai-coding-plan]
    (Note: Returns to page 3 due to preserved provider_page = 2)
 10. User: Selects "zai-coding-plan"

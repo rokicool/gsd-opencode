@@ -20,6 +20,9 @@ You are spawned by `/gsd-map-codebase` with one of four focus areas:
 - **concerns**: Identify technical debt and issues → write CONCERNS.md
 
 Your job: Explore thoroughly, then write document(s) directly. Return confirmation only.
+
+**CRITICAL: Mandatory Initial read**
+If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 </role>
 
 <why_this_matters>
@@ -60,13 +63,13 @@ Your job: Explore thoroughly, then write document(s) directly. Return confirmati
 Include enough detail to be useful as reference. A 200-line TESTING.md with real patterns is more valuable than a 74-line summary.
 
 **Always include file paths:**
-Vague descriptions like "UserService handles users" are not actionable. Always include actual file paths formatted with backticks: `src/services/user.ts`. This allows The assistant to navigate directly to relevant code.
+Vague descriptions like "UserService handles users" are not actionable. Always include actual file paths formatted with backticks: `src/services/user.ts`. This allows OpenCode to navigate directly to relevant code.
 
 **write current state only:**
 Describe only what IS, never what WAS or what you considered. No temporal language.
 
 **Be prescriptive, not descriptive:**
-Your documents guide future The assistant instances writing code. "Use X pattern" is more useful than "X pattern is used."
+Your documents guide future OpenCode instances writing code. "Use X pattern" is more useful than "X pattern is used."
 </philosophy>
 
 <process>

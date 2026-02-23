@@ -117,7 +117,7 @@ Spawn 4 parallel gsd-project-researcher agents. Each uses this template with dim
 
 **Common structure for all 4 researchers:**
 ```
-Task(prompt="
+task(prompt="
 <research_type>Project Research — {DIMENSION} for [new features].</research_type>
 
 <milestone_context>
@@ -128,7 +128,9 @@ Focus ONLY on what's needed for the NEW features.
 
 <question>{QUESTION}</question>
 
-<project_context>[PROJECT.md summary]</project_context>
+<files_to_read>
+- .planning/PROJECT.md (Project context)
+</files_to_read>
 
 <downstream_consumer>{CONSUMER}</downstream_consumer>
 
@@ -154,10 +156,15 @@ Use template: ~/.config/opencode/get-shit-done/templates/research-project/{FILE}
 After all 4 complete, spawn synthesizer:
 
 ```
-Task(prompt="
+task(prompt="
 Synthesize research outputs into SUMMARY.md.
 
-read: .planning/research/STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md
+<files_to_read>
+- .planning/research/STACK.md
+- .planning/research/FEATURES.md
+- .planning/research/ARCHITECTURE.md
+- .planning/research/PITFALLS.md
+</files_to_read>
 
 write to: .planning/research/SUMMARY.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
@@ -262,13 +269,15 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: define mil
 **Starting phase number:** read MILESTONES.md for last phase number. Continue from there (v1.0 ended at phase 5 → v1.1 starts at phase 6).
 
 ```
-Task(prompt="
+task(prompt="
 <planning_context>
-@.planning/PROJECT.md
-@.planning/REQUIREMENTS.md
-@.planning/research/SUMMARY.md (if exists)
-@.planning/config.json
-@.planning/MILESTONES.md
+<files_to_read>
+- .planning/PROJECT.md
+- .planning/REQUIREMENTS.md
+- .planning/research/SUMMARY.md (if exists)
+- .planning/config.json
+- .planning/MILESTONES.md
+</files_to_read>
 </planning_context>
 
 <instructions>

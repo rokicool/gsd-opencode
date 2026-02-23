@@ -109,9 +109,9 @@ describe('copy-from-original CLI', () => {
       const { stdout, exitCode } = await runCli('--help', testDir);
       assert.strictEqual(exitCode, 0);
       assert.match(stdout, /Sync files from original/);
-      assert.match(stdout, /--dry-run/);
+      assert.match(stdout, /--apply/);
       assert.match(stdout, /--force/);
-      assert.match(stdout, /--show-diff/);
+      assert.match(stdout, /--filter/);
     });
 
     it('should exit 0 when no changes (already up to date)', async () => {
@@ -123,25 +123,13 @@ describe('copy-from-original CLI', () => {
       await execAsync('git add .', { cwd: submodulePath });
       await execAsync('git commit -m "Initial commit"', { cwd: submodulePath });
 
-      // Create manifest with this commit as last sync
-      const { stdout: commitHash } = await execAsync('git rev-parse HEAD', { cwd: submodulePath });
-      const manifest = {
-        version: '1.0.0',
-        lastSync: {
-          commit: commitHash.trim(),
-          date: new Date().toISOString(),
-          version: 'v1.0.0'
-        },
-        files: {}
-      };
-      await writeFile(
-        join(testDir, '.planning', 'sync-manifest.json'),
-        JSON.stringify(manifest, null, 2)
-      );
+      // Create the same file in target with same content
+      await mkdir(join(testDir, 'gsd-opencode', 'agents'), { recursive: true });
+      await writeFile(join(testDir, 'gsd-opencode', 'agents', 'test.md'), '# Test Agent\n');
 
       const { stdout, exitCode } = await runCli('', testDir);
       assert.strictEqual(exitCode, 0);
-      assert.match(stdout, /Already up to date/);
+      assert.match(stdout, /All files are up to date/);
     });
 
     it('should detect and sync new files', async () => {
@@ -153,7 +141,7 @@ describe('copy-from-original CLI', () => {
       await execAsync('git add .', { cwd: submodulePath });
       await execAsync('git commit -m "Add planner agent"', { cwd: submodulePath });
 
-      const { stdout, exitCode } = await runCli('', testDir);
+      const { stdout, exitCode } = await runCli('--apply', testDir);
 
       assert.strictEqual(exitCode, 0);
       assert.match(stdout, /Sync complete|Copied/);
@@ -183,27 +171,27 @@ describe('copy-from-original CLI', () => {
     });
   });
 
-  describe('dry-run mode', () => {
-    it('should preview changes without modifying files', async () => {
+  describe('preview mode (default)', () => {
+    it('should preview changes without modifying files by default', async () => {
       const submodulePath = join(testDir, 'original', 'get-shit-done');
 
       // Create test file
       await mkdir(join(submodulePath, 'agents'), { recursive: true });
-      await writeFile(join(submodulePath, 'agents', 'test-dry.md'), '# Test\n');
+      await writeFile(join(submodulePath, 'agents', 'test-preview.md'), '# Test\n');
       await execAsync('git add .', { cwd: submodulePath });
       await execAsync('git commit -m "Add test"', { cwd: submodulePath });
 
-      const { stdout, exitCode } = await runCli('--dry-run', testDir);
+      const { stdout, exitCode } = await runCli('', testDir);
 
       assert.strictEqual(exitCode, 0);
-      assert.match(stdout, /DRY RUN|Would copy/i);
+      assert.match(stdout, /PREVIEW|Would copy/i);
 
       // Verify file was NOT copied
-      const targetPath = join(testDir, 'gsd-opencode', 'agents', 'test-dry.md');
-      assert.ok(!existsSync(targetPath), 'File should NOT be copied in dry-run');
+      const targetPath = join(testDir, 'gsd-opencode', 'agents', 'test-preview.md');
+      assert.ok(!existsSync(targetPath), 'File should NOT be copied in preview mode');
     });
 
-    it('should show what would happen in dry-run', async () => {
+    it('should show what would happen in preview', async () => {
       const submodulePath = join(testDir, 'original', 'get-shit-done');
 
       // Create multiple test files
@@ -213,10 +201,10 @@ describe('copy-from-original CLI', () => {
       await execAsync('git add .', { cwd: submodulePath });
       await execAsync('git commit -m "Add files"', { cwd: submodulePath });
 
-      const { stdout, exitCode } = await runCli('-d -v', testDir);
+      const { stdout, exitCode } = await runCli('-v', testDir);
 
       assert.strictEqual(exitCode, 0);
-      assert.match(stdout, /Would copy|Would sync/i);
+      assert.match(stdout, /Would copy|Files to sync/i);
     });
   });
 
@@ -233,7 +221,7 @@ describe('copy-from-original CLI', () => {
       // Create different file in target
       await writeFile(join(testDir, 'gsd-opencode', 'agents', 'diverged.md'), '# Modified Locally\n');
 
-      const { stdout, exitCode } = await runCli('--force', testDir);
+      const { stdout, exitCode } = await runCli('--apply --force', testDir);
 
       assert.strictEqual(exitCode, 0);
       assert.match(stdout, /Copied|Sync complete/);
@@ -259,27 +247,6 @@ describe('copy-from-original CLI', () => {
 
       assert.strictEqual(exitCode, 0);
       assert.match(stdout, /diverged|Divergence/i);
-    });
-  });
-
-  describe('show-diff mode', () => {
-    it('should display file diffs with --show-diff', async () => {
-      const submodulePath = join(testDir, 'original', 'get-shit-done');
-
-      // Create test file
-      await mkdir(join(submodulePath, 'agents'), { recursive: true });
-      await writeFile(join(submodulePath, 'agents', 'diff-test.md'), '# New Content\n');
-      await execAsync('git add .', { cwd: submodulePath });
-      await execAsync('git commit -m "Add test"', { cwd: submodulePath });
-
-      // Create existing file in target with different content
-      await writeFile(join(testDir, 'gsd-opencode', 'agents', 'diff-test.md'), '# Old Content\n');
-
-      const { stdout, exitCode } = await runCli('--dry-run --show-diff', testDir);
-
-      assert.strictEqual(exitCode, 0);
-      // Should show diff output (with + and - lines)
-      assert.match(stdout, /\+|Diff|-/);
     });
   });
 
@@ -312,7 +279,7 @@ describe('copy-from-original CLI', () => {
       await execAsync('git add .', { cwd: submodulePath });
       await execAsync('git commit -m "Add agent"', { cwd: submodulePath });
 
-      await runCli('', testDir);
+      await runCli('--apply', testDir);
 
       const targetPath = join(testDir, 'gsd-opencode', 'agents', 'mapped.md');
       assert.ok(existsSync(targetPath), 'Should map agents/ correctly');
@@ -326,7 +293,7 @@ describe('copy-from-original CLI', () => {
       await execAsync('git add .', { cwd: submodulePath });
       await execAsync('git commit -m "Add command"', { cwd: submodulePath });
 
-      await runCli('', testDir);
+      await runCli('--apply', testDir);
 
       const targetPath = join(testDir, 'gsd-opencode', 'commands', 'gsd', 'test.md');
       assert.ok(existsSync(targetPath), 'Should map commands/gsd/ correctly');
@@ -340,7 +307,7 @@ describe('copy-from-original CLI', () => {
       await execAsync('git add .', { cwd: submodulePath });
       await execAsync('git commit -m "Add reference"', { cwd: submodulePath });
 
-      await runCli('', testDir);
+      await runCli('--apply', testDir);
 
       const targetPath = join(testDir, 'gsd-opencode', 'get-shit-done', 'references', 'test.md');
       assert.ok(existsSync(targetPath), 'Should map references/ correctly');
@@ -356,7 +323,7 @@ describe('copy-from-original CLI', () => {
       await execAsync('git add .', { cwd: submodulePath });
       await execAsync('git commit -m "Add test"', { cwd: submodulePath });
 
-      await runCli('', testDir);
+      await runCli('--apply', testDir);
 
       const manifestPath = join(testDir, '.planning', 'sync-manifest.json');
       assert.ok(existsSync(manifestPath), 'Manifest should be created');
@@ -375,7 +342,7 @@ describe('copy-from-original CLI', () => {
       await execAsync('git add .', { cwd: submodulePath });
       await execAsync('git commit -m "First"', { cwd: submodulePath });
 
-      await runCli('', testDir);
+      await runCli('--apply', testDir);
 
       const { stdout: commit1 } = await execAsync('git rev-parse HEAD', { cwd: submodulePath });
 
@@ -384,7 +351,7 @@ describe('copy-from-original CLI', () => {
       await execAsync('git add .', { cwd: submodulePath });
       await execAsync('git commit -m "Second"', { cwd: submodulePath });
 
-      await runCli('', testDir);
+      await runCli('--apply', testDir);
 
       const manifest = JSON.parse(
         await readFile(join(testDir, '.planning', 'sync-manifest.json'), 'utf-8')

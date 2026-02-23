@@ -1,7 +1,7 @@
 <purpose>
-Surface The assistant's assumptions about a phase before planning, enabling users to correct misconceptions early.
+Surface OpenCode's assumptions about a phase before planning, enabling users to correct misconceptions early.
 
-Key difference from discuss-phase: This is ANALYSIS of what The assistant thinks, not INTAKE of what user knows. No file output - purely conversational to prompt discussion.
+Key difference from discuss-phase: This is ANALYSIS of what OpenCode thinks, not INTAKE of what user knows. No file output - purely conversational to prompt discussion.
 </purpose>
 
 <process>
@@ -53,31 +53,31 @@ Continue to analyze_phase.
 Based on roadmap description and project context, identify assumptions across five areas:
 
 **1. Technical Approach:**
-What libraries, frameworks, patterns, or tools would The assistant use?
+What libraries, frameworks, patterns, or tools would OpenCode use?
 - "I'd use X library because..."
 - "I'd follow Y pattern because..."
 - "I'd structure this as Z because..."
 
 **2. Implementation Order:**
-What would The assistant build first, second, third?
+What would OpenCode build first, second, third?
 - "I'd start with X because it's foundational"
 - "Then Y because it depends on X"
 - "Finally Z because..."
 
 **3. Scope Boundaries:**
-What's included vs excluded in The assistant's interpretation?
+What's included vs excluded in OpenCode's interpretation?
 - "This phase includes: A, B, C"
 - "This phase does NOT include: D, E, F"
 - "Boundary ambiguities: G could go either way"
 
 **4. Risk Areas:**
-Where does The assistant expect complexity or challenges?
+Where does OpenCode expect complexity or challenges?
 - "The tricky part is X because..."
 - "Potential issues: Y, Z"
 - "I'd watch out for..."
 
 **5. Dependencies:**
-What does The assistant assume exists or needs to be in place?
+What does OpenCode assume exists or needs to be in place?
 - "This assumes X from previous phases"
 - "External dependencies: Y, Z"
 - "This will be consumed by..."

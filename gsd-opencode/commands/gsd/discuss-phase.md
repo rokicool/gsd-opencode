@@ -9,7 +9,7 @@ allowed-tools:
   - glob
   - grep
   - question
-  - Task
+  - task
 ---
 
 <objective>
@@ -32,11 +32,7 @@ Extract implementation decisions that downstream agents need — researcher and 
 <context>
 Phase number: $ARGUMENTS (required)
 
-**Load project state:**
-@.planning/STATE.md
-
-**Load roadmap:**
-@.planning/ROADMAP.md
+Context files are resolved in-workflow using `init phase-op` and roadmap/state tool calls.
 </context>
 
 <process>
@@ -70,7 +66,7 @@ Generate 3-4 **phase-specific** gray areas, not generic categories.
 - If more → ask 4 more, check again
 - After all areas → "Ready to create context?"
 
-**Do NOT ask about (The assistant handles these):**
+**Do NOT ask about (OpenCode handles these):**
 - Technical implementation
 - Architecture choices
 - Performance concerns

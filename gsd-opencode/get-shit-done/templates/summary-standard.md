@@ -31,10 +31,10 @@ completed: YYYY-MM-DD
 - [Key outcome 1]
 - [Key outcome 2]
 
-## Task Commits
-1. **Task 1: [task name]** - `hash`
-2. **Task 2: [task name]** - `hash`
-3. **Task 3: [task name]** - `hash`
+## task Commits
+1. **task 1: [task name]** - `hash`
+2. **task 2: [task name]** - `hash`
+3. **task 3: [task name]** - `hash`
 
 ## Files Created/Modified
 - `path/to/file.ts` - What it does

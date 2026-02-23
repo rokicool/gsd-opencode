@@ -8,7 +8,7 @@ allowed-tools:
   - glob
   - grep
   - write
-  - Task
+  - task
 ---
 
 <objective>

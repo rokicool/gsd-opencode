@@ -6,7 +6,7 @@ allowed-tools:
   - bash
   - write
   - question
-  - slashcommand
+  - command
 ---
 
 <objective>

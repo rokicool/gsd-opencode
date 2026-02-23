@@ -1,8 +1,8 @@
 # User Setup Template
 
-Template for `.planning/phases/XX-name/{phase}-USER-SETUP.md` - human-required configuration that The assistant cannot automate.
+Template for `.planning/phases/XX-name/{phase}-USER-SETUP.md` - human-required configuration that OpenCode cannot automate.
 
-**Purpose:** Document setup tasks that literally require human action - account creation, dashboard configuration, secret retrieval. The assistant automates everything possible; this file captures only what remains.
+**Purpose:** Document setup tasks that literally require human action - account creation, dashboard configuration, secret retrieval. OpenCode automates everything possible; this file captures only what remains.
 
 ---
 
@@ -15,7 +15,7 @@ Template for `.planning/phases/XX-name/{phase}-USER-SETUP.md` - human-required c
 **Phase:** {phase-name}
 **Status:** Incomplete
 
-Complete these items for the integration to function. The assistant automated everything possible; these items require human access to external dashboards/accounts.
+Complete these items for the integration to function. OpenCode automated everything possible; these items require human access to external dashboards/accounts.
 
 ## Environment Variables
 
@@ -97,9 +97,9 @@ user_setup:
 
 ## The Automation-First Rule
 
-**USER-SETUP.md contains ONLY what The assistant literally cannot do.**
+**USER-SETUP.md contains ONLY what OpenCode literally cannot do.**
 
-| The assistant CAN Do (not in USER-SETUP) | The assistant CANNOT Do (→ USER-SETUP) |
+| OpenCode CAN Do (not in USER-SETUP) | OpenCode CANNOT Do (→ USER-SETUP) |
 |-----------------------------------|--------------------------------|
 | `npm install stripe` | Create Stripe account |
 | write webhook handler code | Get API keys from dashboard |
@@ -108,9 +108,9 @@ user_setup:
 | Configure package.json | Access external service dashboards |
 | write any code | Retrieve secrets from third-party systems |
 
-**The test:** "Does this require a human in a browser, accessing an account The assistant doesn't have credentials for?"
+**The test:** "Does this require a human in a browser, accessing an account OpenCode doesn't have credentials for?"
 - Yes → USER-SETUP.md
-- No → The assistant does it automatically
+- No → OpenCode does it automatically
 
 ---
 
@@ -304,7 +304,7 @@ curl -X POST http://localhost:3000/api/test-email \
 
 ## Guidelines
 
-**Never include:** Actual secret values. Steps The assistant can automate (package installs, code changes).
+**Never include:** Actual secret values. Steps OpenCode can automate (package installs, code changes).
 
 **Naming:** `{phase}-USER-SETUP.md` matches the phase number pattern.
 **Status tracking:** User marks checkboxes and updates status line when complete.

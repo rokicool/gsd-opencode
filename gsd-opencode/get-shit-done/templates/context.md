@@ -40,8 +40,8 @@ Template for `.planning/phases/XX-name/{phase_num}-CONTEXT.md` - captures implem
 ### [Area 3 that was discussed]
 - [Specific decision made]
 
-### The assistant's Discretion
-[Areas where user explicitly said "you decide" — The assistant has flexibility here during planning/implementation]
+### OpenCode's Discretion
+[Areas where user explicitly said "you decide" — OpenCode has flexibility here during planning/implementation]
 
 </decisions>
 
@@ -103,7 +103,7 @@ Display posts from followed users in a scrollable feed. Users can view posts and
 - Friendly illustration + "Follow people to see posts here"
 - Suggest 3-5 accounts to follow based on interests
 
-### The assistant's Discretion
+### OpenCode's Discretion
 - Loading skeleton design
 - Exact spacing and typography
 - Error state handling
@@ -165,7 +165,7 @@ CLI command to backup database to local file or S3. Supports full and incrementa
 - --no-retry flag to fail fast
 - Partial backups are deleted on failure (no corrupt files)
 
-### The assistant's Discretion
+### OpenCode's Discretion
 - Exact progress bar implementation
 - Compression algorithm choice
 - Temp file handling
@@ -227,7 +227,7 @@ Organize existing photo library into structured folders. Handle duplicates and a
 - Preserve original filename as suffix for searchability
 - Handle name collisions with incrementing suffix
 
-### The assistant's Discretion
+### OpenCode's Discretion
 - Exact clustering algorithm
 - How to handle photos with no EXIF data
 - Folder emoji usage

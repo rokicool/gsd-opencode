@@ -19,7 +19,7 @@ If `$DESCRIPTION` is empty after parsing, prompt user interactively:
 
 ```
 question(
-  header: "Quick Task",
+  header: "Quick task",
   question: "What do you want to do?",
   followUp: null
 )
@@ -88,7 +88,7 @@ Store `$QUICK_DIR` for use in orchestration.
 **If NOT `$FULL_MODE`:** Use standard `quick` mode.
 
 ```
-Task(
+task(
   prompt="
 <planning_context>
 
@@ -96,8 +96,12 @@ Task(
 **Directory:** ${QUICK_DIR}
 **Description:** ${DESCRIPTION}
 
-**Project State:**
-@.planning/STATE.md
+<files_to_read>
+- .planning/STATE.md (Project State)
+- ./OPENCODE.md (if exists — follow project-specific guidelines)
+</files_to_read>
+
+**Project skills:** Check .agents/skills/ directory (if exists) — read SKILL.md files, plans should account for project skill rules
 
 </planning_context>
 
@@ -143,25 +147,23 @@ Display banner:
 ◆ Spawning plan checker...
 ```
 
-```bash
-PLAN_CONTENT=$(cat "${QUICK_DIR}/${next_num}-PLAN.md" 2>/dev/null)
-```
-
 Checker prompt:
 
 ```markdown
 <verification_context>
 **Mode:** quick-full
-**Task Description:** ${DESCRIPTION}
+**task Description:** ${DESCRIPTION}
 
-**Plan to verify:** ${PLAN_CONTENT}
+<files_to_read>
+- ${QUICK_DIR}/${next_num}-PLAN.md (Plan to verify)
+</files_to_read>
 
 **Scope:** This is a quick task, not a full phase. Skip checks that require a ROADMAP phase goal.
 </verification_context>
 
 <check_dimensions>
 - Requirement coverage: Does the plan address the task description?
-- Task completeness: Do tasks have files, action, verify, done fields?
+- task completeness: Do tasks have files, action, verify, done fields?
 - Key links: Are referenced files real?
 - Scope sanity: Is this appropriately sized for a quick task (1-3 tasks)?
 - must_haves derivation: Are must_haves traceable to the task description?
@@ -176,7 +178,7 @@ Skip: context compliance (no CONTEXT.md), cross-plan deps (single plan), ROADMAP
 ```
 
 ```
-Task(
+task(
   prompt=checker_prompt,
   subagent_type="gsd-plan-checker",
   model="{checker_model}",
@@ -197,17 +199,16 @@ Track `iteration_count` (starts at 1 after initial plan + check).
 
 Display: `Sending back to planner for revision... (iteration ${N}/2)`
 
-```bash
-PLAN_CONTENT=$(cat "${QUICK_DIR}/${next_num}-PLAN.md" 2>/dev/null)
-```
-
 Revision prompt:
 
 ```markdown
 <revision_context>
 **Mode:** quick-full (revision)
 
-**Existing plan:** ${PLAN_CONTENT}
+<files_to_read>
+- ${QUICK_DIR}/${next_num}-PLAN.md (Existing plan)
+</files_to_read>
+
 **Checker issues:** ${structured_issues_from_checker}
 
 </revision_context>
@@ -220,9 +221,9 @@ Return what changed.
 ```
 
 ```
-Task(
+task(
   prompt="First, read ~/.config/opencode/agents/gsd-planner.md for your role and instructions.\n\n" + revision_prompt,
-  subagent_type="general_purpose",
+  subagent_type="task",
   model="{planner_model}",
   description="Revise quick plan: ${DESCRIPTION}"
 )
@@ -243,12 +244,16 @@ Offer: 1) Force proceed, 2) Abort
 Spawn gsd-executor with plan reference:
 
 ```
-Task(
+task(
   prompt="
 Execute quick task ${next_num}.
 
-Plan: @${QUICK_DIR}/${next_num}-PLAN.md
-Project state: @.planning/STATE.md
+<files_to_read>
+- ${QUICK_DIR}/${next_num}-PLAN.md (Plan)
+- .planning/STATE.md (Project state)
+- ./OPENCODE.md (Project instructions, if exists)
+- .agents/skills/ (Project skills, if exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
+</files_to_read>
 
 <constraints>
 - Execute all tasks in the plan
@@ -268,7 +273,7 @@ After executor returns:
 2. Extract commit hash from executor output
 3. Report completion status
 
-**Known The assistant bug (classifyHandoffIfNeeded):** If executor reports "failed" with error `classifyHandoffIfNeeded is not defined`, this is a The assistant runtime bug — not a real failure. Check if summary file exists and git log shows commits. If so, treat as successful.
+**Known OpenCode bug (classifyHandoffIfNeeded):** If executor reports "failed" with error `classifyHandoffIfNeeded is not defined`, this is a OpenCode runtime bug — not a real failure. Check if summary file exists and git log shows commits. If so, treat as successful.
 
 If summary not found, error: "Executor failed to create ${next_num}-SUMMARY.md"
 
@@ -290,11 +295,15 @@ Display banner:
 ```
 
 ```
-Task(
+task(
   prompt="Verify quick task goal achievement.
-Task directory: ${QUICK_DIR}
-Task goal: ${DESCRIPTION}
-Plan: @${QUICK_DIR}/${next_num}-PLAN.md
+task directory: ${QUICK_DIR}
+task goal: ${DESCRIPTION}
+
+<files_to_read>
+- ${QUICK_DIR}/${next_num}-PLAN.md (Plan)
+</files_to_read>
+
 Check must_haves against actual codebase. Create VERIFICATION.md at ${QUICK_DIR}/${next_num}-VERIFICATION.md.",
   subagent_type="gsd-verifier",
   model="{verifier_model}",
@@ -399,7 +408,7 @@ Display completion output:
 
 GSD > QUICK TASK COMPLETE (FULL MODE)
 
-Quick Task ${next_num}: ${DESCRIPTION}
+Quick task ${next_num}: ${DESCRIPTION}
 
 Summary: ${QUICK_DIR}/${next_num}-SUMMARY.md
 Verification: ${QUICK_DIR}/${next_num}-VERIFICATION.md (${VERIFICATION_STATUS})
@@ -416,7 +425,7 @@ Ready for next task: /gsd-quick
 
 GSD > QUICK TASK COMPLETE
 
-Quick Task ${next_num}: ${DESCRIPTION}
+Quick task ${next_num}: ${DESCRIPTION}
 
 Summary: ${QUICK_DIR}/${next_num}-SUMMARY.md
 Commit: ${commit_hash}

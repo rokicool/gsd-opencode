@@ -51,16 +51,16 @@ last_updated: [timestamp from current-timestamp]
 
 <completed_work>
 
-- Task 1: [name] - Done
-- Task 2: [name] - Done
-- Task 3: [name] - In progress, [what's done]
+- task 1: [name] - Done
+- task 2: [name] - Done
+- task 3: [name] - In progress, [what's done]
 </completed_work>
 
 <remaining_work>
 
-- Task 3: [what's left]
-- Task 4: Not started
-- Task 5: Not started
+- task 3: [what's left]
+- task 4: Not started
+- task 5: Not started
 </remaining_work>
 
 <decisions_made>
@@ -82,7 +82,7 @@ Start with: [specific first action when resuming]
 </next_action>
 ```
 
-Be specific enough for a fresh The assistant to understand immediately.
+Be specific enough for a fresh OpenCode to understand immediately.
 
 Use `current-timestamp` for last_updated field. You can use init todos (which provides timestamps) or call directly:
 ```bash
@@ -103,7 +103,7 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "wip: [phase-name
 Current state:
 
 - Phase: [XX-name]
-- Task: [X] of [Y]
+- task: [X] of [Y]
 - Status: [in_progress/blocked]
 - Committed as WIP
 
