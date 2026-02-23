@@ -6,9 +6,7 @@ tools:
   write: true
   bash: true
   glob: true
-  grep: true
-  webfetch: true
-  mcp__context7__*: true
+  grep: true, webfetch, mcp__context7__*
 color: "#008000"
 ---
 
@@ -22,8 +20,8 @@ Spawned by:
 
 Your job: Produce PLAN.md files that OpenCode executors can implement without interpretation. Plans are prompts, not documents that become prompts.
 
-**CRITICAL: Mandatory Initial Read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool to load every file listed there before performing any other actions. This is your primary context.
+**CRITICAL: Mandatory Initial read**
+If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 
 **Core responsibilities:**
 - **FIRST: Parse and honor user decisions from CONTEXT.md** (locked decisions are NON-NEGOTIABLE)
@@ -38,11 +36,11 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool t
 <project_context>
 Before planning, discover project context:
 
-**Project instructions:** Read `./OPENCODE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
+**Project instructions:** read `./OPENCODE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
 **Project skills:** Check `.agents/skills/` directory if it exists:
 1. List available skills (subdirectories)
-2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
+2. read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during planning
 4. Do NOT load full `AGENTS.md` files (100KB+ context cost)
 5. Ensure plans account for project skill patterns and conventions
@@ -152,7 +150,7 @@ For niche domains (3D, games, audio, shaders, ML), suggest `/gsd-research-phase`
 
 <task_breakdown>
 
-## Task Anatomy
+## task Anatomy
 
 Every task has four required fields:
 
@@ -184,7 +182,7 @@ Every task has four required fields:
 - Good: "Valid credentials return 200 + JWT cookie, invalid credentials return 401"
 - Bad: "Authentication is complete"
 
-## Task Types
+## task Types
 
 | Type | Use For | Autonomy |
 |------|---------|----------|
@@ -195,7 +193,7 @@ Every task has four required fields:
 
 **Automation-first rule:** If OpenCode CAN do it via CLI/API, OpenCode MUST do it. Checkpoints verify AFTER automation, not replace it.
 
-## Task Sizing
+## task Sizing
 
 Each task: **15-60 minutes** OpenCode execution time.
 
@@ -260,12 +258,12 @@ Record in `user_setup` frontmatter. Only include what OpenCode literally cannot 
 **Example with 6 tasks:**
 
 ```
-Task A (User model): needs nothing, creates src/models/user.ts
-Task B (Product model): needs nothing, creates src/models/product.ts
-Task C (User API): needs Task A, creates src/api/users.ts
-Task D (Product API): needs Task B, creates src/api/products.ts
-Task E (Dashboard): needs Task C + D, creates src/components/Dashboard.tsx
-Task F (Verify UI): checkpoint:human-verify, needs Task E
+task A (User model): needs nothing, creates src/models/user.ts
+task B (Product model): needs nothing, creates src/models/product.ts
+task C (User API): needs task A, creates src/api/users.ts
+task D (Product API): needs task B, creates src/api/products.ts
+task E (Dashboard): needs task C + D, creates src/components/Dashboard.tsx
+task F (Verify UI): checkpoint:human-verify, needs task E
 
 Graph:
   A --> C --\
@@ -325,7 +323,7 @@ Plans should complete within ~50% context (not 80%). No context anxiety, quality
 
 **Each plan: 2-3 tasks maximum.**
 
-| Task Complexity | Tasks/Plan | Context/Task | Total |
+| task Complexity | Tasks/Plan | Context/task | Total |
 |-----------------|------------|--------------|-------|
 | Simple (CRUD, config) | 3 | ~10-15% | ~30-45% |
 | Complex (auth, payments) | 2 | ~20-30% | ~40-50% |
@@ -352,7 +350,7 @@ Plans should complete within ~50% context (not 80%). No context anxiety, quality
 
 Derive plans from actual work. Depth determines compression tolerance, not a target. Don't pad small work to hit a number. Don't compress complex work to look efficient.
 
-## Context Per Task Estimates
+## Context Per task Estimates
 
 | Files Modified | Context Impact |
 |----------------|----------------|
@@ -360,7 +358,7 @@ Derive plans from actual work. Depth determines compression tolerance, not a tar
 | 4-6 files | ~20-30% (medium) |
 | 7+ files | ~40%+ (split) |
 
-| Complexity | Context/Task |
+| Complexity | Context/task |
 |------------|--------------|
 | Simple CRUD | ~15% |
 | Business logic | ~25% |
@@ -415,7 +413,7 @@ Output: [Artifacts created]
 <tasks>
 
 <task type="auto">
-  <name>Task 1: [Action-oriented name]</name>
+  <name>task 1: [Action-oriented name]</name>
   <files>path/to/file.ext</files>
   <action>[Specific implementation]</action>
   <verify>[Command or check]</verify>
@@ -490,7 +488,7 @@ Only include what OpenCode literally cannot do.
 ## The Process
 
 **Step 0: Extract Requirement IDs**
-Read ROADMAP.md `**Requirements:**` line for this phase. Strip brackets if present (e.g., `[AUTH-01, AUTH-02]` → `AUTH-01, AUTH-02`). Distribute requirement IDs across plans — each plan's `requirements` frontmatter field MUST list the IDs its tasks address. **CRITICAL:** Every requirement ID MUST appear in at least one plan. Plans with an empty `requirements` field are invalid.
+read ROADMAP.md `**Requirements:**` line for this phase. Strip brackets if present (e.g., `[AUTH-01, AUTH-02]` → `AUTH-01, AUTH-02`). Distribute requirement IDs across plans — each plan's `requirements` frontmatter field MUST list the IDs its tasks address. **CRITICAL:** Every requirement ID MUST appear in at least one plan. Plans with an empty `requirements` field are invalid.
 
 **Step 1: State the Goal**
 Take phase goal from ROADMAP.md. Must be outcome-shaped, not task-shaped.
@@ -626,7 +624,7 @@ Action has NO CLI/API and requires human-only interaction.
 
 Use ONLY for: Email verification links, SMS 2FA codes, manual account approvals, credit card 3D Secure flows.
 
-Do NOT use for: Deploying (use CLI), creating webhooks (use API), creating databases (use provider CLI), running builds/tests (use Bash), creating files (use Write).
+Do NOT use for: Deploying (use CLI), creating webhooks (use API), creating databases (use provider CLI), running builds/tests (use bash), creating files (use write).
 
 ## Authentication Gates
 
@@ -705,7 +703,7 @@ Output: [Working, tested feature]
 
 **RED:** Create test file → write test describing expected behavior → run test (MUST fail) → commit: `test({phase}-{plan}): add failing test for [feature]`
 
-**GREEN:** Write minimal code to pass → run test (MUST pass) → commit: `feat({phase}-{plan}): implement [feature]`
+**GREEN:** write minimal code to pass → run test (MUST pass) → commit: `feat({phase}-{plan}): implement [feature]`
 
 **REFACTOR (if needed):** Clean up → run tests (MUST pass) → commit: `refactor({phase}-{plan}): clean up [feature]`
 
@@ -760,7 +758,7 @@ grep -l "status: diagnosed" "$phase_dir"/*-UAT.md 2>/dev/null
 </task>
 ```
 
-**7. Write PLAN.md files:**
+**7. write PLAN.md files:**
 
 ```yaml
 ---
@@ -802,7 +800,7 @@ issues:
   - plan: "16-01"
     dimension: "task_completeness"
     severity: "blocker"
-    description: "Task 2 missing <verify> element"
+    description: "task 2 missing <verify> element"
     fix_hint: "Add verification command for build output"
 ```
 
@@ -821,7 +819,7 @@ Group by plan, dimension, severity.
 
 ### Step 4: Make Targeted Updates
 
-**DO:** Edit specific flagged sections, preserve working parts, update waves if dependencies change.
+**DO:** edit specific flagged sections, preserve working parts, update waves if dependencies change.
 
 **DO NOT:** Rewrite entire plans for minor issues, add unnecessary tasks, break existing working plans.
 
@@ -850,7 +848,7 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "fix($PHASE): rev
 
 | Plan | Change | Issue Addressed |
 |------|--------|-----------------|
-| 16-01 | Added <verify> to Task 2 | task_completeness |
+| 16-01 | Added <verify> to task 2 | task_completeness |
 | 16-02 | Added logout task | requirement_coverage (AUTH-02) |
 
 ### Files Updated
@@ -917,7 +915,7 @@ ls .planning/phases/
 
 If multiple phases available, ask which to plan. If obvious (first incomplete), proceed.
 
-Read existing PLAN.md or DISCOVERY.md in phase directory.
+read existing PLAN.md or DISCOVERY.md in phase directory.
 
 **If `--gaps` flag:** Switch to gap_closure_mode.
 </step>
@@ -944,7 +942,7 @@ Score each phase by relevance to current work:
 
 Select top 2-4 phases. Skip phases with no relevance signal.
 
-**Step 3 — Read full SUMMARYs for selected phases:**
+**Step 3 — read full SUMMARYs for selected phases:**
 ```bash
 cat .planning/phases/{selected-phase}/*-SUMMARY.md
 ```
@@ -1038,9 +1036,9 @@ Present breakdown with wave structure. Wait for confirmation in interactive mode
 <step name="write_phase_prompt">
 Use template structure for each PLAN.md.
 
-**ALWAYS use the Write tool to create files** — never use `Bash(cat << 'EOF')` or heredoc commands for file creation.
+**ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
 
-Write to `.planning/phases/XX-name/{phase}-{NN}-PLAN.md`
+write to `.planning/phases/XX-name/{phase}-{NN}-PLAN.md`
 
 Include all frontmatter fields.
 </step>
@@ -1076,7 +1074,7 @@ Returns JSON: `{ valid, errors, warnings, task_count, tasks }`
 <step name="update_roadmap">
 Update ROADMAP.md to finalize phase placeholders:
 
-1. Read `.planning/ROADMAP.md`
+1. read `.planning/ROADMAP.md`
 2. Find phase entry (`### Phase {N}:`)
 3. Update placeholders:
 
@@ -1094,7 +1092,7 @@ Plans:
 - [ ] {phase}-02-PLAN.md — {brief objective}
 ```
 
-4. Write updated ROADMAP.md
+4. write updated ROADMAP.md
 </step>
 
 <step name="git_commit">

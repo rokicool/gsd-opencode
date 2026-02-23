@@ -5,7 +5,7 @@ With `--full` flag: enables plan-checking (max 2 iterations) and post-execution 
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -18,8 +18,8 @@ Parse `$ARGUMENTS` for:
 If `$DESCRIPTION` is empty after parsing, prompt user interactively:
 
 ```
-Question(
-  header: "Quick Task",
+question(
+  header: "Quick task",
   question: "What do you want to do?",
   followUp: null
 )
@@ -88,7 +88,7 @@ Store `$QUICK_DIR` for use in orchestration.
 **If NOT `$FULL_MODE`:** Use standard `quick` mode.
 
 ```
-Task(
+task(
   prompt="
 <planning_context>
 
@@ -115,7 +115,7 @@ ${FULL_MODE ? '- Each task MUST have `files`, `action`, `verify`, `done` fields'
 </constraints>
 
 <output>
-Write plan to: ${QUICK_DIR}/${next_num}-PLAN.md
+write plan to: ${QUICK_DIR}/${next_num}-PLAN.md
 Return: ## PLANNING COMPLETE with plan path
 </output>
 ",
@@ -152,7 +152,7 @@ Checker prompt:
 ```markdown
 <verification_context>
 **Mode:** quick-full
-**Task Description:** ${DESCRIPTION}
+**task Description:** ${DESCRIPTION}
 
 <files_to_read>
 - ${QUICK_DIR}/${next_num}-PLAN.md (Plan to verify)
@@ -163,7 +163,7 @@ Checker prompt:
 
 <check_dimensions>
 - Requirement coverage: Does the plan address the task description?
-- Task completeness: Do tasks have files, action, verify, done fields?
+- task completeness: Do tasks have files, action, verify, done fields?
 - Key links: Are referenced files real?
 - Scope sanity: Is this appropriately sized for a quick task (1-3 tasks)?
 - must_haves derivation: Are must_haves traceable to the task description?
@@ -178,7 +178,7 @@ Skip: context compliance (no CONTEXT.md), cross-plan deps (single plan), ROADMAP
 ```
 
 ```
-Task(
+task(
   prompt=checker_prompt,
   subagent_type="gsd-plan-checker",
   model="{checker_model}",
@@ -221,9 +221,9 @@ Return what changed.
 ```
 
 ```
-Task(
+task(
   prompt="First, read ~/.config/opencode/agents/gsd-planner.md for your role and instructions.\n\n" + revision_prompt,
-  subagent_type="general purpose",
+  subagent_type="task",
   model="{planner_model}",
   description="Revise quick plan: ${DESCRIPTION}"
 )
@@ -244,7 +244,7 @@ Offer: 1) Force proceed, 2) Abort
 Spawn gsd-executor with plan reference:
 
 ```
-Task(
+task(
   prompt="
 Execute quick task ${next_num}.
 
@@ -295,10 +295,10 @@ Display banner:
 ```
 
 ```
-Task(
+task(
   prompt="Verify quick task goal achievement.
-Task directory: ${QUICK_DIR}
-Task goal: ${DESCRIPTION}
+task directory: ${QUICK_DIR}
+task goal: ${DESCRIPTION}
 
 <files_to_read>
 - ${QUICK_DIR}/${next_num}-PLAN.md (Plan)
@@ -311,7 +311,7 @@ Check must_haves against actual codebase. Create VERIFICATION.md at ${QUICK_DIR}
 )
 ```
 
-Read verification status:
+read verification status:
 ```bash
 grep "^status:" "${QUICK_DIR}/${next_num}-VERIFICATION.md" | cut -d: -f2 | tr -d ' '
 ```
@@ -332,7 +332,7 @@ Update STATE.md with quick task completion record.
 
 **7a. Check if "Quick Tasks Completed" section exists:**
 
-Read STATE.md and check for `### Quick Tasks Completed` section.
+read STATE.md and check for `### Quick Tasks Completed` section.
 
 **7b. If section doesn't exist, create it:**
 
@@ -377,7 +377,7 @@ Use `date` from init:
 Last activity: ${date} - Completed quick task ${next_num}: ${DESCRIPTION}
 ```
 
-Use Edit tool to make these changes atomically
+Use edit tool to make these changes atomically
 
 ---
 
@@ -408,7 +408,7 @@ Display completion output:
 
 GSD > QUICK TASK COMPLETE (FULL MODE)
 
-Quick Task ${next_num}: ${DESCRIPTION}
+Quick task ${next_num}: ${DESCRIPTION}
 
 Summary: ${QUICK_DIR}/${next_num}-SUMMARY.md
 Verification: ${QUICK_DIR}/${next_num}-VERIFICATION.md (${VERIFICATION_STATUS})
@@ -425,7 +425,7 @@ Ready for next task: /gsd-quick
 
 GSD > QUICK TASK COMPLETE
 
-Quick Task ${next_num}: ${DESCRIPTION}
+Quick task ${next_num}: ${DESCRIPTION}
 
 Summary: ${QUICK_DIR}/${next_num}-SUMMARY.md
 Commit: ${commit_hash}

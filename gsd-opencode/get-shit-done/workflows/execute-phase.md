@@ -7,7 +7,7 @@ Orchestrator coordinates, not executes. Each subagent loads the full execute-pla
 </core_principle>
 
 <required_reading>
-Read STATE.md before any operation to load project context.
+read STATE.md before any operation to load project context.
 </required_reading>
 
 <process>
@@ -78,7 +78,7 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
 
 1. **Describe what's being built (BEFORE spawning):**
 
-   Read each plan's `<objective>`. Extract what's being built and why.
+   read each plan's `<objective>`. Extract what's being built and why.
 
    ```
    ---
@@ -100,7 +100,7 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
    This keeps orchestrator context lean (~10-15%).
 
    ```
-   Task(
+   task(
      subagent_type="gsd-executor",
      model="{executor_model}",
      prompt="
@@ -117,7 +117,7 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
        </execution_context>
 
        <files_to_read>
-       Read these files at execution start using the Read tool:
+       read these files at execution start using the read tool:
        - {phase_dir}/{plan_file} (Plan)
        - .planning/STATE.md (State)
        - .planning/config.json (Config, if exists)
@@ -179,7 +179,7 @@ Plans with `autonomous: false` require user interaction.
 
 **Auto-mode checkpoint handling:**
 
-Read auto-advance config:
+read auto-advance config:
 ```bash
 AUTO_CFG=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
 ```
@@ -264,7 +264,7 @@ PARENT_INFO=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs find-phase
 
 **3. Update UAT gap statuses:**
 
-Read the parent UAT file's `## Gaps` section. For each gap entry with `status: failed`:
+read the parent UAT file's `## Gaps` section. For each gap entry with `status: failed`:
 - Update to `status: resolved`
 
 **4. Update UAT frontmatter:**
@@ -276,7 +276,7 @@ If all gaps now have `status: resolved`:
 **5. Resolve referenced debug sessions:**
 
 For each gap that has a `debug_session:` field:
-- Read the debug session file
+- read the debug session file
 - Update frontmatter `status:` → `resolved`
 - Update frontmatter `updated:` timestamp
 - Move to resolved directory:
@@ -299,7 +299,7 @@ PHASE_REQ_IDS=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap 
 ```
 
 ```
-Task(
+task(
   prompt="Verify phase {phase_number} goal achievement.
 Phase directory: {phase_dir}
 Phase goal: {goal from ROADMAP.md}
@@ -312,7 +312,7 @@ Create VERIFICATION.md.",
 )
 ```
 
-Read status:
+read status:
 ```bash
 grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
 ```
@@ -409,7 +409,7 @@ STOP. Do not proceed to auto-advance or transition.
 **Auto-advance detection:**
 
 1. Parse `--auto` flag from $ARGUMENTS
-2. Read `workflow.auto_advance` from config:
+2. read `workflow.auto_advance` from config:
    ```bash
    AUTO_CFG=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
@@ -423,9 +423,9 @@ STOP. Do not proceed to auto-advance or transition.
 ╚══════════════════════════════════════════╝
 ```
 
-Execute the transition workflow inline (do NOT use Task — orchestrator context is ~10-15%, transition needs phase completion data already in context):
+Execute the transition workflow inline (do NOT use task — orchestrator context is ~10-15%, transition needs phase completion data already in context):
 
-Read and follow `~/.config/opencode/get-shit-done/workflows/transition.md`, passing through the `--auto` flag so it propagates to the next phase invocation.
+read and follow `~/.config/opencode/get-shit-done/workflows/transition.md`, passing through the `--auto` flag so it propagates to the next phase invocation.
 
 **If neither `--auto` nor `AUTO_CFG` is true:**
 
@@ -435,7 +435,7 @@ The workflow ends. The user runs `/gsd-progress` or invokes the transition workf
 </process>
 
 <context_efficiency>
-Orchestrator: ~10-15% context. Subagents: fresh 200k each. No polling (Task blocks). No context bleed.
+Orchestrator: ~10-15% context. Subagents: fresh 200k each. No polling (task blocks). No context bleed.
 </context_efficiency>
 
 <failure_handling>

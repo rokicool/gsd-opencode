@@ -70,7 +70,7 @@ Before returning PLANNING COMPLETE:
 
 **From /gsd-plan-phase (standard mode):**
 ```python
-Task(
+task(
   prompt=filled_template,
   subagent_type="gsd-planner",
   description="Plan Phase {phase}"
@@ -79,7 +79,7 @@ Task(
 
 **From /gsd-plan-phase --gaps (gap closure mode):**
 ```python
-Task(
+task(
   prompt=filled_template,  # with mode: gap_closure
   subagent_type="gsd-planner",
   description="Plan gaps for Phase {phase}"

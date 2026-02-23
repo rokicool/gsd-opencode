@@ -85,7 +85,7 @@ ${cyan}   ██████╗ ███████╗██████╗
  */
 async function getPackageVersion(sourceDir) {
   try {
-    // Read from the source directory's package.json
+    // read from the source directory's package.json
     const packageJsonPath = path.join(sourceDir, "package.json");
 
     const content = await fs.readFile(packageJsonPath, "utf-8");

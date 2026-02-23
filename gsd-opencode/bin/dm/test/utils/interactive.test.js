@@ -326,7 +326,7 @@ describe('promptConfirmation', () => {
   it('uses default value true when not specified', async () => {
     inquirer.confirm.mockResolvedValueOnce(true);
 
-    await promptConfirmation('Question?');
+    await promptConfirmation('question?');
 
     expect(inquirer.confirm).toHaveBeenCalledWith(expect.objectContaining({
       default: true
@@ -336,7 +336,7 @@ describe('promptConfirmation', () => {
   it('uses provided default value', async () => {
     inquirer.confirm.mockResolvedValueOnce(false);
 
-    await promptConfirmation('Question?', false);
+    await promptConfirmation('question?', false);
 
     expect(inquirer.confirm).toHaveBeenCalledWith(expect.objectContaining({
       default: false

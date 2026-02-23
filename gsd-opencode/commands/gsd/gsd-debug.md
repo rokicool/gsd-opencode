@@ -3,10 +3,10 @@ name: gsd-debug
 description: Systematic debugging with persistent state across context resets
 argument-hint: [issue description]
 allowed-tools:
-  - Read
-  - Bash
-  - Task
-  - Question
+  - read
+  - bash
+  - task
+  - question
 ---
 
 <objective>
@@ -50,7 +50,7 @@ If $ARGUMENTS provided OR user describes new issue:
 
 ## 2. Gather Symptoms (if new issue)
 
-Use Question for each:
+Use question for each:
 
 1. **Expected behavior** - What should happen?
 2. **Actual behavior** - What happens instead?
@@ -90,7 +90,7 @@ Create: .planning/debug/{slug}.md
 ```
 
 ```
-Task(
+task(
   prompt=filled_prompt,
   subagent_type="gsd-debugger",
   model="{debugger_model}",
@@ -145,7 +145,7 @@ goal: find_and_fix
 ```
 
 ```
-Task(
+task(
   prompt=continuation_prompt,
   subagent_type="gsd-debugger",
   model="{debugger_model}",

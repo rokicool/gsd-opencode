@@ -29,8 +29,8 @@ function output(result, raw, rawValue) {
     process.stdout.write(String(rawValue));
   } else {
     const json = JSON.stringify(result, null, 2);
-    // Large payloads exceed Claude Code's Bash tool buffer (~50KB).
-    // Write to tmpfile and output the path prefixed with @file: so callers can detect it.
+    // Large payloads exceed OpenCode's bash tool buffer (~50KB).
+    // write to tmpfile and output the path prefixed with @file: so callers can detect it.
     if (json.length > 50000) {
       const tmpPath = path.join(require('os').tmpdir(), `gsd-${Date.now()}.json`);
       fs.writeFileSync(tmpPath, json, 'utf-8');

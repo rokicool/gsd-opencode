@@ -153,7 +153,7 @@ describe('path replacement integration', () => {
       // Install from fixture source
       await fileOps.install(FIXTURE_SOURCE, targetDir);
 
-      // Read the installed SKILL.md
+      // read the installed SKILL.md
       const skillPath = path.join(targetDir, 'agents', 'test-agent', 'SKILL.md');
       const content = await fs.readFile(skillPath, 'utf-8');
 
@@ -471,7 +471,7 @@ And @gsd-opencode/agents/test-agent/SKILL.md
       // First install
       await fileOps.install(FIXTURE_SOURCE, targetDir);
 
-      // Read content after first install
+      // read content after first install
       const skillPath = path.join(targetDir, 'agents', 'test-agent', 'SKILL.md');
       const firstContent = await fs.readFile(skillPath, 'utf-8');
 
@@ -479,7 +479,7 @@ And @gsd-opencode/agents/test-agent/SKILL.md
       await fs.rm(targetDir, { recursive: true, force: true });
       await fileOps.install(FIXTURE_SOURCE, targetDir);
 
-      // Read content after second install
+      // read content after second install
       const secondContent = await fs.readFile(skillPath, 'utf-8');
 
       // Content should be the same (no double replacement)

@@ -35,7 +35,7 @@ Output: DISCOVERY.md with recommendation
 
 <discovery_scope>
 <include>
-- [Question to answer]
+- [question to answer]
 - [Area to investigate]
 - [Specific comparison if needed]
 </include>
@@ -51,21 +51,21 @@ Output: DISCOVERY.md with recommendation
 **Source Priority:**
 1. **Context7 MCP** - For library/framework documentation (current, authoritative)
 2. **Official Docs** - For platform-specific or non-indexed libraries
-3. **Websearch** - For comparisons, trends, community patterns (verify all findings)
+3. **websearch** - For comparisons, trends, community patterns (verify all findings)
 
 **Quality Checklist:**
 Before completing discovery, verify:
 - [ ] All claims have authoritative sources (Context7 or official docs)
 - [ ] Negative claims ("X is not possible") verified with official documentation
-- [ ] API syntax/configuration from Context7 or official docs (never Websearch alone)
-- [ ] Websearch findings cross-checked with authoritative sources
+- [ ] API syntax/configuration from Context7 or official docs (never websearch alone)
+- [ ] websearch findings cross-checked with authoritative sources
 - [ ] Recent updates/changelogs checked for breaking changes
 - [ ] Alternative approaches considered (not just first solution found)
 
 **Confidence Levels:**
 - HIGH: Context7 or official docs confirm
-- MEDIUM: Websearch + Context7/official docs confirm
-- LOW: Websearch only or training knowledge only (mark for validation)
+- MEDIUM: websearch + Context7/official docs confirm
+- LOW: websearch only or training knowledge only (mark for validation)
 
 </discovery_protocol>
 

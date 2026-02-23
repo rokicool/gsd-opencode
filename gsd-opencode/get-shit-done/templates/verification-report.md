@@ -124,8 +124,8 @@ None — all verifiable items checked programmatically.
 **Objective:** {What this fixes}
 
 **Tasks:**
-1. {Task to fix gap 1}
-2. {Task to fix gap 2}
+1. {task to fix gap 1}
+2. {task to fix gap 2}
 3. {Verification task}
 
 **Estimated scope:** {Small / Medium}
@@ -137,8 +137,8 @@ None — all verifiable items checked programmatically.
 **Objective:** {What this fixes}
 
 **Tasks:**
-1. {Task}
-2. {Task}
+1. {task}
+2. {task}
 
 **Estimated scope:** {Small / Medium}
 

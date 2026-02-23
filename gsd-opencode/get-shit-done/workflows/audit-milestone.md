@@ -3,7 +3,7 @@ Verify milestone achieved its definition of done by aggregating phase verificati
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -33,7 +33,7 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs phases list
 - Extract milestone definition of done from ROADMAP.md
 - Extract requirements mapped to this milestone from REQUIREMENTS.md
 
-## 2. Read All Phase Verifications
+## 2. read All Phase Verifications
 
 For each phase directory, read the VERIFICATION.md:
 
@@ -60,7 +60,7 @@ With phase context collected:
 Extract `MILESTONE_REQ_IDS` from REQUIREMENTS.md traceability table — all REQ-IDs assigned to phases in this milestone.
 
 ```
-Task(
+task(
   prompt="Check cross-phase integration and E2E flows.
 
 Phases: {phase_dirs}

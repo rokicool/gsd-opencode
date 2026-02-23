@@ -117,7 +117,7 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
             accomplishments.push(fm['one-liner']);
           }
           // Count tasks
-          const taskMatches = content.match(/##\s*Task\s*\d+/gi) || [];
+          const taskMatches = content.match(/##\s*task\s*\d+/gi) || [];
           totalTasks += taskMatches.length;
         } catch {}
       }

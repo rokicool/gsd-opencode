@@ -17,7 +17,7 @@ The git log should read like a changelog of what shipped, not a diary of plannin
 | PLAN.md created         | NO      | Intermediate - commit with plan completion       |
 | RESEARCH.md created     | NO      | Intermediate                                     |
 | DISCOVERY.md created    | NO      | Intermediate                                     |
-| **Task completed**      | YES     | Atomic unit of work (1 commit per task)         |
+| **task completed**      | YES     | Atomic unit of work (1 commit per task)         |
 | **Plan completed**      | YES     | Metadata commit (SUMMARY + STATE + ROADMAP)     |
 | Handoff created         | YES     | WIP state preserved                              |
 
@@ -57,7 +57,7 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: initialize
 </format>
 
 <format name="task-completion">
-## Task Completion (During Plan Execution)
+## task Completion (During Plan Execution)
 
 Each task gets its own commit immediately after completion.
 
@@ -119,9 +119,9 @@ After all tasks committed, one final metadata commit captures plan completion.
 docs({phase}-{plan}): complete [plan-name] plan
 
 Tasks completed: [N]/[N]
-- [Task 1 name]
-- [Task 2 name]
-- [Task 3 name]
+- [task 1 name]
+- [task 2 name]
+- [task 3 name]
 
 SUMMARY: .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md
 ```
@@ -222,7 +222,7 @@ Each plan produces 2-4 commits (tasks + metadata). Clear, granular, bisectable.
 
 <commit_strategy_rationale>
 
-## Why Per-Task Commits?
+## Why Per-task Commits?
 
 **Context engineering for AI:**
 - Git history becomes primary context source for future OpenCode sessions
@@ -231,7 +231,7 @@ Each plan produces 2-4 commits (tasks + metadata). Clear, granular, bisectable.
 - Less reliance on parsing SUMMARY.md = more context for actual work
 
 **Failure recovery:**
-- Task 1 committed ✅, Task 2 failed ❌
+- task 1 committed ✅, task 2 failed ❌
 - OpenCode in next session: sees task 1 complete, can retry task 2
 - Can `git reset --hard` to last successful task
 

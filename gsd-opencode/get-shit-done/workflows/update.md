@@ -3,7 +3,7 @@ Check for GSD updates via npm, display changelog for versions between installed 
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -133,8 +133,8 @@ Your custom files in other locations are preserved:
 If you've modified any GSD files directly, they'll be automatically backed up to `gsd-local-patches/` and can be reapplied with `/gsd-reapply-patches` after the update.
 ```
 
-Use Question:
-- Question: "Proceed with update?"
+Use question:
+- question: "Proceed with update?"
 - Options:
   - "Yes, update now"
   - "No, cancel"

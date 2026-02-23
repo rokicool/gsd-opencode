@@ -26,7 +26,7 @@ With diagnosis: "Comment doesn't refresh" → "useEffect missing dependency" →
 <step name="parse_gaps">
 **Extract gaps from UAT.md:**
 
-Read the "Gaps" section (YAML format):
+read the "Gaps" section (YAML format):
 ```yaml
 - truth: "Comment appears immediately after submission"
   status: failed
@@ -78,9 +78,9 @@ This runs in parallel - all gaps investigated simultaneously.
 For each gap, fill the debug-subagent-prompt template and spawn:
 
 ```
-Task(
+task(
   prompt=filled_debug_subagent_prompt + "\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>",
-  subagent_type="general purpose",
+  subagent_type="task",
   description="Debug: {truth_short}"
 )
 ```

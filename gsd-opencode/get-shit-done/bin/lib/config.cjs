@@ -109,7 +109,7 @@ function cmdConfigSet(cwd, keyPath, value, raw) {
   }
   current[keys[keys.length - 1]] = parsedValue;
 
-  // Write back
+  // write back
   try {
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
     const result = { updated: true, key: keyPath, value: parsedValue };

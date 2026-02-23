@@ -355,7 +355,7 @@ export class SettingsManager {
    * Saves configuration to disk atomically.
    *
    * Private method that writes configuration using the atomic write pattern:
-   * 1. Write to a temporary file
+   * 1. write to a temporary file
    * 2. Rename temp file to final location
    *
    * This ensures that the configuration file is never in a partially written

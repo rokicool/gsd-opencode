@@ -39,9 +39,9 @@ created: {date}
 
 ---
 
-## Per-Task Verification Map
+## Per-task Verification Map
 
-| Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
+| task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
 | {N}-01-01 | 01 | 1 | REQ-{XX} | unit | `pytest tests/test_{module}.py::test_{name} -x` | ✅ / ❌ W0 | ⬜ pending |
 | {N}-01-02 | 01 | 1 | REQ-{XX} | integration | `pytest tests/test_{flow}.py -x` | ✅ / ❌ W0 | ⬜ pending |

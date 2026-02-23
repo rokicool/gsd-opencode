@@ -186,7 +186,7 @@ export class ConfigManager {
       // Ensure target directory exists
       await fs.mkdir(targetDir, { recursive: true });
 
-      // Write version file
+      // write version file
       await fs.writeFile(versionPath, version.trim(), 'utf-8');
     } catch (error) {
       if (error.code === 'EACCES') {

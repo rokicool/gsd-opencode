@@ -3,8 +3,8 @@ Execute a phase prompt (PLAN.md) and create the outcome summary (SUMMARY.md).
 </purpose>
 
 <required_reading>
-Read STATE.md before any operation to load project context.
-Read config.json for planning behavior settings.
+read STATE.md before any operation to load project context.
+read config.json for planning behavior settings.
 
 @~/.config/opencode/get-shit-done/references/git-integration.md
 </required_reading>
@@ -66,7 +66,7 @@ grep -n "type=\"checkpoint" .planning/phases/XX-name/{phase}-{plan}-PLAN.md
 | Verify-only | B (segmented) | Segments between checkpoints. After none/human-verify → SUBAGENT. After decision/human-action → MAIN |
 | Decision | C (main) | Execute entirely in main context |
 
-**Pattern A:** init_agent_tracking → spawn Task(subagent_type="gsd-executor", model=executor_model) with prompt: execute plan at [path], autonomous, all tasks + SUMMARY + commit, follow deviation/auth rules, report: plan name, tasks, SUMMARY path, commit hash → track agent_id → wait → update tracking → report.
+**Pattern A:** init_agent_tracking → spawn task(subagent_type="gsd-executor", model=executor_model) with prompt: execute plan at [path], autonomous, all tasks + SUMMARY + commit, follow deviation/auth rules, report: plan name, tasks, SUMMARY path, commit hash → track agent_id → wait → update tracking → report.
 
 **Pattern B:** Execute segment-by-segment. Autonomous segments: spawn subagent for assigned tasks only (no SUMMARY/commit). Checkpoints: main context. After all segments: aggregate, create SUMMARY, commit. See segment_execution.
 
@@ -87,7 +87,7 @@ if [ -f .planning/current-agent-id.txt ]; then
 fi
 ```
 
-If interrupted: ask user to resume (Task `resume` parameter) or start fresh.
+If interrupted: ask user to resume (task `resume` parameter) or start fresh.
 
 **Tracking protocol:** On spawn: write agent_id to `current-agent-id.txt`, append to agent-history.json: `{"agent_id":"[id]","task_description":"[desc]","phase":"[phase]","plan":"[plan]","segment":[num|null],"timestamp":"[ISO]","status":"spawned","completion_timestamp":null}`. On completion: status → "completed", set completion_timestamp, delete current-agent-id.txt. Prune: if entries > max_entries, remove oldest "completed" (never "spawned").
 
@@ -125,13 +125,13 @@ This IS the execution instructions. Follow exactly. If plan references CONTEXT.m
 node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs phases list --type summaries --raw
 # Extract the second-to-last summary from the JSON result
 ```
-If previous SUMMARY has unresolved "Issues Encountered" or "Next Phase Readiness" blockers: Question(header="Previous Issues", options: "Proceed anyway" | "Address first" | "Review previous").
+If previous SUMMARY has unresolved "Issues Encountered" or "Next Phase Readiness" blockers: question(header="Previous Issues", options: "Proceed anyway" | "Address first" | "Review previous").
 </step>
 
 <step name="execute">
 Deviations are normal — handle via rules below.
 
-1. Read @context files from prompt
+1. read @context files from prompt
 2. Per task:
    - `type="auto"`: if `tdd="true"` → TDD execution. Implement with deviation rules + auth gates. Verify done criteria. Commit (see task_commit). Track hash for Summary.
    - `type="checkpoint:*"`: STOP → checkpoint_protocol → wait for user → continue only after confirmation.
@@ -202,7 +202,7 @@ Proceed with proposed change? (yes / different approach / defer)
 
 Summary MUST include deviations section. None? → `## Deviations from Plan\n\nNone - plan executed exactly as written.`
 
-Per deviation: **[Rule N - Category] Title** — Found during: Task X | Issue | Fix | Files modified | Verification | Commit hash
+Per deviation: **[Rule N - Category] Title** — Found during: task X | Issue | Fix | Files modified | Verification | Commit hash
 
 End with: **Total deviations:** N auto-fixed (breakdown). **Impact:** assessment.
 
@@ -214,8 +214,8 @@ End with: **Total deviations:** N auto-fixed (breakdown). **Impact:** assessment
 For `type: tdd` plans — RED-GREEN-REFACTOR:
 
 1. **Infrastructure** (first TDD plan only): detect project, install framework, config, verify empty suite
-2. **RED:** Read `<behavior>` → failing test(s) → run (MUST fail) → commit: `test({phase}-{plan}): add failing test for [feature]`
-3. **GREEN:** Read `<implementation>` → minimal code → run (MUST pass) → commit: `feat({phase}-{plan}): implement [feature]`
+2. **RED:** read `<behavior>` → failing test(s) → run (MUST fail) → commit: `test({phase}-{plan}): add failing test for [feature]`
+3. **GREEN:** read `<implementation>` → minimal code → run (MUST pass) → commit: `feat({phase}-{plan}): implement [feature]`
 4. **REFACTOR:** Clean up → tests MUST pass → commit: `refactor({phase}-{plan}): clean up [feature]`
 
 Errors: RED doesn't fail → investigate test/existing feature. GREEN doesn't pass → debug, iterate. REFACTOR breaks → undo.
@@ -224,7 +224,7 @@ See `~/.config/opencode/get-shit-done/references/tdd.md` for structure.
 </tdd_plan_execution>
 
 <task_commit>
-## Task Commit Protocol
+## task Commit Protocol
 
 After each task (verification passed, done criteria met), commit immediately.
 
@@ -254,7 +254,7 @@ git add src/types/user.ts
 **5. Record hash:**
 ```bash
 TASK_COMMIT=$(git rev-parse --short HEAD)
-TASK_COMMITS+=("Task ${TASK_NUM}: ${TASK_COMMIT}")
+TASK_COMMITS+=("task ${TASK_NUM}: ${TASK_COMMIT}")
 ```
 
 </task_commit>
@@ -262,7 +262,7 @@ TASK_COMMITS+=("Task ${TASK_NUM}: ${TASK_COMMIT}")
 <step name="checkpoint_protocol">
 On `type="checkpoint:*"`: automate everything possible first. Checkpoints are for verification/decisions only.
 
-Display: `CHECKPOINT: [Type]` box → Progress {X}/{Y} → Task name → type-specific content → `YOUR ACTION: [signal]`
+Display: `CHECKPOINT: [Type]` box → Progress {X}/{Y} → task name → type-specific content → `YOUR ACTION: [signal]`
 
 | Type | Content | Resume signal |
 |------|---------|---------------|
@@ -276,15 +276,15 @@ See ~/.config/opencode/get-shit-done/references/checkpoints.md for details.
 </step>
 
 <step name="checkpoint_return_for_orchestrator">
-When spawned via Task and hitting checkpoint: return structured state (cannot interact with user directly).
+When spawned via task and hitting checkpoint: return structured state (cannot interact with user directly).
 
-**Required return:** 1) Completed Tasks table (hashes + files) 2) Current Task (what's blocking) 3) Checkpoint Details (user-facing content) 4) Awaiting (what's needed from user)
+**Required return:** 1) Completed Tasks table (hashes + files) 2) Current task (what's blocking) 3) Checkpoint Details (user-facing content) 4) Awaiting (what's needed from user)
 
 Orchestrator parses → presents to user → spawns fresh continuation with your completed tasks state. You will NOT be resumed. In main context: use checkpoint_protocol above.
 </step>
 
 <step name="verification_failure_gate">
-If verification fails: STOP. Present: "Verification failed for Task [X]: [name]. Expected: [criteria]. Actual: [result]." Options: Retry | Skip (mark incomplete) | Stop (investigate). If skipped → SUMMARY "Issues Encountered".
+If verification fails: STOP. Present: "Verification failed for task [X]: [name]. Expected: [criteria]. Actual: [result]." Options: Retry | Skip (mark incomplete) | Stop (investigate). If skipped → SUMMARY "Issues Encountered".
 </step>
 
 <step name="record_completion_time">
@@ -391,7 +391,7 @@ Extract requirement IDs from the plan's frontmatter (e.g., `requirements: [AUTH-
 </step>
 
 <step name="git_commit_metadata">
-Task code already committed per-task. Commit plan metadata:
+task code already committed per-task. Commit plan metadata:
 
 ```bash
 node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md

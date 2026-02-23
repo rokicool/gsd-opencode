@@ -68,7 +68,7 @@ Use these as inspiration, not a checklist. Pick what's relevant to the thread.
 
 <using_askuserquestion>
 
-Use Question to help users think by presenting concrete options to react to.
+Use question to help users think by presenting concrete options to react to.
 
 **Good options:**
 - Interpretations of what they might mean

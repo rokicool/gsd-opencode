@@ -3,12 +3,12 @@ name: gsd-audit-milestone
 description: Audit milestone completion against original intent before archiving
 argument-hint: "[version]"
 allowed-tools:
-  - Read
-  - Glob
-  - Grep
-  - Bash
-  - Task
-  - Write
+  - read
+  - glob
+  - grep
+  - bash
+  - task
+  - write
 ---
 <objective>
 Verify milestone achieved its definition of done. Check requirements coverage, cross-phase integration, and end-to-end flows.
@@ -26,8 +26,8 @@ Version: $ARGUMENTS (optional — defaults to current milestone)
 Core planning files are resolved in-workflow (`init milestone-op`) and loaded only as needed.
 
 **Completed Work:**
-Glob: .planning/phases/*/*-SUMMARY.md
-Glob: .planning/phases/*/*-VERIFICATION.md
+glob: .planning/phases/*/*-SUMMARY.md
+glob: .planning/phases/*/*-VERIFICATION.md
 </context>
 
 <process>

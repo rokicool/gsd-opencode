@@ -3,11 +3,11 @@ name: gsd-new-milestone
 description: Start a new milestone cycle — update PROJECT.md and route to requirements
 argument-hint: "[milestone name, e.g., 'v1.1 Notifications']"
 allowed-tools:
-  - Read
-  - Write
-  - Bash
-  - Task
-  - Question
+  - read
+  - write
+  - bash
+  - task
+  - question
 ---
 <objective>
 Start a new milestone: questioning → research (optional) → requirements → roadmap.

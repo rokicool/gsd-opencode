@@ -3,7 +3,7 @@ Create `.continue-here.md` handoff file to preserve complete work state across s
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -34,7 +34,7 @@ Ask user for clarifications if needed via conversational questions.
 </step>
 
 <step name="write">
-**Write handoff to `.planning/phases/XX-name/.continue-here.md`:**
+**write handoff to `.planning/phases/XX-name/.continue-here.md`:**
 
 ```markdown
 ---
@@ -51,16 +51,16 @@ last_updated: [timestamp from current-timestamp]
 
 <completed_work>
 
-- Task 1: [name] - Done
-- Task 2: [name] - Done
-- Task 3: [name] - In progress, [what's done]
+- task 1: [name] - Done
+- task 2: [name] - Done
+- task 3: [name] - In progress, [what's done]
 </completed_work>
 
 <remaining_work>
 
-- Task 3: [what's left]
-- Task 4: Not started
-- Task 5: Not started
+- task 3: [what's left]
+- task 4: Not started
+- task 5: Not started
 </remaining_work>
 
 <decisions_made>
@@ -103,7 +103,7 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "wip: [phase-name
 Current state:
 
 - Phase: [XX-name]
-- Task: [X] of [Y]
+- task: [X] of [Y]
 - Status: [in_progress/blocked]
 - Committed as WIP
 

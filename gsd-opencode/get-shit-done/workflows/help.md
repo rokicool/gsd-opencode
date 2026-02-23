@@ -105,7 +105,7 @@ Result: Creates `.planning/phases/01-foundation/01-01-PLAN.md`
 Execute all plans in a phase.
 
 - Groups plans by wave (from frontmatter), executes waves sequentially
-- Plans within each wave run in parallel via Task tool
+- Plans within each wave run in parallel via task tool
 - Verifies phase goal after all plans complete
 - Updates REQUIREMENTS.md, ROADMAP.md, STATE.md
 
@@ -479,8 +479,8 @@ Example config:
 
 ## Getting Help
 
-- Read `.planning/PROJECT.md` for project vision
-- Read `.planning/STATE.md` for current context
+- read `.planning/PROJECT.md` for project vision
+- read `.planning/STATE.md` for current context
 - Check `.planning/ROADMAP.md` for phase status
 - Run `/gsd-progress` to check where you're up to
 </reference>

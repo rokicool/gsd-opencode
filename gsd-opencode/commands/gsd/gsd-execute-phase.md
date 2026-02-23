@@ -3,15 +3,15 @@ name: gsd-execute-phase
 description: Execute all plans in a phase with wave-based parallelization
 argument-hint: "<phase-number> [--gaps-only]"
 allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Glob
-  - Grep
-  - Bash
-  - Task
-  - Todowrite
-  - Question
+  - read
+  - write
+  - edit
+  - glob
+  - grep
+  - bash
+  - task
+  - todowrite
+  - question
 ---
 <objective>
 Execute all plans in a phase using wave-based parallel execution.

@@ -404,7 +404,7 @@ export class UpdateService {
    * Validates that the update can proceed by checking:
    * - Installation exists (if required)
    * - Target version exists
-   * - Write permissions are available
+   * - write permissions are available
    *
    * @param {string|null} targetVersion - Specific version to validate (null for latest)
    * @returns {Promise<Object>} Validation result
@@ -442,7 +442,7 @@ export class UpdateService {
       } else if (error.code === 'ENOENT') {
         // Directory doesn't exist, which is fine for new installs
       } else {
-        errors.push(`Write permission check failed: ${error.message}`);
+        errors.push(`write permission check failed: ${error.message}`);
       }
     }
 

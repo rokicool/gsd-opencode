@@ -84,14 +84,14 @@ Continue to spawn_agents.
 <step name="spawn_agents">
 Spawn 4 parallel gsd-codebase-mapper agents.
 
-Use Task tool with `subagent_type="gsd-codebase-mapper"`, `model="{mapper_model}"`, and `run_in_background=true` for parallel execution.
+Use task tool with `subagent_type="gsd-codebase-mapper"`, `model="{mapper_model}"`, and `run_in_background=true` for parallel execution.
 
 **CRITICAL:** Use the dedicated `gsd-codebase-mapper` agent, NOT `Explore`. The mapper agent writes documents directly.
 
 **Agent 1: Tech Focus**
 
 ```
-Task(
+task(
   subagent_type="gsd-codebase-mapper",
   model="{mapper_model}",
   run_in_background=true,
@@ -100,18 +100,18 @@ Task(
 
 Analyze this codebase for technology stack and external integrations.
 
-Write these documents to .planning/codebase/:
+write these documents to .planning/codebase/:
 - STACK.md - Languages, runtime, frameworks, dependencies, configuration
 - INTEGRATIONS.md - External APIs, databases, auth providers, webhooks
 
-Explore thoroughly. Write documents directly using templates. Return confirmation only."
+Explore thoroughly. write documents directly using templates. Return confirmation only."
 )
 ```
 
 **Agent 2: Architecture Focus**
 
 ```
-Task(
+task(
   subagent_type="gsd-codebase-mapper",
   model="{mapper_model}",
   run_in_background=true,
@@ -120,18 +120,18 @@ Task(
 
 Analyze this codebase architecture and directory structure.
 
-Write these documents to .planning/codebase/:
+write these documents to .planning/codebase/:
 - ARCHITECTURE.md - Pattern, layers, data flow, abstractions, entry points
 - STRUCTURE.md - Directory layout, key locations, naming conventions
 
-Explore thoroughly. Write documents directly using templates. Return confirmation only."
+Explore thoroughly. write documents directly using templates. Return confirmation only."
 )
 ```
 
 **Agent 3: Quality Focus**
 
 ```
-Task(
+task(
   subagent_type="gsd-codebase-mapper",
   model="{mapper_model}",
   run_in_background=true,
@@ -140,18 +140,18 @@ Task(
 
 Analyze this codebase for coding conventions and testing patterns.
 
-Write these documents to .planning/codebase/:
+write these documents to .planning/codebase/:
 - CONVENTIONS.md - Code style, naming, patterns, error handling
 - TESTING.md - Framework, structure, mocking, coverage
 
-Explore thoroughly. Write documents directly using templates. Return confirmation only."
+Explore thoroughly. write documents directly using templates. Return confirmation only."
 )
 ```
 
 **Agent 4: Concerns Focus**
 
 ```
-Task(
+task(
   subagent_type="gsd-codebase-mapper",
   model="{mapper_model}",
   run_in_background=true,
@@ -160,10 +160,10 @@ Task(
 
 Analyze this codebase for technical debt, known issues, and areas of concern.
 
-Write this document to .planning/codebase/:
+write this document to .planning/codebase/:
 - CONCERNS.md - Tech debt, bugs, security, performance, fragile areas
 
-Explore thoroughly. Write document directly using template. Return confirmation only."
+Explore thoroughly. write document directly using template. Return confirmation only."
 )
 ```
 
@@ -173,7 +173,7 @@ Continue to collect_confirmations.
 <step name="collect_confirmations">
 Wait for all 4 agents to complete.
 
-Read each agent's output file to collect confirmations.
+read each agent's output file to collect confirmations.
 
 **Expected confirmation format from each agent:**
 ```
@@ -294,7 +294,7 @@ Created .planning/codebase/:
 **Also available:**
 - Re-run mapping: `/gsd-map-codebase`
 - Review specific file: `cat .planning/codebase/STACK.md`
-- Edit any document before proceeding
+- edit any document before proceeding
 
 ---
 ```
@@ -308,7 +308,7 @@ End workflow.
 - .planning/codebase/ directory created
 - 4 parallel gsd-codebase-mapper agents spawned with run_in_background=true
 - Agents write documents directly (orchestrator doesn't receive document contents)
-- Read agent output files to collect confirmations
+- read agent output files to collect confirmations
 - All 7 codebase documents exist
 - Clear completion summary with line counts
 - User offered clear next steps in GSD style

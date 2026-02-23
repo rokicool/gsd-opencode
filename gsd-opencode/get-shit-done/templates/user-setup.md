@@ -102,11 +102,11 @@ user_setup:
 | OpenCode CAN Do (not in USER-SETUP) | OpenCode CANNOT Do (→ USER-SETUP) |
 |-----------------------------------|--------------------------------|
 | `npm install stripe` | Create Stripe account |
-| Write webhook handler code | Get API keys from dashboard |
+| write webhook handler code | Get API keys from dashboard |
 | Create `.env.local` file structure | Copy actual secret values |
 | Run `stripe listen` | Authenticate Stripe CLI (browser OAuth) |
 | Configure package.json | Access external service dashboards |
-| Write any code | Retrieve secrets from third-party systems |
+| write any code | Retrieve secrets from third-party systems |
 
 **The test:** "Does this require a human in a browser, accessing an account OpenCode doesn't have credentials for?"
 - Yes → USER-SETUP.md

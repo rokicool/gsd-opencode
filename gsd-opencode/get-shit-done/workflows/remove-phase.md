@@ -3,7 +3,7 @@ Remove an unstarted future phase from the project roadmap, delete its directory,
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>

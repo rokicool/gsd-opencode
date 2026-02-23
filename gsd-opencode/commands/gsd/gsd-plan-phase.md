@@ -4,13 +4,13 @@ description: Create detailed phase plan (PLAN.md) with verification loop
 argument-hint: "[phase] [--auto] [--research] [--skip-research] [--gaps] [--skip-verify]"
 agent: gsd-planner
 allowed-tools:
-  - Read
-  - Write
-  - Bash
-  - Glob
-  - Grep
-  - Task
-  - Webfetch
+  - read
+  - write
+  - bash
+  - glob
+  - grep
+  - task
+  - webfetch
   - mcp__context7__*
 ---
 <objective>

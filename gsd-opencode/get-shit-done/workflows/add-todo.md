@@ -3,7 +3,7 @@ Capture an idea, task, or issue that surfaces during a GSD session as a structur
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -66,10 +66,10 @@ grep -l -i "[key words from title]" .planning/todos/pending/*.md 2>/dev/null
 ```
 
 If potential duplicate found:
-1. Read the existing todo
+1. read the existing todo
 2. Compare scope
 
-If overlapping, use Question:
+If overlapping, use question:
 - header: "Duplicate?"
 - question: "Similar todo exists: [title]. What would you like to do?"
 - options:
@@ -86,7 +86,7 @@ Generate slug for the title:
 slug=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs generate-slug "$title" --raw)
 ```
 
-Write to `.planning/todos/pending/${date}-${slug}.md`:
+write to `.planning/todos/pending/${date}-${slug}.md`:
 
 ```markdown
 ---

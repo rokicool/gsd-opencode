@@ -3,11 +3,11 @@ name: gsd-new-project
 description: Initialize a new project with deep context gathering and PROJECT.md
 argument-hint: "[--auto]"
 allowed-tools:
-  - Read
-  - Bash
-  - Write
-  - Task
-  - Question
+  - read
+  - bash
+  - write
+  - task
+  - question
 ---
 <context>
 **Flags:**

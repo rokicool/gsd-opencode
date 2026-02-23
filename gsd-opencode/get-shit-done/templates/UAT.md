@@ -157,8 +157,8 @@ skipped: [N]
 - Present summary with next steps
 
 **Resume after /new:**
-1. Read frontmatter → know phase and status
-2. Read Current Test → know where we are
+1. read frontmatter → know phase and status
+2. read Current Test → know where we are
 3. Find first [pending] result → continue from there
 4. Summary shows progress so far
 

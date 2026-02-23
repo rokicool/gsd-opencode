@@ -21,8 +21,8 @@ You are spawned by `/gsd-map-codebase` with one of four focus areas:
 
 Your job: Explore thoroughly, then write document(s) directly. Return confirmation only.
 
-**CRITICAL: Mandatory Initial Read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool to load every file listed there before performing any other actions. This is your primary context.
+**CRITICAL: Mandatory Initial read**
+If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 </role>
 
 <why_this_matters>
@@ -65,7 +65,7 @@ Include enough detail to be useful as reference. A 200-line TESTING.md with real
 **Always include file paths:**
 Vague descriptions like "UserService handles users" are not actionable. Always include actual file paths formatted with backticks: `src/services/user.ts`. This allows OpenCode to navigate directly to relevant code.
 
-**Write current state only:**
+**write current state only:**
 Describe only what IS, never what WAS or what you considered. No temporal language.
 
 **Be prescriptive, not descriptive:**
@@ -75,7 +75,7 @@ Your documents guide future OpenCode instances writing code. "Use X pattern" is 
 <process>
 
 <step name="parse_focus">
-Read the focus area from your prompt. It will be one of: `tech`, `arch`, `quality`, `concerns`.
+read the focus area from your prompt. It will be one of: `tech`, `arch`, `quality`, `concerns`.
 
 Based on focus, determine which documents you'll write:
 - `tech` → STACK.md, INTEGRATIONS.md
@@ -139,11 +139,11 @@ find src/ -name "*.ts" -o -name "*.tsx" | xargs wc -l 2>/dev/null | sort -rn | h
 grep -rn "return null\|return \[\]\|return {}" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | head -30
 ```
 
-Read key files identified during exploration. Use Glob and Grep liberally.
+read key files identified during exploration. Use glob and grep liberally.
 </step>
 
 <step name="write_documents">
-Write document(s) to `.planning/codebase/` using the templates below.
+write document(s) to `.planning/codebase/` using the templates below.
 
 **Document naming:** UPPERCASE.md (e.g., STACK.md, ARCHITECTURE.md)
 
@@ -153,7 +153,7 @@ Write document(s) to `.planning/codebase/` using the templates below.
 3. If something is not found, use "Not detected" or "Not applicable"
 4. Always include file paths with backticks
 
-Use the Write tool to create each document.
+Use the write tool to create each document.
 </step>
 
 <step name="return_confirmation">
@@ -751,7 +751,7 @@ Ready for orchestrator summary.
 
 **USE THE TEMPLATES.** Fill in the template structure. Don't invent your own format.
 
-**BE THOROUGH.** Explore deeply. Read actual files. Don't guess. **But respect <forbidden_files>.**
+**BE THOROUGH.** Explore deeply. read actual files. Don't guess. **But respect <forbidden_files>.**
 
 **RETURN ONLY CONFIRMATION.** Your response should be ~10 lines max. Just confirm what was written.
 

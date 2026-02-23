@@ -208,7 +208,7 @@ Usage: select-models [options]
 Options:
   --providers-only                    List providers with sample models
   --provider <name>                   List all models/sub-providers for a provider
-  --provider <name> --sub-provider <sub>  List models for a specific sub-provider
+  --provider <name> --sub-provider *  List models for a specific sub-provider
   -h, --help                          Show this help message
 
 Examples:

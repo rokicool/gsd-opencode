@@ -5,7 +5,7 @@ Executed by a verification subagent spawned from execute-phase.md.
 </purpose>
 
 <core_principle>
-**Task completion ≠ Goal achievement**
+**task completion ≠ Goal achievement**
 
 A task "create chat component" can be marked complete when the component is a placeholder. The task was done — but the goal "working chat interface" was not achieved.
 

@@ -138,9 +138,9 @@ files_changed: []
 When OpenCode reads this file after /new:
 
 1. Parse frontmatter → know status
-2. Read Current Focus → know exactly what was happening
-3. Read Eliminated → know what NOT to retry
-4. Read Evidence → know what's been learned
+2. read Current Focus → know exactly what was happening
+3. read Eliminated → know what NOT to retry
+4. read Evidence → know what's been learned
 5. Continue from next_action
 
 The file IS the debugging brain. OpenCode should be able to resume perfectly from any interruption point.

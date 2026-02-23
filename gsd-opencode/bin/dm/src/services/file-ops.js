@@ -471,7 +471,7 @@ export class FileOperations {
     const isMarkdown = sourcePath.endsWith('.md');
 
     if (isMarkdown) {
-      // Read, replace, and write markdown content
+      // read, replace, and write markdown content
       let content = await fs.readFile(sourcePath, 'utf-8');
 
       // Optimization: Skip files that don't contain any patterns needing replacement

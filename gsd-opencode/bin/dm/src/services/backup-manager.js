@@ -211,7 +211,7 @@ export class BackupManager {
         throw error;
       }
 
-      // Read backup directory contents
+      // read backup directory contents
       const entries = await fs.readdir(this._backupDir, { withFileTypes: true });
 
       // Filter for files (not directories) with date prefix

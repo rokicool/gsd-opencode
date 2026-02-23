@@ -17,7 +17,7 @@ function cmdTemplateSelect(cwd, planPath, raw) {
     const content = fs.readFileSync(fullPath, 'utf-8');
 
     // Simple heuristics
-    const taskMatch = content.match(/###\s*Task\s*\d+/g) || [];
+    const taskMatch = content.match(/###\s*task\s*\d+/g) || [];
     const taskCount = taskMatch.length;
 
     const decisionMatch = content.match(/decision/gi) || [];
@@ -101,8 +101,8 @@ function cmdTemplateFill(cwd, templateType, options, raw) {
         '- [Key outcome 1]',
         '- [Key outcome 2]',
         '',
-        '## Task Commits',
-        '1. **Task 1: [task name]** - `hash`',
+        '## task Commits',
+        '1. **task 1: [task name]** - `hash`',
         '',
         '## Files Created/Modified',
         '- `path/to/file.ts` - What it does',
@@ -147,7 +147,7 @@ function cmdTemplateFill(cwd, templateType, options, raw) {
         '## Tasks',
         '',
         '<task type="code">',
-        '  <name>[Task name]</name>',
+        '  <name>[task name]</name>',
         '  <files>[file paths]</files>',
         '  <action>[What to do]</action>',
         '  <verify>[How to verify]</verify>',

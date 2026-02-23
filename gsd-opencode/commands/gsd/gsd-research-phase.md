@@ -3,9 +3,9 @@ name: gsd-research-phase
 description: Research how to implement a phase (standalone - usually use /gsd-plan-phase instead)
 argument-hint: "[phase]"
 allowed-tools:
-  - Read
-  - Bash
-  - Task
+  - read
+  - bash
+  - task
 ---
 
 <objective>
@@ -20,7 +20,7 @@ Research how to implement a phase. Spawns gsd-phase-researcher agent with phase 
 
 **Orchestrator role:** Parse phase, validate against roadmap, check existing research, gather context, spawn researcher agent, present results.
 
-**Why subagent:** Research burns context fast (Websearch, Context7 queries, source verification). Fresh 200k context for investigation. Main context stays lean for user interaction.
+**Why subagent:** Research burns context fast (websearch, Context7 queries, source verification). Fresh 200k context for investigation. Main context stays lean for user interaction.
 </objective>
 
 <context>
@@ -111,10 +111,10 @@ Mode: ecosystem
 <downstream_consumer>
 Your RESEARCH.md will be loaded by `/gsd-plan-phase` which uses specific sections:
 - `## Standard Stack` → Plans use these libraries
-- `## Architecture Patterns` → Task structure follows these
+- `## Architecture Patterns` → task structure follows these
 - `## Don't Hand-Roll` → Tasks NEVER build custom solutions for listed problems
 - `## Common Pitfalls` → Verification steps check for these
-- `## Code Examples` → Task actions reference these patterns
+- `## Code Examples` → task actions reference these patterns
 
 Be prescriptive, not exploratory. "Use X" not "Consider X or Y."
 </downstream_consumer>
@@ -129,14 +129,14 @@ Before declaring complete, verify:
 </quality_gate>
 
 <output>
-Write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
+write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 </output>
 ```
 
 ```
-Task(
+task(
   prompt="First, read ~/.config/opencode/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + filled_prompt,
-  subagent_type="general purpose",
+  subagent_type="task",
   model="{researcher_model}",
   description="Research Phase {phase}"
 )
@@ -170,9 +170,9 @@ Continue research for Phase {phase_number}: {phase_name}
 ```
 
 ```
-Task(
+task(
   prompt="First, read ~/.config/opencode/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + continuation_prompt,
-  subagent_type="general purpose",
+  subagent_type="task",
   model="{researcher_model}",
   description="Continue research Phase {phase}"
 )

@@ -16,7 +16,7 @@ Archive accumulated phase directories from completed milestones into `.planning/
 
 <step name="identify_completed_milestones">
 
-Read `.planning/MILESTONES.md` to identify completed milestones and their versions.
+read `.planning/MILESTONES.md` to identify completed milestones and their versions.
 
 ```bash
 cat .planning/MILESTONES.md
@@ -93,7 +93,7 @@ No phase directories found to archive. Phases may have been removed or archived 
 
 Stop here.
 
-Question: "Proceed with archiving?" with options: "Yes — archive listed phases" | "Cancel"
+question: "Proceed with archiving?" with options: "Yes — archive listed phases" | "Cancel"
 
 If "Cancel": Stop.
 

@@ -39,7 +39,7 @@ find .planning/phases -name "*-UAT.md" -type f 2>/dev/null | head -5
 
 **If active sessions exist AND no $ARGUMENTS provided:**
 
-Read each file's frontmatter (status, phase) and Current Test section.
+read each file's frontmatter (status, phase) and Current Test section.
 
 Display inline:
 
@@ -86,7 +86,7 @@ Use `phase_dir` from init (or run init if not already done).
 ls "$phase_dir"/*-SUMMARY.md 2>/dev/null
 ```
 
-Read each SUMMARY.md to extract testable deliverables.
+read each SUMMARY.md to extract testable deliverables.
 </step>
 
 <step name="extract_tests">
@@ -164,7 +164,7 @@ skipped: 0
 [none yet]
 ```
 
-Write to `.planning/phases/XX-name/{phase_num}-UAT.md`
+write to `.planning/phases/XX-name/{phase_num}-UAT.md`
 
 Proceed to `present_test`.
 </step>
@@ -172,7 +172,7 @@ Proceed to `present_test`.
 <step name="present_test">
 **Present current test to user:**
 
-Read Current Test section from UAT file.
+read Current Test section from UAT file.
 
 Display using checkpoint box format:
 
@@ -190,7 +190,7 @@ Display using checkpoint box format:
 ──────────────────────────────────────────────────────────────
 ```
 
-Wait for user response (plain text, no Question).
+Wait for user response (plain text, no question).
 </step>
 
 <step name="process_response">
@@ -259,7 +259,7 @@ If no more tests → Go to `complete_session`
 <step name="resume_from_file">
 **Resume testing from UAT file:**
 
-Read the full UAT file.
+read the full UAT file.
 
 Find first test with `result: [pending]`.
 
@@ -358,7 +358,7 @@ Display:
 Spawn gsd-planner in --gaps mode:
 
 ```
-Task(
+task(
   prompt="""
 <planning_context>
 
@@ -406,7 +406,7 @@ Initialize: `iteration_count = 1`
 Spawn gsd-plan-checker:
 
 ```
-Task(
+task(
   prompt="""
 <verification_context>
 
@@ -446,7 +446,7 @@ Display: `Sending back to planner for revision... (iteration {N}/3)`
 Spawn gsd-planner with revision context:
 
 ```
-Task(
+task(
   prompt="""
 <revision_context>
 
@@ -463,7 +463,7 @@ Task(
 </revision_context>
 
 <instructions>
-Read existing PLAN.md files. Make targeted updates to address checker issues.
+read existing PLAN.md files. Make targeted updates to address checker issues.
 Do NOT replan from scratch unless issues are fundamental.
 </instructions>
 """,
@@ -522,7 +522,7 @@ Plans verified and ready for execution.
 <update_rules>
 **Batched writes for efficiency:**
 
-Keep results in memory. Write to file only when:
+Keep results in memory. write to file only when:
 1. **Issue found** — Preserve the problem immediately
 2. **Session complete** — Final write before commit
 3. **Checkpoint** — Every 5 passed tests (safety net)

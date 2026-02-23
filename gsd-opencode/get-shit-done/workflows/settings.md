@@ -3,7 +3,7 @@ Interactive configuration of GSD workflow agents (research, plan_check, verifier
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -34,10 +34,10 @@ Parse current values (default to `true` if not present):
 </step>
 
 <step name="present_settings">
-Use Question with current values pre-selected:
+Use question with current values pre-selected:
 
 ```
-Question([
+question([
   {
     question: "Which model profile for agents?",
     header: "Model",
@@ -81,7 +81,7 @@ Question([
     multiSelect: false,
     options: [
       { label: "No (Recommended)", description: "Manual /new + paste between stages" },
-      { label: "Yes", description: "Chain stages via Task() subagents (same isolation)" }
+      { label: "Yes", description: "Chain stages via task() subagents (same isolation)" }
     ]
   },
   {
@@ -127,14 +127,14 @@ Merge new settings into existing config.json:
 }
 ```
 
-Write updated config to `.planning/config.json`.
+write updated config to `.planning/config.json`.
 </step>
 
 <step name="save_as_defaults">
 Ask whether to save these settings as global defaults for future projects:
 
 ```
-Question([
+question([
   {
     question: "Save these as default settings for all new projects?",
     header: "Defaults",
@@ -153,7 +153,7 @@ If "Yes": write the same config object (minus project-specific fields like `brav
 mkdir -p ~/.gsd
 ```
 
-Write `~/.gsd/defaults.json` with:
+write `~/.gsd/defaults.json` with:
 ```json
 {
   "mode": <current>,

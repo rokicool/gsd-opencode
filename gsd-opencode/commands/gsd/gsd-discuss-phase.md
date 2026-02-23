@@ -3,13 +3,13 @@ name: gsd-discuss-phase
 description: Gather phase context through adaptive questioning before planning
 argument-hint: "<phase> [--auto]"
 allowed-tools:
-  - Read
-  - Write
-  - Bash
-  - Glob
-  - Grep
-  - Question
-  - Task
+  - read
+  - write
+  - bash
+  - glob
+  - grep
+  - question
+  - task
 ---
 
 <objective>
@@ -41,7 +41,7 @@ Context files are resolved in-workflow using `init phase-op` and roadmap/state t
 3. **Analyze phase** — Identify domain and generate phase-specific gray areas
 4. **Present gray areas** — Multi-select: which to discuss? (NO skip option)
 5. **Deep-dive each area** — 4 questions per area, then offer more/next
-6. **Write CONTEXT.md** — Sections match areas discussed
+6. **write CONTEXT.md** — Sections match areas discussed
 7. Offer next steps (research or plan)
 
 **CRITICAL: Scope guardrail**

@@ -3,7 +3,7 @@ Insert a decimal phase for urgent work discovered mid-milestone between existing
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -64,7 +64,7 @@ Extract from result: `phase_number`, `after_phase`, `name`, `slug`, `directory`.
 <step name="update_project_state">
 Update STATE.md to reflect the inserted phase:
 
-1. Read `.planning/STATE.md`
+1. read `.planning/STATE.md`
 2. Under "## Accumulated Context" → "### Roadmap Evolution" add entry:
    ```
    - Phase {decimal_phase} inserted after Phase {after_phase}: {description} (URGENT)

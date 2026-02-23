@@ -198,8 +198,8 @@ Plans execute autonomously. Checkpoints formalize interaction points where human
 **Do NOT use for pre-planned manual work:**
 - Deploying (use CLI - auth gate if needed)
 - Creating webhooks/databases (use API/CLI - auth gate if needed)
-- Running builds/tests (use Bash tool)
-- Creating files (use Write tool)
+- Running builds/tests (use bash tool)
+- Creating files (use write tool)
 
 **Structure:**
 ```xml
@@ -286,7 +286,7 @@ When OpenCode encounters `type="checkpoint:*"`:
 ╚═══════════════════════════════════════════════════════╝
 
 Progress: 5/8 tasks complete
-Task: Responsive dashboard layout
+task: Responsive dashboard layout
 
 Built: Responsive dashboard at /dashboard
 
@@ -308,7 +308,7 @@ How to verify:
 ╚═══════════════════════════════════════════════════════╝
 
 Progress: 2/6 tasks complete
-Task: Select authentication provider
+task: Select authentication provider
 
 Decision: Which auth provider should we use?
 
@@ -339,7 +339,7 @@ Options:
 ╚═══════════════════════════════════════════════════════╝
 
 Progress: 3/8 tasks complete
-Task: Deploy to Vercel
+task: Deploy to Vercel
 
 Attempted: vercel --yes
 Error: Not authenticated. Please run 'vercel login'
@@ -400,7 +400,7 @@ I'll verify: vercel whoami returns your account
 
 ## Environment Variable Automation
 
-**Env files:** Use Write/Edit tools. Never ask human to create .env manually.
+**Env files:** Use write/edit tools. Never ask human to create .env manually.
 
 **Dashboard env vars via CLI:**
 
@@ -517,7 +517,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
 |--------|--------------|-----------------|
 | Deploy to Vercel | Yes (`vercel`) | YES |
 | Create Stripe webhook | Yes (API) | YES |
-| Write .env file | Yes (Write tool) | YES |
+| write .env file | Yes (write tool) | YES |
 | Create Upstash DB | Yes (`upstash`) | YES |
 | Run tests | Yes (`npm test`) | YES |
 | Start dev server | Yes (`npm run dev`) | YES |
@@ -567,7 +567,7 @@ timeout 30 bash -c 'until curl -s localhost:3000 > /dev/null 2>&1; do sleep 1; d
   <action>
     1. Run `upstash redis create myapp-cache --region us-east-1`
     2. Capture connection URL from output
-    3. Write to .env: UPSTASH_REDIS_URL={url}
+    3. write to .env: UPSTASH_REDIS_URL={url}
     4. Verify connection with test command
   </action>
   <verify>

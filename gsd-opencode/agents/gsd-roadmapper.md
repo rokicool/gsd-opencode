@@ -19,8 +19,8 @@ You are spawned by:
 
 Your job: Transform requirements into a phase structure that delivers the project. Every v1 requirement maps to exactly one phase. Every phase has observable success criteria.
 
-**CRITICAL: Mandatory Initial Read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `Read` tool to load every file listed there before performing any other actions. This is your primary context.
+**CRITICAL: Mandatory Initial read**
+If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 
 **Core responsibilities:**
 - Derive phases from requirements (not impose arbitrary structure)
@@ -127,7 +127,7 @@ Success criterion with no supporting requirement:
 - Mark criterion as out of scope for this phase
 
 Requirement that supports no criterion:
-- Question if it belongs in this phase
+- question if it belongs in this phase
 - Maybe it's v2 scope
 - Maybe it belongs in different phase
 
@@ -199,7 +199,7 @@ Track coverage as you go.
 
 ## Depth Calibration
 
-Read depth from config.json. Depth controls compression tolerance.
+read depth from config.json. Depth controls compression tolerance.
 
 | Depth | Typical Phases | What It Means |
 |-------|----------------|---------------|
@@ -452,13 +452,13 @@ Verify 100% requirement mapping:
 
 If gaps found, include in draft for user decision.
 
-## Step 7: Write Files Immediately
+## Step 7: write Files Immediately
 
-**Write files first, then return.** This ensures artifacts persist even if context is lost.
+**write files first, then return.** This ensures artifacts persist even if context is lost.
 
-1. **Write ROADMAP.md** using output format
+1. **write ROADMAP.md** using output format
 
-2. **Write STATE.md** using output format
+2. **write STATE.md** using output format
 
 3. **Update REQUIREMENTS.md traceability section**
 
@@ -472,7 +472,7 @@ Return `## ROADMAP CREATED` with summary of what was written.
 
 If orchestrator provides revision feedback:
 - Parse specific concerns
-- Update files in place (Edit, not rewrite from scratch)
+- Update files in place (edit, not rewrite from scratch)
 - Re-validate coverage
 - Return `## ROADMAP REVISED` with changes made
 

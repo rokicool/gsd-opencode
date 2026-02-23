@@ -43,9 +43,9 @@ export async function createMockInstallWithMixedFiles(installDir) {
   // Create files - mix of gsd and user files
   const files = {
     // GSD files (should be removed)
-    'agents/gsd-debugger/SKILL.md': 'GSD Debugger Skill',
+    'agents/gsd-debugger/SKILL.md': 'GSD Debugger skill',
     'agents/gsd-debugger/config.json': '{"enabled": true}',
-    'agents/gsd-planner/SKILL.md': 'GSD Planner Skill',
+    'agents/gsd-planner/SKILL.md': 'GSD Planner skill',
     'command/gsd/install.js': '// Install command',
     'command/gsd/uninstall.js': '// Uninstall command',
     'get-shit-done/workflows/execute.md': 'Workflow content',

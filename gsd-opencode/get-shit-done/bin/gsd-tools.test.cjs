@@ -684,8 +684,8 @@ objective: Set up database schema
 files-modified: [prisma/schema.prisma, src/lib/db.ts]
 ---
 
-## Task 1: Create schema
-## Task 2: Generate client
+## task 1: Create schema
+## task 2: Generate client
 `
     );
 
@@ -715,7 +715,7 @@ autonomous: true
 objective: Database setup
 ---
 
-## Task 1: Schema
+## task 1: Schema
 `
     );
 
@@ -727,7 +727,7 @@ autonomous: true
 objective: Auth setup
 ---
 
-## Task 1: JWT
+## task 1: JWT
 `
     );
 
@@ -739,7 +739,7 @@ autonomous: false
 objective: API routes
 ---
 
-## Task 1: Routes
+## task 1: Routes
 `
     );
 
@@ -757,11 +757,11 @@ objective: API routes
     fs.mkdirSync(phaseDir, { recursive: true });
 
     // Plan with summary
-    fs.writeFileSync(path.join(phaseDir, '03-01-PLAN.md'), `---\nwave: 1\n---\n## Task 1`);
+    fs.writeFileSync(path.join(phaseDir, '03-01-PLAN.md'), `---\nwave: 1\n---\n## task 1`);
     fs.writeFileSync(path.join(phaseDir, '03-01-SUMMARY.md'), `# Summary`);
 
     // Plan without summary
-    fs.writeFileSync(path.join(phaseDir, '03-02-PLAN.md'), `---\nwave: 2\n---\n## Task 1`);
+    fs.writeFileSync(path.join(phaseDir, '03-02-PLAN.md'), `---\nwave: 2\n---\n## task 1`);
 
     const result = runGsdTools('phase-plan-index 03', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
@@ -784,7 +784,7 @@ autonomous: false
 objective: Manual review needed
 ---
 
-## Task 1: Review
+## task 1: Review
 `
     );
 
@@ -919,7 +919,7 @@ describe('state-snapshot command', () => {
 ## Session
 
 **Last Date:** 2024-01-15
-**Stopped At:** Phase 3, Plan 2, Task 1
+**Stopped At:** Phase 3, Plan 2, task 1
 **Resume File:** .planning/phases/03-api/03-02-PLAN.md
 `
     );
@@ -929,7 +929,7 @@ describe('state-snapshot command', () => {
 
     const output = JSON.parse(result.output);
     assert.strictEqual(output.session.last_date, '2024-01-15', 'session date extracted');
-    assert.strictEqual(output.session.stopped_at, 'Phase 3, Plan 2, Task 1', 'stopped at extracted');
+    assert.strictEqual(output.session.stopped_at, 'Phase 3, Plan 2, task 1', 'stopped at extracted');
     assert.strictEqual(output.session.resume_file, '.planning/phases/03-api/03-02-PLAN.md', 'resume file extracted');
   });
 
@@ -939,7 +939,7 @@ describe('state-snapshot command', () => {
       `# Project State
 
 **Current Phase:** 03
-**Paused At:** Phase 3, Plan 1, Task 2 - mid-implementation
+**Paused At:** Phase 3, Plan 1, task 2 - mid-implementation
 `
     );
 
@@ -947,7 +947,7 @@ describe('state-snapshot command', () => {
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
-    assert.strictEqual(output.paused_at, 'Phase 3, Plan 1, Task 2 - mid-implementation', 'paused_at extracted');
+    assert.strictEqual(output.paused_at, 'Phase 3, Plan 1, task 2 - mid-implementation', 'paused_at extracted');
   });
 });
 

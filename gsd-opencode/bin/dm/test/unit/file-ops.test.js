@@ -188,7 +188,7 @@ import { something } from '@gsd-opencode/lib/constants.js';
       // Act: Copy the file using FileOperations
       await fileOps._copyFile(sourcePath, targetPath);
 
-      // Assert: Read the output and verify replacements
+      // Assert: read the output and verify replacements
       const content = await fs.readFile(targetPath, 'utf-8');
 
       // Verify NO @gsd-opencode/ references remain
@@ -284,7 +284,7 @@ This document references:
       // Act: Copy the file using FileOperations
       await fileOps._copyFile(sourcePath, targetPath);
 
-      // Assert: Read the output and verify replacements
+      // Assert: read the output and verify replacements
       const content = await fs.readFile(targetPath, 'utf-8');
 
       // Verify NO @~/.config/opencode/ references remain
@@ -314,7 +314,7 @@ This document references:
       // Act: Copy the file using FileOperations
       await fileOps._copyFile(sourcePath, targetPath);
 
-      // Assert: Read the output and verify @~/.config/opencode/ is preserved
+      // Assert: read the output and verify @~/.config/opencode/ is preserved
       const content = await fs.readFile(targetPath, 'utf-8');
 
       // For global installs, @~/.config/opencode/ should stay unchanged

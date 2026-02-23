@@ -301,7 +301,7 @@ Template for `.planning/codebase/CONVENTIONS.md` - captures coding style and pat
 **Analysis approach:**
 - Scan src/ directory for file naming patterns
 - Check package.json scripts for lint/format commands
-- Read 5-10 files to identify function naming, error handling
+- read 5-10 files to identify function naming, error handling
 - Look for config files (.prettierrc, eslint.config.js)
 - Note patterns in imports, comments, function signatures
 </guidelines>

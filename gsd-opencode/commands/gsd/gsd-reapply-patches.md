@@ -1,6 +1,6 @@
 ---
 description: Reapply local modifications after a GSD update
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Question
+allowed-tools: read, write, edit, bash, glob, grep, question
 ---
 
 <purpose>
@@ -22,7 +22,7 @@ if [ ! -d "$PATCHES_DIR" ]; then
 fi
 ```
 
-Read `backup-meta.json` from the patches directory.
+read `backup-meta.json` from the patches directory.
 
 **If no patches found:**
 ```
@@ -52,20 +52,20 @@ Exit.
 
 For each file in `backup-meta.json`:
 
-1. **Read the backed-up version** (user's modified copy from `gsd-local-patches/`)
-2. **Read the newly installed version** (current file after update)
+1. **read the backed-up version** (user's modified copy from `gsd-local-patches/`)
+2. **read the newly installed version** (current file after update)
 3. **Compare and merge:**
 
    - If the new file is identical to the backed-up file: skip (modification was incorporated upstream)
    - If the new file differs: identify the user's modifications and apply them to the new version
 
    **Merge strategy:**
-   - Read both versions fully
+   - read both versions fully
    - Identify sections the user added or modified (look for additions, not just differences from path replacement)
    - Apply user's additions/modifications to the new version
    - If a section the user modified was also changed upstream: flag as conflict, show both versions, ask user which to keep
 
-4. **Write merged result** to the installed location
+4. **write merged result** to the installed location
 5. **Report status:**
    - `Merged` — user modifications applied cleanly
    - `Skipped` — modification already in upstream

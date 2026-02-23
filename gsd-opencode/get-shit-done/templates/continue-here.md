@@ -20,17 +20,17 @@ last_updated: 2025-01-15T14:30:00Z
 <completed_work>
 [What got done this session - be specific]
 
-- Task 1: [name] - Done
-- Task 2: [name] - Done
-- Task 3: [name] - In progress, [what's done on it]
+- task 1: [name] - Done
+- task 2: [name] - Done
+- task 3: [name] - In progress, [what's done on it]
 </completed_work>
 
 <remaining_work>
 [What's left in this phase]
 
-- Task 3: [name] - [what's left to do]
-- Task 4: [name] - Not started
-- Task 5: [name] - Not started
+- task 3: [name] - [what's left to do]
+- task 4: [name] - Not started
+- task 5: [name] - Not started
 </remaining_work>
 
 <decisions_made>

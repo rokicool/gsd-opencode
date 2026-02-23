@@ -325,7 +325,7 @@ async function cmdWebsearch(query, options, raw) {
   const apiKey = process.env.BRAVE_API_KEY;
 
   if (!apiKey) {
-    // No key = silent skip, agent falls back to built-in WebSearch
+    // No key = silent skip, agent falls back to built-in websearch
     output({ available: false, reason: 'BRAVE_API_KEY not set' }, raw, '');
     return;
   }
@@ -471,7 +471,7 @@ function cmdTodoComplete(cwd, filename, raw) {
   // Ensure completed directory exists
   fs.mkdirSync(completedDir, { recursive: true });
 
-  // Read, add completion timestamp, move
+  // read, add completion timestamp, move
   let content = fs.readFileSync(sourcePath, 'utf-8');
   const today = new Date().toISOString().split('T')[0];
   content = `completed: ${today}\n` + content;
@@ -500,7 +500,7 @@ function cmdScaffold(cwd, type, options, raw) {
   switch (type) {
     case 'context': {
       filePath = path.join(phaseDir, `${padded}-CONTEXT.md`);
-      content = `---\nphase: "${padded}"\nname: "${name || phaseInfo?.phase_name || 'Unnamed'}"\ncreated: ${today}\n---\n\n# Phase ${phase}: ${name || phaseInfo?.phase_name || 'Unnamed'} — Context\n\n## Decisions\n\n_Decisions will be captured during /gsd:discuss-phase ${phase}_\n\n## Discretion Areas\n\n_Areas where the executor can use judgment_\n\n## Deferred Ideas\n\n_Ideas to consider later_\n`;
+      content = `---\nphase: "${padded}"\nname: "${name || phaseInfo?.phase_name || 'Unnamed'}"\ncreated: ${today}\n---\n\n# Phase ${phase}: ${name || phaseInfo?.phase_name || 'Unnamed'} — Context\n\n## Decisions\n\n_Decisions will be captured during /gsd-discuss-phase ${phase}_\n\n## Discretion Areas\n\n_Areas where the executor can use judgment_\n\n## Deferred Ideas\n\n_Ideas to consider later_\n`;
       break;
     }
     case 'uat': {

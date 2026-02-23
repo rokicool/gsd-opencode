@@ -20,13 +20,13 @@ NOTE: For comprehensive ecosystem research ("how do experts build this"), use /g
 </depth_levels>
 
 <source_hierarchy>
-**MANDATORY: Context7 BEFORE Websearch**
+**MANDATORY: Context7 BEFORE websearch**
 
 OpenCode's training data is 6-18 months stale. Always verify.
 
 1. **Context7 MCP FIRST** - Current docs, no hallucination
 2. **Official docs** - When Context7 lacks coverage
-3. **Websearch LAST** - For comparisons and trends only
+3. **websearch LAST** - For comparisons and trends only
 
 See ~/.config/opencode/get-shit-done/templates/discovery.md `<discovery_protocol>` for full protocol.
 </source_hierarchy>
@@ -99,13 +99,13 @@ For: Choosing between options, new external integration.
 
 3. **Official docs** for anything Context7 lacks.
 
-4. **Websearch** for comparisons:
+4. **websearch** for comparisons:
 
    - "[option A] vs [option B] {current_year}"
    - "[option] known issues"
    - "[option] with [our stack]"
 
-5. **Cross-verify:** Any Websearch finding → confirm with Context7/official docs.
+5. **Cross-verify:** Any websearch finding → confirm with Context7/official docs.
 
 6. **Create DISCOVERY.md** using ~/.config/opencode/get-shit-done/templates/discovery.md structure:
 
@@ -145,7 +145,7 @@ For: Architectural decisions, novel problems, high-risk choices.
    - Migration/upgrade guides
    - Known limitations
 
-4. **Websearch for ecosystem context:**
+4. **websearch for ecosystem context:**
 
    - How others solved similar problems
    - Production experiences
@@ -154,7 +154,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 5. **Cross-verify ALL findings:**
 
-   - Every Websearch claim → verify with authoritative source
+   - Every websearch claim → verify with authoritative source
    - Mark what's verified vs assumed
    - Flag contradictions
 
@@ -203,7 +203,7 @@ Run the discovery:
 </step>
 
 <step name="create_discovery_output">
-Write `.planning/phases/XX-name/DISCOVERY.md`:
+write `.planning/phases/XX-name/DISCOVERY.md`:
 - Summary with recommendation
 - Key findings with sources
 - Code examples if applicable
@@ -214,7 +214,7 @@ Write `.planning/phases/XX-name/DISCOVERY.md`:
 After creating DISCOVERY.md, check confidence level.
 
 If confidence is LOW:
-Use Question:
+Use question:
 
 - header: "Low Conf."
 - question: "Discovery confidence is LOW: [reason]. How would you like to proceed?"
@@ -236,8 +236,8 @@ If DISCOVERY.md has open_questions:
 Present them inline:
 "Open questions from discovery:
 
-- [Question 1]
-- [Question 2]
+- [question 1]
+- [question 2]
 
 These may affect implementation. Acknowledge and proceed? (yes / address first)"
 
@@ -272,7 +272,7 @@ NOTE: DISCOVERY.md is NOT committed separately. It will be committed with phase 
 
 **Level 2 (Standard):**
 - Context7 consulted for all options
-- Websearch findings cross-verified
+- websearch findings cross-verified
 - DISCOVERY.md created with recommendation
 - Confidence level MEDIUM or higher
 - Ready to inform PLAN.md creation
@@ -280,7 +280,7 @@ NOTE: DISCOVERY.md is NOT committed separately. It will be committed with phase 
 **Level 3 (Deep Dive):**
 - Discovery scope defined
 - Context7 exhaustively consulted
-- All Websearch findings verified against authoritative sources
+- All websearch findings verified against authoritative sources
 - DISCOVERY.md created with comprehensive analysis
 - Quality report with source attribution
 - If LOW confidence findings → validation checkpoints defined

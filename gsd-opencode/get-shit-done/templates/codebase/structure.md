@@ -127,7 +127,7 @@ get-shit-done/
 ├── bin/                # Executable entry points
 ├── commands/           # Slash command definitions
 │   └── gsd/           # GSD-specific commands
-├── get-shit-done/     # Skill resources
+├── get-shit-done/     # skill resources
 │   ├── references/    # Principle documents
 │   ├── templates/     # File templates
 │   └── workflows/     # Multi-step procedures

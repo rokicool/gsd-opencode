@@ -508,7 +508,7 @@ describe('Uninstall Safety Features', () => {
         env: { HOME: homeDir }
       });
 
-      // Read backup content
+      // read backup content
       const backupDir = path.join(installDir, '.backups');
       const timestampDirs = await fs.readdir(backupDir);
       expect(timestampDirs.length).toBeGreaterThan(0);

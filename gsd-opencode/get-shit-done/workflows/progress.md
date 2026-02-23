@@ -3,7 +3,7 @@ Check project progress, summarize recent work and what's ahead, then intelligent
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -170,7 +170,7 @@ Track:
 **Route A: Unexecuted plan exists**
 
 Find the first PLAN.md without matching SUMMARY.md.
-Read its `<objective>` section.
+read its `<objective>` section.
 
 ```
 ---
@@ -261,7 +261,7 @@ UAT.md exists with gaps (diagnosed issues). User needs to plan fixes.
 
 **Step 3: Check milestone status (only when phase complete)**
 
-Read ROADMAP.md and identify:
+read ROADMAP.md and identify:
 1. Current phase number
 2. All phase numbers in the current milestone section
 
@@ -280,7 +280,7 @@ State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
 
 **Route C: Phase complete, more phases remain**
 
-Read ROADMAP.md to get the next phase's name and goal.
+read ROADMAP.md to get the next phase's name and goal.
 
 ```
 ---
@@ -337,7 +337,7 @@ All {N} phases finished!
 
 A milestone was completed and archived. Ready to start the next milestone cycle.
 
-Read MILESTONES.md to find the last completed milestone version.
+read MILESTONES.md to find the last completed milestone version.
 
 ```
 ---

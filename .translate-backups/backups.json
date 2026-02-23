@@ -4900,5 +4900,797 @@
     "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-debugger.md.2026-02-23T04-26-32-582Z.bak",
     "timestamp": "2026-02-23T04-26-32-582Z",
     "created": "2026-02-23T04:26:32.583Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-codebase-mapper.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-codebase-mapper.md.2026-02-23T16-56-00-176Z.bak",
+    "timestamp": "2026-02-23T16-56-00-176Z",
+    "created": "2026-02-23T16:56:00.177Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-debugger.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-debugger.md.2026-02-23T16-56-05-817Z.bak",
+    "timestamp": "2026-02-23T16-56-05-817Z",
+    "created": "2026-02-23T16:56:05.818Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-executor.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-executor.md.2026-02-23T16-56-05-819Z.bak",
+    "timestamp": "2026-02-23T16-56-05-819Z",
+    "created": "2026-02-23T16:56:05.820Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-integration-checker.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-integration-checker.md.2026-02-23T16-56-05-821Z.bak",
+    "timestamp": "2026-02-23T16-56-05-821Z",
+    "created": "2026-02-23T16:56:05.821Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-phase-researcher.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-phase-researcher.md.2026-02-23T16-56-05-822Z.bak",
+    "timestamp": "2026-02-23T16-56-05-822Z",
+    "created": "2026-02-23T16:56:05.824Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-plan-checker.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-plan-checker.md.2026-02-23T16-56-05-824Z.bak",
+    "timestamp": "2026-02-23T16-56-05-824Z",
+    "created": "2026-02-23T16:56:05.825Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-planner.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-planner.md.2026-02-23T16-56-05-825Z.bak",
+    "timestamp": "2026-02-23T16-56-05-825Z",
+    "created": "2026-02-23T16:56:05.826Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-project-researcher.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-project-researcher.md.2026-02-23T16-56-05-826Z.bak",
+    "timestamp": "2026-02-23T16-56-05-826Z",
+    "created": "2026-02-23T16:56:05.827Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-research-synthesizer.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-research-synthesizer.md.2026-02-23T16-56-05-827Z.bak",
+    "timestamp": "2026-02-23T16-56-05-827Z",
+    "created": "2026-02-23T16:56:05.828Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-roadmapper.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-roadmapper.md.2026-02-23T16-56-05-828Z.bak",
+    "timestamp": "2026-02-23T16-56-05-828Z",
+    "created": "2026-02-23T16:56:05.829Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/agents/gsd-verifier.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_agents_gsd-verifier.md.2026-02-23T16-56-05-830Z.bak",
+    "timestamp": "2026-02-23T16-56-05-830Z",
+    "created": "2026-02-23T16:56:05.830Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/bin/gsd-tools.test.cjs",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_bin_gsd-tools.test.cjs.2026-02-23T16-56-05-831Z.bak",
+    "timestamp": "2026-02-23T16-56-05-831Z",
+    "created": "2026-02-23T16:56:05.831Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/checkpoints.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_checkpoints.md.2026-02-23T16-56-05-832Z.bak",
+    "timestamp": "2026-02-23T16-56-05-832Z",
+    "created": "2026-02-23T16:56:05.833Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/continuation-format.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_continuation-format.md.2026-02-23T16-56-05-833Z.bak",
+    "timestamp": "2026-02-23T16-56-05-833Z",
+    "created": "2026-02-23T16:56:05.834Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/decimal-phase-calculation.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_decimal-phase-calculation.md.2026-02-23T16-56-05-834Z.bak",
+    "timestamp": "2026-02-23T16-56-05-834Z",
+    "created": "2026-02-23T16:56:05.835Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/git-integration.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_git-integration.md.2026-02-23T16-56-05-836Z.bak",
+    "timestamp": "2026-02-23T16-56-05-836Z",
+    "created": "2026-02-23T16:56:05.837Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/git-planning-commit.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_git-planning-commit.md.2026-02-23T16-56-05-837Z.bak",
+    "timestamp": "2026-02-23T16-56-05-837Z",
+    "created": "2026-02-23T16:56:05.838Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/model-profile-resolution.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_model-profile-resolution.md.2026-02-23T16-56-05-839Z.bak",
+    "timestamp": "2026-02-23T16-56-05-839Z",
+    "created": "2026-02-23T16:56:05.839Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/model-profiles.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_model-profiles.md.2026-02-23T16-56-05-840Z.bak",
+    "timestamp": "2026-02-23T16-56-05-840Z",
+    "created": "2026-02-23T16:56:05.840Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/phase-argument-parsing.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_phase-argument-parsing.md.2026-02-23T16-56-05-842Z.bak",
+    "timestamp": "2026-02-23T16-56-05-842Z",
+    "created": "2026-02-23T16:56:05.842Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/planning-config.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_planning-config.md.2026-02-23T16-56-05-843Z.bak",
+    "timestamp": "2026-02-23T16-56-05-843Z",
+    "created": "2026-02-23T16:56:05.843Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/questioning.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_questioning.md.2026-02-23T16-56-05-844Z.bak",
+    "timestamp": "2026-02-23T16-56-05-844Z",
+    "created": "2026-02-23T16:56:05.844Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/tdd.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_tdd.md.2026-02-23T16-56-05-845Z.bak",
+    "timestamp": "2026-02-23T16-56-05-845Z",
+    "created": "2026-02-23T16:56:05.846Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/ui-brand.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_ui-brand.md.2026-02-23T16-56-05-847Z.bak",
+    "timestamp": "2026-02-23T16-56-05-847Z",
+    "created": "2026-02-23T16:56:05.848Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/references/verification-patterns.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_references_verification-patterns.md.2026-02-23T16-56-05-848Z.bak",
+    "timestamp": "2026-02-23T16-56-05-848Z",
+    "created": "2026-02-23T16:56:05.849Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/DEBUG.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_DEBUG.md.2026-02-23T16-56-05-849Z.bak",
+    "timestamp": "2026-02-23T16-56-05-849Z",
+    "created": "2026-02-23T16:56:05.850Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/UAT.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_UAT.md.2026-02-23T16-56-05-850Z.bak",
+    "timestamp": "2026-02-23T16-56-05-850Z",
+    "created": "2026-02-23T16:56:05.851Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/VALIDATION.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_VALIDATION.md.2026-02-23T16-56-05-852Z.bak",
+    "timestamp": "2026-02-23T16-56-05-852Z",
+    "created": "2026-02-23T16:56:05.852Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/context.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_context.md.2026-02-23T16-56-05-852Z.bak",
+    "timestamp": "2026-02-23T16-56-05-852Z",
+    "created": "2026-02-23T16:56:05.853Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/continue-here.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_continue-here.md.2026-02-23T16-56-05-853Z.bak",
+    "timestamp": "2026-02-23T16-56-05-853Z",
+    "created": "2026-02-23T16:56:05.854Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/debug-subagent-prompt.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_debug-subagent-prompt.md.2026-02-23T16-56-05-856Z.bak",
+    "timestamp": "2026-02-23T16-56-05-856Z",
+    "created": "2026-02-23T16:56:05.856Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/discovery.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_discovery.md.2026-02-23T16-56-05-857Z.bak",
+    "timestamp": "2026-02-23T16-56-05-857Z",
+    "created": "2026-02-23T16:56:05.858Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/milestone-archive.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_milestone-archive.md.2026-02-23T16-56-05-859Z.bak",
+    "timestamp": "2026-02-23T16-56-05-859Z",
+    "created": "2026-02-23T16:56:05.859Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/phase-prompt.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_phase-prompt.md.2026-02-23T16-56-05-860Z.bak",
+    "timestamp": "2026-02-23T16-56-05-860Z",
+    "created": "2026-02-23T16:56:05.860Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/planner-subagent-prompt.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_planner-subagent-prompt.md.2026-02-23T16-56-05-861Z.bak",
+    "timestamp": "2026-02-23T16-56-05-861Z",
+    "created": "2026-02-23T16:56:05.862Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/project.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_project.md.2026-02-23T16-56-05-862Z.bak",
+    "timestamp": "2026-02-23T16-56-05-862Z",
+    "created": "2026-02-23T16:56:05.863Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/research.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_research.md.2026-02-23T16-56-05-864Z.bak",
+    "timestamp": "2026-02-23T16-56-05-864Z",
+    "created": "2026-02-23T16:56:05.864Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/state.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_state.md.2026-02-23T16-56-05-865Z.bak",
+    "timestamp": "2026-02-23T16-56-05-865Z",
+    "created": "2026-02-23T16:56:05.865Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/summary-complex.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_summary-complex.md.2026-02-23T16-56-05-867Z.bak",
+    "timestamp": "2026-02-23T16-56-05-867Z",
+    "created": "2026-02-23T16:56:05.868Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/summary-minimal.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_summary-minimal.md.2026-02-23T16-56-05-868Z.bak",
+    "timestamp": "2026-02-23T16-56-05-868Z",
+    "created": "2026-02-23T16:56:05.869Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/summary-standard.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_summary-standard.md.2026-02-23T16-56-05-869Z.bak",
+    "timestamp": "2026-02-23T16-56-05-869Z",
+    "created": "2026-02-23T16:56:05.870Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/summary.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_summary.md.2026-02-23T16-56-05-872Z.bak",
+    "timestamp": "2026-02-23T16-56-05-872Z",
+    "created": "2026-02-23T16:56:05.872Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/user-setup.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_user-setup.md.2026-02-23T16-56-05-873Z.bak",
+    "timestamp": "2026-02-23T16-56-05-873Z",
+    "created": "2026-02-23T16:56:05.873Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/verification-report.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_verification-report.md.2026-02-23T16-56-05-874Z.bak",
+    "timestamp": "2026-02-23T16-56-05-874Z",
+    "created": "2026-02-23T16:56:05.874Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/add-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_add-phase.md.2026-02-23T16-56-05-875Z.bak",
+    "timestamp": "2026-02-23T16-56-05-875Z",
+    "created": "2026-02-23T16:56:05.876Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/add-todo.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_add-todo.md.2026-02-23T16-56-05-876Z.bak",
+    "timestamp": "2026-02-23T16-56-05-876Z",
+    "created": "2026-02-23T16:56:05.877Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/audit-milestone.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_audit-milestone.md.2026-02-23T16-56-05-877Z.bak",
+    "timestamp": "2026-02-23T16-56-05-877Z",
+    "created": "2026-02-23T16:56:05.878Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/check-todos.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_check-todos.md.2026-02-23T16-56-05-879Z.bak",
+    "timestamp": "2026-02-23T16-56-05-879Z",
+    "created": "2026-02-23T16:56:05.879Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/cleanup.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_cleanup.md.2026-02-23T16-56-05-880Z.bak",
+    "timestamp": "2026-02-23T16-56-05-880Z",
+    "created": "2026-02-23T16:56:05.880Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/complete-milestone.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_complete-milestone.md.2026-02-23T16-56-05-881Z.bak",
+    "timestamp": "2026-02-23T16-56-05-881Z",
+    "created": "2026-02-23T16:56:05.881Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/diagnose-issues.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_diagnose-issues.md.2026-02-23T16-56-05-882Z.bak",
+    "timestamp": "2026-02-23T16-56-05-882Z",
+    "created": "2026-02-23T16:56:05.882Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/discovery-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_discovery-phase.md.2026-02-23T16-56-05-883Z.bak",
+    "timestamp": "2026-02-23T16-56-05-883Z",
+    "created": "2026-02-23T16:56:05.883Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/discuss-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_discuss-phase.md.2026-02-23T16-56-05-884Z.bak",
+    "timestamp": "2026-02-23T16-56-05-884Z",
+    "created": "2026-02-23T16:56:05.885Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/execute-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_execute-phase.md.2026-02-23T16-56-05-885Z.bak",
+    "timestamp": "2026-02-23T16-56-05-885Z",
+    "created": "2026-02-23T16:56:05.886Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/execute-plan.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_execute-plan.md.2026-02-23T16-56-05-886Z.bak",
+    "timestamp": "2026-02-23T16-56-05-886Z",
+    "created": "2026-02-23T16:56:05.887Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/health.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_health.md.2026-02-23T16-56-05-888Z.bak",
+    "timestamp": "2026-02-23T16-56-05-888Z",
+    "created": "2026-02-23T16:56:05.889Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/help.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_help.md.2026-02-23T16-56-05-889Z.bak",
+    "timestamp": "2026-02-23T16-56-05-889Z",
+    "created": "2026-02-23T16:56:05.890Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/insert-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_insert-phase.md.2026-02-23T16-56-05-891Z.bak",
+    "timestamp": "2026-02-23T16-56-05-891Z",
+    "created": "2026-02-23T16:56:05.891Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/list-phase-assumptions.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_list-phase-assumptions.md.2026-02-23T16-56-05-892Z.bak",
+    "timestamp": "2026-02-23T16-56-05-892Z",
+    "created": "2026-02-23T16:56:05.893Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/map-codebase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_map-codebase.md.2026-02-23T16-56-05-894Z.bak",
+    "timestamp": "2026-02-23T16-56-05-894Z",
+    "created": "2026-02-23T16:56:05.894Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/new-milestone.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_new-milestone.md.2026-02-23T16-56-05-895Z.bak",
+    "timestamp": "2026-02-23T16-56-05-895Z",
+    "created": "2026-02-23T16:56:05.895Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/new-project.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_new-project.md.2026-02-23T16-56-05-896Z.bak",
+    "timestamp": "2026-02-23T16-56-05-896Z",
+    "created": "2026-02-23T16:56:05.896Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/pause-work.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_pause-work.md.2026-02-23T16-56-05-898Z.bak",
+    "timestamp": "2026-02-23T16-56-05-898Z",
+    "created": "2026-02-23T16:56:05.898Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/plan-milestone-gaps.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_plan-milestone-gaps.md.2026-02-23T16-56-05-899Z.bak",
+    "timestamp": "2026-02-23T16-56-05-899Z",
+    "created": "2026-02-23T16:56:05.899Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/plan-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_plan-phase.md.2026-02-23T16-56-05-900Z.bak",
+    "timestamp": "2026-02-23T16-56-05-900Z",
+    "created": "2026-02-23T16:56:05.901Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/progress.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_progress.md.2026-02-23T16-56-05-901Z.bak",
+    "timestamp": "2026-02-23T16-56-05-901Z",
+    "created": "2026-02-23T16:56:05.901Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/quick.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_quick.md.2026-02-23T16-56-05-902Z.bak",
+    "timestamp": "2026-02-23T16-56-05-902Z",
+    "created": "2026-02-23T16:56:05.903Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/remove-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_remove-phase.md.2026-02-23T16-56-05-903Z.bak",
+    "timestamp": "2026-02-23T16-56-05-903Z",
+    "created": "2026-02-23T16:56:05.904Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/research-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_research-phase.md.2026-02-23T16-56-05-904Z.bak",
+    "timestamp": "2026-02-23T16-56-05-904Z",
+    "created": "2026-02-23T16:56:05.905Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/resume-project.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_resume-project.md.2026-02-23T16-56-05-905Z.bak",
+    "timestamp": "2026-02-23T16-56-05-905Z",
+    "created": "2026-02-23T16:56:05.905Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/set-profile.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_set-profile.md.2026-02-23T16-56-05-906Z.bak",
+    "timestamp": "2026-02-23T16-56-05-906Z",
+    "created": "2026-02-23T16:56:05.907Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/settings.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_settings.md.2026-02-23T16-56-05-907Z.bak",
+    "timestamp": "2026-02-23T16-56-05-907Z",
+    "created": "2026-02-23T16:56:05.908Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/transition.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_transition.md.2026-02-23T16-56-05-908Z.bak",
+    "timestamp": "2026-02-23T16-56-05-908Z",
+    "created": "2026-02-23T16:56:05.909Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/update.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_update.md.2026-02-23T16-56-05-910Z.bak",
+    "timestamp": "2026-02-23T16-56-05-910Z",
+    "created": "2026-02-23T16:56:05.910Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/verify-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_verify-phase.md.2026-02-23T16-56-05-912Z.bak",
+    "timestamp": "2026-02-23T16-56-05-912Z",
+    "created": "2026-02-23T16:56:05.914Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/workflows/verify-work.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_workflows_verify-work.md.2026-02-23T16-56-05-914Z.bak",
+    "timestamp": "2026-02-23T16-56-05-914Z",
+    "created": "2026-02-23T16:56:05.915Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-add-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-add-phase.md.2026-02-23T16-56-05-915Z.bak",
+    "timestamp": "2026-02-23T16-56-05-915Z",
+    "created": "2026-02-23T16:56:05.916Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-add-todo.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-add-todo.md.2026-02-23T16-56-05-916Z.bak",
+    "timestamp": "2026-02-23T16-56-05-916Z",
+    "created": "2026-02-23T16:56:05.916Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-audit-milestone.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-audit-milestone.md.2026-02-23T16-56-05-917Z.bak",
+    "timestamp": "2026-02-23T16-56-05-917Z",
+    "created": "2026-02-23T16:56:05.918Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-check-todos.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-check-todos.md.2026-02-23T16-56-05-919Z.bak",
+    "timestamp": "2026-02-23T16-56-05-919Z",
+    "created": "2026-02-23T16:56:05.919Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-cleanup.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-cleanup.md.2026-02-23T16-56-05-920Z.bak",
+    "timestamp": "2026-02-23T16-56-05-920Z",
+    "created": "2026-02-23T16:56:05.920Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-complete-milestone.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-complete-milestone.md.2026-02-23T16-56-05-920Z.bak",
+    "timestamp": "2026-02-23T16-56-05-920Z",
+    "created": "2026-02-23T16:56:05.921Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-debug.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-debug.md.2026-02-23T16-56-05-922Z.bak",
+    "timestamp": "2026-02-23T16-56-05-922Z",
+    "created": "2026-02-23T16:56:05.922Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-discuss-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-discuss-phase.md.2026-02-23T16-56-05-923Z.bak",
+    "timestamp": "2026-02-23T16-56-05-923Z",
+    "created": "2026-02-23T16:56:05.923Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-execute-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-execute-phase.md.2026-02-23T16-56-05-924Z.bak",
+    "timestamp": "2026-02-23T16-56-05-924Z",
+    "created": "2026-02-23T16:56:05.925Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-health.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-health.md.2026-02-23T16-56-05-925Z.bak",
+    "timestamp": "2026-02-23T16-56-05-925Z",
+    "created": "2026-02-23T16:56:05.926Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-help.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-help.md.2026-02-23T16-56-05-926Z.bak",
+    "timestamp": "2026-02-23T16-56-05-926Z",
+    "created": "2026-02-23T16:56:05.927Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-insert-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-insert-phase.md.2026-02-23T16-56-05-930Z.bak",
+    "timestamp": "2026-02-23T16-56-05-930Z",
+    "created": "2026-02-23T16:56:05.930Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-join-discord.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-join-discord.md.2026-02-23T16-56-05-931Z.bak",
+    "timestamp": "2026-02-23T16-56-05-931Z",
+    "created": "2026-02-23T16:56:05.931Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-list-phase-assumptions.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-list-phase-assumptions.md.2026-02-23T16-56-05-933Z.bak",
+    "timestamp": "2026-02-23T16-56-05-933Z",
+    "created": "2026-02-23T16:56:05.933Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-map-codebase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-map-codebase.md.2026-02-23T16-56-05-934Z.bak",
+    "timestamp": "2026-02-23T16-56-05-934Z",
+    "created": "2026-02-23T16:56:05.934Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-new-milestone.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-new-milestone.md.2026-02-23T16-56-05-935Z.bak",
+    "timestamp": "2026-02-23T16-56-05-935Z",
+    "created": "2026-02-23T16:56:05.935Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-new-project.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-new-project.md.2026-02-23T16-56-05-936Z.bak",
+    "timestamp": "2026-02-23T16-56-05-936Z",
+    "created": "2026-02-23T16:56:05.937Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-pause-work.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-pause-work.md.2026-02-23T16-56-05-938Z.bak",
+    "timestamp": "2026-02-23T16-56-05-938Z",
+    "created": "2026-02-23T16:56:05.938Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-plan-milestone-gaps.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-plan-milestone-gaps.md.2026-02-23T16-56-05-939Z.bak",
+    "timestamp": "2026-02-23T16-56-05-939Z",
+    "created": "2026-02-23T16:56:05.939Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-plan-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-plan-phase.md.2026-02-23T16-56-05-940Z.bak",
+    "timestamp": "2026-02-23T16-56-05-940Z",
+    "created": "2026-02-23T16:56:05.940Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-progress.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-progress.md.2026-02-23T16-56-05-941Z.bak",
+    "timestamp": "2026-02-23T16-56-05-941Z",
+    "created": "2026-02-23T16:56:05.942Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-quick.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-quick.md.2026-02-23T16-56-05-942Z.bak",
+    "timestamp": "2026-02-23T16-56-05-942Z",
+    "created": "2026-02-23T16:56:05.943Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-reapply-patches.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-reapply-patches.md.2026-02-23T16-56-05-943Z.bak",
+    "timestamp": "2026-02-23T16-56-05-943Z",
+    "created": "2026-02-23T16:56:05.944Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-remove-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-remove-phase.md.2026-02-23T16-56-05-944Z.bak",
+    "timestamp": "2026-02-23T16-56-05-944Z",
+    "created": "2026-02-23T16:56:05.945Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-research-phase.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-research-phase.md.2026-02-23T16-56-05-946Z.bak",
+    "timestamp": "2026-02-23T16-56-05-946Z",
+    "created": "2026-02-23T16:56:05.947Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-resume-work.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-resume-work.md.2026-02-23T16-56-05-947Z.bak",
+    "timestamp": "2026-02-23T16-56-05-947Z",
+    "created": "2026-02-23T16:56:05.948Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-set-profile.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-set-profile.md.2026-02-23T16-56-05-950Z.bak",
+    "timestamp": "2026-02-23T16-56-05-950Z",
+    "created": "2026-02-23T16:56:05.950Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-settings.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-settings.md.2026-02-23T16-56-05-951Z.bak",
+    "timestamp": "2026-02-23T16-56-05-951Z",
+    "created": "2026-02-23T16:56:05.951Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-update.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-update.md.2026-02-23T16-56-05-952Z.bak",
+    "timestamp": "2026-02-23T16-56-05-952Z",
+    "created": "2026-02-23T16:56:05.953Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/commands/gsd/gsd-verify-work.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_commands_gsd_gsd-verify-work.md.2026-02-23T16-56-05-953Z.bak",
+    "timestamp": "2026-02-23T16-56-05-953Z",
+    "created": "2026-02-23T16:56:05.954Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/codebase/architecture.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_codebase_architecture.md.2026-02-23T16-56-05-954Z.bak",
+    "timestamp": "2026-02-23T16-56-05-954Z",
+    "created": "2026-02-23T16:56:05.955Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/codebase/concerns.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_codebase_concerns.md.2026-02-23T16-56-05-955Z.bak",
+    "timestamp": "2026-02-23T16-56-05-955Z",
+    "created": "2026-02-23T16:56:05.956Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/codebase/conventions.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_codebase_conventions.md.2026-02-23T16-56-05-956Z.bak",
+    "timestamp": "2026-02-23T16-56-05-956Z",
+    "created": "2026-02-23T16:56:05.957Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/codebase/structure.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_codebase_structure.md.2026-02-23T16-56-05-957Z.bak",
+    "timestamp": "2026-02-23T16-56-05-957Z",
+    "created": "2026-02-23T16:56:05.958Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/codebase/testing.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_codebase_testing.md.2026-02-23T16-56-05-959Z.bak",
+    "timestamp": "2026-02-23T16-56-05-959Z",
+    "created": "2026-02-23T16:56:05.959Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/bin/lib/commands.cjs",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_bin_lib_commands.cjs.2026-02-23T16-56-05-960Z.bak",
+    "timestamp": "2026-02-23T16-56-05-960Z",
+    "created": "2026-02-23T16:56:05.961Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/bin/lib/config.cjs",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_bin_lib_config.cjs.2026-02-23T16-56-05-962Z.bak",
+    "timestamp": "2026-02-23T16-56-05-962Z",
+    "created": "2026-02-23T16:56:05.963Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/bin/lib/core.cjs",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_bin_lib_core.cjs.2026-02-23T16-56-05-964Z.bak",
+    "timestamp": "2026-02-23T16-56-05-964Z",
+    "created": "2026-02-23T16:56:05.964Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/bin/lib/milestone.cjs",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_bin_lib_milestone.cjs.2026-02-23T16-56-05-965Z.bak",
+    "timestamp": "2026-02-23T16-56-05-965Z",
+    "created": "2026-02-23T16:56:05.966Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/bin/lib/phase.cjs",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_bin_lib_phase.cjs.2026-02-23T16-56-05-966Z.bak",
+    "timestamp": "2026-02-23T16-56-05-966Z",
+    "created": "2026-02-23T16:56:05.967Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/bin/lib/template.cjs",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_bin_lib_template.cjs.2026-02-23T16-56-05-967Z.bak",
+    "timestamp": "2026-02-23T16-56-05-967Z",
+    "created": "2026-02-23T16:56:05.968Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/bin/lib/verify.cjs",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_bin_lib_verify.cjs.2026-02-23T16-56-05-968Z.bak",
+    "timestamp": "2026-02-23T16-56-05-968Z",
+    "created": "2026-02-23T16:56:05.969Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/get-shit-done/templates/research-project/SUMMARY.md",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_get-shit-done_templates_research-project_SUMMARY.md.2026-02-23T16-56-05-970Z.bak",
+    "timestamp": "2026-02-23T16-56-05-970Z",
+    "created": "2026-02-23T16:56:05.971Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/skills/gsd-oc-select-model/scripts/select-models.cjs",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_skills_gsd-oc-select-model_scripts_select-models.cjs.2026-02-23T16-56-05-971Z.bak",
+    "timestamp": "2026-02-23T16-56-05-971Z",
+    "created": "2026-02-23T16:56:05.972Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/src/commands/install.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_src_commands_install.js.2026-02-23T16-56-05-974Z.bak",
+    "timestamp": "2026-02-23T16-56-05-974Z",
+    "created": "2026-02-23T16:56:05.974Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/src/services/backup-manager.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_src_services_backup-manager.js.2026-02-23T16-56-05-975Z.bak",
+    "timestamp": "2026-02-23T16-56-05-975Z",
+    "created": "2026-02-23T16:56:05.976Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/src/services/config.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_src_services_config.js.2026-02-23T16-56-05-977Z.bak",
+    "timestamp": "2026-02-23T16-56-05-977Z",
+    "created": "2026-02-23T16:56:05.977Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/src/services/file-ops.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_src_services_file-ops.js.2026-02-23T16-56-05-978Z.bak",
+    "timestamp": "2026-02-23T16-56-05-978Z",
+    "created": "2026-02-23T16:56:05.978Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/src/services/settings.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_src_services_settings.js.2026-02-23T16-56-05-979Z.bak",
+    "timestamp": "2026-02-23T16-56-05-979Z",
+    "created": "2026-02-23T16:56:05.980Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/src/services/update-service.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_src_services_update-service.js.2026-02-23T16-56-05-981Z.bak",
+    "timestamp": "2026-02-23T16-56-05-981Z",
+    "created": "2026-02-23T16:56:05.981Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/test/unit/file-ops.test.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_test_unit_file-ops.test.js.2026-02-23T16-56-05-982Z.bak",
+    "timestamp": "2026-02-23T16-56-05-982Z",
+    "created": "2026-02-23T16:56:05.982Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/test/integration/commands-integration.test.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_test_integration_commands-integration.test.js.2026-02-23T16-56-05-983Z.bak",
+    "timestamp": "2026-02-23T16-56-05-983Z",
+    "created": "2026-02-23T16:56:05.984Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/test/integration/path-replacement.test.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_test_integration_path-replacement.test.js.2026-02-23T16-56-05-987Z.bak",
+    "timestamp": "2026-02-23T16-56-05-987Z",
+    "created": "2026-02-23T16:56:05.987Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/test/integration/uninstall-safety.test.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_test_integration_uninstall-safety.test.js.2026-02-23T16-56-05-988Z.bak",
+    "timestamp": "2026-02-23T16-56-05-988Z",
+    "created": "2026-02-23T16:56:05.988Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/test/utils/interactive.test.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_test_utils_interactive.test.js.2026-02-23T16-56-05-989Z.bak",
+    "timestamp": "2026-02-23T16-56-05-989Z",
+    "created": "2026-02-23T16:56:05.990Z"
+  },
+  {
+    "originalPath": "/Users/roki/github/gsd-opencode/gsd-opencode/bin/dm/test/integration/helpers/test-utils.js",
+    "backupPath": "/Users/roki/github/gsd-opencode/.translate-backups/_Users_roki_github_gsd-opencode_gsd-opencode_bin_dm_test_integration_helpers_test-utils.js.2026-02-23T16-56-05-991Z.bak",
+    "timestamp": "2026-02-23T16-56-05-991Z",
+    "created": "2026-02-23T16:56:05.991Z"
   }
 ]

@@ -183,7 +183,7 @@ If additional details are needed (e.g., user-provided "Delivered" summary, git r
 
 Full PROJECT.md evolution review at milestone completion.
 
-Read all phase summaries:
+read all phase summaries:
 
 ```bash
 cat .planning/phases/*-*/*-SUMMARY.md
@@ -384,7 +384,7 @@ Verify: `✅ Milestone archived to .planning/milestones/`
 
 **Phase archival (optional):** After archival completes, ask the user:
 
-Question(header="Archive Phases", question="Archive phase directories to milestones/?", options: "Yes — move to milestones/v[X.Y]-phases/" | "Skip — keep phases in place")
+question(header="Archive Phases", question="Archive phase directories to milestones/?", options: "Yes — move to milestones/v[X.Y]-phases/" | "Skip — keep phases in place")
 
 If "Yes": move phase directories to the milestone archive:
 ```bash
@@ -504,7 +504,7 @@ Options:
 3. **Keep branches** — Leave for manual handling
 ```
 
-Question with options: Squash merge (Recommended), Merge with history, Delete without merging, Keep branches.
+question with options: Squash merge (Recommended), Merge with history, Delete without merging, Keep branches.
 
 **Squash merge:**
 

@@ -100,7 +100,7 @@ describe('commands integration', () => {
       // Install
       await fileOps.install(FIXTURE_SOURCE, targetDir);
 
-      // Read SKILL.md which has frontmatter
+      // read SKILL.md which has frontmatter
       const skillPath = path.join(targetDir, 'agents', 'test-agent', 'SKILL.md');
       const content = await fs.readFile(skillPath, 'utf-8');
 
@@ -138,7 +138,7 @@ describe('commands integration', () => {
       // Install
       await fileOps.install(FIXTURE_SOURCE, targetDir);
 
-      // Read all .md files and verify path format
+      // read all .md files and verify path format
       async function checkPathFormat(dir) {
         const entries = await fs.readdir(dir, { withFileTypes: true });
 
@@ -178,7 +178,7 @@ describe('commands integration', () => {
       // Install
       await fileOps.install(FIXTURE_SOURCE, targetDir);
 
-      // Read the summary template
+      // read the summary template
       const summaryPath = path.join(targetDir, 'get-shit-done', 'templates', 'summary.md');
       const content = await fs.readFile(summaryPath, 'utf-8');
 
@@ -204,7 +204,7 @@ describe('commands integration', () => {
       // Install
       await fileOps.install(FIXTURE_SOURCE, targetDir);
 
-      // Read SKILL.md which references templates
+      // read SKILL.md which references templates
       const skillPath = path.join(targetDir, 'agents', 'test-agent', 'SKILL.md');
       const content = await fs.readFile(skillPath, 'utf-8');
 
@@ -315,7 +315,7 @@ describe('commands integration', () => {
       // Install
       await fileOps.install(FIXTURE_SOURCE, targetDir);
 
-      // Read a file and verify paths are absolute
+      // read a file and verify paths are absolute
       const skillPath = path.join(targetDir, 'agents', 'test-agent', 'SKILL.md');
       const content = await fs.readFile(skillPath, 'utf-8');
 
@@ -340,7 +340,7 @@ describe('commands integration', () => {
       // Install
       await fileOps.install(FIXTURE_SOURCE, targetDir);
 
-      // Read a file and verify paths are absolute
+      // read a file and verify paths are absolute
       const summaryPath = path.join(targetDir, 'get-shit-done', 'templates', 'summary.md');
       const content = await fs.readFile(summaryPath, 'utf-8');
 
@@ -454,7 +454,7 @@ describe('commands integration', () => {
       // Install
       await fileOps.install(FIXTURE_SOURCE, targetDir);
 
-      // Read original and installed files to compare structure
+      // read original and installed files to compare structure
       const originalSkill = await fs.readFile(
         path.join(FIXTURE_SOURCE, 'agents', 'test-agent', 'SKILL.md'),
         'utf-8'

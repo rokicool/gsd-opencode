@@ -80,7 +80,7 @@ STATE.md is the project's short-term memory spanning all phases and sessions.
 **Problem it solves:** Information is captured in summaries, issues, and decisions but not systematically consumed. Sessions start without context.
 
 **Solution:** A single, small file that's:
-- Read first in every workflow
+- read first in every workflow
 - Updated after every significant action
 - Contains digest of accumulated context
 - Enables instant session restoration

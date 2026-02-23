@@ -3,7 +3,7 @@ Switch the model profile used by GSD agents. Controls which OpenCode model each 
 </purpose>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -31,7 +31,7 @@ This creates `.planning/config.json` with defaults if missing and loads current 
 </step>
 
 <step name="update_config">
-Read current config from state load or directly:
+read current config from state load or directly:
 
 Update `model_profile` field:
 ```json
@@ -40,7 +40,7 @@ Update `model_profile` field:
 }
 ```
 
-Write updated config back to `.planning/config.json`.
+write updated config back to `.planning/config.json`.
 </step>
 
 <step name="confirm">

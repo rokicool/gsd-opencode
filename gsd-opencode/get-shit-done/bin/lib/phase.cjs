@@ -249,8 +249,8 @@ function cmdPhasePlanIndex(cwd, phase, raw) {
     const content = fs.readFileSync(planPath, 'utf-8');
     const fm = extractFrontmatter(content);
 
-    // Count tasks (## Task N patterns)
-    const taskMatches = content.match(/##\s*Task\s*\d+/gi) || [];
+    // Count tasks (## task N patterns)
+    const taskMatches = content.match(/##\s*task\s*\d+/gi) || [];
     const taskCount = taskMatches.length;
 
     // Parse wave as integer
@@ -340,7 +340,7 @@ function cmdPhaseAdd(cwd, description, raw) {
   fs.writeFileSync(path.join(dirPath, '.gitkeep'), '');
 
   // Build phase entry
-  const phaseEntry = `\n### Phase ${newPhaseNum}: ${description}\n\n**Goal:** [To be planned]\n**Depends on:** Phase ${maxPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /gsd:plan-phase ${newPhaseNum} to break down)\n`;
+  const phaseEntry = `\n### Phase ${newPhaseNum}: ${description}\n\n**Goal:** [To be planned]\n**Depends on:** Phase ${maxPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /gsd-plan-phase ${newPhaseNum} to break down)\n`;
 
   // Find insertion point: before last "---" or at end
   let updatedContent;
@@ -411,7 +411,7 @@ function cmdPhaseInsert(cwd, afterPhase, description, raw) {
   fs.writeFileSync(path.join(dirPath, '.gitkeep'), '');
 
   // Build phase entry
-  const phaseEntry = `\n### Phase ${decimalPhase}: ${description} (INSERTED)\n\n**Goal:** [Urgent work - to be planned]\n**Depends on:** Phase ${afterPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /gsd:plan-phase ${decimalPhase} to break down)\n`;
+  const phaseEntry = `\n### Phase ${decimalPhase}: ${description} (INSERTED)\n\n**Goal:** [Urgent work - to be planned]\n**Depends on:** Phase ${afterPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /gsd-plan-phase ${decimalPhase} to break down)\n`;
 
   // Insert after the target phase section
   const headerPattern = new RegExp(`(#{2,4}\\s*Phase\\s+0*${afterPhaseEscaped}:[^\\n]*\\n)`, 'i');
