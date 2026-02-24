@@ -12,9 +12,7 @@
     "**/*.yml",
     "**/*.toml"
   ],
-  "include": [
-    "gsd-opencode/**"
-  ],
+  "include": ["gsd-opencode/**"],
   "exclude": [
     "node_modules/**",
     ".git/**",
@@ -525,56 +523,6 @@
       "replacement": "task",
       "caseSensitive": true,
       "description": "Transform Task tool to lowercase task"
-    },
-    {
-      "pattern": "tools: Read, Bash, Grep, Glob, Write",
-      "replacement": "tools:\\n  read: true\\n  bash: true\\n  grep: true\\n  glob: true\\n  write: true",
-      "description": "Convert tools list to YAML map (gsd-codebase-mapper pattern)"
-    },
-    {
-      "pattern": "tools: Read, Write, Bash, Glob, Grep, Webfetch, mcp__context7__\\*",
-      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  glob: true\\n  grep: true\\n  webfetch: true\\n  mcp__context7__*: true",
-      "description": "Convert tools list to YAML map (gsd-planner pattern)"
-    },
-    {
-      "pattern": "tools: Read, Write, Bash, Glob, Grep, Websearch, Webfetch, mcp__context7__\\*",
-      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  glob: true\\n  grep: true\\n  websearch: true\\n  webfetch: true\\n  mcp__context7__*: true",
-      "description": "Convert tools list to YAML map (gsd-project-researcher pattern)"
-    },
-    {
-      "pattern": "tools: Read, Write, Bash, Grep, Glob, Websearch, Webfetch, mcp__context7__\\*",
-      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  grep: true\\n  glob: true\\n  websearch: true\\n  webfetch: true\\n  mcp__context7__*: true",
-      "description": "Convert tools list to YAML map (gsd-phase-researcher pattern)"
-    },
-    {
-      "pattern": "tools: Read, Write, Edit, Bash, Grep, Glob, Websearch",
-      "replacement": "tools:\\n  read: true\\n  write: true\\n  edit: true\\n  bash: true\\n  grep: true\\n  glob: true\\n  websearch: true",
-      "description": "Convert tools list to YAML map (gsd-debugger pattern)"
-    },
-    {
-      "pattern": "tools: Read, Write, Edit, Bash, Grep, Glob",
-      "replacement": "tools:\\n  read: true\\n  write: true\\n  edit: true\\n  bash: true\\n  grep: true\\n  glob: true",
-      "description": "Convert tools list to YAML map (gsd-executor pattern)"
-    },
-    {
-      "pattern": "tools: Read, Write, Bash, Grep, Glob",
-      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  grep: true\\n  glob: true",
-      "description": "Convert tools list to YAML map (gsd-verifier pattern)"
-    },
-    {
-      "pattern": "tools: Read, Write, Bash, Glob, Grep",
-      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  glob: true\\n  grep: true",
-      "description": "Convert tools list to YAML map (gsd-roadmapper pattern)"
-    },
-    {
-      "pattern": "tools: Read, Bash, Glob, Grep",
-      "replacement": "tools:\\n  read: true\\n  bash: true\\n  glob: true\\n  grep: true",
-      "description": "Convert tools list to YAML map (gsd-plan-checker/integration-checker pattern)"
-    },
-    {
-      "pattern": "tools: Read, Write, Bash",
-      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true",
-      "description": "Convert tools list to YAML map (gsd-research-synthesizer pattern)"
     },
     {
       "_comment": "Generic regex fallback for any remaining tools: lines",
