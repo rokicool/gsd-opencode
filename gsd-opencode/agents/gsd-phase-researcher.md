@@ -6,7 +6,10 @@ tools:
   write: true
   bash: true
   grep: true
-  glob: true, websearch, webfetch, mcp__context7__*
+  glob: true
+  websearch: true
+  webfetch: true
+  mcp__context7__*: true
 color: "#00FFFF"
 ---
 

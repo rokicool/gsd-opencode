@@ -30,4 +30,5 @@ forbidden_strings = [
         "color: green",
         "color: purple",
         "name: set-profile",
+        "websearch, webfetch, mcp__context7__*"
         ]
