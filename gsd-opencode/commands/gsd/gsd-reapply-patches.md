@@ -1,4 +1,5 @@
 ---
+name: Reapply Patches
 description: Reapply local modifications after a GSD update
 allowed-tools: read, write, edit, bash, glob, grep, question
 ---
