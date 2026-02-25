@@ -37,7 +37,7 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 
 ## Step 1: Load and validate config
 
-Read `.planning/config.json`. Handle these cases:
+read `.planning/config.json`. Handle these cases:
 
 **Case A: File missing or invalid**
 - Print: `Error: No GSD project found. Run /gsd-new-project first.`
@@ -45,7 +45,7 @@ Read `.planning/config.json`. Handle these cases:
 
 **Case B: Legacy config (has model_profile but no profiles.profile_type)**
 - Auto-migrate to Custom profile
-- Use OLD_PROFILE_MODEL_MAP to convert quality/balanced/budget → Custom
+- Use OLD_PROFILE_MODEL_MAP to convert quality / balanced / budget → Custom
 
 **Case C: Current config**
 - Use `profiles.profile_type` and `profiles.models`
@@ -54,15 +54,6 @@ Read `.planning/config.json`. Handle these cases:
 - If missing, it will be created
 - If exists, merge agent assignments (preserve other keys)
 
-## Step 2: Check for migration
-
-```bash
-node gsd-opencode/get-shit-done/bin/gsd-tools.cjs set-profile --status --raw
-```
-
-Parse JSON. If `needs_wizard: true` or `has_old_config: true`:
-- Run migration first
-- Then continue to profile selection
 
 ## Step 3: Display current state
 
@@ -86,7 +77,7 @@ Current configuration:
 
 **B) Interactive picker (no args):**
 
-Use Question tool:
+Use question tool:
 
 ```
 header: "Profile Type"
@@ -210,11 +201,7 @@ If any model invalid:
 
 ### Save config.json
 
-```bash
-node gsd-opencode/get-shit-done/bin/gsd-tools.cjs profile-switch {profile_type} --complete '{"stage":"model",...}' --raw
-```
-
-Or build and save manually:
+Save config.json Or build and save manually:
 
 ```json
 {
@@ -229,25 +216,90 @@ Or build and save manually:
 }
 ```
 
-### Generate and save opencode.json
 
-```bash
-node gsd-opencode/get-shit-done/bin/gsd-tools.cjs derive-opencode-json --raw
+## Step 8: Check for changes
+
+If no changes were made (all stages selected "Keep current"):
+```
+No changes made to {targetProfile} profile.
+```
+Stop.
+
+## Step 9: Save changes
+
+Use the **write tool directly** to update files. Do NOT use bash, python, or other scripts—use native file writing.
+
+1. **Update .planning/config.json:**
+
+    - Set `config.profiles.presets[targetProfile].planning` to selected value
+    - Set `config.profiles.presets[targetProfile].execution` to selected value
+    - Set `config.profiles.presets[targetProfile].verification` to selected value
+    - Write the config file (preserve all other keys)
+
+2. **Update opencode.json (only if targetProfile is active):**
+
+Check if `config.profiles.active_profile === targetProfile`. If so, regenerate `opencode.json` with the new effective models.
+
+Compute effective models (preset + overrides):
+```
+overrides = config.profiles.custom_overrides[targetProfile] || {}
+effective.planning = overrides.planning || newPreset.planning
+effective.execution = overrides.execution || newPreset.execution
+effective.verification = overrides.verification || newPreset.verification
 ```
 
-Parse output and write to `opencode.json`, merging with existing content.
+Build agent config:
 
-## Step 9: Report success
-
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "gsd-planner": { "model": "{effective.planning}" },
+    "gsd-plan-checker": { "model": "{effective.planning}" },
+    "gsd-phase-researcher": { "model": "{effective.planning}" },
+    "gsd-roadmapper": { "model": "{effective.planning}" },
+    "gsd-project-researcher": { "model": "{effective.planning}" },
+    "gsd-research-synthesizer": { "model": "{effective.planning}" },
+    "gsd-codebase-mapper": { "model": "{effective.planning}" },
+    "gsd-executor": { "model": "{effective.execution}" },
+    "gsd-debugger": { "model": "{effective.execution}" },
+    "gsd-verifier": { "model": "{effective.verification}" },
+    "gsd-integration-checker": { "model": "{effective.verification}" },
+    "gsd-set-profile": { "model": "{effective.verification}" },
+    "gsd-settings": { "model": "{effective.verification}" },
+    "gsd-set-model": { "model": "{effective.verification}" }
+  }
+}
 ```
-✓ Active profile set to: {profile_type}
 
-Configuration:
+If `opencode.json` already exists, merge the `agent` key (preserve other top-level keys).
+
+## Step 10: Report success
+
+```text
+✓ Updated {targetProfile} profile:
+
 | Stage        | Model |
 |--------------|-------|
-| planning     | {models.planning} |
-| execution    | {models.execution} |
-| verification | {models.verification} |
+| planning     | {newPreset.planning} |
+| execution    | {newPreset.execution} |
+| verification | {newPreset.verification} |
+```
+
+If `targetProfile` is the active profile:
+```text
+Note: This is your active profile. Quit and relaunch OpenCode to apply model changes.
+```
+
+If `targetProfile` is NOT the active profile:
+```text
+To use this profile, run: /gsd-set-profile {targetProfile}
+```
+
+</behavior>
+
+
+Parse output and write to `opencode.json`, merging with existing content.
 
 Note: Quit and relaunch OpenCode to apply model changes.
 ```
@@ -260,7 +312,7 @@ If migration occurred:
 </behavior>
 
 <notes>
-- Use Question tool for ALL user input
+- Use question tool for ALL user input
 - Always show full model IDs (e.g., `opencode/glm-4.7-free`)
 - Preserve all other config.json keys when writing
 - Do NOT rewrite agent .md files — only update opencode.json

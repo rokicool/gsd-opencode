@@ -54,15 +54,6 @@ read `.planning/config.json`. Handle these cases:
 - If missing, it will be created
 - If exists, merge agent assignments (preserve other keys)
 
-## Step 2: Check for migration
-
-```bash
-node gsd-opencode/get-shit-done/bin/gsd-tools.cjs set-profile --status --raw
-```
-
-Parse JSON. If `needs_wizard: true` or `has_old_config: true`:
-- Run migration first
-- Then continue to profile selection
 
 ## Step 3: Display current state
 
@@ -210,11 +201,7 @@ If any model invalid:
 
 ### Save config.json
 
-```bash
-node gsd-opencode/get-shit-done/bin/gsd-tools.cjs profile-switch {profile_type} --complete '{"stage":"model",...}' --raw
-```
-
-Or build and save manually:
+Save config.json Or build and save manually:
 
 ```json
 {
@@ -247,7 +234,7 @@ Use the **write tool directly** to update files. Do NOT use bash, python, or oth
     - Set `config.profiles.presets[targetProfile].planning` to selected value
     - Set `config.profiles.presets[targetProfile].execution` to selected value
     - Set `config.profiles.presets[targetProfile].verification` to selected value
-    - Write the config file (preserve all other keys)
+    - write the config file (preserve all other keys)
 
 2. **Update opencode.json (only if targetProfile is active):**
 

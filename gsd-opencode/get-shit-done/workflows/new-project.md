@@ -156,9 +156,9 @@ question([
     question: "Which AI models for planning agents?",
     multiSelect: false,
     options: [
-      { label: "Balanced (Recommended)", description: "Sonnet for most agents — good quality/cost ratio" },
-      { label: "Quality", description: "Opus for research/roadmap — higher cost, deeper analysis" },
-      { label: "Budget", description: "Haiku where possible — fastest, lowest cost" }
+      { label: "Smart (Recommended)", description: "Two models: one for reseach and planing, other for execution and verification" },
+      { label: "Simple", description: Description: "One model for all agents (not flexible)" },
+      { label: "Custom (most flexible)", description: "Three models: different for every stage" }
     ]
   }
 ])
@@ -455,9 +455,9 @@ questions: [
     question: "Which AI models for planning agents?",
     multiSelect: false,
     options: [
-      { label: "Balanced (Recommended)", description: "Sonnet for most agents — good quality/cost ratio" },
-      { label: "Quality", description: "Opus for research/roadmap — higher cost, deeper analysis" },
-      { label: "Budget", description: "Haiku where possible — fastest, lowest cost" }
+      { label: "Smart (Recommended)", description: "Two models: one for reseach and planing, other for execution and verification" },
+      { label: "Simple", description: Description: "One model for all agents (not flexible)" },
+      { label: "Custom (most flexible)", description: "Three models: different for every stage" }
     ]
   }
 ]

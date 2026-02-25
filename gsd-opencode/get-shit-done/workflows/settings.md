@@ -29,7 +29,7 @@ Parse current values (default to `true` if not present):
 - `workflow.plan_check` — spawn plan checker during plan-phase
 - `workflow.verifier` — spawn verifier during execute-phase
 - `workflow.nyquist_validation` — validation architecture research during plan-phase
-- `model_profile` — which model each agent uses (default: `balanced`)
+- `model_profile` — which model each agent uses (default: `simple`)
 - `git.branching_strategy` — branching approach (default: `"none"`)
 </step>
 
@@ -43,9 +43,9 @@ question([
     header: "Model",
     multiSelect: false,
     options: [
-      { label: "Quality", description: "Opus everywhere except verification (highest cost)" },
-      { label: "Balanced (Recommended)", description: "Opus for planning, Sonnet for execution/verification" },
-      { label: "Budget", description: "Sonnet for writing, Haiku for research/verification (lowest cost)" }
+      { label: "Simple", description: "One model for all agents (not flexible)" },
+      { label: "Smart (Recommended)", description: "Two models: one for reseach and planing, other for execution and verification" },
+      { label: "Custom (most flexible)", description: "Three models: different for every stage" }
     ]
   },
   {

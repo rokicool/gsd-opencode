@@ -641,6 +641,56 @@
       "pattern": "get-shit-done/workflows/set-profile.md",
       "replacement": "get-shit-done/workflows/oc-set-profile.md",
       "description": "Use OpenCode related process instead of Claude Code's one"
+    },
+    {
+      "pattern": "default: `balanced`",
+      "replacement": "default: `simple`",
+      "description": "Use simple - one model for all agents - profile"
+    },
+    {
+      "pattern": "label: \"Quality\"",
+      "replacement": "label: \"Simple\"",
+      "description": "Use simple - one model for all agents - profile"
+    },
+    {
+      "pattern": "description: \"Opus everywhere except verification (highest cost)\"",
+      "replacement": "description: \"One model for all agents (not flexible)\"",
+      "description": "Use simple - one model for all agents - profile"
+    },
+    {
+      "pattern": "\"Opus for research/roadmap — higher cost, deeper analysis\"",
+      "replacement": "description: \"One model for all agents (not flexible)\"",
+      "description": "Use simple - one model for all agents - profile"
+    },
+    {
+      "pattern": "label: \"Balanced (Recommended)\"",
+      "replacement": "label: \"Smart (Recommended)\"",
+      "description": "Use - two models: advanced and less advanced - profile"
+    },
+    {
+      "pattern": "description: \"Opus for planning, Sonnet for execution/verification\"",
+      "replacement": "description: \"Two models: one for reseach and planing, other for execution and verification\"",
+      "description": "Use - two models: advanced and less advanced - profile"
+    },
+    {
+      "pattern": "description: \"Sonnet for most agents — good quality/cost ratio\"",
+      "replacement": "description: \"Two models: one for reseach and planing, other for execution and verification\"",
+      "description": "Use - two models: advanced and less advanced - profile"
+    },
+    {
+      "pattern": "label: \"Budget\"",
+      "replacement": "label: \"Custom (most flexible)\"",
+      "description": "Use - three models - profile"
+    },
+    {
+      "pattern": "description: \"Sonnet for writing, Haiku for research/verification (lowest cost)\"",
+      "replacement": "description: \"Three models: different for every stage\"",
+      "description": "Use - three models - profile"
+    },
+    {
+      "pattern": "description: \"Haiku where possible — fastest, lowest cost\"",
+      "replacement": "description: \"Three models: different for every stage\"",
+      "description": "Use - three models - profile"
     }
   ],
   "_forbidden_strings_after_translation": [

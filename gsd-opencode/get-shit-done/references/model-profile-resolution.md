@@ -8,7 +8,7 @@ Resolve model profile once at the start of orchestration, then use it for all ta
 MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
-Default: `balanced` if not set or config missing.
+Default: `simple` if not set or config missing.
 
 ## Lookup Table
 
