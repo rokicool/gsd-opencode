@@ -588,9 +588,11 @@ export class FileOperations {
         // Cross-device move needed
         this.logger.debug('Cross-device move detected, using copy+delete');
         await this._crossDeviceMove(tempDir, targetDir);
-      } else if (error.code === 'ENOTEMPTY' || error.code === 'EEXIST') {
+      } else if (error.code === 'ENOTEMPTY' || error.code === 'EEXIST' || error.code === 'EPERM') {
         // Target exists with other files - MERGE instead of replace
         // This preserves existing opencode configuration
+        // NOTE: On Windows, fs.rename throws EPERM instead of ENOTEMPTY/EEXIST
+        // when target directory exists. Fixed: 2026-02-26
         this.logger.debug('Target exists with existing files, merging contents');
         await this._mergeDirectories(tempDir, targetDir);
         // Clean up temp directory after merge
