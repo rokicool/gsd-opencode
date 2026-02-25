@@ -296,7 +296,7 @@ Usage: `/gsd-plan-milestone-gaps`
 Configure workflow toggles and model profile interactively.
 
 - Toggle researcher, plan checker, verifier agents
-- Select model profile (quality/balanced/budget)
+- Select model profile (simple/smart/custom)
 - Updates `.planning/config.json`
 
 Usage: `/gsd-settings`

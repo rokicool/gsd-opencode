@@ -172,7 +172,7 @@ Create `.planning/config.json` with mode set to "yolo":
   "depth": "[selected]",
   "parallelization": true|false,
   "commit_docs": true|false,
-  "model_profile": "quality|balanced|budget",
+  "model_profile": "simple|smart|custom",
   "workflow": {
     "research": true|false,
     "plan_check": true|false,
@@ -471,7 +471,7 @@ Create `.planning/config.json` with all settings:
   "depth": "quick|standard|comprehensive",
   "parallelization": true|false,
   "commit_docs": true|false,
-  "model_profile": "quality|balanced|budget",
+  "model_profile": "simple|smart|custom",
   "workflow": {
     "research": true|false,
     "plan_check": true|false,

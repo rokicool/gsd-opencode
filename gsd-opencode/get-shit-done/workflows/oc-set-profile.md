@@ -1,12 +1,3 @@
----
-name: gsd-set-profile
-description: Switch between model profiles (simple/smart/custom) with model reuse option
-tools:
-  - read: true
-  - write: true
-  - bash: true
-  - question: true
----
 
 <role>
 You are executing the `/gsd-set-profile` command. Switch the project's active model profile (simple/smart/custom) with optional model reuse.
@@ -39,14 +30,14 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 - **Smart**: 2 models — planning+execution share model, verification uses different
 - **Custom**: 3 models — each stage can have different model
 
-**Migration:** Old configs with `model_profile: quality/balanced/budget` are auto-migrated to Custom profile.
+**Migration:** Old configs with `model_profile: quality / balanced / budget` are auto-migrated to Custom profile.
 </context>
 
 <behavior>
 
 ## Step 1: Load and validate config
 
-Read `.planning/config.json`. Handle these cases:
+read `.planning/config.json`. Handle these cases:
 
 **Case A: File missing or invalid**
 - Print: `Error: No GSD project found. Run /gsd-new-project first.`
@@ -54,7 +45,7 @@ Read `.planning/config.json`. Handle these cases:
 
 **Case B: Legacy config (has model_profile but no profiles.profile_type)**
 - Auto-migrate to Custom profile
-- Use OLD_PROFILE_MODEL_MAP to convert quality/balanced/budget → Custom
+- Use OLD_PROFILE_MODEL_MAP to convert quality / balanced / budget → Custom
 
 **Case C: Current config**
 - Use `profiles.profile_type` and `profiles.models`
@@ -95,7 +86,7 @@ Current configuration:
 
 **B) Interactive picker (no args):**
 
-Use Question tool:
+Use question tool:
 
 ```
 header: "Profile Type"
@@ -156,52 +147,52 @@ Based on profile type, prompt for models:
 
 ### Simple Profile (1 model)
 
-Use gsd-oc-select-model skill:
-
-```
-header: "Simple Profile - Select Model"
-question: "Choose a model for all stages"
-```
-
-Or call:
-```bash
-node gsd-opencode/get-shit-done/bin/gsd-tools.cjs wizard-model-select --providers --raw
-```
-
-Then for selected provider:
-```bash
-node gsd-opencode/get-shit-done/bin/gsd-tools.cjs wizard-model-select --provider "{provider}" --raw
-```
+Use gsd-oc-select-model skill to select model for "Simple Profile - One model to rule them all".
 
 Store selected model. All stages will use this model.
 
 ### Smart Profile (2 models)
 
+Use gsd-oc-select-model skill twice.
+
 **First model** (planning + execution):
-```
-header: "Smart Profile - Planning & Execution"
-question: "Choose a model for planning and execution agents"
-```
+
+Use gsd-oc-select-model skill to select model for "Smart Profile - Planning & Execution"
 
 **Second model** (verification):
-```
-header: "Smart Profile - Verification"
-question: "Choose a model for verification agents (can be cheaper)"
-```
+
+Use gsd-oc-select-model skill to select model for "Smart Profile - Verification"
+
+Store selected models. 
+
+Planning + Execution will use First model selected.
+Verification will use Second model selected.
+
 
 ### Custom Profile (3 models)
 
-Prompt for each stage separately:
-```
-header: "Custom Profile - Planning"
-question: "Choose model for planning agents"
+Use gsd-oc-select-model skill
 
-header: "Custom Profile - Execution"
-question: "Choose model for execution agents"
 
-header: "Custom Profile - Verification"
-question: "Choose model for verification agents"
-```
+**First model** (planning):
+
+Use gsd-oc-select-model skill to select model for "Custom Profile - Planning"
+
+**Second model** (execution)
+
+Use gsd-oc-select-model skill to select model for "Custom Profile - Execution"
+
+**Thrid model** (verification):
+
+Use gsd-oc-select-model skill to select model for "Custom Profile - Verification"
+
+Store selected models. 
+
+Planning will use First model selected.
+Execution will use Second model selected.
+Verification will use Third model selected.
+
+
 
 ## Step 7: Validate selected models
 
@@ -269,12 +260,12 @@ If migration occurred:
 </behavior>
 
 <notes>
-- Use Question tool for ALL user input
+- Use question tool for ALL user input
 - Always show full model IDs (e.g., `opencode/glm-4.7-free`)
 - Preserve all other config.json keys when writing
 - Do NOT rewrite agent .md files — only update opencode.json
 - If opencode.json doesn't exist, create it
 - **Source of truth:** `config.json` stores profile_type and models; `opencode.json` is derived
 - When migrating, preserve old model_profile field for backward compat during transition
-- Model selection uses gsd-oc-select-model skill via gsd-tools.cjs wizard-model-select command
+- Model selection uses gsd-oc-select-model skill 
 </notes>

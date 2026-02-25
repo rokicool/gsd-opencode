@@ -589,9 +589,9 @@
     },
     {
       "pattern": "subagent_type=\"general-purpose\"",
-      "replacement": "subagent_type=\"task\"",
+      "replacement": "subagent_type=\"general\"",
       "caseSensitive": true,
-      "description": "Transform general-purpose subagent type to task"
+      "description": "Transform general-purpose subagent type to general"
     },
     {
       "pattern": "subagent_type=\"Explore\"",
@@ -626,6 +626,21 @@
       "pattern": "Claude",
       "replacement": "OpenCode",
       "description": "Transform standalone Claude references to OpenCode"
+    },
+    {
+      "pattern": "quality/balanced/budget",
+      "replacement": "simple/smart/custom",
+      "description": "Replace qbd with ssc"
+    },
+    {
+      "pattern": "quality|balanced|budget",
+      "replacement": "simple|smart|custom",
+      "description": "Replace qbd with ssc"
+    },
+    {
+      "pattern": "get-shit-done/workflows/set-profile.md",
+      "replacement": "get-shit-done/workflows/oc-set-profile.md",
+      "description": "Use OpenCode related process instead of Claude Code's one"
     }
   ],
   "_forbidden_strings_after_translation": [
