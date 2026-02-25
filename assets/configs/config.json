@@ -691,6 +691,11 @@
       "pattern": "description: \"Haiku where possible — fastest, lowest cost\"",
       "replacement": "description: \"Three models: different for every stage\"",
       "description": "Use - three models - profile"
+    },
+    {
+      "pattern": "\"quality\" | \"balanced\" | \"budget\"",
+      "replacement": "\"simple\" | \"smart\" | \"custom\"",
+      "description": "Use - three models - profile"
     }
   ],
   "_forbidden_strings_after_translation": [

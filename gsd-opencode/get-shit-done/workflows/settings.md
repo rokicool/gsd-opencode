@@ -113,7 +113,7 @@ Merge new settings into existing config.json:
 ```json
 {
   ...existing_config,
-  "model_profile": "quality" | "balanced" | "budget",
+  "model_profile": "simple" | "smart" | "custom",
   "workflow": {
     "research": true/false,
     "plan_check": true/false,
