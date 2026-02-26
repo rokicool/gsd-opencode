@@ -629,12 +629,12 @@
     },
     {
       "pattern": "quality/balanced/budget",
-      "replacement": "simple/smart/custom",
+      "replacement": "simple/smart/genius",
       "description": "Replace qbd with ssc"
     },
     {
       "pattern": "quality|balanced|budget",
-      "replacement": "simple|smart|custom",
+      "replacement": "simple|smart|genius",
       "description": "Replace qbd with ssc"
     },
     {
@@ -679,7 +679,7 @@
     },
     {
       "pattern": "label: \"Budget\"",
-      "replacement": "label: \"Custom (most flexible)\"",
+      "replacement": "label: \"Genius (most flexible)\"",
       "description": "Use - three models - profile"
     },
     {
@@ -694,7 +694,7 @@
     },
     {
       "pattern": "\"quality\" | \"balanced\" | \"budget\"",
-      "replacement": "\"simple\" | \"smart\" | \"custom\"",
+      "replacement": "\"simple\" | \"smart\" | \"genius\"",
       "description": "Use - three models - profile"
     }
   ],

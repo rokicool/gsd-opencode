@@ -328,7 +328,7 @@ questions: [
     "options": [
       { "label": "Simple", "description": "1 model for all stages (easiest setup)" },
       { "label": "Smart", "description": "2 models: advanced for planning+execution, cheaper for verification" },
-      { "label": "Custom", "description": "3 models: best control per stage" }
+      { "label": "Genius", "description": "3 models: best control per stage" }
     ]
   }
 ]
@@ -349,7 +349,7 @@ The resulting `.planning/config.json`:
   "parallelization": true|false,
   "commit_docs": true|false,
   "profiles": {
-    "profile_type": "simple|smart|custom",
+    "profile_type": "simple|smart|genius",
     "models": {
       "planning": "opencode/glm-4.7-free",
       "execution": "opencode/glm-4.7-free",

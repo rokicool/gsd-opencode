@@ -1,6 +1,6 @@
 
 <role>
-You are executing the `/gsd-set-profile` command. Switch the project's active model profile (simple/smart/custom) with optional model reuse.
+You are executing the `/gsd-set-profile` command. Switch the project's active model profile (simple/smart/genius) with optional model reuse.
 
 This command reads/writes:
 - `.planning/config.json` — profile state (profile_type, models)
@@ -13,7 +13,7 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 **Invocation styles:**
 
 1. No args (interactive wizard): `/gsd-set-profile`
-2. Positional with type: `/gsd-set-profile simple|smart|custom`
+2. Positional with type: `/gsd-set-profile simple|smart|genius`
 3. With reuse flag: `/gsd-set-profile smart --reuse`
 
 **Stage-to-agent mapping (11 agents):**
@@ -28,9 +28,9 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 
 - **Simple**: 1 model total — all stages use same model
 - **Smart**: 2 models — planning+execution share model, verification uses different
-- **Custom**: 3 models — each stage can have different model
+- **Genius**: 3 models — each stage can have different model
 
-**Migration:** Old configs with `model_profile: quality / balanced / budget` are auto-migrated to Custom profile.
+**Migration:** Old configs with `model_profile: quality / balanced / budget` are auto-migrated to genius profile.
 </context>
 
 <behavior>
@@ -44,8 +44,8 @@ read `.planning/config.json`. Handle these cases:
 - Stop.
 
 **Case B: Legacy config (has model_profile but no profiles.profile_type)**
-- Auto-migrate to Custom profile
-- Use OLD_PROFILE_MODEL_MAP to convert quality / balanced / budget → Custom
+- Auto-migrate to genius profile
+- Use OLD_PROFILE_MODEL_MAP to convert quality / balanced / budget → genius
 
 **Case C: Current config**
 - Use `profiles.profile_type` and `profiles.models`
@@ -73,7 +73,7 @@ Current configuration:
 ## Step 4: Determine requested profile
 
 **A) Check for positional argument:**
-- If user typed `/gsd-set-profile simple|smart|custom`, use that as `newProfileType`
+- If user typed `/gsd-set-profile simple|smart|genius`, use that as `newProfileType`
 
 **B) Interactive picker (no args):**
 
@@ -87,7 +87,7 @@ options:
     description: "1 model for all stages (easiest setup)"
   - label: "Smart"
     description: "2 models: advanced for planning+execution, cheaper for verification"
-  - label: "Custom"
+  - label: "Genius"
     description: "3 models: full control with different model per stage"
   - label: "Cancel"
     description: "Exit without changes"
@@ -98,7 +98,7 @@ If Cancel selected, print cancellation message and stop.
 **C) Invalid profile handling:**
 
 If invalid profile name:
-- Print: `Unknown profile type '{name}'. Valid options: simple, smart, custom`
+- Print: `Unknown profile type '{name}'. Valid options: simple, smart, genius`
 - Fall back to interactive picker
 
 ## Step 5: Handle --reuse flag
@@ -160,22 +160,22 @@ Planning + Execution will use First model selected.
 Verification will use Second model selected.
 
 
-### Custom Profile (3 models)
+### genius Profile (3 models)
 
 Use gsd-oc-select-model skill
 
 
 **First model** (planning):
 
-Use gsd-oc-select-model skill to select model for "Custom Profile - Planning"
+Use gsd-oc-select-model skill to select model for "Genius Profile - Planning"
 
 **Second model** (execution)
 
-Use gsd-oc-select-model skill to select model for "Custom Profile - Execution"
+Use gsd-oc-select-model skill to select model for "Genius Profile - Execution"
 
 **Thrid model** (verification):
 
-Use gsd-oc-select-model skill to select model for "Custom Profile - Verification"
+Use gsd-oc-select-model skill to select model for "Genius Profile - Verification"
 
 Store selected models. 
 
@@ -206,7 +206,7 @@ Save config.json Or build and save manually:
 ```json
 {
   "profiles": {
-    "profile_type": "{simple|smart|custom}",
+    "profile_type": "{simple|smart|genius}",
     "models": {
       "planning": "{model}",
       "execution": "{model}",
@@ -242,7 +242,7 @@ Check if `config.profiles.active_profile === targetProfile`. If so, regenerate `
 
 Compute effective models (preset + overrides):
 ```
-overrides = config.profiles.custom_overrides[targetProfile] || {}
+overrides = config.profiles.genius_overrides[targetProfile] || {}
 effective.planning = overrides.planning || newPreset.planning
 effective.execution = overrides.execution || newPreset.execution
 effective.verification = overrides.verification || newPreset.verification
@@ -306,7 +306,7 @@ Note: Quit and relaunch OpenCode to apply model changes.
 
 If migration occurred:
 ```
-⚡ Auto-migrated from {old_profile} to custom profile
+⚡ Auto-migrated from {old_profile} to genius profile
 ```
 
 </behavior>
