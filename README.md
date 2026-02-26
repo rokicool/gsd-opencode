@@ -1,6 +1,6 @@
 <div align="left">
 
-# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.9.4 - 2026-01-21)
+# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.20.5 - 2026-02-19)
 
 **A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (Adapted for OpenCode by rokicool and enthusiasts)**
 
@@ -86,6 +86,18 @@ That's what this is. No enterprise roleplay bullshit. Just an incredibly effecti
 I just love both GSD and OpenCode. I felt like having GSD available only for Claude Code is not fair. 
 
 — **Roman**
+
+## Version 1.20.0 - We are catching up with original v1.20.5
+
+As usual, you can find all changes that TACHES made in the [original CHANGELOG.md v1.9.4 -> v1.20.5](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md)
+
+As for our side. We have a lot of small changes and one significant change to the Profile Management. Istead of replicating TACHES/Claude Code approach we use OpenCode relevant.
+
+GSD-OpenCode supports three Profiles:
+
+ - Simple (allows to define one model to work for all types of gsd custom agents)
+ - Smart  (allows to define two different models to work with gsd custom agents: one for  )
+ - Genius (ok, ok. Not exactly genius, but allows to define three different models to work with custom agents)
 
 ## Version 1.9.0 - We are catching up with original v1.9.4
 

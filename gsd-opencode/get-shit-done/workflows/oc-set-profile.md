@@ -22,7 +22,7 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 |--------------|--------|
 | Planning     | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
 | Execution    | gsd-executor, gsd-debugger |
-| Verification | gsd-verifier, gsd-integration-checker, gsd-set-profile, gsd-settings, gsd-set-model |
+| Verification | gsd-verifier, gsd-integration-checker |
 
 **Profile types:**
 
@@ -84,11 +84,11 @@ header: "Profile Type"
 question: "Select a profile type for model configuration"
 options:
   - label: "Simple"
-    description: "1 model for all stages (easiest setup)"
+    description: "1 model for all gsd stages (easiest setup)"
   - label: "Smart"
-    description: "2 models: advanced for planning+execution, cheaper for verification"
+    description: "2 models: advanced for planning & execution, cheaper for verification stages"
   - label: "Genius"
-    description: "3 models: full control with different model per stage"
+    description: "3 models: different model for planning, execution, or verification stages"
   - label: "Cancel"
     description: "Exit without changes"
 ```
@@ -160,7 +160,7 @@ Planning + Execution will use First model selected.
 Verification will use Second model selected.
 
 
-### genius Profile (3 models)
+### Genius Profile (3 models)
 
 Use gsd-oc-select-model skill
 
@@ -265,9 +265,6 @@ Build agent config:
     "gsd-debugger": { "model": "{effective.execution}" },
     "gsd-verifier": { "model": "{effective.verification}" },
     "gsd-integration-checker": { "model": "{effective.verification}" },
-    "gsd-set-profile": { "model": "{effective.verification}" },
-    "gsd-settings": { "model": "{effective.verification}" },
-    "gsd-set-model": { "model": "{effective.verification}" }
   }
 }
 ```
