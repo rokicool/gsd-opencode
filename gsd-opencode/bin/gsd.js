@@ -20,15 +20,15 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { installCommand } from '../src/commands/install.js';
-import { listCommand } from '../src/commands/list.js';
-import { uninstallCommand } from '../src/commands/uninstall.js';
-import { configGetCommand, configSetCommand, configResetCommand, configListCommand } from '../src/commands/config.js';
-import { checkCommand } from '../src/commands/check.js';
-import { repairCommand } from '../src/commands/repair.js';
-import { updateCommand } from '../src/commands/update.js';
-import { logger, setVerbose } from '../src/utils/logger.js';
-import { ERROR_CODES } from '../lib/constants.js';
+import { installCommand } from './dm/src/commands/install.js';
+import { listCommand } from './dm/src/commands/list.js';
+import { uninstallCommand } from './dm/src/commands/uninstall.js';
+import { configGetCommand, configSetCommand, configResetCommand, configListCommand } from './dm/src/commands/config.js';
+import { checkCommand } from './dm/src/commands/check.js';
+import { repairCommand } from './dm/src/commands/repair.js';
+import { updateCommand } from './dm/src/commands/update.js';
+import { logger, setVerbose } from './dm/src/utils/logger.js';
+import { ERROR_CODES } from './dm/lib/constants.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';

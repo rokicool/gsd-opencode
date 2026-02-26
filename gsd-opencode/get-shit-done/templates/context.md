@@ -1,6 +1,6 @@
 # Phase Context Template
 
-Template for `.planning/phases/XX-name/{phase}-CONTEXT.md` - captures implementation decisions for a phase.
+Template for `.planning/phases/XX-name/{phase_num}-CONTEXT.md` - captures implementation decisions for a phase.
 
 **Purpose:** Document decisions that downstream agents need. Researcher uses this to know WHAT to investigate. Planner uses this to know WHAT choices are locked vs flexible.
 
@@ -275,16 +275,8 @@ The output should answer: "What does the researcher need to investigate? What ch
 - "Fast and responsive"
 - "Easy to use"
 
-**Sections explained:**
-
-- **Domain** — The scope anchor. Copied/derived from ROADMAP.md. Fixed boundary.
-- **Decisions** — Organized by areas discussed (NOT predefined categories). Section headers come from the actual discussion — "Layout style", "Flag design", "Grouping criteria", etc.
-- **OpenCode's Discretion** — Explicit acknowledgment of what OpenCode can decide during implementation.
-- **Specifics** — Product references, examples, "like X but..." statements.
-- **Deferred** — Ideas captured but explicitly out of scope. Prevents scope creep while preserving good ideas.
-
 **After creation:**
-- File lives in phase directory: `.planning/phases/XX-name/{phase}-CONTEXT.md`
+- File lives in phase directory: `.planning/phases/XX-name/{phase_num}-CONTEXT.md`
 - `gsd-phase-researcher` uses decisions to focus investigation
 - `gsd-planner` uses decisions + research to create executable tasks
 - Downstream agents should NOT need to ask the user again about captured decisions

@@ -5,7 +5,6 @@ tools:
   - read
   - bash
   - write
-
   - question
 ---
 
@@ -323,19 +322,25 @@ questions: [
     ]
   },
   {
-    header: "Model Profile",
-    question: "Which AI models for planning agents?",
-    multiSelect: false,
-    options: [
-      { label: "Balanced", description: "planning/verifier: opencode/glm-4.7-free, execution: opencode/minimax-m2.1-free" },
-      { label: "Quality", description: "All stages: opencode/glm-4.7-free" },
-      { label: "Budget", description: "planning/verifier: opencode/minimax-m2.1-free, execution: opencode/grok-code" }
+    "header": "Model Profile",
+    "question": "Which model profile type?",
+    "multiSelect": false,
+    "options": [
+      { "label": "Simple", "description": "1 model for all stages (easiest setup)" },
+      { "label": "Smart", "description": "2 models: advanced for planning+execution, cheaper for verification" },
+      { "label": "Genius", "description": "3 models: best control per stage" }
     ]
   }
 ]
 ```
 
-Create `.planning/config.json` with all settings:
+Create `.planning/config.json` with all settings.
+
+**Profile Selection (in workflow preferences):**
+
+Then run model selection wizard using `/gsd-set-profile {selected_type}` to configure models.
+
+The resulting `.planning/config.json`:
 
 ```json
 {
@@ -343,30 +348,12 @@ Create `.planning/config.json` with all settings:
   "depth": "quick|standard|comprehensive",
   "parallelization": true|false,
   "commit_docs": true|false,
-  "model_profile": "quality|balanced|budget",
   "profiles": {
-    "active_profile": "balanced",
-    "presets": {
-      "quality": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/glm-4.7-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "balanced": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/minimax-m2.1-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "budget": {
-        "planning": "opencode/minimax-m2.1-free",
-        "execution": "opencode/grok-code",
-        "verification": "opencode/minimax-m2.1-free"
-      }
-    },
-    "custom_overrides": {
-      "quality": {},
-      "balanced": {},
-      "budget": {}
+    "profile_type": "simple|smart|genius",
+    "models": {
+      "planning": "opencode/glm-4.7-free",
+      "execution": "opencode/glm-4.7-free",
+      "verification": "opencode/glm-4.7-free"
     }
   },
   "workflow": {
@@ -375,6 +362,15 @@ Create `.planning/config.json` with all settings:
     "verifier": true|false
   }
 }
+```
+
+**Profile types explained:**
+
+- **Simple**: 1 model for all stages (planning, execution, verification all same)
+- **Smart**: 2 models (planning+execution share model, verification uses different)
+- **Custom**: 3 models (each stage type can have different model)
+
+**Legacy migration:** Old configs with `model_profile: quality/balanced/budget` are auto-migrated to Custom profile on first use of `/gsd-set-profile` or `/gsd-settings`.
 ```
 
 **If commit_docs = No:**
@@ -443,23 +439,31 @@ git commit -m "chore: configure opencode agent models"
 
 ## Phase 5.5: Resolve Model Profile
 
-read model profile for agent spawning:
+Use gsd-tools to resolve models for agent spawning:
 
 ```bash
-MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+# Resolve model for each agent type
+PLANNER_MODEL=$(node gsd-opencode/get-shit-done/bin/gsd-tools.cjs resolve-model gsd-planner --raw 2>/dev/null | grep -o '"model"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4 || echo "inherit")
+RESEARCHER_MODEL=$(node gsd-opencode/get-shit-done/bin/gsd-tools.cjs resolve-model gsd-project-researcher --raw 2>/dev/null | grep -o '"model"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4 || echo "inherit")
+ROADMAPPER_MODEL=$(node gsd-opencode/get-shit-done/bin/gsd-tools.cjs resolve-model gsd-roadmapper --raw 2>/dev/null | grep -o '"model"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4 || echo "inherit")
+EXECUTOR_MODEL=$(node gsd-opencode/get-shit-done/bin/gsd-tools.cjs resolve-model gsd-executor --raw 2>/dev/null | grep -o '"model"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4 || echo "inherit")
+VERIFIER_MODEL=$(node gsd-opencode/get-shit-done/bin/gsd-tools.cjs resolve-model gsd-verifier --raw 2>/dev/null | grep -o '"model"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4 || echo "inherit")
 ```
 
-Default to "balanced" if not set.
+The resolve-model command reads from `profiles.models` in config.json and maps agents to their stage:
+- Planning agents → profiles.models.planning
+- Execution agents → profiles.models.execution  
+- Verification agents → profiles.models.verification
 
-**Model lookup table:**
+**Agent-to-stage mapping:**
 
-| Agent | quality | balanced | budget |
-|-------|---------|----------|--------|
-| gsd-project-researcher | opus | sonnet | haiku |
-| gsd-research-synthesizer | sonnet | sonnet | haiku |
-| gsd-roadmapper | opus | sonnet | sonnet |
+| Stage | Agents |
+|-------|--------|
+| Planning | gsd-planner, gsd-plan-checker, gsd-phase-researcher, gsd-roadmapper, gsd-project-researcher, gsd-research-synthesizer, gsd-codebase-mapper |
+| Execution | gsd-executor, gsd-debugger |
+| Verification | gsd-verifier, gsd-integration-checker, gsd-set-profile, gsd-settings, gsd-set-model |
 
-Store resolved models for use in Task calls below.
+Use resolved models in Task calls below.
 
 ## Phase 6: Research Decision
 

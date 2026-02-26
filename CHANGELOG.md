@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.0] - 2026-02-25
+
+Overview: Major release with complete GSD to OpenCode migration, Simple Profile System for model configuration, and comprehensive CLI tools infrastructure. Introduced copy-from-original synchronization services and translation utilities.
+
+### Added
+
+- Simple Profile System for model configuration in `assets/prompts/Simple-Profile-System.md` and `assets/lib/simple-profile.js`
+- gsd-oc-select-model skill with interactive model selection workflow in `gsd-opencode/skills/gsd-oc-select-model/`
+- Model configuration files for multiple providers (glm47, glm5, grok, kimi25, opus) in `assets/configs/`
+- gsd-tools.cjs CLI utility in `gsd-opencode/get-shit-done/bin/gsd-tools.cjs` with commands for phase, roadmap, state, milestone, and verify operations
+- Copy-from-original synchronization system with SubmoduleService, SyncManifest, and SyncService in `assets/copy-services/`
+- Translation infrastructure with `assets/bin/translate.js`, `assets/lib/translator.js`, and `assets/lib/validator.js`
+- New workflows: plan-phase, quick, remove-phase, research-phase, settings, health, cleanup in `gsd-opencode/get-shit-done/workflows/`
+- Summary templates (complex, minimal, standard) in `gsd-opencode/get-shit-done/templates/`
+- VALIDATION.md template for verification reports
+- gsd-oc-work-hard.md rule file for OpenCode-specific work guidelines
+- vitest.config.js for test configuration in `gsd-opencode/`
+
+### Changed
+
+- Migrated distribution manager code from `gsd-opencode/src/`, `gsd-opencode/lib/`, `gsd-opencode/agents/` to `gsd-opencode/bin/dm/` directory structure
+- Renamed command files with gsd- prefix (e.g., `debug.md` to `gsd-debug.md`) in `gsd-opencode/commands/gsd/`
+- Moved workflows from `commands/gsd/` to `get-shit-done/workflows/` directory
+- Updated model profile terminology from quality/balanced/budget to simple/smart/genius across codebase
+- Updated agent tool specifications in gsd-executor, gsd-planner, gsd-verifier, gsd-phase-researcher, gsd-plan-checker agents
+- Enhanced checkpoints.md, git-integration.md, planning-config.md references
+- Updated research.md, phase-prompt.md, summary.md templates
+
+### Fixed
+
+- Corrected tool list specifications for gsd-phase-researcher and other agents
+- Added missing objective section and name field to gsd-reapply-patches command
+- Fixed source directory path resolution in install operations
+- Fixed test paths and package config after directory migration
+- Replaced bare `~/.config/opencode/` paths during installation
+
+### Removed
+
+- Legacy files `gsd-opencode/package-old.json` and `gsd-opencode/package-lock-old.json`
+- Original install.js script (migrated to bin/dm/)
+- Removed set-model.md, set-profile.md, settings.md from agents directory (moved to workflows)
+
 ## [1.10.2] - 2026-02-17
 
 Overview: Fixed path replacement bug in file operations service for local scope installs. Removed duplicate local directory and obsolete backup files. Added comprehensive test coverage for path replacement functionality.

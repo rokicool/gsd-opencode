@@ -1,6 +1,6 @@
 # Translation Mapping: Claude Code → OpenCode
 
-## Command Names
+## Command Names Examples (NOT ALL OF THEM)
 
 | Claude Code | OpenCode |
 |-------------|----------|
@@ -15,23 +15,7 @@
 | gsd:add-phase | gsd-add-phase |
 | gsd:insert-phase | gsd-insert-phase |
 | gsd:remove-phase | gsd-remove-phase |
-| gsd:add-todo | gsd-add-todo |
-| gsd:check-todos | gsd-check-todos |
-| gsd:debug | gsd-debug |
-| gsd:map-codebase | gsd-map-codebase |
-| gsd:verify-work | gsd-verify-work |
-| gsd:progress | gsd-progress |
-| gsd:settings | gsd-settings |
-| gsd:set-profile | gsd-set-profile |
-| gsd:update | gsd-update |
-| gsd:pause-work | gsd-pause-work |
-| gsd:resume-work | gsd-resume-work |
-| gsd:quick | gsd-quick |
-| gsd:whats-new | gsd-whats-new |
-| gsd:help | gsd-help |
-| gsd:audit-milestone | gsd-audit-milestone |
-| gsd:plan-milestone-gaps | gsd-plan-milestone-gaps |
-| gsd:list-phase-assumptions | gsd-list-phase-assumptions |
+
 
 ## Tool Mapping
 
@@ -105,7 +89,7 @@ color: "#00FFFF"
 |-------------|----------|
 | ~/.claude/ | ~/.config/opencode/ |
 | ~/.claude/get-shit-done/ | ~/.config/opencode/get-shit-done/ |
-| ./original/get-shit-done/commands/gsd/ | ./gsd-opencode/command/gsd/ |
+| ./original/get-shit-done/commands/gsd/ | ./gsd-opencode/commands/gsd/ |
 | ./original/get-shit-done/get-shit-done/references/ | ./gsd-opencode/get-shit-done/references/ |
 | ./original/get-shit-done/get-shit-done/templates/ | ./gsd-opencode/get-shit-done/templates/ |
 | ./original/get-shit-done/get-shit-done/workflows/ | ./gsd-opencode/get-shit-done/workflows/ |
@@ -130,13 +114,14 @@ color: "#00FFFF"
 |-------------|----------|
 | https://raw.githubusercontent.com/glittercowboy/get-shit-done | https://raw.githubusercontent.com/rokicool/gsd-opencode |
 | https://github.com/glittercowboy/get-shit-done | https://github.com/rokicool/gsd-opencode |
+| https://raw.githubusercontent.com/gsd-build/get-shit-done | https://raw.githubusercontent.com/rokicool/gsd-opencode |
+| https://github.com/gsd-build/get-shit-done | https://github.com/rokicool/gsd-opencode |
 
 ## Project References
 
 | Claude Code | OpenCode |
 |-------------|----------|
 | get-shit-done-cc | gsd-opencode |
-| get-shit-done | get-shit-done (preserved in references as original name) |
 
 ## Frontmatter Field Changes
 
@@ -145,13 +130,13 @@ color: "#00FFFF"
 | name: gsd:command | name: gsd-command |
 | agent: gsd-xxx | agent: gsd-xxx |
 | tools: Read, Write, ... | tools: read, write, ... (lowercase) |
-| allowed-tools: [Read, Write] | allowed-tools: [read, write] (lowercase) |
+
 
 ## Variable Usage
 
 | Claude Code | OpenCode |
 |-------------|----------|
-| All arguments | $ARGUMENTS (preserved) |
+| All arguments | $ARGUMENTS |
 
 ## Config File
 

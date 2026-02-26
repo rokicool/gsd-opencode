@@ -1,0 +1,756 @@
+{
+  "patterns": ["**/*"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.gif",
+    "**/*.ico",
+    "**/*.svg",
+    "**/*.woff",
+    "**/*.woff2",
+    "**/*.ttf",
+    "**/*.eot"
+  ],
+  "rules": [
+    {
+      "pattern": "https://raw.githubusercontent.com/glittercowboy/get-shit-done",
+      "replacement": "https://raw.githubusercontent.com/rokicool/gsd-opencode",
+      "description": "Transform raw GitHub URLs from glittercowboy to rokicool"
+    },
+    {
+      "pattern": "https://github.com/glittercowboy/get-shit-done",
+      "replacement": "https://github.com/rokicool/gsd-opencode",
+      "description": "Transform GitHub URLs from glittercowboy to rokicool"
+    },
+    {
+      "pattern": "https://raw.githubusercontent.com/gsd-build/get-shit-done",
+      "replacement": "https://raw.githubusercontent.com/rokicool/gsd-opencode",
+      "description": "Transform raw GitHub URLs from gsd-build to rokicool"
+    },
+    {
+      "pattern": "https://github.com/gsd-build/get-shit-done",
+      "replacement": "https://github.com/rokicool/gsd-opencode",
+      "description": "Transform GitHub URLs from gsd-build to rokicool"
+    },
+    {
+      "pattern": "rokicool/get-shit-done",
+      "replacement": "rokicool/gsd-opencode",
+      "description": "Transform repository references from get-shit-done to gsd-opencode"
+    },
+    {
+      "pattern": "get-shit-done-cc",
+      "replacement": "gsd-opencode",
+      "description": "Transform project name references from get-shit-done-cc to gsd-opencode"
+    },
+    {
+      "pattern": "glittercowboy",
+      "replacement": "rokicool",
+      "description": "Transform username references from glittercowboy to rokicool"
+    },
+    {
+      "pattern": "./original/get-shit-done/commands/gsd/",
+      "replacement": "./gsd-opencode/commands/gsd/",
+      "description": "Transform commands path"
+    },
+    {
+      "pattern": "./original/get-shit-done/get-shit-done/references/",
+      "replacement": "./gsd-opencode/get-shit-done/references/",
+      "description": "Transform references path"
+    },
+    {
+      "pattern": "./original/get-shit-done/get-shit-done/templates/",
+      "replacement": "./gsd-opencode/get-shit-done/templates/",
+      "description": "Transform templates path"
+    },
+    {
+      "pattern": "./original/get-shit-done/get-shit-done/workflows/",
+      "replacement": "./gsd-opencode/get-shit-done/workflows/",
+      "description": "Transform workflows path"
+    },
+    {
+      "pattern": "./original/get-shit-done/agents/",
+      "replacement": "./gsd-opencode/agents/",
+      "description": "Transform agents path"
+    },
+    {
+      "pattern": "~/.claude/get-shit-done/",
+      "replacement": "~/.config/opencode/get-shit-done/",
+      "description": "Transform specific path with get-shit-done"
+    },
+    {
+      "pattern": "~/.claude/config.json",
+      "replacement": "~/.config/opencode/opencode.json",
+      "description": "Transform config file path"
+    },
+    {
+      "pattern": "~/.claude/",
+      "replacement": "~/.config/opencode/",
+      "description": "Transform Claude config path to OpenCode config path"
+    },
+    {
+      "pattern": "~/.claude",
+      "replacement": "~/.config/opencode",
+      "description": "Transform Claude config path to OpenCode config path (no trailing slash)"
+    },
+    {
+      "pattern": "name: gsd:plan-phase",
+      "replacement": "name: gsd-plan-phase",
+      "description": "Transform frontmatter name for gsd:plan-phase"
+    },
+    {
+      "pattern": "name: gsd:execute-phase",
+      "replacement": "name: gsd-execute-phase",
+      "description": "Transform frontmatter name for gsd:execute-phase"
+    },
+    {
+      "pattern": "name: gsd:research-phase",
+      "replacement": "name: gsd-research-phase",
+      "description": "Transform frontmatter name for gsd:research-phase"
+    },
+    {
+      "pattern": "name: gsd:verify-phase",
+      "replacement": "name: gsd-verify-phase",
+      "description": "Transform frontmatter name for gsd:verify-phase"
+    },
+    {
+      "pattern": "name: gsd:discuss-phase",
+      "replacement": "name: gsd-discuss-phase",
+      "description": "Transform frontmatter name for gsd:discuss-phase"
+    },
+    {
+      "pattern": "name: gsd:new-project",
+      "replacement": "name: gsd-new-project",
+      "description": "Transform frontmatter name for gsd:new-project"
+    },
+    {
+      "pattern": "name: gsd:new-milestone",
+      "replacement": "name: gsd-new-milestone",
+      "description": "Transform frontmatter name for gsd:new-milestone"
+    },
+    {
+      "pattern": "name: gsd:complete-milestone",
+      "replacement": "name: gsd-complete-milestone",
+      "description": "Transform frontmatter name for gsd:complete-milestone"
+    },
+    {
+      "pattern": "name: gsd:add-phase",
+      "replacement": "name: gsd-add-phase",
+      "description": "Transform frontmatter name for gsd:add-phase"
+    },
+    {
+      "pattern": "name: gsd:insert-phase",
+      "replacement": "name: gsd-insert-phase",
+      "description": "Transform frontmatter name for gsd:insert-phase"
+    },
+    {
+      "pattern": "name: gsd:remove-phase",
+      "replacement": "name: gsd-remove-phase",
+      "description": "Transform frontmatter name for gsd:remove-phase"
+    },
+    {
+      "pattern": "name: gsd:debug",
+      "replacement": "name: gsd-debug",
+      "description": "Transform frontmatter name for gsd:debug"
+    },
+    {
+      "pattern": "name: gsd:map-codebase",
+      "replacement": "name: gsd-map-codebase",
+      "description": "Transform frontmatter name for gsd:map-codebase"
+    },
+    {
+      "pattern": "name: gsd:verify-work",
+      "replacement": "name: gsd-verify-work",
+      "description": "Transform frontmatter name for gsd:verify-work"
+    },
+    {
+      "pattern": "name: gsd:add-todo",
+      "replacement": "name: gsd-add-todo",
+      "description": "Transform frontmatter name for gsd:add-todo"
+    },
+    {
+      "pattern": "name: gsd:check-todos",
+      "replacement": "name: gsd-check-todos",
+      "description": "Transform frontmatter name for gsd:check-todos"
+    },
+    {
+      "pattern": "name: gsd:progress",
+      "replacement": "name: gsd-progress",
+      "description": "Transform frontmatter name for gsd:progress"
+    },
+    {
+      "pattern": "name: gsd:settings",
+      "replacement": "name: gsd-settings",
+      "description": "Transform frontmatter name for gsd:settings"
+    },
+    {
+      "pattern": "name: gsd:set-profile",
+      "replacement": "name: gsd-set-profile",
+      "description": "Transform frontmatter name for gsd:set-profile"
+    },
+    {
+      "pattern": "name: gsd:update",
+      "replacement": "name: gsd-update",
+      "description": "Transform frontmatter name for gsd:update"
+    },
+    {
+      "pattern": "name: gsd:pause-work",
+      "replacement": "name: gsd-pause-work",
+      "description": "Transform frontmatter name for gsd:pause-work"
+    },
+    {
+      "pattern": "name: gsd:resume-work",
+      "replacement": "name: gsd-resume-work",
+      "description": "Transform frontmatter name for gsd:resume-work"
+    },
+    {
+      "pattern": "name: gsd:quick",
+      "replacement": "name: gsd-quick",
+      "description": "Transform frontmatter name for gsd:quick"
+    },
+    {
+      "pattern": "name: gsd:whats-new",
+      "replacement": "name: gsd-whats-new",
+      "description": "Transform frontmatter name for gsd:whats-new"
+    },
+    {
+      "pattern": "name: gsd:help",
+      "replacement": "name: gsd-help",
+      "description": "Transform frontmatter name for gsd:help"
+    },
+    {
+      "pattern": "name: gsd:audit-milestone",
+      "replacement": "name: gsd-audit-milestone",
+      "description": "Transform frontmatter name for gsd:audit-milestone"
+    },
+    {
+      "pattern": "name: gsd:plan-milestone-gaps",
+      "replacement": "name: gsd-plan-milestone-gaps",
+      "description": "Transform frontmatter name for gsd:plan-milestone-gaps"
+    },
+    {
+      "pattern": "name: gsd:list-phase-assumptions",
+      "replacement": "name: gsd-list-phase-assumptions",
+      "description": "Transform frontmatter name for gsd:list-phase-assumptions"
+    },
+    {
+      "pattern": "name: set-profile",
+      "replacement": "name: gsd-set-profile",
+      "description": "Transform set-profile command name to include gsd- prefix"
+    },
+    {
+      "pattern": "name: gsd:",
+      "replacement": "name: gsd-",
+      "description": "Transform generic frontmatter name field from colon to dash format"
+    },
+    {
+      "pattern": "/gsd:plan-phase",
+      "replacement": "/gsd-plan-phase",
+      "description": "Transform gsd:plan-phase command to gsd-plan-phase"
+    },
+    {
+      "pattern": "/gsd:execute-phase",
+      "replacement": "/gsd-execute-phase",
+      "description": "Transform gsd:execute-phase command to gsd-execute-phase"
+    },
+    {
+      "pattern": "/gsd:research-phase",
+      "replacement": "/gsd-research-phase",
+      "description": "Transform gsd:research-phase command to gsd-research-phase"
+    },
+    {
+      "pattern": "/gsd:verify-phase",
+      "replacement": "/gsd-verify-phase",
+      "description": "Transform gsd:verify-phase command to gsd-verify-phase"
+    },
+    {
+      "pattern": "/gsd:discuss-phase",
+      "replacement": "/gsd-discuss-phase",
+      "description": "Transform gsd:discuss-phase command to gsd-discuss-phase"
+    },
+    {
+      "pattern": "/gsd:new-project",
+      "replacement": "/gsd-new-project",
+      "description": "Transform gsd:new-project command to gsd-new-project"
+    },
+    {
+      "pattern": "/gsd:new-milestone",
+      "replacement": "/gsd-new-milestone",
+      "description": "Transform gsd:new-milestone command to gsd-new-milestone"
+    },
+    {
+      "pattern": "/gsd:complete-milestone",
+      "replacement": "/gsd-complete-milestone",
+      "description": "Transform gsd:complete-milestone command to gsd-complete-milestone"
+    },
+    {
+      "pattern": "/gsd:add-phase",
+      "replacement": "/gsd-add-phase",
+      "description": "Transform gsd:add-phase command to gsd-add-phase"
+    },
+    {
+      "pattern": "/gsd:insert-phase",
+      "replacement": "/gsd-insert-phase",
+      "description": "Transform gsd:insert-phase command to gsd-insert-phase"
+    },
+    {
+      "pattern": "/gsd:remove-phase",
+      "replacement": "/gsd-remove-phase",
+      "description": "Transform gsd:remove-phase command to gsd-remove-phase"
+    },
+    {
+      "pattern": "/gsd:debug",
+      "replacement": "/gsd-debug",
+      "description": "Transform gsd:debug command to gsd-debug"
+    },
+    {
+      "pattern": "/gsd:map-codebase",
+      "replacement": "/gsd-map-codebase",
+      "description": "Transform gsd:map-codebase command to gsd-map-codebase"
+    },
+    {
+      "pattern": "/gsd:verify-work",
+      "replacement": "/gsd-verify-work",
+      "description": "Transform gsd:verify-work command to gsd-verify-work"
+    },
+    {
+      "pattern": "/gsd:add-todo",
+      "replacement": "/gsd-add-todo",
+      "description": "Transform gsd:add-todo command to gsd-add-todo"
+    },
+    {
+      "pattern": "/gsd:check-todos",
+      "replacement": "/gsd-check-todos",
+      "description": "Transform gsd:check-todos command to gsd-check-todos"
+    },
+    {
+      "pattern": "/gsd:progress",
+      "replacement": "/gsd-progress",
+      "description": "Transform gsd:progress command to gsd-progress"
+    },
+    {
+      "pattern": "/gsd:settings",
+      "replacement": "/gsd-settings",
+      "description": "Transform gsd:settings command to gsd-settings"
+    },
+    {
+      "pattern": "/gsd:set-profile",
+      "replacement": "/gsd-set-profile",
+      "description": "Transform gsd:set-profile command to gsd-set-profile"
+    },
+    {
+      "pattern": "/gsd:update",
+      "replacement": "/gsd-update",
+      "description": "Transform gsd:update command to gsd-update"
+    },
+    {
+      "pattern": "/gsd:pause-work",
+      "replacement": "/gsd-pause-work",
+      "description": "Transform gsd:pause-work command to gsd-pause-work"
+    },
+    {
+      "pattern": "/gsd:resume-work",
+      "replacement": "/gsd-resume-work",
+      "description": "Transform gsd:resume-work command to gsd-resume-work"
+    },
+    {
+      "pattern": "/gsd:quick",
+      "replacement": "/gsd-quick",
+      "description": "Transform gsd:quick command to gsd-quick"
+    },
+    {
+      "pattern": "/gsd:whats-new",
+      "replacement": "/gsd-whats-new",
+      "description": "Transform gsd:whats-new command to gsd-whats-new"
+    },
+    {
+      "pattern": "/gsd:help",
+      "replacement": "/gsd-help",
+      "description": "Transform gsd:help command to gsd-help"
+    },
+    {
+      "pattern": "/gsd:audit-milestone",
+      "replacement": "/gsd-audit-milestone",
+      "description": "Transform gsd:audit-milestone command to gsd-audit-milestone"
+    },
+    {
+      "pattern": "/gsd:plan-milestone-gaps",
+      "replacement": "/gsd-plan-milestone-gaps",
+      "description": "Transform gsd:plan-milestone-gaps command to gsd-plan-milestone-gaps"
+    },
+    {
+      "pattern": "/gsd:list-phase-assumptions",
+      "replacement": "/gsd-list-phase-assumptions",
+      "description": "Transform gsd:list-phase-assumptions command to gsd-list-phase-assumptions"
+    },
+    {
+      "pattern": "/gsd:command",
+      "replacement": "/gsd-command",
+      "description": "Transform generic gsd:command references"
+    },
+    {
+      "pattern": "/gsd:",
+      "replacement": "/gsd-",
+      "description": "Transform any remaining gsd: prefix to gsd-"
+    },
+    {
+      "pattern": "gsd:plan-phase",
+      "replacement": "gsd-plan-phase",
+      "description": "Transform gsd:plan-phase reference (without slash)"
+    },
+    {
+      "pattern": "gsd:execute-phase",
+      "replacement": "gsd-execute-phase",
+      "description": "Transform gsd:execute-phase reference (without slash)"
+    },
+    {
+      "pattern": "gsd:research-phase",
+      "replacement": "gsd-research-phase",
+      "description": "Transform gsd:research-phase reference (without slash)"
+    },
+    {
+      "pattern": "gsd:verify-phase",
+      "replacement": "gsd-verify-phase",
+      "description": "Transform gsd:verify-phase reference (without slash)"
+    },
+    {
+      "pattern": "gsd:discuss-phase",
+      "replacement": "gsd-discuss-phase",
+      "description": "Transform gsd:discuss-phase reference (without slash)"
+    },
+    {
+      "pattern": "gsd:new-project",
+      "replacement": "gsd-new-project",
+      "description": "Transform gsd:new-project reference (without slash)"
+    },
+    {
+      "pattern": "gsd:new-milestone",
+      "replacement": "gsd-new-milestone",
+      "description": "Transform gsd:new-milestone reference (without slash)"
+    },
+    {
+      "pattern": "gsd:complete-milestone",
+      "replacement": "gsd-complete-milestone",
+      "description": "Transform gsd:complete-milestone reference (without slash)"
+    },
+    {
+      "pattern": "gsd:add-phase",
+      "replacement": "gsd-add-phase",
+      "description": "Transform gsd:add-phase reference (without slash)"
+    },
+    {
+      "pattern": "gsd:insert-phase",
+      "replacement": "gsd-insert-phase",
+      "description": "Transform gsd:insert-phase reference (without slash)"
+    },
+    {
+      "pattern": "gsd:remove-phase",
+      "replacement": "gsd-remove-phase",
+      "description": "Transform gsd:remove-phase reference (without slash)"
+    },
+    {
+      "pattern": "gsd:debug",
+      "replacement": "gsd-debug",
+      "description": "Transform gsd:debug reference (without slash)"
+    },
+    {
+      "pattern": "gsd:map-codebase",
+      "replacement": "gsd-map-codebase",
+      "description": "Transform gsd:map-codebase reference (without slash)"
+    },
+    {
+      "pattern": "gsd:verify-work",
+      "replacement": "gsd-verify-work",
+      "description": "Transform gsd:verify-work reference (without slash)"
+    },
+    {
+      "pattern": "gsd:add-todo",
+      "replacement": "gsd-add-todo",
+      "description": "Transform gsd:add-todo reference (without slash)"
+    },
+    {
+      "pattern": "gsd:check-todos",
+      "replacement": "gsd-check-todos",
+      "description": "Transform gsd:check-todos reference (without slash)"
+    },
+    {
+      "pattern": "gsd:progress",
+      "replacement": "gsd-progress",
+      "description": "Transform gsd:progress reference (without slash)"
+    },
+    {
+      "pattern": "gsd:settings",
+      "replacement": "gsd-settings",
+      "description": "Transform gsd:settings reference (without slash)"
+    },
+    {
+      "pattern": "gsd:set-profile",
+      "replacement": "gsd-set-profile",
+      "description": "Transform gsd:set-profile reference (without slash)"
+    },
+    {
+      "pattern": "gsd:update",
+      "replacement": "gsd-update",
+      "description": "Transform gsd:update reference (without slash)"
+    },
+    {
+      "pattern": "gsd:pause-work",
+      "replacement": "gsd-pause-work",
+      "description": "Transform gsd:pause-work reference (without slash)"
+    },
+    {
+      "pattern": "gsd:resume-work",
+      "replacement": "gsd-resume-work",
+      "description": "Transform gsd:resume-work reference (without slash)"
+    },
+    {
+      "pattern": "gsd:quick",
+      "replacement": "gsd-quick",
+      "description": "Transform gsd:quick reference (without slash)"
+    },
+    {
+      "pattern": "gsd:whats-new",
+      "replacement": "gsd-whats-new",
+      "description": "Transform gsd:whats-new reference (without slash)"
+    },
+    {
+      "pattern": "gsd:help",
+      "replacement": "gsd-help",
+      "description": "Transform gsd:help reference (without slash)"
+    },
+    {
+      "pattern": "gsd:audit-milestone",
+      "replacement": "gsd-audit-milestone",
+      "description": "Transform gsd:audit-milestone reference (without slash)"
+    },
+    {
+      "pattern": "gsd:plan-milestone-gaps",
+      "replacement": "gsd-plan-milestone-gaps",
+      "description": "Transform gsd:plan-milestone-gaps reference (without slash)"
+    },
+    {
+      "pattern": "gsd:list-phase-assumptions",
+      "replacement": "gsd-list-phase-assumptions",
+      "description": "Transform gsd:list-phase-assumptions reference (without slash)"
+    },
+    {
+      "pattern": "TodoWrite",
+      "replacement": "todowrite",
+      "description": "Transform TodoWrite tool name to lowercase"
+    },
+    {
+      "pattern": "TodoRead",
+      "replacement": "todoread",
+      "description": "Transform TodoRead tool name to lowercase"
+    },
+    {
+      "pattern": "WebFetch",
+      "replacement": "webfetch",
+      "description": "Transform WebFetch tool name to lowercase"
+    },
+    {
+      "pattern": "WebSearch",
+      "replacement": "websearch",
+      "description": "Transform WebSearch tool name to lowercase"
+    },
+    {
+      "pattern": "BashOutput",
+      "replacement": "bashoutput",
+      "description": "Transform BashOutput tool name to lowercase"
+    },
+    {
+      "pattern": "AskUserQuestion",
+      "replacement": "question",
+      "description": "Transform AskUserQuestion to question"
+    },
+    {
+      "pattern": "SlashCommand",
+      "replacement": "command",
+      "description": "Transform SlashCommand to command"
+    },
+    {
+      "pattern": "Read",
+      "replacement": "read",
+      "description": "Transform Read tool name to lowercase"
+    },
+    {
+      "pattern": "Write",
+      "replacement": "write",
+      "description": "Transform Write tool name to lowercase"
+    },
+    {
+      "pattern": "Bash",
+      "replacement": "bash",
+      "description": "Transform Bash tool name to lowercase"
+    },
+    {
+      "pattern": "Glob",
+      "replacement": "glob",
+      "description": "Transform Glob tool name to lowercase"
+    },
+    {
+      "pattern": "Grep",
+      "replacement": "grep",
+      "description": "Transform Grep tool name to lowercase"
+    },
+    {
+      "pattern": "Edit",
+      "replacement": "edit",
+      "description": "Transform Edit tool name to lowercase"
+    },
+    {
+      "pattern": "Patch",
+      "replacement": "patch",
+      "description": "Transform Patch tool name to lowercase"
+    },
+    {
+      "pattern": "Skill",
+      "replacement": "skill",
+      "description": "Transform Skill tool name to lowercase"
+    },
+    {
+      "pattern": "Question",
+      "replacement": "question",
+      "description": "Transform Question tool name to lowercase"
+    },
+    {
+      "pattern": "<sub>",
+      "replacement": "*",
+      "description": "Transform opening sub tag to asterisk"
+    },
+    {
+      "pattern": "</sub>",
+      "replacement": "*",
+      "description": "Transform closing sub tag to asterisk"
+    },
+    {
+      "pattern": "/clear",
+      "replacement": "/new",
+      "description": "Transform /clear command to /new"
+    },
+    {
+      "pattern": "color: cyan",
+      "replacement": "color: \"#00FFFF\"",
+      "description": "Transform cyan color name to hex"
+    },
+    {
+      "pattern": "color: orange",
+      "replacement": "color: \"#FFA500\"",
+      "description": "Transform orange color name to hex"
+    },
+    {
+      "pattern": "color: yellow",
+      "replacement": "color: \"#FFFF00\"",
+      "description": "Transform yellow color name to hex"
+    },
+    {
+      "pattern": "color: blue",
+      "replacement": "color: \"#0000FF\"",
+      "description": "Transform blue color name to hex"
+    },
+    {
+      "pattern": "color: green",
+      "replacement": "color: \"#008000\"",
+      "description": "Transform green color name to hex"
+    },
+    {
+      "pattern": "color: purple",
+      "replacement": "color: \"#800080\"",
+      "description": "Transform purple color name to hex"
+    },
+    {
+      "pattern": "color: red",
+      "replacement": "color: \"#FF0000\"",
+      "description": "Transform red color name to hex"
+    },
+    {
+      "pattern": "color: magenta",
+      "replacement": "color: \"#FF00FF\"",
+      "description": "Transform magenta color name to hex"
+    },
+    {
+      "pattern": "color: white",
+      "replacement": "color: \"#FFFFFF\"",
+      "description": "Transform white color name to hex"
+    },
+    {
+      "pattern": "color: black",
+      "replacement": "color: \"#000000\"",
+      "description": "Transform black color name to hex"
+    },
+    {
+      "pattern": "subagent_type=\"Explore\"",
+      "replacement": "subagent_type=\"research\"",
+      "description": "Transform Explore subagent type to research"
+    },
+    {
+      "pattern": "subagent_type: Explore",
+      "replacement": "subagent_type: research",
+      "description": "Transform Explore subagent type to research (YAML format)"
+    },
+    {
+      "pattern": "general-purpose",
+      "replacement": "general purpose",
+      "description": "Transform hyphenated general-purpose to general purpose"
+    },
+    {
+      "pattern": "Claude Code",
+      "replacement": "OpenCode",
+      "description": "Transform Claude Code to OpenCode"
+    },
+    {
+      "pattern": "Claude",
+      "replacement": "OpenCode",
+      "description": "Transform Claude to OpenCode"
+    },
+    {
+      "pattern": "All arguments",
+      "replacement": "$ARGUMENTS",
+      "description": "Transform 'All arguments' variable to '$ARGUMENTS'"
+    },
+    {
+      "pattern": "tools: read, write, bash, grep, glob, webfetch, (optional MCP tool)",
+      "replacement": "tools:\n  read: true\n  write: true\n  bash: true\n  grep: true\n  glob: true\n  webfetch: true",
+      "description": "Convert comma-separated tools to YAML map format"
+    }
+  ],
+  "_forbidden_strings_after_translation": [
+    "Claude",
+    "Claude Code",
+    "<sub>",
+    "</sub>",
+    "general-purpose",
+    "subagent_type=\"Explore\"",
+    "subagent_type: Explore",
+    "~/.claude",
+    "/gsd:",
+    "gsd:",
+    "get-shit-done-cc",
+    "glittercowboy",
+    "gsd-build/get-shit-done",
+    "AskUserQuestion",
+    "SlashCommand",
+    "TodoWrite",
+    "TodoRead",
+    "WebSearch",
+    "WebFetch",
+    "BashOutput",
+    "rokicool/get-shit-done",
+    "/clear",
+    "color: cyan",
+    "color: orange",
+    "color: yellow",
+    "color: blue",
+    "color: green",
+    "color: purple",
+    "color: red",
+    "color: magenta",
+    "color: white",
+    "color: black",
+    "name: set-profile",
+    "name: gsd:",
+    "./original/get-shit-done"
+  ]
+}

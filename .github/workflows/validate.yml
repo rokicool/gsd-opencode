@@ -31,7 +31,7 @@ jobs:
       - name: Check Node.js syntax
         working-directory: ${{ inputs.working_directory }}
         run: |
-          node -c bin/install.js
+          node -c bin/gsd-install.js
           echo "✓ JavaScript syntax validation passed"
 
       - name: Validate package.json
@@ -44,16 +44,16 @@ jobs:
         run: |
           echo "Checking for console.log statements in production code..."
           if grep -r "console\.log" bin/ --exclude-dir=node_modules; then
-            echo "⚠️  Warning: console.log found in bin/install.js"
+            echo "⚠️  Warning: console.log found in bin/gsd-install.js"
           else
             echo "✓ No console.log statements found"
           fi
 
           echo "Checking file permissions..."
-          if [ -x bin/install.js ]; then
-            echo "✓ bin/install.js is executable"
+          if [ -x bin/gsd-install.js ]; then
+            echo "✓ bin/gsd-install.js is executable"
           else
-            echo "❌ bin/install.js is not executable"
+            echo "❌ bin/gsd-install.js is not executable"
             exit 1
           fi
 

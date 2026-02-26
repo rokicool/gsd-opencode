@@ -17,6 +17,9 @@ You are spawned by:
 
 Your job: Create a unified research summary that informs roadmap creation. Extract key findings, identify patterns across research files, and produce roadmap implications.
 
+**CRITICAL: Mandatory Initial read**
+If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+
 **Core responsibilities:**
 - read all 4 research files (STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md)
 - Synthesize findings into executive summary
@@ -52,10 +55,7 @@ cat .planning/research/FEATURES.md
 cat .planning/research/ARCHITECTURE.md
 cat .planning/research/PITFALLS.md
 
-# Check if planning docs should be committed (default: true)
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-# Auto-detect gitignored (overrides config)
-git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+# Planning config loaded via gsd-tools.cjs in commit step
 ```
 
 Parse each file to extract:
@@ -133,25 +133,8 @@ write to `.planning/research/SUMMARY.md`
 
 The 4 parallel researcher agents write files but do NOT commit. You commit everything together.
 
-**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Skipping planning docs commit (commit_docs: false)"
-
-**If `COMMIT_PLANNING_DOCS=true` (default):**
-
 ```bash
-git add .planning/research/
-git commit -m "docs: complete project research
-
-Files:
-- STACK.md
-- FEATURES.md
-- ARCHITECTURE.md
-- PITFALLS.md
-- SUMMARY.md
-
-Key findings:
-- Stack: [one-liner]
-- Architecture: [one-liner]
-- Critical pitfall: [one-liner]"
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: complete project research" --files .planning/research/
 ```
 
 ## Step 8: Return Summary

@@ -8,7 +8,7 @@ tools:
   bash: true
   grep: true
   glob: true
-  webfetch: true
+  websearch: true
 color: "#FFA500"
 ---
 
@@ -21,6 +21,9 @@ You are spawned by:
 - `diagnose-issues` workflow (parallel UAT diagnosis)
 
 Your job: Find the root cause through hypothesis testing, maintain debug file state, optionally fix and verify (depending on mode).
+
+**CRITICAL: Mandatory Initial read**
+If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 
 **Core responsibilities:**
 - Investigate autonomously (user reports symptoms, you find cause)
@@ -57,7 +60,7 @@ When debugging code you wrote, you're fighting your own mental model.
 
 **The discipline:**
 1. **Treat your code as foreign** - read it as if someone else wrote it
-2. **Question your design decisions** - Your implementation decisions are hypotheses, not facts
+2. **question your design decisions** - Your implementation decisions are hypotheses, not facts
 3. **Admit your mental model might be wrong** - The code's behavior is truth; your model is a guess
 4. **Prioritize code you touched** - If you modified 100 lines and something breaks, those are prime suspects
 
@@ -836,17 +839,17 @@ The file IS the debugging brain.
 ls .planning/debug/*.md 2>/dev/null | grep -v resolved
 ```
 
-**If active sessions exist AND no `$ARGUMENTS`:**
+**If active sessions exist AND no $ARGUMENTS:**
 - Display sessions with status, hypothesis, next action
 - Wait for user to select (number) or describe new issue (text)
 
-**If active sessions exist AND `$ARGUMENTS`:**
+**If active sessions exist AND $ARGUMENTS:**
 - Start new session (continue to create_debug_file)
 
-**If no active sessions AND no `$ARGUMENTS`:**
+**If no active sessions AND no $ARGUMENTS:**
 - Prompt: "No active sessions. Describe the issue to start."
 
-**If no active sessions AND `$ARGUMENTS`:**
+**If no active sessions AND $ARGUMENTS:**
 - Continue to create_debug_file
 </step>
 
@@ -857,7 +860,7 @@ ls .planning/debug/*.md 2>/dev/null | grep -v resolved
 2. `mkdir -p .planning/debug`
 3. Create file with initial state:
    - status: gathering
-   - trigger: verbatim `$ARGUMENTS`
+   - trigger: verbatim $ARGUMENTS
    - Current Focus: next_action = "gather symptoms"
    - Symptoms: empty
 4. Proceed to symptom_gathering
@@ -986,32 +989,27 @@ mkdir -p .planning/debug/resolved
 mv .planning/debug/{slug}.md .planning/debug/resolved/
 ```
 
-**Check planning config:**
+**Check planning config using state load (commit_docs is available from the output):**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
+INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state load)
+# commit_docs is in the JSON output
 ```
 
 **Commit the fix:**
 
-If `COMMIT_PLANNING_DOCS=true` (default):
+Stage and commit code changes (NEVER `git add -A` or `git add .`):
 ```bash
-git add -A
-git commit -m "fix: {brief description}
-
-Root cause: {root_cause}
-Debug session: .planning/debug/resolved/{slug}.md"
-```
-
-If `COMMIT_PLANNING_DOCS=false`:
-```bash
-# Only commit code changes, exclude .planning/
-git add -A
-git reset .planning/
+git add src/path/to/fixed-file.ts
+git add src/path/to/other-file.ts
 git commit -m "fix: {brief description}
 
 Root cause: {root_cause}"
+```
+
+Then commit planning docs via CLI (respects `commit_docs` config automatically):
+```bash
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: resolve debug {slug}" --files .planning/debug/resolved/{slug}.md
 ```
 
 Report completion and offer next steps.

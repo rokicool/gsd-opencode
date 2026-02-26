@@ -78,9 +78,9 @@ This runs in parallel - all gaps investigated simultaneously.
 For each gap, fill the debug-subagent-prompt template and spawn:
 
 ```
-Task(
-  prompt=filled_debug_subagent_prompt,
-  subagent_type="general",
+task(
+  prompt=filled_debug_subagent_prompt + "\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>",
+  subagent_type="task",
   description="Debug: {truth_short}"
 )
 ```
@@ -156,21 +156,9 @@ For each gap in the Gaps section, add artifacts and missing fields:
 
 Update status in frontmatter to "diagnosed".
 
-**Check planning config:**
-
-```bash
-COMMIT_PLANNING_DOCS=$(cat .planning/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-git check-ignore -q .planning 2>/dev/null && COMMIT_PLANNING_DOCS=false
-```
-
-**If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
-
-**If `COMMIT_PLANNING_DOCS=true` (default):**
-
 Commit the updated UAT.md:
 ```bash
-git add ".planning/phases/XX-name/{phase}-UAT.md"
-git commit -m "docs({phase}): add root causes from diagnosis"
+node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs({phase_num}): add root causes from diagnosis" --files ".planning/phases/XX-name/{phase_num}-UAT.md"
 ```
 </step>
 
@@ -201,21 +189,8 @@ Do NOT offer manual next steps - verify-work handles the rest.
 </process>
 
 <context_efficiency>
-**Orchestrator context:** ~15%
-- Parse UAT.md gaps
-- Fill template strings
-- Spawn parallel Task calls
-- Collect results
-- Update UAT.md
-
-**Each debug agent:** Fresh 200k context
-- Loads full debug workflow
-- Loads debugging references
-- Investigates with full capacity
-- Returns root cause
-
-**No symptom gathering.** Agents start with symptoms pre-filled from UAT.
-**No fix application.** Agents only diagnose - plan-phase --gaps handles fixes.
+Agents start with symptoms pre-filled from UAT (no symptom gathering).
+Agents only diagnose—plan-phase --gaps handles fixes (no fix application).
 </context_efficiency>
 
 <failure_handling>

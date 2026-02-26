@@ -22,14 +22,14 @@ Template for spawning gsd-planner agent. The agent contains all planning experti
 @.planning/REQUIREMENTS.md
 
 **Phase Context (if exists):**
-@.planning/phases/{phase_dir}/{phase}-CONTEXT.md
+@.planning/phases/{phase_dir}/{phase_num}-CONTEXT.md
 
 **Research (if exists):**
-@.planning/phases/{phase_dir}/{phase}-RESEARCH.md
+@.planning/phases/{phase_dir}/{phase_num}-RESEARCH.md
 
 **Gap Closure (if --gaps mode):**
-@.planning/phases/{phase_dir}/{phase}-VERIFICATION.md
-@.planning/phases/{phase_dir}/{phase}-UAT.md
+@.planning/phases/{phase_dir}/{phase_num}-VERIFICATION.md
+@.planning/phases/{phase_dir}/{phase_num}-UAT.md
 
 </planning_context>
 
@@ -70,7 +70,7 @@ Before returning PLANNING COMPLETE:
 
 **From /gsd-plan-phase (standard mode):**
 ```python
-Task(
+task(
   prompt=filled_template,
   subagent_type="gsd-planner",
   description="Plan Phase {phase}"
@@ -79,7 +79,7 @@ Task(
 
 **From /gsd-plan-phase --gaps (gap closure mode):**
 ```python
-Task(
+task(
   prompt=filled_template,  # with mode: gap_closure
   subagent_type="gsd-planner",
   description="Plan gaps for Phase {phase}"

@@ -101,6 +101,12 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **MIGRATE-02**: Migration is atomic with rollback capability
 - [x] **MIGRATE-03**: Migration updates manifest paths
 
+### Distribution Manager Migration (Phase 11)
+
+- [x] **MIGRATE-04**: Files are moved with git mv preserving history
+- [x] **MIGRATE-05**: Entry point imports and package.json are updated
+- [x] **MIGRATE-06**: All tests pass and CLI commands work after migration
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.

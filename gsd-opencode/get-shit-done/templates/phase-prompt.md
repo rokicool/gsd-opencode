@@ -20,6 +20,7 @@ wave: N                     # Execution wave (1, 2, 3...). Pre-computed at plan 
 depends_on: []              # Plan IDs this plan requires (e.g., ["01-01"]).
 files_modified: []          # Files this plan modifies.
 autonomous: true            # false if plan has checkpoints requiring user interaction
+requirements: []            # REQUIRED — Requirement IDs from ROADMAP this plan addresses. MUST NOT be empty.
 user_setup: []              # Human-required setup OpenCode cannot automate (see below)
 
 # Goal-backward verification (derived during planning, verified after execution)
@@ -60,7 +61,7 @@ Output: [What artifacts will be created]
 <tasks>
 
 <task type="auto">
-  <name>Task 1: [Action-oriented name]</name>
+  <name>task 1: [Action-oriented name]</name>
   <files>path/to/file.ext, another/file.ext</files>
   <action>[Specific implementation - what to do, how to do it, what to avoid and WHY]</action>
   <verify>[Command or check to prove it worked]</verify>
@@ -68,7 +69,7 @@ Output: [What artifacts will be created]
 </task>
 
 <task type="auto">
-  <name>Task 2: [Action-oriented name]</name>
+  <name>task 2: [Action-oriented name]</name>
   <files>path/to/file.ext</files>
   <action>[Specific implementation]</action>
   <verify>[Command or check]</verify>
@@ -129,6 +130,7 @@ After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 | `depends_on` | Yes | Array of plan IDs this plan requires. |
 | `files_modified` | Yes | Files this plan touches. |
 | `autonomous` | Yes | `true` if no checkpoints, `false` if has checkpoints |
+| `requirements` | Yes | **MUST** list requirement IDs from ROADMAP. Every roadmap requirement MUST appear in at least one plan. |
 | `user_setup` | No | Array of human-required setup items (external services) |
 | `must_haves` | Yes | Goal-backward verification criteria (see below) |
 
@@ -272,7 +274,7 @@ See `~/.config/opencode/get-shit-done/references/tdd.md` for TDD plan structure.
 
 ---
 
-## Task Types
+## task Types
 
 | Type | Use For | Autonomy |
 |------|---------|----------|
@@ -320,7 +322,7 @@ Output: User model, API endpoints, and UI components.
 
 <tasks>
 <task type="auto">
-  <name>Task 1: Create User model</name>
+  <name>task 1: Create User model</name>
   <files>src/features/user/model.ts</files>
   <action>Define User type with id, email, name, createdAt. Export TypeScript interface.</action>
   <verify>tsc --noEmit passes</verify>
@@ -328,7 +330,7 @@ Output: User model, API endpoints, and UI components.
 </task>
 
 <task type="auto">
-  <name>Task 2: Create User API endpoints</name>
+  <name>task 2: Create User API endpoints</name>
   <files>src/features/user/api.ts</files>
   <action>GET /users (list), GET /users/:id (single), POST /users (create). Use User type from model.</action>
   <verify>curl tests pass for all endpoints</verify>
@@ -386,7 +388,7 @@ Output: Working dashboard component.
 
 <tasks>
 <task type="auto">
-  <name>Task 1: Build Dashboard layout</name>
+  <name>task 1: Build Dashboard layout</name>
   <files>src/components/Dashboard.tsx</files>
   <action>Create responsive grid with UserList and ProductList components. Use Tailwind for styling.</action>
   <verify>npm run build succeeds</verify>
@@ -553,7 +555,7 @@ must_haves:
 
 **Why this matters:**
 
-Task completion ≠ Goal achievement. A task "create chat component" can complete by creating a placeholder. The `must_haves` field captures what must actually work, enabling verification to catch gaps before they compound.
+task completion ≠ Goal achievement. A task "create chat component" can complete by creating a placeholder. The `must_haves` field captures what must actually work, enabling verification to catch gaps before they compound.
 
 **Verification flow:**
 

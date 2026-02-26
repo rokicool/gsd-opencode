@@ -1,0 +1,618 @@
+{
+  "patterns": ["gsd-opencode/**/*.md"],
+  "exclude": ["node_modules/**", ".git/**", "**/*.bak"],
+  "rules": [
+    {
+      "pattern": "https://raw.githubusercontent.com/glittercowboy/get-shit-done",
+      "replacement": "https://raw.githubusercontent.com/rokicool/gsd-opencode",
+      "description": "Transform raw GitHub URLs from glittercowboy to rokicool"
+    },
+    {
+      "pattern": "https://github.com/glittercowboy/get-shit-done",
+      "replacement": "https://github.com/rokicool/gsd-opencode",
+      "description": "Transform GitHub URLs from glittercowboy to rokicool"
+    },
+    {
+      "pattern": "https://raw.githubusercontent.com/gsd-build/get-shit-done",
+      "replacement": "https://raw.githubusercontent.com/rokicool/gsd-opencode",
+      "description": "Transform raw GitHub URLs from gsd-build to rokicool"
+    },
+    {
+      "pattern": "https://github.com/gsd-build/get-shit-done",
+      "replacement": "https://github.com/rokicool/gsd-opencode",
+      "description": "Transform GitHub URLs from gsd-build to rokicool"
+    },
+    {
+      "pattern": "rokicool/get-shit-done",
+      "replacement": "rokicool/gsd-opencode",
+      "description": "Transform repository references from get-shit-done to gsd-opencode"
+    },
+    {
+      "pattern": "get-shit-done-cc",
+      "replacement": "gsd-opencode",
+      "description": "Transform project name references from get-shit-done-cc to gsd-opencode"
+    },
+    {
+      "pattern": "glittercowboy",
+      "replacement": "rokicool",
+      "description": "Transform username references from glittercowboy to rokicool"
+    },
+    {
+      "pattern": "name: set-profile",
+      "replacement": "name: gsd-set-profile",
+      "description": "Transform set-profile command name to include gsd- prefix"
+    },
+    {
+      "pattern": "name: gsd:",
+      "replacement": "name: gsd-",
+      "description": "Transform frontmatter name field from colon to dash format"
+    },
+    {
+      "pattern": "/gsd:new-project",
+      "replacement": "/gsd-new-project",
+      "description": "Transform gsd:new-project command to gsd-new-project"
+    },
+    {
+      "pattern": "/gsd:new-milestone",
+      "replacement": "/gsd-new-milestone",
+      "description": "Transform gsd:new-milestone command to gsd-new-milestone"
+    },
+    {
+      "pattern": "/gsd:complete-milestone",
+      "replacement": "/gsd-complete-milestone",
+      "description": "Transform gsd:complete-milestone command to gsd-complete-milestone"
+    },
+    {
+      "pattern": "/gsd:add-phase",
+      "replacement": "/gsd-add-phase",
+      "description": "Transform gsd:add-phase command to gsd-add-phase"
+    },
+    {
+      "pattern": "/gsd:insert-phase",
+      "replacement": "/gsd-insert-phase",
+      "description": "Transform gsd:insert-phase command to gsd-insert-phase"
+    },
+    {
+      "pattern": "/gsd:remove-phase",
+      "replacement": "/gsd-remove-phase",
+      "description": "Transform gsd:remove-phase command to gsd-remove-phase"
+    },
+    {
+      "pattern": "/gsd:plan-phase",
+      "replacement": "/gsd-plan-phase",
+      "description": "Transform gsd:plan-phase command to gsd-plan-phase"
+    },
+    {
+      "pattern": "/gsd:execute-phase",
+      "replacement": "/gsd-execute-phase",
+      "description": "Transform gsd:execute-phase command to gsd-execute-phase"
+    },
+    {
+      "pattern": "/gsd:research-phase",
+      "replacement": "/gsd-research-phase",
+      "description": "Transform gsd:research-phase command to gsd-research-phase"
+    },
+    {
+      "pattern": "/gsd:verify-phase",
+      "replacement": "/gsd-verify-phase",
+      "description": "Transform gsd:verify-phase command to gsd-verify-phase"
+    },
+    {
+      "pattern": "/gsd:discuss-phase",
+      "replacement": "/gsd-discuss-phase",
+      "description": "Transform gsd:discuss-phase command to gsd-discuss-phase"
+    },
+    {
+      "pattern": "/gsd:verify-work",
+      "replacement": "/gsd-verify-work",
+      "description": "Transform gsd:verify-work command to gsd-verify-work"
+    },
+    {
+      "pattern": "/gsd:map-codebase",
+      "replacement": "/gsd-map-codebase",
+      "description": "Transform gsd:map-codebase command to gsd-map-codebase"
+    },
+    {
+      "pattern": "/gsd:add-todo",
+      "replacement": "/gsd-add-todo",
+      "description": "Transform gsd:add-todo command to gsd-add-todo"
+    },
+    {
+      "pattern": "/gsd:check-todos",
+      "replacement": "/gsd-check-todos",
+      "description": "Transform gsd:check-todos command to gsd-check-todos"
+    },
+    {
+      "pattern": "/gsd:debug",
+      "replacement": "/gsd-debug",
+      "description": "Transform gsd:debug command to gsd-debug"
+    },
+    {
+      "pattern": "/gsd:progress",
+      "replacement": "/gsd-progress",
+      "description": "Transform gsd:progress command to gsd-progress"
+    },
+    {
+      "pattern": "/gsd:settings",
+      "replacement": "/gsd-settings",
+      "description": "Transform gsd:settings command to gsd-settings"
+    },
+    {
+      "pattern": "/gsd:set-profile",
+      "replacement": "/gsd-set-profile",
+      "description": "Transform gsd:set-profile command to gsd-set-profile"
+    },
+    {
+      "pattern": "/gsd:update",
+      "replacement": "/gsd-update",
+      "description": "Transform gsd:update command to gsd-update"
+    },
+    {
+      "pattern": "/gsd:pause-work",
+      "replacement": "/gsd-pause-work",
+      "description": "Transform gsd:pause-work command to gsd-pause-work"
+    },
+    {
+      "pattern": "/gsd:resume-work",
+      "replacement": "/gsd-resume-work",
+      "description": "Transform gsd:resume-work command to gsd-resume-work"
+    },
+    {
+      "pattern": "/gsd:quick",
+      "replacement": "/gsd-quick",
+      "description": "Transform gsd:quick command to gsd-quick"
+    },
+    {
+      "pattern": "/gsd:whats-new",
+      "replacement": "/gsd-whats-new",
+      "description": "Transform gsd:whats-new command to gsd-whats-new"
+    },
+    {
+      "pattern": "/gsd:help",
+      "replacement": "/gsd-help",
+      "description": "Transform gsd:help command to gsd-help"
+    },
+    {
+      "pattern": "/gsd:audit-milestone",
+      "replacement": "/gsd-audit-milestone",
+      "description": "Transform gsd:audit-milestone command to gsd-audit-milestone"
+    },
+    {
+      "pattern": "/gsd:plan-milestone-gaps",
+      "replacement": "/gsd-plan-milestone-gaps",
+      "description": "Transform gsd:plan-milestone-gaps command to gsd-plan-milestone-gaps"
+    },
+    {
+      "pattern": "/gsd:list-phase-assumptions",
+      "replacement": "/gsd-list-phase-assumptions",
+      "description": "Transform gsd:list-phase-assumptions command to gsd-list-phase-assumptions"
+    },
+    {
+      "pattern": "/gsd:command",
+      "replacement": "/gsd-command",
+      "description": "Transform generic gsd:command references"
+    },
+    {
+      "pattern": "/gsd:",
+      "replacement": "/gsd-",
+      "description": "Transform any remaining gsd: prefix to gsd-"
+    },
+    {
+      "pattern": "gsd:plan-phase",
+      "replacement": "gsd-plan-phase",
+      "description": "Transform gsd:plan-phase agent/command reference"
+    },
+    {
+      "pattern": "gsd:execute-phase",
+      "replacement": "gsd-execute-phase",
+      "description": "Transform gsd:execute-phase agent/command reference"
+    },
+    {
+      "pattern": "gsd:research-phase",
+      "replacement": "gsd-research-phase",
+      "description": "Transform gsd:research-phase agent/command reference"
+    },
+    {
+      "pattern": "gsd:verify-phase",
+      "replacement": "gsd-verify-phase",
+      "description": "Transform gsd:verify-phase agent/command reference"
+    },
+    {
+      "pattern": "gsd:discuss-phase",
+      "replacement": "gsd-discuss-phase",
+      "description": "Transform gsd:discuss-phase agent/command reference"
+    },
+    {
+      "pattern": "gsd:new-project",
+      "replacement": "gsd-new-project",
+      "description": "Transform gsd:new-project agent/command reference"
+    },
+    {
+      "pattern": "gsd:new-milestone",
+      "replacement": "gsd-new-milestone",
+      "description": "Transform gsd:new-milestone agent/command reference"
+    },
+    {
+      "pattern": "gsd:complete-milestone",
+      "replacement": "gsd-complete-milestone",
+      "description": "Transform gsd:complete-milestone agent/command reference"
+    },
+    {
+      "pattern": "gsd:add-phase",
+      "replacement": "gsd-add-phase",
+      "description": "Transform gsd:add-phase agent/command reference"
+    },
+    {
+      "pattern": "gsd:insert-phase",
+      "replacement": "gsd-insert-phase",
+      "description": "Transform gsd:insert-phase agent/command reference"
+    },
+    {
+      "pattern": "gsd:remove-phase",
+      "replacement": "gsd-remove-phase",
+      "description": "Transform gsd:remove-phase agent/command reference"
+    },
+    {
+      "pattern": "gsd:add-todo",
+      "replacement": "gsd-add-todo",
+      "description": "Transform gsd:add-todo agent/command reference"
+    },
+    {
+      "pattern": "gsd:check-todos",
+      "replacement": "gsd-check-todos",
+      "description": "Transform gsd:check-todos agent/command reference"
+    },
+    {
+      "pattern": "gsd:debug",
+      "replacement": "gsd-debug",
+      "description": "Transform gsd:debug agent/command reference"
+    },
+    {
+      "pattern": "gsd:map-codebase",
+      "replacement": "gsd-map-codebase",
+      "description": "Transform gsd:map-codebase agent/command reference"
+    },
+    {
+      "pattern": "gsd:verify-work",
+      "replacement": "gsd-verify-work",
+      "description": "Transform gsd:verify-work agent/command reference"
+    },
+    {
+      "pattern": "gsd:progress",
+      "replacement": "gsd-progress",
+      "description": "Transform gsd:progress agent/command reference"
+    },
+    {
+      "pattern": "gsd:settings",
+      "replacement": "gsd-settings",
+      "description": "Transform gsd:settings agent/command reference"
+    },
+    {
+      "pattern": "gsd:set-profile",
+      "replacement": "gsd-set-profile",
+      "description": "Transform gsd:set-profile agent/command reference"
+    },
+    {
+      "pattern": "gsd:update",
+      "replacement": "gsd-update",
+      "description": "Transform gsd:update agent/command reference"
+    },
+    {
+      "pattern": "gsd:pause-work",
+      "replacement": "gsd-pause-work",
+      "description": "Transform gsd:pause-work agent/command reference"
+    },
+    {
+      "pattern": "gsd:resume-work",
+      "replacement": "gsd-resume-work",
+      "description": "Transform gsd:resume-work agent/command reference"
+    },
+    {
+      "pattern": "gsd:quick",
+      "replacement": "gsd-quick",
+      "description": "Transform gsd:quick agent/command reference"
+    },
+    {
+      "pattern": "gsd:whats-new",
+      "replacement": "gsd-whats-new",
+      "description": "Transform gsd:whats-new agent/command reference"
+    },
+    {
+      "pattern": "gsd:help",
+      "replacement": "gsd-help",
+      "description": "Transform gsd:help agent/command reference"
+    },
+    {
+      "pattern": "gsd:audit-milestone",
+      "replacement": "gsd-audit-milestone",
+      "description": "Transform gsd:audit-milestone agent/command reference"
+    },
+    {
+      "pattern": "gsd:plan-milestone-gaps",
+      "replacement": "gsd-plan-milestone-gaps",
+      "description": "Transform gsd:plan-milestone-gaps agent/command reference"
+    },
+    {
+      "pattern": "gsd:list-phase-assumptions",
+      "replacement": "gsd-list-phase-assumptions",
+      "description": "Transform gsd:list-phase-assumptions agent/command reference"
+    },
+    {
+      "pattern": "~/.claude/get-shit-done/",
+      "replacement": "~/.config/opencode/get-shit-done/",
+      "description": "Transform specific path with get-shit-done"
+    },
+    {
+      "pattern": "~/.claude/",
+      "replacement": "~/.config/opencode/",
+      "description": "Transform Claude config path to OpenCode config path"
+    },
+    {
+      "pattern": "~/.claude",
+      "replacement": "~/.config/opencode",
+      "description": "Transform Claude config path to OpenCode config path (no trailing slash)"
+    },
+    {
+      "pattern": "WebFetch",
+      "replacement": "webfetch",
+      "description": "Transform WebFetch tool name to lowercase"
+    },
+    {
+      "pattern": "WebSearch",
+      "replacement": "websearch",
+      "description": "Transform WebSearch tool name to lowercase"
+    },
+    {
+      "pattern": "TodoWrite",
+      "replacement": "todowrite",
+      "description": "Transform TodoWrite tool name to lowercase"
+    },
+    {
+      "pattern": "TodoRead",
+      "replacement": "todoread",
+      "description": "Transform TodoRead tool name to lowercase"
+    },
+    {
+      "pattern": "BashOutput",
+      "replacement": "bashoutput",
+      "description": "Transform BashOutput tool name to lowercase"
+    },
+    {
+      "pattern": "AskUserQuestion",
+      "replacement": "question",
+      "description": "Transform AskUserQuestion to question"
+    },
+    {
+      "pattern": "SlashCommand",
+      "replacement": "command",
+      "description": "Transform SlashCommand to command"
+    },
+    {
+      "pattern": "Read",
+      "replacement": "read",
+      "description": "Transform Read tool name to lowercase"
+    },
+    {
+      "pattern": "Write",
+      "replacement": "write",
+      "description": "Transform Write tool name to lowercase"
+    },
+    {
+      "pattern": "Bash",
+      "replacement": "bash",
+      "description": "Transform Bash tool name to lowercase"
+    },
+    {
+      "pattern": "Glob",
+      "replacement": "glob",
+      "description": "Transform Glob tool name to lowercase"
+    },
+    {
+      "pattern": "Grep",
+      "replacement": "grep",
+      "description": "Transform Grep tool name to lowercase"
+    },
+    {
+      "pattern": "Edit",
+      "replacement": "edit",
+      "description": "Transform Edit tool name to lowercase"
+    },
+    {
+      "pattern": "Patch",
+      "replacement": "patch",
+      "description": "Transform Patch tool name to lowercase"
+    },
+    {
+      "pattern": "Skill",
+      "replacement": "skill",
+      "description": "Transform Skill tool name to lowercase"
+    },
+    {
+      "pattern": "Question",
+      "replacement": "question",
+      "description": "Transform Question tool name to lowercase"
+    },
+    {
+      "pattern": "<sub>",
+      "replacement": "*",
+      "description": "Transform opening sub tag to asterisk"
+    },
+    {
+      "pattern": "</sub>",
+      "replacement": "*",
+      "description": "Transform closing sub tag to asterisk"
+    },
+    {
+      "pattern": "/clear",
+      "replacement": "/new",
+      "description": "Transform /clear command to /new"
+    },
+    {
+      "pattern": "color: cyan",
+      "replacement": "color: \"#00FFFF\"",
+      "description": "Transform cyan color name to hex"
+    },
+    {
+      "pattern": "color: orange",
+      "replacement": "color: \"#FFA500\"",
+      "description": "Transform orange color name to hex"
+    },
+    {
+      "pattern": "color: yellow",
+      "replacement": "color: \"#FFFF00\"",
+      "description": "Transform yellow color name to hex"
+    },
+    {
+      "pattern": "color: blue",
+      "replacement": "color: \"#0000FF\"",
+      "description": "Transform blue color name to hex"
+    },
+    {
+      "pattern": "color: green",
+      "replacement": "color: \"#008000\"",
+      "description": "Transform green color name to hex"
+    },
+    {
+      "pattern": "color: purple",
+      "replacement": "color: \"#800080\"",
+      "description": "Transform purple color name to hex"
+    },
+    {
+      "pattern": "subagent_type=\"Explore\"",
+      "replacement": "subagent_type=\"research\"",
+      "description": "Transform Explore subagent type to research"
+    },
+    {
+      "pattern": "general-purpose",
+      "replacement": "general purpose",
+      "description": "Transform hyphenated general-purpose to general purpose"
+    },
+    {
+      "pattern": "Claude Code",
+      "replacement": "OpenCode",
+      "description": "Transform Claude Code to OpenCode"
+    },
+    {
+      "pattern": "Claude",
+      "replacement": "OpenCode",
+      "description": "Transform Claude to OpenCode"
+    },
+    {
+      "pattern": "All arguments become",
+      "replacement": "$ARGUMENTS become",
+      "description": "Transform 'All arguments' to '$ARGUMENTS'"
+    },
+    {
+      "pattern": "tools: Read, Bash, Grep, Glob, Write",
+      "replacement": "tools:\\n  read: true\\n  bash: true\\n  grep: true\\n  glob: true\\n  write: true",
+      "description": "Convert gsd-codebase-mapper tools to YAML map format"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash, Glob, Grep, Webfetch, mcp__context7__\\*",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  glob: true\\n  grep: true\\n  webfetch: true\\n  mcp__context7__\\*: true",
+      "description": "Convert gsd-planner tools to YAML map format"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash, Glob, Grep, Websearch, Webfetch, mcp__context7__\\*",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  glob: true\\n  grep: true\\n  websearch: true\\n  webfetch: true\\n  mcp__context7__\\*: true",
+      "description": "Convert gsd-project-researcher tools to YAML map format"
+    },
+    {
+      "pattern": "tools: Read, Bash, Glob, Grep",
+      "replacement": "tools:\\n  read: true\\n  bash: true\\n  glob: true\\n  grep: true",
+      "description": "Convert gsd-plan-checker tools to YAML map format"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash, Grep, Glob, Websearch, Webfetch, mcp__context7__\\*",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  grep: true\\n  glob: true\\n  websearch: true\\n  webfetch: true\\n  mcp__context7__\\*: true",
+      "description": "Convert gsd-phase-researcher tools to YAML map format"
+    },
+    {
+      "pattern": "tools: Read, Bash, Grep, Glob",
+      "replacement": "tools:\\n  read: true\\n  bash: true\\n  grep: true\\n  glob: true",
+      "description": "Convert gsd-integration-checker tools to YAML map format"
+    },
+    {
+      "pattern": "tools: Read, Write, Edit, Bash, Grep, Glob",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  edit: true\\n  bash: true\\n  grep: true\\n  glob: true",
+      "description": "Convert gsd-executor tools to YAML map format"
+    },
+    {
+      "pattern": "tools: Read, Write, Edit, Bash, Grep, Glob, Websearch",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  edit: true\\n  bash: true\\n  grep: true\\n  glob: true\\n  websearch: true",
+      "description": "Convert gsd-debugger tools to YAML map format"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash, Grep, Glob",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  grep: true\\n  glob: true",
+      "description": "Convert gsd-verifier tools to YAML map format"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash, Glob, Grep",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true\\n  glob: true\\n  grep: true",
+      "description": "Convert gsd-roadmapper tools to YAML map format"
+    },
+    {
+      "pattern": "tools: Read, Write, Bash",
+      "replacement": "tools:\\n  read: true\\n  write: true\\n  bash: true",
+      "description": "Convert gsd-research-synthesizer tools to YAML map format"
+    },
+    {
+      "pattern": "grep: true, Webfetch, mcp__context7__\\*",
+      "replacement": "grep: true\\n  webfetch: true\\n  mcp__context7__\\*: true",
+      "description": "Fix partial gsd-planner frontmatter"
+    },
+    {
+      "pattern": "glob: true, Websearch, Webfetch, mcp__context7__\\*",
+      "replacement": "glob: true\\n  websearch: true\\n  webfetch: true\\n  mcp__context7__\\*: true",
+      "description": "Fix partial gsd-project-researcher frontmatter"
+    },
+    {
+      "pattern": "glob: true, Websearch",
+      "replacement": "glob: true\\n  websearch: true",
+      "description": "Fix partial gsd-debugger frontmatter"
+    },
+    {
+      "pattern": "grep: true, Webfetch, mcp__context7__\\*",
+      "replacement": "grep: true\\n  webfetch: true\\n  mcp__context7__\\*: true",
+      "description": "Fix remaining gsd-planner frontmatter"
+    },
+    {
+      "pattern": "  webfetch: true, mcp__context7__\\*",
+      "replacement": "  webfetch: true\\n  mcp__context7__\\*: true",
+      "description": "Fix remaining gsd-project-researcher and gsd-phase-researcher frontmatter"
+    },
+    {
+      "pattern": "  grep: true, Webfetch, mcp__context7__\\*",
+      "replacement": "  grep: true\\n  webfetch: true\\n  mcp__context7__\\*: true",
+      "description": "Fix gsd-planner frontmatter with capitalized Webfetch"
+    }
+  ],
+  "_forbidden_strings_after_translation": [
+    "Claude",
+    "Claude Code",
+    "<sub>",
+    "general-purpose",
+    "subagent_type=\"Explore\"",
+    "~/.claude",
+    "/gsd:",
+    "get-shit-done-cc",
+    "glittercowboy",
+    "AskUserQuestion",
+    "All arguments become",
+    "/clear",
+    "SlashCommand",
+    "TodoWrite",
+    "WebSearch",
+    "WebFetch",
+    "BashOutput",
+    "rokicool/get-shit-done",
+    "color: cyan",
+    "color: orange",
+    "color: yellow",
+    "color: blue",
+    "color: green",
+    "color: purple",
+    "name: set-profile"
+  ]
+}

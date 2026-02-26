@@ -379,13 +379,18 @@ Plans:
 | Phase | Goal | Requirements | Status | Started | Completed |
 |-------|------|--------------|--------|---------|-----------|
 | 1 | Core CLI & Installation | 22 | 🟢 Completed | 2026-02-09 | 2026-02-09 |
-| 2 | Uninstall & Configuration | 10 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
+| 2 | Uninstall & Configuration | 10 | 🟢 Completed | Complete    | 2026-02-19 |
 | 3 | Health Verification | 6 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
 | 4 | Self-Healing | 6 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
 | 5 | Lifecycle Management | 6 | 🟢 Completed | 2026-02-10 | 2026-02-10 |
 | 6 | Integration & Polish | 2 | 🟢 Completed | 2026-02-10 | 2026-02-11 |
 | 7 | Make Uninstall Safe and User-Friendly | 5 | 🟢 Completed | 2026-02-11 | 2026-02-11 |
 | 8 | Support for opencode/commands/ Directory Structure | 6 | 🟢 Completed | 2026-02-11 | 2026-02-11 |
+| 9 | Fix Support for Local Install | 4 | 🟢 Completed | 2026-02-17 | 2026-02-17 |
+| 10 | Create Node.js script to translate gsd to gsd-opencode | 6 | 🟢 Completed | 2026-02-18 | 2026-02-18 |
+| 11 | Migrate Distribution Manager Code | 3 | 🟢 Completed | 2026-02-21 | 2026-02-21 |
+| 12 | Simple Profiles System | 6 | 🟡 In Progress | 2026-02-22 | — |
+| 13 | 3/3 | Complete    | 2026-02-22 | 2026-02-22 | — |
 
 **Legend:** 🔵 Planned | 🟡 In Progress | 🟢 Completed | ⭕ Blocked
 
@@ -394,9 +399,9 @@ Plans:
 ## Coverage
 
 **v1 Requirements:** 52 total
-**Phase 8 Requirements:** 6 new
-**Total Requirements:** 58
-**Mapped to Phases:** 58
+**Phase 8-13 Requirements:** 37 new
+**Total Requirements:** 89
+**Mapped to Phases:** 89
 **Unmapped:** 0 ✓
 
 ### By Phase
@@ -411,7 +416,11 @@ Plans:
 | Phase 6 | INST-04 (comprehensive testing) | 2 |
 | Phase 7 | UNIN-06 to UNIN-10 (safety enhancements) | 5 |
 | Phase 8 | INST-11, UPDATE-07, CHECK-06, MIGRATE-01-03 | 6 |
-| Phase 8 | TBD (support opencode/commands/ directory) | TBD |
+| Phase 9 | LOCAL-01 to LOCAL-04 | 4 |
+| Phase 10 | TRANS-01 to TRANS-06 | 6 |
+| Phase 11 | MIGRATE-04 to MIGRATE-06 | 3 |
+| Phase 12 | PROF-01 to PROF-06 | 6 |
+| Phase 13 | CFOS-01 to CFOS-12 | 12 |
 
 ### Phase 9: fix support for local install
 
@@ -422,7 +431,152 @@ Plans:
 Plans:
 - [ ] 09-01-PLAN.md — Fix path replacement for local scope (NOT DONE - needs rework)
 
+### Phase 10: Create Node.js script to translate gsd to gsd-opencode
+
+**Goal:** Create a utility script that translates/replaces references from "gsd" to "gsd-opencode" in files for migration purposes
+**Depends on:** Phase 9
+**Plans:** 1/1 plans complete
+
+**Requirements:**
+| ID | Requirement |
+|----|-------------|
+| TRANS-01 | Script accepts file paths or glob patterns as input |
+| TRANS-02 | Script supports dry-run mode to preview changes |
+| TRANS-03 | Script supports in-place editing or output to new files |
+| TRANS-04 | Script handles various file types (md, js, json, yaml, etc.) |
+| TRANS-05 | Script provides clear output about what was changed |
+| TRANS-06 | Script has comprehensive tests |
+
+**Success Criteria:**
+1. User can run `gsd-opencode translate "*.md"` to translate all markdown files
+2. Dry-run mode shows preview without modifying files
+3. Output directory mode preserves originals and writes to new location
+4. In-place mode modifies files directly
+5. Pattern matching respects word boundaries (no partial matches)
+6. Case preservation works (GSD -> GSD-OPENCODE)
+7. Clear output shows files processed and replacement counts
+8. All unit and integration tests pass
+
+**Wave Structure:**
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 10-01 | Complete translation utility with TextTranslator service, CLI command, and tests |
+
+Plans:
+- [x] 10-01-PLAN.md — Create translation utility with TextTranslator service, CLI command, standalone script, and comprehensive tests
+
+### Phase 11: Migrate Distribution manager code
+
+**Goal:** Consolidate gsd-opencode/lib, gsd-opencode/src, and gsd-opencode/test into gsd-opencode/bin/dm
+
+**Depends on:** Phase 10
+
+**Requirements:**
+| ID | Requirement |
+|----|-------------|
+| MIGRATE-04 | Files are moved with git mv preserving history |
+| MIGRATE-05 | Entry point imports and package.json are updated |
+| MIGRATE-06 | All tests pass and CLI commands work after migration |
+
+**Success Criteria:**
+1. All files moved from lib/, src/, test/ to bin/dm/ subdirectories
+2. Entry points (bin/gsd.js) import from correct new paths
+3. package.json files array reflects new structure
+4. All tests pass after migration
+5. CLI commands work correctly (install, list, check, etc.)
+6. npm pack produces correct package contents
+
+**Plans:** 3/3 plans complete
+
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 11-01 | Create directory structure and move files with git mv |
+| 2 | 11-02 | Update entry point imports and package.json |
+| 3 | 11-03 | Verification and testing |
+
+Plans:
+- [ ] 11-01-PLAN.md — Create directory structure and move files with git mv
+- [ ] 11-02-PLAN.md — Update entry point imports and package.json
+- [ ] 11-03-PLAN.md — Verify tests pass and CLI works
+
+### Phase 12: Simple Profiles System
+
+**Goal:** Simple profiles system for OpenCode model configuration with Simple/Smart/Custom profile types
+**Depends on:** Phase 11
+**Plans:** 3/4 plans executed
+
+**Requirements:**
+| ID | Requirement |
+|----|-------------|
+| PROF-01 | Define profile config schema in `.planning/config.json` |
+| PROF-02 | Implement first-run wizard triggered by settings/new-project/set-profile |
+| PROF-03 | Create profile switching with model reuse option |
+| PROF-04 | Auto-migrate old quality/balanced/budget configs |
+| PROF-05 | Update gsd-tools.cjs resolveModel to read new schema |
+| PROF-06 | Derive opencode.json agent assignments from profile |
+
+**Wave Structure:**
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 12-01 | Schema and model resolution foundation |
+| 2 | 12-02 | Migration and opencode.json derivation |
+| 3 | 12-03 | First-run wizard infrastructure |
+| 4 | 12-04 | Profile switching with verification checkpoint |
+
+Plans:
+- [ ] 12-01-PLAN.md — Profile schema and resolveModel update
+- [ ] 12-02-PLAN.md — Migration logic and opencode.json derivation
+- [ ] 12-03-PLAN.md — First-run wizard infrastructure
+- [ ] 12-04-PLAN.md — Profile switching with model reuse
+
+### Phase 13: copy-from-original script
+
+**Goal:** Create a CLI script that synchronizes changes from the original TÂCHES repository (git submodule) to the OpenCode adaptation with CC→OC transformations
+
+**Depends on:** Phase 12
+
+**Requirements:**
+| ID | Requirement |
+|----|-------------|
+| CFOS-01 | Script detects changes between git submodule and adaptation using git diff-tree |
+| CFOS-02 | Script copies files from original to gsd-opencode preserving directory structure |
+| CFOS-03 | Script applies Claude Code → OpenCode transformations (reuses Phase 10 translate.js) |
+| CFOS-04 | Script tracks sync state in a JSON manifest file |
+| CFOS-05 | Script supports dry-run mode to preview changes |
+| CFOS-06 | Script supports force mode to auto-overwrite diverged files |
+| CFOS-07 | Script shows diff of changes before syncing |
+| CFOS-08 | Script detects diverged files (local modifications) and warns |
+| CFOS-09 | Script skips binary files automatically |
+| CFOS-10 | Script creates backup before modifications |
+| CFOS-11 | Script uses atomic operations (temp-then-move) for safety |
+| CFOS-12 | Script reports orphans (files in gsd-opencode not in original) |
+
+**Success Criteria:**
+1. User can run `gsd-opencode copy-from-original` to sync changes
+2. Script detects upstream changes using git diff-tree
+3. Script applies CC→OC transformations during copy
+4. Script tracks sync state in JSON manifest
+5. --dry-run shows preview without changes
+6. --force overwrites diverged files
+7. --show-diff displays file diffs
+8. Binary files are automatically skipped
+9. Backups created before modifications
+10. Orphan files are reported
+
+**Plans:** 3/3 plans complete
+
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 13-01 | Foundation: SubmoduleService and SyncManifest |
+| 2 | 13-02 | Core: SyncService and TransformationEngine |
+| 3 | 13-03 | CLI: copy-from-original command and integration tests |
+
+Plans:
+- [x] 13-01-PLAN.md — Create SubmoduleService and SyncManifest for change detection and state tracking
+- [x] 13-02-PLAN.md — Create SyncService for file copying with safety features
+- [x] 13-03-PLAN.md — Create copy-from-original CLI command with dry-run, force, diff, and orphan reporting
+
 ---
 
-*Roadmap created: 2026-02-09*  
-*Last updated: 2026-02-11 (Phase 8 added — support for opencode/commands/ directory)*
+*Roadmap created: 2026-02-09*
+*Last updated: 2026-02-22 (Phase 13 planning complete — 3 plans ready for execution)*

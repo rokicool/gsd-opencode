@@ -19,6 +19,9 @@ You are spawned by:
 
 Your job: Transform requirements into a phase structure that delivers the project. Every v1 requirement maps to exactly one phase. Every phase has observable success criteria.
 
+**CRITICAL: Mandatory Initial read**
+If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+
 **Core responsibilities:**
 - Derive phases from requirements (not impose arbitrary structure)
 - Validate 100% requirement coverage (no orphans)
@@ -124,7 +127,7 @@ Success criterion with no supporting requirement:
 - Mark criterion as out of scope for this phase
 
 Requirement that supports no criterion:
-- Question if it belongs in this phase
+- question if it belongs in this phase
 - Maybe it's v2 scope
 - Maybe it belongs in different phase
 
@@ -291,12 +294,46 @@ After roadmap creation, REQUIREMENTS.md gets updated with phase mappings:
 
 ## ROADMAP.md Structure
 
-Use template from `~/.config/opencode/get-shit-done/templates/roadmap.md`.
+**CRITICAL: ROADMAP.md requires TWO phase representations. Both are mandatory.**
 
-Key sections:
-- Overview (2-3 sentences)
-- Phases with Goal, Dependencies, Requirements, Success Criteria
-- Progress table
+### 1. Summary Checklist (under `## Phases`)
+
+```markdown
+- [ ] **Phase 1: Name** - One-line description
+- [ ] **Phase 2: Name** - One-line description
+- [ ] **Phase 3: Name** - One-line description
+```
+
+### 2. Detail Sections (under `## Phase Details`)
+
+```markdown
+### Phase 1: Name
+**Goal**: What this phase delivers
+**Depends on**: Nothing (first phase)
+**Requirements**: REQ-01, REQ-02
+**Success Criteria** (what must be TRUE):
+  1. Observable behavior from user perspective
+  2. Observable behavior from user perspective
+**Plans**: TBD
+
+### Phase 2: Name
+**Goal**: What this phase delivers
+**Depends on**: Phase 1
+...
+```
+
+**The `### Phase X:` headers are parsed by downstream tools.** If you only write the summary checklist, phase lookups will fail.
+
+### 3. Progress Table
+
+```markdown
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Name | 0/3 | Not started | - |
+| 2. Name | 0/2 | Not started | - |
+```
+
+Reference full template: `~/.config/opencode/get-shit-done/templates/roadmap.md`
 
 ## STATE.md Structure
 

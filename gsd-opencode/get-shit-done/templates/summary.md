@@ -38,6 +38,8 @@ patterns-established:
   - "Pattern 1: description"
   - "Pattern 2: description"
 
+requirements-completed: []  # REQUIRED — Copy ALL requirement IDs from this plan's `requirements` frontmatter field.
+
 # Metrics
 duration: Xmin
 completed: YYYY-MM-DD
@@ -60,13 +62,13 @@ completed: YYYY-MM-DD
 - [Second key accomplishment]
 - [Third if applicable]
 
-## Task Commits
+## task Commits
 
 Each task was committed atomically:
 
-1. **Task 1: [task name]** - `abc123f` (feat/fix/test/refactor)
-2. **Task 2: [task name]** - `def456g` (feat/fix/test/refactor)
-3. **Task 3: [task name]** - `hij789k` (feat/fix/test/refactor)
+1. **task 1: [task name]** - `abc123f` (feat/fix/test/refactor)
+2. **task 2: [task name]** - `def456g` (feat/fix/test/refactor)
+3. **task 3: [task name]** - `hij789k` (feat/fix/test/refactor)
 
 **Plan metadata:** `lmn012o` (docs: complete plan)
 
@@ -88,7 +90,7 @@ _Note: TDD tasks may have multiple commits (test → feat → refactor)_
 ### Auto-fixed Issues
 
 **1. [Rule X - Category] Brief description**
-- **Found during:** Task [N] ([task name])
+- **Found during:** task [N] ([task name])
 - **Issue:** [What was wrong]
 - **Fix:** [What was done]
 - **Files modified:** [file paths]
@@ -199,20 +201,20 @@ The one-liner should tell someone what actually shipped.
 ### Auto-fixed Issues
 
 **1. [Rule 2 - Missing Critical] Added password hashing with bcrypt**
-- **Found during:** Task 2 (Login endpoint implementation)
+- **Found during:** task 2 (Login endpoint implementation)
 - **Issue:** Plan didn't specify password hashing - storing plaintext would be critical security flaw
 - **Fix:** Added bcrypt hashing on registration, comparison on login with salt rounds 10
 - **Files modified:** src/app/api/auth/login/route.ts, src/lib/auth.ts
 - **Verification:** Password hash test passes, plaintext never stored
-- **Committed in:** abc123f (Task 2 commit)
+- **Committed in:** abc123f (task 2 commit)
 
 **2. [Rule 3 - Blocking] Installed missing jose dependency**
-- **Found during:** Task 4 (JWT token generation)
+- **Found during:** task 4 (JWT token generation)
 - **Issue:** jose package not in package.json, import failing
 - **Fix:** Ran `npm install jose`
 - **Files modified:** package.json, package-lock.json
 - **Verification:** Import succeeds, build passes
-- **Committed in:** def456g (Task 4 commit)
+- **Committed in:** def456g (task 4 commit)
 
 ---
 
@@ -233,37 +235,14 @@ The one-liner should tell someone what actually shipped.
 </example>
 
 <guidelines>
-**When to create:**
-- After completing each phase plan
-- Required output from execute-plan workflow
-- Documents what actually happened vs what was planned
+**Frontmatter:** MANDATORY - complete all fields. Enables automatic context assembly for future planning.
 
-**Frontmatter completion:**
-- MANDATORY: Complete all frontmatter fields during summary creation
-- See <frontmatter_guidance> for field purposes
-- Frontmatter enables automatic context assembly for future planning
-
-**One-liner requirements:**
-- Must be substantive (describe what shipped, not "phase complete")
-- Should tell someone what was accomplished
-- Examples: "JWT auth with refresh rotation using jose library" not "Authentication implemented"
-
-**Performance tracking:**
-- Include duration, start/end timestamps
-- Used for velocity metrics in STATE.md
-
-**Deviations section:**
-- Documents unplanned work handled via deviation rules
-- Separate from "Issues Encountered" (which is planned work problems)
-- Auto-fixed issues: What was wrong, how fixed, verification
+**One-liner:** Must be substantive. "JWT auth with refresh rotation using jose library" not "Authentication implemented".
 
 **Decisions section:**
-- Key decisions made during execution
-- Include rationale (why this choice)
+- Key decisions made during execution with rationale
 - Extracted to STATE.md accumulated context
 - Use "None - followed plan as specified" if no deviations
 
-**After creation:**
-- STATE.md updated with position, decisions, issues
-- Next plan can reference decisions made
+**After creation:** STATE.md updated with position, decisions, issues.
 </guidelines>

@@ -7,7 +7,7 @@ Key difference from discuss-phase: This is ANALYSIS of what OpenCode thinks, not
 <process>
 
 <step name="validate_phase" priority="first">
-Phase number: `$ARGUMENTS` (required)
+Phase number: $ARGUMENTS (required)
 
 **If argument missing:**
 
@@ -132,7 +132,7 @@ Wait for user response.
 Acknowledge the corrections:
 
 ```
-Got it. Key corrections:
+Key corrections:
 - [correction 1]
 - [correction 2]
 
@@ -142,7 +142,7 @@ This changes my understanding significantly. [Summarize new understanding]
 **If user confirms assumptions:**
 
 ```
-Great, assumptions validated.
+Assumptions validated.
 ```
 
 Continue to offer_next.

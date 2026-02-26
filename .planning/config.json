@@ -5,28 +5,11 @@
   "commit_docs": false,
   "model_profile": "quality",
   "profiles": {
-    "active_profile": "quality",
-    "presets": {
-      "quality": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/glm-4.7-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "balanced": {
-        "planning": "opencode/glm-4.7-free",
-        "execution": "opencode/minimax-m2.1-free",
-        "verification": "opencode/glm-4.7-free"
-      },
-      "budget": {
-        "planning": "opencode/minimax-m2.1-free",
-        "execution": "opencode/grok-code",
-        "verification": "opencode/minimax-m2.1-free"
-      }
-    },
-    "custom_overrides": {
-      "quality": {},
-      "balanced": {},
-      "budget": {}
+    "profile_type": "custom",
+    "models": {
+      "planning": "inherit",
+      "execution": "inherit",
+      "verification": "sonnet"
     }
   },
   "workflow": {
