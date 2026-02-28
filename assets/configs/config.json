@@ -600,6 +600,12 @@
       "description": "Transform Explore subagent type to lowercase explore"
     },
     {
+      "pattern": "subagent_type=\"task\"",
+      "replacement": "subagent_type=\"general\"",
+      "caseSensitive": true,
+      "description": "Transform task subagent type to general"
+    },
+    {
       "pattern": "CLAUDE.md",
       "replacement": "AGENTS.md",
       "caseSensitive": true,

@@ -223,7 +223,7 @@ Return what changed.
 ```
 task(
   prompt="First, read ~/.config/opencode/agents/gsd-planner.md for your role and instructions.\n\n" + revision_prompt,
-  subagent_type="task",
+  subagent_type="general",
   model="{planner_model}",
   description="Revise quick plan: ${DESCRIPTION}"
 )
