@@ -136,7 +136,7 @@ write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 ```
 task(
   prompt="First, read ~/.config/opencode/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + filled_prompt,
-  subagent_type="task",
+  subagent_type="general",
   model="{researcher_model}",
   description="Research Phase {phase}"
 )
@@ -172,7 +172,7 @@ Continue research for Phase {phase_number}: {phase_name}
 ```
 task(
   prompt="First, read ~/.config/opencode/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + continuation_prompt,
-  subagent_type="task",
+  subagent_type="general",
   model="{researcher_model}",
   description="Continue research Phase {phase}"
 )

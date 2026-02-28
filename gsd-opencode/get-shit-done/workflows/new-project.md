@@ -582,7 +582,7 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 write to: .planning/research/STACK.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/STACK.md
 </output>
-", subagent_type="task", model="{researcher_model}", description="Stack research")
+", subagent_type="general", model="{researcher_model}", description="Stack research")
 
 task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
@@ -622,7 +622,7 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 write to: .planning/research/FEATURES.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/FEATURES.md
 </output>
-", subagent_type="task", model="{researcher_model}", description="Features research")
+", subagent_type="general", model="{researcher_model}", description="Features research")
 
 task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
@@ -662,7 +662,7 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 write to: .planning/research/ARCHITECTURE.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
-", subagent_type="task", model="{researcher_model}", description="Architecture research")
+", subagent_type="general", model="{researcher_model}", description="Architecture research")
 
 task(prompt="First, read ~/.config/opencode/agents/gsd-project-researcher.md for your role and instructions.
 
@@ -702,7 +702,7 @@ Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
 write to: .planning/research/PITFALLS.md
 Use template: ~/.config/opencode/get-shit-done/templates/research-project/PITFALLS.md
 </output>
-", subagent_type="task", model="{researcher_model}", description="Pitfalls research")
+", subagent_type="general", model="{researcher_model}", description="Pitfalls research")
 ```
 
 After all 4 agents complete, spawn synthesizer to create SUMMARY.md:

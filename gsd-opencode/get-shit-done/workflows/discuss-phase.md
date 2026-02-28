@@ -488,7 +488,7 @@ task(
     6. Return: PHASE COMPLETE (full pipeline success), PLANNING COMPLETE (planning done but execute failed/skipped), PLANNING INCONCLUSIVE, or GAPS FOUND
     </instructions>
   ",
-  subagent_type="task",
+  subagent_type="general",
   description="Plan Phase ${PHASE}"
 )
 ```

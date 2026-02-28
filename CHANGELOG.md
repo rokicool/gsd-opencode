@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.2] - 2026-02-27
+
+Overview: Updated subagent type references from "task" to "general" across workflow files for compatibility with the current agent system. Added path replacement rule for future installations.
+
+### Changed
+
+- Updated `subagent_type="task"` to `subagent_type="general"` in `gsd-opencode/commands/gsd/gsd-research-phase.md`, `gsd-opencode/get-shit-done/workflows/diagnose-issues.md`, `gsd-opencode/get-shit-done/workflows/discuss-phase.md`, `gsd-opencode/get-shit-done/workflows/new-project.md`, `gsd-opencode/get-shit-done/workflows/plan-phase.md`, and `gsd-opencode/get-shit-done/workflows/quick.md`
+- Added path replacement rule in `assets/configs/config.json` to transform `subagent_type="task"` to `subagent_type="general"` during installation
+
 ## [1.20.1] - 2026-02-27
 
 Overview: Renamed project instructions file from OPENCODE.md to AGENTS.md for broader AI agent compatibility. Updated path replacement rules and gitignore patterns.

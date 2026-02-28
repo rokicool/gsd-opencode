@@ -117,7 +117,7 @@ write to: {phase_dir}/{phase_num}-RESEARCH.md
 ```
 task(
   prompt="First, read ~/.config/opencode/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + research_prompt,
-  subagent_type="task",
+  subagent_type="general",
   model="{researcher_model}",
   description="Research Phase {phase}"
 )
@@ -230,7 +230,7 @@ Output consumed by /gsd-execute-phase. Plans need:
 ```
 task(
   prompt="First, read ~/.config/opencode/agents/gsd-planner.md for your role and instructions.\n\n" + filled_prompt,
-  subagent_type="task",
+  subagent_type="general",
   model="{planner_model}",
   description="Plan Phase {phase}"
 )
@@ -327,7 +327,7 @@ Return what changed.
 ```
 task(
   prompt="First, read ~/.config/opencode/agents/gsd-planner.md for your role and instructions.\n\n" + revision_prompt,
-  subagent_type="task",
+  subagent_type="general",
   model="{planner_model}",
   description="Revise Phase {phase} plans"
 )
@@ -396,7 +396,7 @@ task(
     7. Do NOT use the skill tool or /gsd- commands
     </instructions>
   ",
-  subagent_type="task",
+  subagent_type="general",
   description="Execute Phase ${PHASE}"
 )
 ```

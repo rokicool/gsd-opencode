@@ -80,7 +80,7 @@ For each gap, fill the debug-subagent-prompt template and spawn:
 ```
 task(
   prompt=filled_debug_subagent_prompt + "\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>",
-  subagent_type="task",
+  subagent_type="general",
   description="Debug: {truth_short}"
 )
 ```
