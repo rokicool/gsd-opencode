@@ -33,7 +33,7 @@ You are NOT the executor or verifier — you verify plans WILL work before execu
 <project_context>
 Before verifying, discover project context:
 
-**Project instructions:** read `./OPENCODE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
+**Project instructions:** read `./AGENTS.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
 **Project skills:** Check `.agents/skills/` directory if it exists:
 1. List available skills (subdirectories)

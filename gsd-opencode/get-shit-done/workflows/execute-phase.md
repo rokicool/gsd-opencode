@@ -121,7 +121,7 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
        - {phase_dir}/{plan_file} (Plan)
        - .planning/STATE.md (State)
        - .planning/config.json (Config, if exists)
-       - ./OPENCODE.md (Project instructions, if exists — follow project-specific guidelines and coding conventions)
+       - ./AGENTS.md (Project instructions, if exists — follow project-specific guidelines and coding conventions)
        - .agents/skills/ (Project skills, if exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
        </files_to_read>
 

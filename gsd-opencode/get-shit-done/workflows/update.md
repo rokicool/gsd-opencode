@@ -128,7 +128,7 @@ Your custom files in other locations are preserved:
 - Custom commands not in `commands/gsd/` ✓
 - Custom agents not prefixed with `gsd-` ✓
 - Custom hooks ✓
-- Your OPENCODE.md files ✓
+- Your AGENTS.md files ✓
 
 If you've modified any GSD files directly, they'll be automatically backed up to `gsd-local-patches/` and can be reapplied with `/gsd-reapply-patches` after the update.
 ```

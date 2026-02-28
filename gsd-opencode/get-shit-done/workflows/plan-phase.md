@@ -105,7 +105,7 @@ Answer: "What do I need to know to PLAN this phase well?"
 **Phase description:** {phase_description}
 **Phase requirement IDs (MUST address):** {phase_req_ids}
 
-**Project instructions:** read ./OPENCODE.md if exists — follow project-specific guidelines
+**Project instructions:** read ./AGENTS.md if exists — follow project-specific guidelines
 **Project skills:** Check .agents/skills/ directory (if exists) — read SKILL.md files, research should account for project skill patterns
 </additional_context>
 
@@ -205,7 +205,7 @@ Planner prompt:
 
 **Phase requirement IDs (every ID MUST appear in a plan's `requirements` field):** {phase_req_ids}
 
-**Project instructions:** read ./OPENCODE.md if exists — follow project-specific guidelines
+**Project instructions:** read ./AGENTS.md if exists — follow project-specific guidelines
 **Project skills:** Check .agents/skills/ directory (if exists) — read SKILL.md files, plans should account for project skill rules
 </planning_context>
 
@@ -270,7 +270,7 @@ Checker prompt:
 
 **Phase requirement IDs (MUST ALL be covered):** {phase_req_ids}
 
-**Project instructions:** read ./OPENCODE.md if exists — verify plans honor project guidelines
+**Project instructions:** read ./AGENTS.md if exists — verify plans honor project guidelines
 **Project skills:** Check .agents/skills/ directory (if exists) — verify plans account for project skill rules
 </verification_context>
 

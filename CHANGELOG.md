@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.1] - 2026-02-27
+
+Overview: Renamed project instructions file from OPENCODE.md to AGENTS.md for broader AI agent compatibility. Updated path replacement rules and gitignore patterns.
+
+### Changed
+
+- Renamed project instructions file reference from `OPENCODE.md` to `AGENTS.md` in `gsd-opencode/agents/gsd-executor.md`, `gsd-opencode/agents/gsd-phase-researcher.md`, `gsd-opencode/agents/gsd-plan-checker.md`, and `gsd-opencode/agents/gsd-planner.md`
+- Updated project instructions reference from `OPENCODE.md` to `AGENTS.md` in `gsd-opencode/get-shit-done/workflows/execute-phase.md`, `gsd-opencode/get-shit-done/workflows/plan-phase.md`, `gsd-opencode/get-shit-done/workflows/quick.md`, and `gsd-opencode/get-shit-done/workflows/update.md`
+- Updated project instructions reference in `gsd-opencode/get-shit-done/templates/codebase/structure.md`
+- Modified `assets/configs/config.json` to transform `OPENCODE.md` to `AGENTS.md` during installation path replacements
+
 ## [1.20.0] - 2026-02-25
 
 Overview: Major release with complete GSD to OpenCode migration, Simple Profile System for model configuration, and comprehensive CLI tools infrastructure. Introduced copy-from-original synchronization services and translation utilities.

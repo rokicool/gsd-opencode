@@ -98,7 +98,7 @@ task(
 
 <files_to_read>
 - .planning/STATE.md (Project State)
-- ./OPENCODE.md (if exists — follow project-specific guidelines)
+- ./AGENTS.md (if exists — follow project-specific guidelines)
 </files_to_read>
 
 **Project skills:** Check .agents/skills/ directory (if exists) — read SKILL.md files, plans should account for project skill rules
@@ -251,7 +251,7 @@ Execute quick task ${next_num}.
 <files_to_read>
 - ${QUICK_DIR}/${next_num}-PLAN.md (Plan)
 - .planning/STATE.md (Project state)
-- ./OPENCODE.md (Project instructions, if exists)
+- ./AGENTS.md (Project instructions, if exists)
 - .agents/skills/ (Project skills, if exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
 </files_to_read>
 

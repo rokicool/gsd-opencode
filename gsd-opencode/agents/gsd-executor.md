@@ -25,7 +25,7 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool t
 <project_context>
 Before executing, discover project context:
 
-**Project instructions:** read `./OPENCODE.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
+**Project instructions:** read `./AGENTS.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
 **Project skills:** Check `.agents/skills/` directory if it exists:
 1. List available skills (subdirectories)

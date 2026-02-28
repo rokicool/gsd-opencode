@@ -186,7 +186,7 @@ get-shit-done/
 
 **Documentation:**
 - `README.md` - User-facing installation and usage guide
-- `OPENCODE.md` - Instructions for OpenCode when working in this repo
+- `AGENTS.md` - Instructions for OpenCode when working in this repo
 
 ## Naming Conventions
 

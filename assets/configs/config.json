@@ -601,9 +601,15 @@
     },
     {
       "pattern": "CLAUDE.md",
-      "replacement": "OPENCODE.md",
+      "replacement": "AGENTS.md",
       "caseSensitive": true,
-      "description": "Transform CLAUDE.md project instructions file to OPENCODE.md"
+      "description": "Transform CLAUDE.md project instructions file to AGENTS.md"
+    },
+    {
+      "pattern": "OPENCODE.md",
+      "replacement": "AGENTS.md",
+      "caseSensitive": true,
+      "description": "Transform OPENCODE.md project instructions file to AGENTS.md"
     },
     {
       "pattern": "~/.claude/config.json",
