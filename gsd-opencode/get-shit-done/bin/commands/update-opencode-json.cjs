@@ -77,7 +77,13 @@ function updateOpencodeJson(cwd, args) {
       const opencodeData = JSON.parse(opencodeContent);
       
       const profiles = config.profiles || {};
-      const profileModels = profiles[profileType] || {};
+      // Support both structures: profiles.models or direct profile.{type}
+      let profileModels;
+      if (profiles.models && typeof profiles.models === 'object') {
+        profileModels = profiles.models;
+      } else {
+        profileModels = profiles[profileType] || {};
+      }
       
       // Determine which agents would be updated
       const wouldUpdate = [];

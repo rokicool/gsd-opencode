@@ -125,8 +125,17 @@ function applyProfileToOpencode(opencodePath, configPath) {
     const opencodeData = JSON.parse(opencodeContent);
     
     // Get model assignments from profile
+    // Support both structures: profiles.planning or profiles.models.planning
     const profiles = config.profiles || {};
-    const profileModels = profiles[profileType] || {};
+    let profileModels;
+    
+    // Try new structure first: profiles.models.{planning|execution|verification}
+    if (profiles.models && typeof profiles.models === 'object') {
+      profileModels = profiles.models;
+    } else {
+      // Fallback to old structure: profiles.{planning|execution|verification}
+      profileModels = profiles[profileType] || {};
+    }
     
     if (!profileModels.planning && !profileModels.execution && !profileModels.verification) {
       return {
