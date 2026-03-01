@@ -138,6 +138,10 @@ Based on profile type, prompt for models:
 
 ### Simple Profile (1 model)
 
+Using question tool ask user if he wants to use current model (provide model ID). Yes or no?
+
+If yes, just store the selected model and go to **Step 7**
+
 Use gsd-oc-select-model skill to select model for "Simple Profile - One model to rule them all".
 
 Store selected model. All stages will use this model.
