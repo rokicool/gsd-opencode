@@ -35,25 +35,70 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 
 <behavior>
 
-## Step 1: Load and validate config
+## Step 1: Load config and check for migration
 
-read `.planning/config.json`. Handle these cases:
+Run migrate-config to handle legacy configs:
 
-**Case A: File missing or invalid**
+```bash
+node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs migrate-config --verbose
+```
+
+Parse the JSON output:
+
+**If migration occurred:**
+```json
+{
+  "success": true,
+  "data": {
+    "migrated": true,
+    "from": "quality",
+    "to": "genius",
+    "backup": ".opencode-backups/..."
+  }
+}
+```
+
+Store migration info for final report.
+
+**If already current format:**
+```json
+{
+  "success": true,
+  "data": {
+    "migrated": false,
+    "reason": "Config already uses current format"
+  }
+}
+```
+
+Proceed to Step 2.
+
+**If config missing:**
+```json
+{
+  "success": false,
+  "error": { "code": "CONFIG_NOT_FOUND", "message": "..." }
+}
+```
 - Print: `Error: No GSD project found. Run /gsd-new-project first.`
 - Stop.
 
-**Case B: Legacy config (has model_profile but no profiles.profile_type)**
-- Auto-migrate to genius profile
-- Use OLD_PROFILE_MODEL_MAP to convert quality / balanced / budget → genius
+## Step 2: Read current profile state
 
-**Case C: Current config**
-- Use `profiles.profile_type` and `profiles.models`
+Read `.planning/config.json` to get current profile state:
 
-**Also check `opencode.json`:**
-- If missing, it will be created
-- If exists, merge agent assignments (preserve other keys)
-
+```json
+{
+  "profiles": {
+    "profile_type": "smart",
+    "models": {
+      "planning": "opencode/glm-4.7",
+      "execution": "opencode/glm-4.7",
+      "verification": "opencode/cheaper-model"
+    }
+  }
+}
+```
 
 ## Step 3: Display current state
 
@@ -77,20 +122,25 @@ Current configuration:
 
 **B) Interactive picker (no args):**
 
-Use question tool:
+Run set-profile command without profile argument:
 
+```bash
+node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile --raw
 ```
-header: "Profile Type"
-question: "Select a profile type for model configuration"
-options:
-  - label: "Simple"
-    description: "1 model for all gsd stages (easiest setup)"
-  - label: "Smart"
-    description: "2 models: advanced for planning & execution, cheaper for verification stages"
-  - label: "Genius"
-    description: "3 models: different model for planning, execution, or verification stages"
-  - label: "Cancel"
-    description: "Exit without changes"
+
+Parse the output and use question tool:
+
+```json
+{
+  "header": "Profile Type",
+  "question": "Select a profile type for model configuration",
+  "options": [
+    { "label": "Simple", "description": "1 model for all gsd stages (easiest setup)" },
+    { "label": "Smart", "description": "2 models: advanced for planning & execution, cheaper for verification stages" },
+    { "label": "Genius", "description": "3 models: different model for planning, execution, or verification stages" },
+    { "label": "Cancel", "description": "Exit without changes" }
+  ]
+}
 ```
 
 If Cancel selected, print cancellation message and stop.
@@ -103,15 +153,38 @@ If invalid profile name:
 
 ## Step 5: Handle --reuse flag
 
-If `--reuse` flag present and current profile exists:
+If `--reuse` flag present:
 
 ```bash
-node gsd-opencode/get-shit-done/bin/gsd-tools.cjs profile-switch {newProfileType} --reuse --raw
+node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs analyze-reuse {newProfileType}
 ```
 
 Parse the reuse analysis:
-- Shows which stages can reuse existing models
-- Displays suggestions for each stage
+
+```json
+{
+  "success": true,
+  "data": {
+    "currentProfile": "smart",
+    "targetProfile": "genius",
+    "currentModels": {
+      "planning": "opencode/glm-4.7",
+      "execution": "opencode/glm-4.7",
+      "verification": "opencode/cheaper-model"
+    },
+    "reuseAnalysis": {
+      "planning": { "currentModel": "opencode/glm-4.7", "canReuse": true },
+      "execution": { "currentModel": "opencode/glm-4.7", "canReuse": true },
+      "verification": { "currentModel": "opencode/cheaper-model", "canReuse": true }
+    },
+    "suggestions": {
+      "planning": { "suggested": "opencode/glm-4.7", "reason": "Reusing current planning model" },
+      "execution": { "suggested": "opencode/glm-4.7", "reason": "Reusing current execution model" },
+      "verification": { "suggested": "opencode/cheaper-model", "reason": "Reusing current verification model" }
+    }
+  }
+}
+```
 
 Present to user:
 
@@ -134,21 +207,34 @@ If no, run full model selection wizard.
 
 ## Step 6: Model selection wizard
 
-Based on profile type, prompt for models:
+Run set-profile command to get model selection prompts:
+
+```bash
+node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile {newProfileType}
+```
+
+Parse the output and use gsd-oc-select-model skill for each required stage.
 
 ### Simple Profile (1 model)
 
-Using question tool ask user if he wants to use current model (provide model ID). Yes or no?
+Parse the prompt for stage "all":
 
-If yes, just store the selected model and go to **Step 7**
+```json
+{
+  "context": "Simple Profile - One model to rule them all",
+  "current": "opencode/glm-4.7"
+}
+```
 
-Use gsd-oc-select-model skill to select model for "Simple Profile - One model to rule them all".
+Using question tool ask user if they want to use current model.
 
-Store selected model. All stages will use this model.
+If yes, store the selected model and go to **Step 7**.
+
+If no, use gsd-oc-select-model skill to select model for "Simple Profile - One model to rule them all".
 
 ### Smart Profile (2 models)
 
-Use gsd-oc-select-model skill twice.
+Parse the prompts for stages "planning_execution" and "verification":
 
 **First model** (planning + execution):
 
@@ -158,122 +244,90 @@ Use gsd-oc-select-model skill to select model for "Smart Profile - Planning & Ex
 
 Use gsd-oc-select-model skill to select model for "Smart Profile - Verification"
 
-Store selected models. 
-
-Planning + Execution will use First model selected.
-Verification will use Second model selected.
-
-
 ### Genius Profile (3 models)
 
-Use gsd-oc-select-model skill
-
+Parse the prompts for stages "planning", "execution", "verification":
 
 **First model** (planning):
 
 Use gsd-oc-select-model skill to select model for "Genius Profile - Planning"
 
-**Second model** (execution)
+**Second model** (execution):
 
 Use gsd-oc-select-model skill to select model for "Genius Profile - Execution"
 
-**Thrid model** (verification):
+**Third model** (verification):
 
 Use gsd-oc-select-model skill to select model for "Genius Profile - Verification"
-
-Store selected models. 
-
-Planning will use First model selected.
-Execution will use Second model selected.
-Verification will use Third model selected.
-
-
 
 ## Step 7: Validate selected models
 
 Before writing files, validate models exist:
 
 ```bash
-opencode models | grep -q "^{model}$" && echo "valid" || echo "invalid"
+node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs validate-models {model1} {model2} {model3}
 ```
 
-If any model invalid:
+Parse the output:
+
+```json
+{
+  "success": true,
+  "data": {
+    "total": 3,
+    "valid": 3,
+    "invalid": 0,
+    "models": [
+      { "model": "opencode/glm-4.7", "valid": true },
+      { "model": "opencode/other", "valid": true },
+      { "model": "opencode/third", "valid": true }
+    ]
+  }
+}
+```
+
+If any model invalid (success: false):
 - Print error with list of missing models
 - Stop. Do NOT write config files.
 
 ## Step 8: Apply changes
 
-### Save config.json
+Run update-opencode-json to apply profile changes:
 
-Save config.json Or build and save manually:
+```bash
+node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs update-opencode-json --verbose
+```
+
+This command:
+1. Reads `.planning/config.json` (already updated with new models)
+2. Creates timestamped backup of `opencode.json`
+3. Updates agent model assignments based on profile
+4. Outputs results:
 
 ```json
 {
-  "profiles": {
-    "profile_type": "{simple|smart|genius}",
-    "models": {
-      "planning": "{model}",
-      "execution": "{model}",
-      "verification": "{model}"
-    }
+  "success": true,
+  "data": {
+    "backup": ".opencode-backups/20250101-120000-000-opencode.json",
+    "updated": ["gsd-planner", "gsd-executor", ...],
+    "dryRun": false,
+    "details": [...]
   }
 }
 ```
 
+**If update fails:**
+- Error is output with code and message
+- Restore from backup if possible
+- Print error and stop
 
-## Step 8: Check for changes
+## Step 9: Check for changes
 
-If no changes were made (all stages selected "Keep current"):
+Compare old and new models. If no changes were made:
 ```
 No changes made to {targetProfile} profile.
 ```
 Stop.
-
-## Step 9: Save changes
-
-Use the **write tool directly** to update files. Do NOT use bash, python, or other scripts—use native file writing.
-
-1. **Update .planning/config.json:**
-
-    - Set `config.profiles.presets[targetProfile].planning` to selected value
-    - Set `config.profiles.presets[targetProfile].execution` to selected value
-    - Set `config.profiles.presets[targetProfile].verification` to selected value
-    - write the config file (preserve all other keys)
-
-2. **Update opencode.json (only if targetProfile is active):**
-
-Check if `config.profiles.active_profile === targetProfile`. If so, regenerate `opencode.json` with the new effective models.
-
-Compute effective models (preset + overrides):
-```
-overrides = config.profiles.genius_overrides[targetProfile] || {}
-effective.planning = overrides.planning || newPreset.planning
-effective.execution = overrides.execution || newPreset.execution
-effective.verification = overrides.verification || newPreset.verification
-```
-
-Build agent config:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "agent": {
-    "gsd-planner": { "model": "{effective.planning}" },
-    "gsd-plan-checker": { "model": "{effective.planning}" },
-    "gsd-phase-researcher": { "model": "{effective.planning}" },
-    "gsd-roadmapper": { "model": "{effective.planning}" },
-    "gsd-project-researcher": { "model": "{effective.planning}" },
-    "gsd-research-synthesizer": { "model": "{effective.planning}" },
-    "gsd-codebase-mapper": { "model": "{effective.planning}" },
-    "gsd-executor": { "model": "{effective.execution}" },
-    "gsd-debugger": { "model": "{effective.execution}" },
-    "gsd-verifier": { "model": "{effective.verification}" },
-    "gsd-integration-checker": { "model": "{effective.verification}" },
-  }
-}
-```
-
-If `opencode.json` already exists, merge the `agent` key (preserve other top-level keys).
 
 ## Step 10: Report success
 
@@ -285,6 +339,11 @@ If `opencode.json` already exists, merge the `agent` key (preserve other top-lev
 | planning     | {newPreset.planning} |
 | execution    | {newPreset.execution} |
 | verification | {newPreset.verification} |
+```
+
+If migration occurred:
+```
+⚡ Auto-migrated from {old_profile} to genius profile
 ```
 
 If `targetProfile` is the active profile:
@@ -299,26 +358,12 @@ To use this profile, run: /gsd-set-profile {targetProfile}
 
 </behavior>
 
-
-Parse output and write to `opencode.json`, merging with existing content.
-
-Note: Quit and relaunch OpenCode to apply model changes.
-```
-
-If migration occurred:
-```
-⚡ Auto-migrated from {old_profile} to genius profile
-```
-
-</behavior>
-
 <notes>
 - Use question tool for ALL user input
 - Always show full model IDs (e.g., `opencode/glm-4.7-free`)
-- Preserve all other config.json keys when writing
-- Do NOT rewrite agent .md files — only update opencode.json
-- If opencode.json doesn't exist, create it
+- Use gsd-oc-tools.cjs for validation and file operations
+- Backup files are created automatically by update-opencode-json and migrate-config
 - **Source of truth:** `config.json` stores profile_type and models; `opencode.json` is derived
-- When migrating, preserve old model_profile field for backward compat during transition
-- Model selection uses gsd-oc-select-model skill 
+- Model selection uses gsd-oc-select-model skill via the set-profile command
+- Commands support --verbose for debug output and --raw for machine-readable output
 </notes>
