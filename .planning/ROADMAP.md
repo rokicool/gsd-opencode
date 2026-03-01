@@ -580,7 +580,7 @@ Plans:
 
 **Goal:** CLI utility script for fast validation and management of opencode configuration files (check-opencode-json, check-config-json, update-opencode-json)
 **Depends on:** Phase 13
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 14-01-PLAN.md — Core infrastructure: oc-core.cjs, oc-models.cjs, check-opencode-json, check-config-json, main entry point
