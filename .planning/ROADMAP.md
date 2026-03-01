@@ -576,7 +576,17 @@ Plans:
 - [x] 13-02-PLAN.md — Create SyncService for file copying with safety features
 - [x] 13-03-PLAN.md — Create copy-from-original CLI command with dry-run, force, diff, and orphan reporting
 
+### Phase 14: gsd-oc-tools.cjs for quick operations
+
+**Goal:** CLI utility script for fast validation and management of opencode configuration files (check-opencode-json, check-config-json, update-opencode-json)
+**Depends on:** Phase 13
+**Plans:** 1/2 plans executed
+
+Plans:
+- [ ] 14-01-PLAN.md — Core infrastructure: oc-core.cjs, oc-models.cjs, check-opencode-json, check-config-json, main entry point
+- [ ] 14-02-PLAN.md — Update command: oc-config.cjs, update-opencode-json with backup and profile application
+
 ---
 
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-22 (Phase 13 planning complete — 3 plans ready for execution)*
+*Last updated: 2026-02-28 (Phase 14 planning complete — 2 plans ready for execution)*
