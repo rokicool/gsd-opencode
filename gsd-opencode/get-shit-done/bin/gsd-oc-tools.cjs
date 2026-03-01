@@ -9,9 +9,10 @@
  * Usage: node gsd-oc-tools.cjs <command> [args] [--raw] [--verbose]
  *
  * Available Commands:
- *   check-opencode-json    Validate model IDs in opencode.json
- *   check-config-json      Validate profile configuration in .planning/config.json
- *   help                   Show this help message
+ *   check-opencode-json     Validate model IDs in opencode.json
+ *   check-config-json       Validate profile configuration in .planning/config.json
+ *   update-opencode-json    Update opencode.json agent models from profile config
+ *   help                    Show this help message
  */
 
 const path = require('path');
@@ -38,18 +39,21 @@ gsd-oc-tools — OpenCode validation utilities
 Usage: node gsd-oc-tools.cjs <command> [options]
 
 Available Commands:
-  check-opencode-json    Validate model IDs in opencode.json against opencode models catalog
-  check-config-json      Validate profile configuration in .planning/config.json
-  help                   Show this help message
+  check-opencode-json     Validate model IDs in opencode.json against opencode models catalog
+  check-config-json       Validate profile configuration in .planning/config.json
+  update-opencode-json    Update opencode.json agent models from profile config (creates backup)
+  help                    Show this help message
 
 Options:
   --verbose              Enable verbose output (stderr)
   --raw                  Output raw values (future use)
+  --dry-run              Preview changes without applying (update-opencode-json only)
 
 Examples:
   node gsd-oc-tools.cjs check-opencode-json
   node gsd-oc-tools.cjs check-config-json
-  node gsd-oc-tools.cjs check-opencode-json --verbose
+  node gsd-oc-tools.cjs update-opencode-json --dry-run
+  node gsd-oc-tools.cjs update-opencode-json --verbose
 `.trim();
 
   console.log(helpText);
@@ -74,6 +78,12 @@ switch (command) {
     break;
   }
 
+  case 'update-opencode-json': {
+    const updateOpencodeJson = require('./commands/update-opencode-json.cjs');
+    updateOpencodeJson(cwd, flags);
+    break;
+  }
+
   default:
-    error(`Unknown command: ${command}\nRun 'node gsd-oc-tools.cjs help' for available commands.`, 'UNKNOWN_COMMAND');
+    error(`Unknown command: ${command}\nRun 'node gsd-oc-tools.cjs help' for available commands.`);
 }
