@@ -5,11 +5,11 @@
   "commit_docs": false,
   "model_profile": "quality",
   "profiles": {
-    "profile_type": "custom",
+    "profile_type": "smart",
     "models": {
-      "planning": "inherit",
-      "execution": "inherit",
-      "verification": "sonnet"
+      "planning": "ai-coding-plan/qwen3.5-plus",
+      "execution": "bailian-coding-plan/qwen3.5-plus",
+      "verification": "bailian-coding-plan/MiniMax-M2.5"
     }
   },
   "workflow": {
@@ -18,3 +18,4 @@
     "verifier": true
   }
 }
+

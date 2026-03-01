@@ -16,7 +16,7 @@
  */
 
 const path = require('path');
-const { output, error } = require('./lib/oc-core.cjs');
+const { output, error } = require('./gsd-oc-lib/oc-core.cjs');
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -67,19 +67,19 @@ if (!command || command === 'help') {
 
 switch (command) {
   case 'check-opencode-json': {
-    const checkOpencodeJson = require('./commands/check-opencode-json.cjs');
+    const checkOpencodeJson = require('./gsd-oc-commands/check-opencode-json.cjs');
     checkOpencodeJson(cwd, flags);
     break;
   }
 
   case 'check-config-json': {
-    const checkConfigJson = require('./commands/check-config-json.cjs');
+    const checkConfigJson = require('./gsd-oc-commands/check-config-json.cjs');
     checkConfigJson(cwd, flags);
     break;
   }
 
   case 'update-opencode-json': {
-    const updateOpencodeJson = require('./commands/update-opencode-json.cjs');
+    const updateOpencodeJson = require('./gsd-oc-commands/update-opencode-json.cjs');
     updateOpencodeJson(cwd, flags);
     break;
   }

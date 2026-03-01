@@ -10,7 +10,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { output, error } = require('../lib/oc-core.cjs');
+const { output, error } = require('../gsd-oc-lib/oc-core.cjs');
+const { getModelCatalog } = require('../gsd-oc-lib/oc-models.cjs');
 
 // Whitelist of valid profile names
 const VALID_PROFILES = ['simple', 'smart', 'genius'];
@@ -22,6 +23,7 @@ const VALID_PROFILES = ['simple', 'smart', 'genius'];
  * @param {string[]} args - Command line arguments
  */
 function checkConfigJson(cwd, args) {
+  const verbose = args.includes('--verbose');
   const configPath = path.join(cwd, '.planning', 'config.json');
 
   // Check if config.json exists
@@ -67,6 +69,47 @@ function checkConfigJson(cwd, args) {
           value: key,
           reason: `Profile name must be one of: ${VALID_PROFILES.join(', ')}`
         });
+      }
+    }
+
+    // Validate model IDs in profiles.models structure
+    if (config.profiles.models && typeof config.profiles.models === 'object') {
+      if (verbose) {
+        console.error('[verbose] Fetching model catalog...');
+      }
+
+      const catalogResult = getModelCatalog();
+      if (!catalogResult.success) {
+        error(catalogResult.error.message, catalogResult.error.code);
+      }
+
+      const validModels = catalogResult.models;
+
+      if (verbose) {
+        console.error(`[verbose] Found ${validModels.length} models in catalog`);
+        console.error('[verbose] Validating profile model IDs...');
+      }
+
+      // Check each profile category (planning, execution, verification)
+      for (const [category, modelId] of Object.entries(config.profiles.models)) {
+        if (typeof modelId !== 'string' || !modelId.trim()) {
+          issues.push({
+            field: `profiles.models.${category}`,
+            value: modelId,
+            reason: `Model ID must be a non-empty string`
+          });
+          continue;
+        }
+
+        if (!validModels.includes(modelId)) {
+          issues.push({
+            field: `profiles.models.${category}`,
+            value: modelId,
+            reason: `Model ID not found in opencode models catalog`
+          });
+        } else if (verbose) {
+          console.error(`[verbose] ✓ profiles.models.${category}: ${modelId} (valid)`);
+        }
       }
     }
   }

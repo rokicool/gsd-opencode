@@ -9,8 +9,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { output, error } = require('../lib/oc-core.cjs');
-const { getModelCatalog, validateModelIds } = require('../lib/oc-models.cjs');
+const { output, error } = require('../gsd-oc-lib/oc-core.cjs');
+const { getModelCatalog, validateModelIds } = require('../gsd-oc-lib/oc-models.cjs');
 
 /**
  * Main command function

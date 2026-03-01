@@ -10,8 +10,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { output, error, createBackup } = require('../lib/oc-core.cjs');
-const { applyProfileToOpencode, VALID_PROFILES } = require('../lib/oc-config.cjs');
+const { output, error, createBackup } = require('../gsd-oc-lib/oc-core.cjs');
+const { applyProfileToOpencode, VALID_PROFILES } = require('../gsd-oc-lib/oc-config.cjs');
 
 /**
  * Main command function
