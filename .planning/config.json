@@ -5,11 +5,11 @@
   "commit_docs": false,
   "model_profile": "quality",
   "profiles": {
-    "profile_type": "smart",
+    "profile_type": "simple",
     "models": {
-      "planning": "ai-coding-plan/qwen3.5-plus",
+      "planning": "bailian-coding-plan/qwen3.5-plus",
       "execution": "bailian-coding-plan/qwen3.5-plus",
-      "verification": "bailian-coding-plan/MiniMax-M2.5"
+      "verification": "bailian-coding-plan/qwen3.5-plus"
     }
   },
   "workflow": {
@@ -18,4 +18,3 @@
     "verifier": true
   }
 }
-

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "gsd-planner": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    },
+    "gsd-plan-checker": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    },
+    "gsd-phase-researcher": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    },
+    "gsd-roadmapper": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    },
+    "gsd-project-researcher": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    },
+    "gsd-research-synthesizer": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    },
+    "gsd-codebase-mapper": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    },
+    "gsd-executor": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    },
+    "gsd-debugger": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    },
+    "gsd-verifier": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    },
+    "gsd-integration-checker": {
+      "model": "bailian-coding-plan/qwen3.5-plus"
+    }
+  }
+}
