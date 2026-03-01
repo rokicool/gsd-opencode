@@ -169,7 +169,7 @@ function applyProfileToOpencode(opencodePath, configPath) {
           } else {
             opencodeData.agent[agentName] = modelId;
           }
-          updatedAgents.push(agentName);
+          updatedAgents.push({ agent: agentName, model: modelId });
         }
       }
     }
