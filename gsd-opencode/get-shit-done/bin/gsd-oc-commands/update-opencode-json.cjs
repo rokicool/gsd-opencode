@@ -110,7 +110,8 @@ function updateOpencodeJson(cwd, args) {
               wouldUpdate.push({
                 agent: agentName,
                 from: currentModel || '(not set)',
-                to: modelId
+                to: modelId,
+                modelId: modelId
               });
             }
           }
@@ -184,8 +185,9 @@ function updateOpencodeJson(cwd, args) {
     success: true,
     data: {
       backup: backupPath,
-      updated: result.updated,
-      dryRun: false
+      updated: result.updated.map(u => u.agent),
+      dryRun: false,
+      details: result.updated
     }
   };
   
