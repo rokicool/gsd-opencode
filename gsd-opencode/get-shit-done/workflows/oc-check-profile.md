@@ -15,7 +15,7 @@ read all files referenced by the invoking prompt's execution_context before star
 Run validation on opencode.json:
 
 ```bash
-OPENCODE_RESULT=$(node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs check-opencode-json 2>&1)
+OPENCODE_RESULT=$(node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs check-opencode-json 2>&1)
 OPENCODE_EXIT=$?
 ```
 
@@ -29,7 +29,7 @@ Parse JSON output:
 Run validation on .planning/config.json:
 
 ```bash
-CONFIG_RESULT=$(node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs check-config-json 2>&1)
+CONFIG_RESULT=$(node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs check-config-json 2>&1)
 CONFIG_EXIT=$?
 ```
 

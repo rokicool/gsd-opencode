@@ -40,7 +40,7 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 Run migrate-config to handle legacy configs:
 
 ```bash
-node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs migrate-config --verbose
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs migrate-config --verbose
 ```
 
 Parse the JSON output:
@@ -125,7 +125,7 @@ Current configuration:
 Run set-profile command without profile argument:
 
 ```bash
-node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile --raw
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile --raw
 ```
 
 Parse the output and use question tool:
@@ -156,7 +156,7 @@ If invalid profile name:
 If `--reuse` flag present:
 
 ```bash
-node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs analyze-reuse {newProfileType}
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs analyze-reuse {newProfileType}
 ```
 
 Parse the reuse analysis:
@@ -210,7 +210,7 @@ If no, run full model selection wizard.
 Run set-profile command to get model selection prompts:
 
 ```bash
-node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile {newProfileType}
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile {newProfileType}
 ```
 
 Parse the output and use gsd-oc-select-model skill for each required stage.
@@ -265,7 +265,7 @@ Use gsd-oc-select-model skill to select model for "Genius Profile - Verification
 Before writing files, validate models exist:
 
 ```bash
-node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs validate-models {model1} {model2} {model3}
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs validate-models {model1} {model2} {model3}
 ```
 
 Parse the output:
@@ -295,7 +295,7 @@ If any model invalid (success: false):
 Run update-opencode-json to apply profile changes:
 
 ```bash
-node gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs update-opencode-json --verbose
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs update-opencode-json --verbose
 ```
 
 This command:
