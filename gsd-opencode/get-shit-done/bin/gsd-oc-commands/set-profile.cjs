@@ -21,12 +21,6 @@ const { output, error, createBackup } = require('../gsd-oc-lib/oc-core.cjs');
 const { applyProfileToOpencode, VALID_PROFILES, PROFILE_AGENT_MAPPING } = require('../gsd-oc-lib/oc-config.cjs');
 const { getModelCatalog } = require('../gsd-oc-lib/oc-models.cjs');
 
-const LEGACY_PROFILE_MAP = {
-  quality: 'genius',
-  balanced: 'smart',
-  budget: 'simple'
-};
-
 /**
  * Main command function
  *
@@ -53,33 +47,18 @@ function setProfile(cwd, args) {
     error('Failed to parse .planning/config.json', 'INVALID_JSON');
   }
 
-  // Check for legacy config and auto-migrate
-  let migrationOccurred = false;
-  let oldProfile = null;
-  if (config.model_profile && !config.profiles?.profile_type) {
-    oldProfile = config.model_profile;
-    const newProfileType = LEGACY_PROFILE_MAP[oldProfile] || 'genius';
-    
-    config.profiles = config.profiles || {};
-    config.profiles.profile_type = newProfileType;
-    config.profiles.models = {
-      planning: 'opencode/default',
-      execution: 'opencode/default',
-      verification: 'opencode/default'
-    };
-    migrationOccurred = true;
-    
-    if (verbose) {
-      console.error(`[verbose] Auto-migrated from ${oldProfile} to ${newProfileType}`);
-    }
-  }
-
   const profiles = config.profiles || {};
   const currentProfileType = profiles.profile_type || config.profile_type;
   const currentModels = profiles.models || {};
 
   // Get target profile from args or mark for interactive
   let targetProfile = args.find(arg => VALID_PROFILES.includes(arg));
+  
+  // Validate profile exists if provided
+  if (targetProfile && !VALID_PROFILES.includes(targetProfile)) {
+    error(`Unknown profile: "${targetProfile}". Valid profiles: ${VALID_PROFILES.join(', ')}`, 'INVALID_PROFILE');
+  }
+  
   const isInteractive = !targetProfile;
 
   // Step 3: Display current state (output for workflow to display)
@@ -240,6 +219,8 @@ function applyProfileChanges(cwd, targetProfile, models, verbose = false) {
     execution: models.execution || models.planning,
     verification: models.verification || models.planning
   };
+  // Track current OS profile
+  config.current_os_profile = targetProfile;
 
   try {
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n', 'utf8');
