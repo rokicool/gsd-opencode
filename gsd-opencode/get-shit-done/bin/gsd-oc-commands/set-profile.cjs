@@ -231,15 +231,13 @@ function applyProfileChanges(cwd, targetProfile, models, verbose = false) {
     };
   }
 
-  // Update opencode.json if exists
+  // Update or create opencode.json with profile models
   let updatedAgents = [];
-  if (fs.existsSync(opencodePath)) {
-    const applyResult = applyProfileToOpencode(opencodePath, configPath);
-    if (!applyResult.success) {
-      return applyResult;
-    }
-    updatedAgents = applyResult.updated;
+  const applyResult = applyProfileToOpencode(opencodePath, configPath);
+  if (!applyResult.success) {
+    return applyResult;
   }
+  updatedAgents = applyResult.updated;
 
   return {
     success: true,
