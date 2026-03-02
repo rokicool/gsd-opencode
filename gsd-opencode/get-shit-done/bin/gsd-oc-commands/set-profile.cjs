@@ -35,7 +35,6 @@ const LEGACY_PROFILE_MAP = {
  */
 function setProfile(cwd, args) {
   const verbose = args.includes('--verbose');
-  const reuse = args.includes('--reuse');
   const raw = args.includes('--raw');
   
   const configPath = path.join(cwd, '.planning', 'config.json');
@@ -94,67 +93,6 @@ function setProfile(cwd, args) {
     }
   };
 
-  // Step 4: Determine requested profile
-  if (!targetProfile) {
-    // Interactive mode - output available options for workflow
-    const interactiveOptions = {
-      mode: 'interactive',
-      prompt: {
-        header: 'Profile Type',
-        question: 'Select a profile type for model configuration',
-        options: [
-          { label: 'Simple', value: 'simple', description: '1 model for all gsd stages (easiest setup)' },
-          { label: 'Smart', value: 'smart', description: '2 models: advanced for planning & execution, cheaper for verification stages' },
-          { label: 'Genius', value: 'genius', description: '3 models: different model for planning, execution, or verification stages' },
-          { label: 'Cancel', value: 'cancel', description: 'Exit without changes' }
-        ]
-      },
-      currentState
-    };
-    
-    if (raw) {
-      output(interactiveOptions, true, JSON.stringify(interactiveOptions.prompt));
-    } else {
-      output({ success: true, data: interactiveOptions });
-    }
-    process.exit(0);
-  }
-
-  // Validate target profile
-  if (!VALID_PROFILES.includes(targetProfile)) {
-    error(`Unknown profile type '${targetProfile}'. Valid options: ${VALID_PROFILES.join(', ')}`, 'INVALID_PROFILE');
-  }
-
-  // Step 5: Handle --reuse flag
-  let selectedModels = {};
-  let reuseAnalysis = null;
-
-  if (reuse) {
-    const analyzeReuse = require('./analyze-reuse.cjs');
-    const { execSync } = require('child_process');
-    
-    try {
-      const result = execSync(`node "${__filename.replace('set-profile.cjs', 'analyze-reuse.cjs')}" ${targetProfile}`, {
-        encoding: 'utf8',
-        cwd
-      });
-      const analysis = JSON.parse(result);
-      
-      if (analysis.success) {
-        reuseAnalysis = analysis.data;
-        selectedModels = {
-          planning: reuseAnalysis.suggestions.planning?.suggested || currentModels.planning,
-          execution: reuseAnalysis.suggestions.execution?.suggested || currentModels.execution,
-          verification: reuseAnalysis.suggestions.verification?.suggested || currentModels.verification
-        };
-      }
-    } catch (err) {
-      if (verbose) {
-        console.error(`[verbose] Reuse analysis failed: ${err.message}`);
-      }
-    }
-  }
-
   // Step 6: Model selection wizard output
   const requiredStages = getRequiredStages(targetProfile);
   const modelSelectionPrompt = {
@@ -166,8 +104,7 @@ function setProfile(cwd, args) {
       execution: currentModels.execution,
       verification: currentModels.verification
     },
-    reuseAnalysis,
-    prompt: buildModelSelectionPrompts(targetProfile, currentModels, selectedModels)
+    prompt: buildModelSelectionPrompts(targetProfile, currentModels)
   };
 
   if (raw) {
@@ -198,47 +135,41 @@ function getRequiredStages(profileType) {
 /**
  * Build model selection prompts based on profile type
  */
-function buildModelSelectionPrompts(profileType, currentModels, selectedModels) {
+function buildModelSelectionPrompts(profileType, currentModels) {
   const prompts = [];
 
   if (profileType === 'simple') {
     prompts.push({
       stage: 'all',
       context: 'Simple Profile - One model to rule them all',
-      current: currentModels.planning,
-      suggested: selectedModels.planning
+      current: currentModels.planning
     });
   } else if (profileType === 'smart') {
     prompts.push({
       stage: 'planning_execution',
       context: 'Smart Profile - Planning & Execution',
-      current: currentModels.planning,
-      suggested: selectedModels.planning
+      current: currentModels.planning
     });
     prompts.push({
       stage: 'verification',
       context: 'Smart Profile - Verification',
-      current: currentModels.verification,
-      suggested: selectedModels.verification
+      current: currentModels.verification
     });
   } else if (profileType === 'genius') {
     prompts.push({
       stage: 'planning',
       context: 'Genius Profile - Planning',
-      current: currentModels.planning,
-      suggested: selectedModels.planning
+      current: currentModels.planning
     });
     prompts.push({
       stage: 'execution',
       context: 'Genius Profile - Execution',
-      current: currentModels.execution,
-      suggested: selectedModels.execution
+      current: currentModels.execution
     });
     prompts.push({
       stage: 'verification',
       context: 'Genius Profile - Verification',
-      current: currentModels.verification,
-      suggested: selectedModels.verification
+      current: currentModels.verification
     });
   }
 

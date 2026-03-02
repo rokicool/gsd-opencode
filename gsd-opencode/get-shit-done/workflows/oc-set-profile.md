@@ -151,61 +151,7 @@ If invalid profile name:
 - Print: `Unknown profile type '{name}'. Valid options: simple, smart, genius`
 - Fall back to interactive picker
 
-## Step 5: Handle --reuse flag
-
-If `--reuse` flag present:
-
-```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs analyze-reuse {newProfileType}
-```
-
-Parse the reuse analysis:
-
-```json
-{
-  "success": true,
-  "data": {
-    "currentProfile": "smart",
-    "targetProfile": "genius",
-    "currentModels": {
-      "planning": "opencode/glm-4.7",
-      "execution": "opencode/glm-4.7",
-      "verification": "opencode/cheaper-model"
-    },
-    "reuseAnalysis": {
-      "planning": { "currentModel": "opencode/glm-4.7", "canReuse": true },
-      "execution": { "currentModel": "opencode/glm-4.7", "canReuse": true },
-      "verification": { "currentModel": "opencode/cheaper-model", "canReuse": true }
-    },
-    "suggestions": {
-      "planning": { "suggested": "opencode/glm-4.7", "reason": "Reusing current planning model" },
-      "execution": { "suggested": "opencode/glm-4.7", "reason": "Reusing current execution model" },
-      "verification": { "suggested": "opencode/cheaper-model", "reason": "Reusing current verification model" }
-    }
-  }
-}
-```
-
-Present to user:
-
-```
-Model Reuse Analysis for {newProfileType} profile:
-
-Current models:
-- Planning: {current.planning}
-- Execution: {current.execution}
-- Verification: {current.verification}
-
-Suggested reuse:
-{reuse analysis from tool}
-
-Use these suggestions? (yes/no)
-```
-
-If yes, proceed with suggested models.
-If no, run full model selection wizard.
-
-## Step 6: Model selection wizard
+## Step 5: Model selection wizard
 
 Run set-profile command to get model selection prompts:
 
@@ -260,7 +206,7 @@ Use gsd-oc-select-model skill to select model for "Genius Profile - Execution"
 
 Use gsd-oc-select-model skill to select model for "Genius Profile - Verification"
 
-## Step 7: Validate selected models
+## Step 6: Validate selected models
 
 Before writing files, validate models exist:
 
@@ -290,7 +236,7 @@ If any model invalid (success: false):
 - Print error with list of missing models
 - Stop. Do NOT write config files.
 
-## Step 8: Apply changes
+## Step 7: Apply changes
 
 Run update-opencode-json to apply profile changes:
 
@@ -321,7 +267,7 @@ This command:
 - Restore from backup if possible
 - Print error and stop
 
-## Step 9: Check for changes
+## Step 8: Check for changes
 
 Compare old and new models. If no changes were made:
 ```
@@ -329,7 +275,7 @@ No changes made to {targetProfile} profile.
 ```
 Stop.
 
-## Step 10: Report success
+## Step 9: Report success
 
 ```text
 ✓ Updated {targetProfile} profile:
