@@ -72,18 +72,34 @@ function setProfile(cwd, args) {
     }
   };
 
-  // Step 6: Model selection wizard output
-  const requiredStages = getRequiredStages(targetProfile);
+  // Non-interactive mode: apply changes with current models
+  if (targetProfile) {
+    const result = applyProfileChanges(cwd, targetProfile, currentModels, verbose);
+    
+    if (!result.success) {
+      error(result.error.message, result.error.code);
+    }
+    
+    if (raw) {
+      output(result.data, true, JSON.stringify(result.data, null, 2));
+    } else {
+      output({ success: true, data: result.data });
+    }
+    process.exit(0);
+  }
+
+  // Interactive mode: output model selection prompt
+  const requiredStages = getRequiredStages(currentProfileType);
   const modelSelectionPrompt = {
     mode: 'model_selection',
-    targetProfile,
+    targetProfile: null,
     stages: requiredStages,
     currentModels: {
       planning: currentModels.planning,
       execution: currentModels.execution,
       verification: currentModels.verification
     },
-    prompt: buildModelSelectionPrompts(targetProfile, currentModels)
+    prompt: buildModelSelectionPrompts(currentProfileType, currentModels)
   };
 
   if (raw) {
