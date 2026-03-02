@@ -30,7 +30,6 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 - **Smart**: 2 models — planning+execution share model, verification uses different
 - **Genius**: 3 models — each stage can have different model
 
-**Migration:** Old configs with `model_profile: quality / balanced / budget` are auto-migrated to genius profile.
 </context>
 
 <behavior>
@@ -89,11 +88,12 @@ Read `.planning/config.json` to get current profile state:
 
 ```json
 {
+  "current_oc_profile": "smart",
   "profiles": {
     "profile_type": "smart",
     "models": {
-      "planning": "opencode/glm-4.7",
-      "execution": "opencode/glm-4.7",
+      "planning": "opencode/smartest-model",
+      "execution": "opencode/middle-model",
       "verification": "opencode/cheaper-model"
     }
   }
