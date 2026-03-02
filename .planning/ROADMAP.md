@@ -586,7 +586,16 @@ Plans:
 - [ ] 14-01-PLAN.md — Core infrastructure: oc-core.cjs, oc-models.cjs, check-opencode-json, check-config-json, main entry point
 - [ ] 14-02-PLAN.md — Update command: oc-config.cjs, update-opencode-json with backup and profile application
 
+### Phase 15: fix set-profile script
+
+**Goal:** Fix set-profile script to properly handle profile switching with correct config.json schema, model validation, and opencode.json updates
+**Depends on:** Phase 14
+**Plans:** 1 plan
+
+Plans:
+- [ ] 15-01-PLAN.md — Fix set-profile with validation, backups, and proper JSON output (7 tasks, SETPROFILE-01 to SETPROFILE-07)
+
 ---
 
 *Roadmap created: 2026-02-09*
-*Last updated: 2026-02-28 (Phase 14 planning complete — 2 plans ready for execution)*
+*Last updated: 2026-03-02 (Phase 15 planned — 1 plan with 7 tasks ready for execution)*

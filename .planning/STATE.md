@@ -7,15 +7,15 @@
 
 ## Current Position
 
-**Current Phase:** 14
-**Current Plan:** Not started
-**Status:** Milestone complete
-**Overall Progress:** 76/76 requirements (v1 + Phase 10 + Phase 11 + Phase 12 + Phase 13 partial)
-**Next Phase:** Phase 13 Plan 03
+**Current Phase:** 15
+**Current Plan:** 01 Complete
+**Status:** Phase 15 Plan 01 complete
+**Overall Progress:** 83/83 requirements (v1 + Phase 10 + Phase 11 + Phase 12 + Phase 13 partial + Phase 14 + Phase 15)
+**Next Phase:** Phase 15 Plan 02 (if needed) or Phase 16
 
 ```
 [████████████████████████████████████████] 100% (65/65 requirements)
-[██████████████████████████████████████░░]  88% (8/9 phases complete)
+[███████████████████████████████████████░]  89% (8/9 phases complete)
 ```
 
 ---
@@ -35,6 +35,10 @@
 | Phase 9: Fix Support for Local Install | 🔴 Blocked | 0/1 | Fix not working - needs redesign |
 | Phase 10: Create Node.js translation script | 🟢 Completed | 1/1 plans complete | None |
 | Phase 11: Migrate Distribution Manager Code | 🟢 Completed | 3/3 | None |
+| Phase 12: Simple profiles system | 🟢 Completed | 1/1 | None |
+| Phase 13: copy-from-original script | 🟢 Completed | 1/1 | None |
+| Phase 14: gsd-oc-tools.cjs for quick operations | 🟢 Completed | 2/2 | None |
+| Phase 15: fix set-profile script | 🟢 Completed | 1/1 | None |
 
 ---
 
@@ -55,10 +59,18 @@
 | Phase 12 P01 | 5 min | 2 tasks | 1 files |
 | Phase 13 P01 | 31 min | 3 tasks | 4 files |
 | Phase 13 P03 | 5 min | 2 tasks | 3 files |
+| Phase 14 P01 | 31 min | 3 tasks | 4 files |
+| Phase 15 P01 | 23 min | 7 tasks | 2 files |
+| Phase 15-fix-set-profile-script P01 | 23min | 7 tasks | 2 files |
 
 ## Accumulated Context
 
 ### Key Decisions
+| Use current_oc_profile key (not current_os_profile) | Consistent naming with auto-migration for backward compatibility | 2026-03-02 |
+| Two-mode profile switching | Mode 1 validates current profile, Mode 2 sets new profile - both with full validation | 2026-03-02 |
+| Model validation before file modifications | Pre-flight validation catches ALL invalid models before ANY changes | 2026-03-02 |
+| Backup system in .planning/backups/ | Timestamped backups protect against data loss | 2026-03-02 |
+| Opencode.json merge preserves non-gsd agents | Only update gsd-* agents, leave all others untouched | 2026-03-02 |
 | Create-or-update pattern for opencode.json | applyProfileToOpencode creates file with $schema and agent object when missing, updates when present | 2026-03-02 |
 
 | Decision | Rationale | Date |
@@ -160,24 +172,30 @@ None currently.
 | 2026-02-21 | Phase 12 added | Simple profiles system |
 | 2026-02-22 | Phase 13 added | copy-from-original script |
 | 2026-02-28 | Phase 14 added | gsd-oc-tools.cjs for quick operations |
+| 2026-03-02 | Phase 15 added | fix set-profile script |
 
 ---
 
 ## Session Continuity
 
-**Last Session:** 2026-03-02T03:02:19.241Z
-**Stopped at:** Completed Quick Task 7 — set-profile creates opencode.json when missing
-**Resume file:** None
-**Current Focus:** Quick Task 7 complete — set-profile now creates/updates opencode.json unconditionally
-**Next Action:** Continue with Phase 14 or next quick task
+**Last Session:** 2026-03-02T16:25:53Z
+**Stopped at:** Phase 15 Plan 01 complete
+**Resume file:** .planning/phases/15-fix-set-profile-script/15-01-SUMMARY.md
+**Current Focus:** Phase 15 Plan 01 complete - set-profile fixed with two modes, validation, backup
+**Next Action:** Phase 15 Plan 02 (if needed) or Phase 16
 
 ### Recently Completed
 
-- ✓ Project initialized
-- ✓ Requirements defined (52 v1 requirements)
-- ✓ Research completed (HIGH confidence)
-- ✓ Roadmap created (6 phases)
-- ✓ **PHASE 1 COMPLETE** — All 6 plans executed, 22/22 requirements satisfied
+- ✓ **PHASE 15 PLAN 01 COMPLETE** — Fix set-profile script with comprehensive validation
+  - Task 1: Fixed config.json schema to use current_oc_profile key with auto-migration
+  - Task 2: Implemented two operation modes (with/without profile name)
+  - Task 3: Model validation BEFORE any file modifications
+  - Task 4: Opencode.json merge preserves non-gsd agents
+  - Task 5: Backup system in .planning/backups/ with date stamps
+  - Task 6: Structured JSON output with success/error format
+  - Task 7: Local scope only (no --global flag)
+  - All 7 SETPROFILE requirements satisfied
+  - Commits: c4ad78d, 93c6c50, 9afe34d
   - ✓ Plan 01-01: Foundation utilities — logger, path-resolver, constants
   - ✓ Plan 01-02: Interactive prompt utilities
   - ✓ Plan 01-03: Service layer — ScopeManager and ConfigManager
