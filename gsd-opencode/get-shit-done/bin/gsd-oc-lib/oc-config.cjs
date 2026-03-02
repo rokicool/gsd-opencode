@@ -110,19 +110,24 @@ function applyProfileToOpencode(opencodePath, configPath) {
       };
     }
     
-    // Load opencode.json
+    // Load or create opencode.json
+    let opencodeData;
     if (!fs.existsSync(opencodePath)) {
-      return {
-        success: false,
-        error: {
-          code: 'CONFIG_NOT_FOUND',
-          message: `opencode.json not found at ${opencodePath}`
-        }
+      // Create initial opencode.json structure
+      opencodeData = {
+        "$schema": "https://opencode.ai/config.json",
+        "agent": {}
       };
+    } else {
+      // Load existing opencode.json
+      const opencodeContent = fs.readFileSync(opencodePath, 'utf8');
+      opencodeData = JSON.parse(opencodeContent);
+      
+      // Ensure agent object exists
+      if (!opencodeData.agent) {
+        opencodeData.agent = {};
+      }
     }
-    
-    const opencodeContent = fs.readFileSync(opencodePath, 'utf8');
-    const opencodeData = JSON.parse(opencodeContent);
     
     // Get model assignments from profile
     // Support both structures: profiles.planning or profiles.models.planning
