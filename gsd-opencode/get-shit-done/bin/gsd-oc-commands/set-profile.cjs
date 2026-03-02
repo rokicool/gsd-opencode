@@ -1,22 +1,21 @@
 /**
- * set-profile.cjs — Switch profile with interactive model selection
+ * set-profile.cjs — Switch profile with validation and two operation modes
  *
- * Command module that handles the full profile switching workflow:
- * 1. Load and validate config
- * 2. Display current state
- * 3. Determine target profile (arg or interactive)
- * 4. Handle --reuse flag with analyze-reuse
- * 5. Model selection wizard
- * 6. Validate selected models
- * 7. Apply changes (config.json + opencode.json)
- * 8. Report success
+ * Command module that handles profile switching with comprehensive validation:
+ * 1. Validate config.json exists
+ * 2. Support two operation modes:
+ *    - Mode 1 (no profile name): Validate current profile and apply
+ *    - Mode 2 (profile name provided): Validate and apply specified profile
+ * 3. Model validation BEFORE any file modifications
+ * 4. Create backups before modifications
+ * 5. Apply changes atomically
+ * 6. Output structured JSON
  *
- * Usage: node set-profile.cjs [simple|smart|genius] [--reuse] [--verbose]
+ * Usage: node set-profile.cjs [profile-name] [--raw] [--verbose]
  */
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 const { output, error, createBackup } = require('../gsd-oc-lib/oc-core.cjs');
 const { applyProfileToOpencode, VALID_PROFILES, PROFILE_AGENT_MAPPING } = require('../gsd-oc-lib/oc-config.cjs');
 const { getModelCatalog } = require('../gsd-oc-lib/oc-models.cjs');
@@ -33,6 +32,7 @@ function setProfile(cwd, args) {
   
   const configPath = path.join(cwd, '.planning', 'config.json');
   const opencodePath = path.join(cwd, 'opencode.json');
+  const backupsDir = path.join(cwd, '.planning', 'backups');
 
   // Step 1: Load and validate config
   if (!fs.existsSync(configPath)) {
@@ -47,34 +47,37 @@ function setProfile(cwd, args) {
     error('Failed to parse .planning/config.json', 'INVALID_JSON');
   }
 
-  const profiles = config.profiles || {};
-  const currentProfileType = profiles.profile_type || config.profile_type;
-  const currentModels = profiles.models || {};
+  // Ensure profiles.presets exists
+  if (!config.profiles || !config.profiles.presets) {
+    error('config.json missing profiles.presets structure', 'INVALID_CONFIG');
+  }
 
-  // Get target profile from args or mark for interactive
-  let targetProfile = args.find(arg => VALID_PROFILES.includes(arg));
+  const presets = config.profiles.presets;
+  const currentProfileName = config.current_oc_profile;
   
-  // Validate profile exists if provided
-  if (targetProfile && !VALID_PROFILES.includes(targetProfile)) {
-    error(`Unknown profile: "${targetProfile}". Valid profiles: ${VALID_PROFILES.join(', ')}`, 'INVALID_PROFILE');
+  // Filter out flags to get profile name argument
+  const profileArgs = args.filter(arg => !arg.startsWith('--'));
+  
+  // Check for unknown profile arguments
+  if (profileArgs.length > 1) {
+    error(`Too many arguments. Usage: set-profile [profile-name]`, 'INVALID_ARGS');
   }
   
-  const isInteractive = !targetProfile;
+  const targetProfile = profileArgs.length > 0 ? profileArgs[0] : null;
+  
+  // Validate profile argument if provided
+  if (targetProfile && !presets[targetProfile]) {
+    const availableProfiles = Object.keys(presets).join(', ');
+    error(`Profile "${targetProfile}" not found. Available profiles: ${availableProfiles}`, 'PROFILE_NOT_FOUND');
+  }
 
-  // Step 3: Display current state (output for workflow to display)
-  const currentState = {
-    hasProfile: !!currentProfileType,
-    profileType: currentProfileType,
-    models: {
-      planning: currentModels.planning || '(not set)',
-      execution: currentModels.execution || '(not set)',
-      verification: currentModels.verification || '(not set)'
-    }
-  };
-
-  // Non-interactive mode: apply changes with current models
+  // ========== MODE 2: Profile name provided ==========
   if (targetProfile) {
-    const result = applyProfileChanges(cwd, targetProfile, currentModels, verbose);
+    if (verbose) {
+      console.error(`[verbose] Mode 2: Setting profile to "${targetProfile}"`);
+    }
+    
+    const result = applyProfileWithValidation(cwd, targetProfile, config, presets, verbose);
     
     if (!result.success) {
       error(result.error.message, result.error.code);
@@ -88,97 +91,63 @@ function setProfile(cwd, args) {
     process.exit(0);
   }
 
-  // Interactive mode: output model selection prompt
-  const requiredStages = getRequiredStages(currentProfileType);
-  const modelSelectionPrompt = {
-    mode: 'model_selection',
-    targetProfile: null,
-    stages: requiredStages,
-    currentModels: {
-      planning: currentModels.planning,
-      execution: currentModels.execution,
-      verification: currentModels.verification
-    },
-    prompt: buildModelSelectionPrompts(currentProfileType, currentModels)
-  };
-
-  if (raw) {
-    output(modelSelectionPrompt, true, JSON.stringify(modelSelectionPrompt.prompt));
-  } else {
-    output({ success: true, data: modelSelectionPrompt });
+  // ========== MODE 1: No profile name - validate current profile ==========
+  if (!currentProfileName) {
+    error(
+      `No current profile set. Run set-profile with a profile name first.\nAvailable profiles: ${Object.keys(presets).join(', ')}`,
+      'MISSING_CURRENT_PROFILE'
+    );
   }
-
+  
+  if (!presets[currentProfileName]) {
+    error(
+      `Current profile "${currentProfileName}" not found in profiles.presets.\nAvailable profiles: ${Object.keys(presets).join(', ')}`,
+      'PROFILE_NOT_FOUND'
+    );
+  }
+  
+  if (verbose) {
+    console.error(`[verbose] Mode 1: Validating current profile "${currentProfileName}"`);
+  }
+  
+  const result = applyProfileWithValidation(cwd, currentProfileName, config, presets, verbose);
+  
+  if (!result.success) {
+    error(result.error.message, result.error.code);
+  }
+  
+  if (raw) {
+    output(result.data, true, JSON.stringify(result.data, null, 2));
+  } else {
+    output({ success: true, data: result.data });
+  }
   process.exit(0);
 }
 
 /**
- * Get required stages for profile type
+ * Apply profile with comprehensive validation
+ * Validates models BEFORE any file modifications
+ *
+ * @param {string} cwd - Current working directory
+ * @param {string} profileName - Profile name to apply
+ * @param {Object} config - Parsed config.json
+ * @param {Object} presets - profiles.presets object
+ * @param {boolean} verbose - Verbose output
+ * @returns {Object} {success, data, error}
  */
-function getRequiredStages(profileType) {
-  switch (profileType) {
-    case 'simple':
-      return ['planning'];
-    case 'smart':
-      return ['planning', 'verification'];
-    case 'genius':
-      return ['planning', 'execution', 'verification'];
-    default:
-      return [];
-  }
-}
-
-/**
- * Build model selection prompts based on profile type
- */
-function buildModelSelectionPrompts(profileType, currentModels) {
-  const prompts = [];
-
-  if (profileType === 'simple') {
-    prompts.push({
-      stage: 'all',
-      context: 'Simple Profile - One model to rule them all',
-      current: currentModels.planning
-    });
-  } else if (profileType === 'smart') {
-    prompts.push({
-      stage: 'planning_execution',
-      context: 'Smart Profile - Planning & Execution',
-      current: currentModels.planning
-    });
-    prompts.push({
-      stage: 'verification',
-      context: 'Smart Profile - Verification',
-      current: currentModels.verification
-    });
-  } else if (profileType === 'genius') {
-    prompts.push({
-      stage: 'planning',
-      context: 'Genius Profile - Planning',
-      current: currentModels.planning
-    });
-    prompts.push({
-      stage: 'execution',
-      context: 'Genius Profile - Execution',
-      current: currentModels.execution
-    });
-    prompts.push({
-      stage: 'verification',
-      context: 'Genius Profile - Verification',
-      current: currentModels.verification
-    });
-  }
-
-  return prompts;
-}
-
-/**
- * Apply profile changes to config files (called after model selection)
- */
-function applyProfileChanges(cwd, targetProfile, models, verbose = false) {
+function applyProfileWithValidation(cwd, profileName, config, presets, verbose = false) {
   const configPath = path.join(cwd, '.planning', 'config.json');
   const opencodePath = path.join(cwd, 'opencode.json');
+  const backupsDir = path.join(cwd, '.planning', 'backups');
 
-  // Validate models
+  // Step 1: Validate ALL models BEFORE any modifications
+  const profileModels = presets[profileName];
+  const modelIdsToValidate = [
+    profileModels.planning,
+    profileModels.execution,
+    profileModels.verification
+  ].filter(Boolean);
+
   const catalogResult = getModelCatalog();
   if (!catalogResult.success) {
     return {
@@ -190,7 +159,7 @@ function applyProfileChanges(cwd, targetProfile, models, verbose = false) {
   const validModels = catalogResult.models;
   const invalidModels = [];
 
-  for (const modelId of Object.values(models)) {
+  for (const modelId of modelIdsToValidate) {
     if (!validModels.includes(modelId)) {
       invalidModels.push(modelId);
     }
@@ -201,14 +170,23 @@ function applyProfileChanges(cwd, targetProfile, models, verbose = false) {
       success: false,
       error: {
         code: 'INVALID_MODELS',
-        message: `Invalid model IDs: ${invalidModels.join(', ')}`
+        message: `Profile '${profileName}' contains invalid models: ${invalidModels.join(', ')}`
       }
     };
   }
 
-  // Create backups
-  const configBackup = createBackup(configPath);
-  const opencodeBackup = fs.existsSync(opencodePath) ? createBackup(opencodePath) : null;
+  if (verbose) {
+    console.error(`[verbose] Model validation passed for profile "${profileName}"`);
+  }
+
+  // Step 2: Create backups directory
+  if (!fs.existsSync(backupsDir)) {
+    fs.mkdirSync(backupsDir, { recursive: true });
+  }
+
+  // Step 3: Create backups BEFORE modifications
+  const configBackup = createBackup(configPath, backupsDir);
+  const opencodeBackup = fs.existsSync(opencodePath) ? createBackup(opencodePath, backupsDir) : null;
 
   if (verbose) {
     console.error(`[verbose] Config backup: ${configBackup}`);
@@ -217,27 +195,9 @@ function applyProfileChanges(cwd, targetProfile, models, verbose = false) {
     }
   }
 
-  // Update config.json
-  let config;
-  try {
-    config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  } catch (err) {
-    return {
-      success: false,
-      error: { code: 'INVALID_JSON', message: 'Failed to parse config.json' }
-    };
-  }
-
-  config.profiles = config.profiles || {};
-  config.profiles.profile_type = targetProfile;
-  config.profiles.models = {
-    planning: models.planning,
-    execution: models.execution || models.planning,
-    verification: models.verification || models.planning
-  };
-  // Track current OS profile
-  config.current_os_profile = targetProfile;
-
+  // Step 4: Update config.json with current_oc_profile
+  config.current_oc_profile = profileName;
+  
   try {
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n', 'utf8');
   } catch (err) {
@@ -247,22 +207,26 @@ function applyProfileChanges(cwd, targetProfile, models, verbose = false) {
     };
   }
 
-  // Update or create opencode.json with profile models
-  let updatedAgents = [];
-  const applyResult = applyProfileToOpencode(opencodePath, configPath);
+  // Step 5: Update opencode.json with profile models
+  const applyResult = applyProfileToOpencode(opencodePath, configPath, profileName);
   if (!applyResult.success) {
     return applyResult;
   }
-  updatedAgents = applyResult.updated;
 
   return {
     success: true,
     data: {
-      profileType: targetProfile,
-      models: config.profiles.models,
-      configBackup,
-      opencodeBackup,
-      updated: updatedAgents.map(u => u.agent)
+      profile: profileName,
+      models: {
+        planning: profileModels.planning,
+        execution: profileModels.execution,
+        verification: profileModels.verification
+      },
+      updated: applyResult.updated.map(u => u.agent),
+      backups: {
+        config: configBackup,
+        opencode: opencodeBackup
+      }
     }
   };
 }
