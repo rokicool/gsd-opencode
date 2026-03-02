@@ -47,6 +47,18 @@ function setProfile(cwd, args) {
     error('Failed to parse .planning/config.json', 'INVALID_JSON');
   }
 
+  // Auto-migrate old key name: current_os_profile → current_oc_profile
+  if (config.current_os_profile && !config.current_oc_profile) {
+    config.current_oc_profile = config.current_os_profile;
+    delete config.current_os_profile;
+    try {
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n', 'utf8');
+      console.error('[migrated] current_os_profile → current_oc_profile');
+    } catch (err) {
+      // Ignore write errors during migration
+    }
+  }
+
   // Ensure profiles.presets exists
   if (!config.profiles || !config.profiles.presets) {
     error('config.json missing profiles.presets structure', 'INVALID_CONFIG');
