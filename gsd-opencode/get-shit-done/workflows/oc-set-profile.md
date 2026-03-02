@@ -34,43 +34,15 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 
 <behavior>
 
-## Step 1: Load config and check for migration
+## Step 1: Load config
 
-Run migrate-config to handle legacy configs:
+Run set-profile without args to get current state:
 
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs migrate-config --verbose
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile --raw
 ```
 
 Parse the JSON output:
-
-**If migration occurred:**
-```json
-{
-  "success": true,
-  "data": {
-    "migrated": true,
-    "from": "quality",
-    "to": "genius",
-    "backup": ".opencode-backups/..."
-  }
-}
-```
-
-Store migration info for final report.
-
-**If already current format:**
-```json
-{
-  "success": true,
-  "data": {
-    "migrated": false,
-    "reason": "Config already uses current format"
-  }
-}
-```
-
-Proceed to Step 2.
 
 **If config missing:**
 ```json
@@ -82,25 +54,25 @@ Proceed to Step 2.
 - Print: `Error: No GSD project found. Run /gsd-new-project first.`
 - Stop.
 
-## Step 2: Read current profile state
-
-Read `.planning/config.json` to get current profile state:
-
+**Success returns current state for interactive mode:**
 ```json
 {
-  "current_oc_profile": "smart",
-  "profiles": {
-    "profile_type": "smart",
-    "models": {
-      "planning": "opencode/smartest-model",
-      "execution": "opencode/middle-model",
-      "verification": "opencode/cheaper-model"
-    }
+  "success": true,
+  "data": {
+    "mode": "model_selection",
+    "targetProfile": null,
+    "stages": ["planning", ...],
+    "currentModels": {
+      "planning": "opencode/model",
+      "execution": "opencode/model",
+      "verification": "opencode/model"
+    },
+    "prompt": [...]
   }
 }
 ```
 
-## Step 3: Display current state
+## Step 2: Display current state
 
 If profile exists:
 
@@ -115,7 +87,7 @@ Current configuration:
 | verification | {models.verification} |
 ```
 
-## Step 4: Determine requested profile
+## Step 3: Determine requested profile
 
 **A) Check for positional argument:**
 - If user typed `/gsd-set-profile simple|smart|genius`, use that as `newProfileType`
@@ -151,7 +123,7 @@ If invalid profile name:
 - Print: `Unknown profile type '{name}'. Valid options: simple, smart, genius`
 - Fall back to interactive picker
 
-## Step 5: Model selection wizard
+## Step 4: Model selection wizard
 
 Run set-profile command to get model selection prompts:
 
@@ -206,7 +178,7 @@ Use gsd-oc-select-model skill to select model for "Genius Profile - Execution"
 
 Use gsd-oc-select-model skill to select model for "Genius Profile - Verification"
 
-## Step 6: Validate selected models
+## Step 5: Validate selected models
 
 Before writing files, validate models exist:
 
@@ -236,7 +208,7 @@ If any model invalid (success: false):
 - Print error with list of missing models
 - Stop. Do NOT write config files.
 
-## Step 7: Apply changes
+## Step 6: Apply changes
 
 Run update-opencode-json to apply profile changes:
 
@@ -267,7 +239,7 @@ This command:
 - Restore from backup if possible
 - Print error and stop
 
-## Step 8: Check for changes
+## Step 7: Check for changes
 
 Compare old and new models. If no changes were made:
 ```
@@ -275,7 +247,7 @@ No changes made to {targetProfile} profile.
 ```
 Stop.
 
-## Step 9: Report success
+## Step 8: Report success
 
 ```text
 ✓ Updated {targetProfile} profile:
@@ -285,11 +257,6 @@ Stop.
 | planning     | {newPreset.planning} |
 | execution    | {newPreset.execution} |
 | verification | {newPreset.verification} |
-```
-
-If migration occurred:
-```
-⚡ Auto-migrated from {old_profile} to genius profile
 ```
 
 If `targetProfile` is the active profile:
@@ -308,7 +275,7 @@ To use this profile, run: /gsd-set-profile {targetProfile}
 - Use question tool for ALL user input
 - Always show full model IDs (e.g., `opencode/glm-4.7-free`)
 - Use gsd-oc-tools.cjs for validation and file operations
-- Backup files are created automatically by update-opencode-json and migrate-config
+- Backup files are created automatically by update-opencode-json
 - **Source of truth:** `config.json` stores profile_type and models; `opencode.json` is derived
 - Model selection uses gsd-oc-select-model skill via the set-profile command
 - Commands support --verbose for debug output and --raw for machine-readable output

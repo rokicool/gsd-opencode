@@ -5,16 +5,28 @@
   "commit_docs": false,
   "model_profile": "quality",
   "profiles": {
-    "profile_type": "simple",
-    "models": {
-      "planning": "bailian-coding-plan/qwen3.5-plus",
-      "execution": "bailian-coding-plan/qwen3.5-plus",
-      "verification": "bailian-coding-plan/qwen3.5-plus"
+    "presets": {
+      "quality": {
+        "planning": "bailian-coding-plan/qwen3.5-plus",
+        "execution": "bailian-coding-plan/qwen3.5-plus",
+        "verification": "bailian-coding-plan/qwen3.5-plus"
+      },
+      "balanced": {
+        "planning": "bailian-coding-plan/qwen3.5-plus",
+        "execution": "bailian-coding-plan/qwen3.5-plus",
+        "verification": "bailian-coding-plan/qwen3.5-plus"
+      },
+      "budget": {
+        "planning": "bailian-coding-plan/qwen3.5-plus",
+        "execution": "bailian-coding-plan/qwen3.5-plus",
+        "verification": "bailian-coding-plan/qwen3.5-plus"
+      }
     }
   },
   "workflow": {
     "research": true,
     "plan_check": true,
     "verifier": true
-  }
+  },
+  "current_oc_profile": "quality"
 }
