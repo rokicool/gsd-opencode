@@ -166,13 +166,10 @@ function applyProfileToOpencode(opencodePath, configPath) {
       
       if (modelId) {
         for (const agentName of agentNames) {
-          // Handle both string and object agent configurations
-          if (typeof opencodeData.agent[agentName] === 'string') {
-            opencodeData.agent[agentName] = modelId;
-          } else if (typeof opencodeData.agent[agentName] === 'object' && opencodeData.agent[agentName] !== null) {
+          if (typeof opencodeData.agent[agentName] === 'object' && opencodeData.agent[agentName] !== null) {
             opencodeData.agent[agentName].model = modelId;
           } else {
-            opencodeData.agent[agentName] = modelId;
+            opencodeData.agent[agentName] = { model: modelId };
           }
           updatedAgents.push({ agent: agentName, model: modelId });
         }
