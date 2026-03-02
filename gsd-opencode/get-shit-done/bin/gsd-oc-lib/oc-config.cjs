@@ -55,7 +55,14 @@ function loadProfileConfig(cwd) {
     }
     
     const content = fs.readFileSync(configPath, 'utf8');
-    const config = JSON.parse(content);
+    let config = JSON.parse(content);
+    
+    // Auto-migrate old key name: current_os_profile → current_oc_profile
+    if (config.current_os_profile && !config.current_oc_profile) {
+      config.current_oc_profile = config.current_os_profile;
+      delete config.current_os_profile;
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n', 'utf8');
+    }
     
     return config;
   } catch (err) {
@@ -69,9 +76,10 @@ function loadProfileConfig(cwd) {
  *
  * @param {string} opencodePath - Path to opencode.json
  * @param {string} configPath - Path to .planning/config.json
+ * @param {string} [profileName] - Optional profile name to use (overrides current_oc_profile)
  * @returns {Object} {success: true, updated: [agentNames]} or {success: false, error: {code, message}}
  */
-function applyProfileToOpencode(opencodePath, configPath) {
+function applyProfileToOpencode(opencodePath, configPath, profileName = null) {
   try {
     // Load profile config
     let config;
@@ -88,24 +96,28 @@ function applyProfileToOpencode(opencodePath, configPath) {
       };
     }
     
-    // Validate profile_type
-    const profileType = config.profile_type || config.profiles?.profile_type;
-    if (!profileType) {
+    // Determine which profile to use
+    const targetProfile = profileName || config.current_oc_profile;
+    
+    if (!targetProfile) {
       return {
         success: false,
         error: {
           code: 'PROFILE_NOT_FOUND',
-          message: 'profile_type not found in config.json'
+          message: 'current_oc_profile not found in config.json. Run set-profile with a profile name first.'
         }
       };
     }
     
-    if (!VALID_PROFILES.includes(profileType)) {
+    // Validate profile exists in profiles.presets
+    const presets = config.profiles?.presets;
+    if (!presets || !presets[targetProfile]) {
+      const availableProfiles = presets ? Object.keys(presets).join(', ') : 'none';
       return {
         success: false,
         error: {
-          code: 'INVALID_PROFILE',
-          message: `Invalid profile_type: "${profileType}". Valid profiles: ${VALID_PROFILES.join(', ')}`
+          code: 'PROFILE_NOT_FOUND',
+          message: `Profile "${targetProfile}" not found in profiles.presets. Available profiles: ${availableProfiles}`
         }
       };
     }
@@ -129,30 +141,20 @@ function applyProfileToOpencode(opencodePath, configPath) {
       }
     }
     
-    // Get model assignments from profile
-    // Support both structures: profiles.planning or profiles.models.planning
-    const profiles = config.profiles || {};
-    let profileModels;
-    
-    // Try new structure first: profiles.models.{planning|execution|verification}
-    if (profiles.models && typeof profiles.models === 'object') {
-      profileModels = profiles.models;
-    } else {
-      // Fallback to old structure: profiles.{planning|execution|verification}
-      profileModels = profiles[profileType] || {};
-    }
+    // Get model assignments from profiles.presets.{profile_name}.models
+    const profileModels = presets[targetProfile];
     
     if (!profileModels.planning && !profileModels.execution && !profileModels.verification) {
       return {
         success: false,
         error: {
           code: 'PROFILE_NOT_FOUND',
-          message: `No model assignments found for profile "${profileType}"`
+          message: `No model assignments found for profile "${targetProfile}"`
         }
       };
     }
     
-    // Apply model assignments to agents
+    // Apply model assignments to agents (MERGE - preserve non-gsd agents)
     const updatedAgents = [];
     
     // Initialize agent object if it doesn't exist
@@ -160,12 +162,13 @@ function applyProfileToOpencode(opencodePath, configPath) {
       opencodeData.agent = {};
     }
     
-    // Apply each profile category
+    // Apply each profile category - ONLY update gsd-* agents
     for (const [category, agentNames] of Object.entries(PROFILE_AGENT_MAPPING)) {
       const modelId = profileModels[category];
       
       if (modelId) {
         for (const agentName of agentNames) {
+          // Only update gsd-* agents, preserve all others
           if (typeof opencodeData.agent[agentName] === 'object' && opencodeData.agent[agentName] !== null) {
             opencodeData.agent[agentName].model = modelId;
           } else {
