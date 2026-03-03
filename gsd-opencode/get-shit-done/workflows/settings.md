@@ -128,8 +128,8 @@ Merge new settings into existing config.json:
 ```
 
 write updated config to `.planning/config.json`.
- **Follow the set-profile workflow** from `@~/.config/opencode/get-shit-done/workflows/oc-set-profile.md`.
- </step>
+
+</step>
 
 <step name="save_as_defaults">
 Ask whether to save these settings as global defaults for future projects:
