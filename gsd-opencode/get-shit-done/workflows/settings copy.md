@@ -45,7 +45,7 @@ question([
     options: [
       { label: "Simple", description: "One model for all agents (not flexible)" },
       { label: "Smart (Recommended)", description: "Two models: one for reseach and planing, other for execution and verification" },
-      { label: "Genius (most flexible)", description: "Three models: different for every stage" }
+      { label: "Custom (most flexible)", description: "Three models: different for every stage" }
     ]
   },
   {
@@ -113,7 +113,7 @@ Merge new settings into existing config.json:
 ```json
 {
   ...existing_config,
-  "model_profile": "simple" | "smart" | "genius",
+  "model_profile": "simple" | "smart" | "custom",
   "workflow": {
     "research": true/false,
     "plan_check": true/false,
@@ -128,8 +128,11 @@ Merge new settings into existing config.json:
 ```
 
 write updated config to `.planning/config.json`.
- **Follow the set-profile workflow** from `@~/.config/opencode/get-shit-done/workflows/oc-set-profile.md`.
- </step>
+
+
+**Follow the set-profile workflow** from `@~/.config/opencode/get-shit-done/workflows/oc-set-profile.md`.
+
+</step>
 
 <step name="save_as_defaults">
 Ask whether to save these settings as global defaults for future projects:
@@ -184,7 +187,7 @@ Display:
 
 | Setting              | Value |
 |----------------------|-------|
-| Model Profile        | {simple/smart/genius} |
+| Model Profile        | {simple/smart/custom} |
 | Plan Researcher      | {On/Off} |
 | Plan Checker         | {On/Off} |
 | Execution Verifier   | {On/Off} |

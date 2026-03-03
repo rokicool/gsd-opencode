@@ -297,7 +297,7 @@ function applyProfileWithValidation(cwd, profileName, options = {}) {
       config.profiles.presets[targetProfileName] = inlineProfile;
     }
 
-    // Write updated oc_config.json
+    // write updated oc_config.json
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n', 'utf8');
     log('Updated oc_config.json');
   } catch (err) {

@@ -174,7 +174,7 @@ function applyProfileToOpencode(opencodePath, configPath) {
       }
     }
     
-    // Write updated opencode.json
+    // write updated opencode.json
     fs.writeFileSync(opencodePath, JSON.stringify(opencodeData, null, 2) + '\n', 'utf8');
     
     return {

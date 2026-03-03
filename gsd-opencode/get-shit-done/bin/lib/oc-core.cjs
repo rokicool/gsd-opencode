@@ -83,7 +83,7 @@ function createBackup(filePath, backupDir = '.opencode-backups') {
       fs.mkdirSync(backupDir, { recursive: true });
     }
 
-    // Read original file
+    // read original file
     const content = fs.readFileSync(filePath, 'utf8');
 
     // Create timestamped filename (YYYYMMDD-HHmmss-SSS format)
@@ -97,7 +97,7 @@ function createBackup(filePath, backupDir = '.opencode-backups') {
     const backupFileName = `${timestamp}-${fileName}`;
     const backupPath = path.join(backupDir, backupFileName);
 
-    // Write backup
+    // write backup
     fs.writeFileSync(backupPath, content, 'utf8');
 
     return backupPath;

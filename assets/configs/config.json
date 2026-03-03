@@ -15,6 +15,8 @@
   "include": ["gsd-opencode/**"],
   "exclude": [
     "node_modules/**",
+    "gsd-opencode/node_modules/**",
+    "gsd-opencode/get-shit-done/bin/test/**",
     ".git/**",
     ".translate-backups/**",
     "assets/**",
@@ -708,6 +710,12 @@
       "pattern": "\"quality\" | \"balanced\" | \"budget\"",
       "replacement": "\"simple\" | \"smart\" | \"genius\"",
       "description": "Use - three models - profile"
+    },
+    {
+      "pattern": "write updated config to `.planning/config.json`\\.\\n*</step>",
+      "isRegex": true,
+      "replacement": "write updated config to `.planning/config.json`.\\n **Follow the set-profile workflow** from `@~/.config/opencode/get-shit-done/workflows/oc-set-profile.md`.\\n </step>",
+      "description": "Instert call to oc-set-profile.md "
     }
   ],
   "_forbidden_strings_after_translation": [

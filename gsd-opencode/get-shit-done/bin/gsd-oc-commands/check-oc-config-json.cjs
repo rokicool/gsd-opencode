@@ -31,7 +31,7 @@ function checkOcConfigJson(cwd, args) {
     error('.planning/oc_config.json not found', 'CONFIG_NOT_FOUND');
   }
 
-  // Read and parse config
+  // read and parse config
   let config;
   try {
     const content = fs.readFileSync(configPath, 'utf8');

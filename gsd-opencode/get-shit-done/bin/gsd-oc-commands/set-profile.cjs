@@ -207,7 +207,7 @@ function setProfilePhase16(cwd, args) {
     config.profiles.presets[profileName] = profile;
     config.current_oc_profile = profileName;
 
-    // Write oc_config.json
+    // write oc_config.json
     try {
       fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n', 'utf8');
       log('Updated oc_config.json');
