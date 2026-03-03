@@ -24,7 +24,7 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 | Execution    | gsd-executor, gsd-debugger |
 | Verification | gsd-verifier, gsd-integration-checker |
 
-**Profile types:**
+**Profile names:**
 
 - **Simple**: 1 model total — all stages use same model
 - **Smart**: 2 models — planning+execution share model, verification uses different
@@ -71,8 +71,8 @@ Parse the JSON output:
 
 If profile exists:
 
-```
-Active profile: {profile_name}
+``` markdown
+Active profile: **{profile_name}**
 
 Current configuration:
 | Stage        | Model |
@@ -259,7 +259,7 @@ from the previous answers.
 
 - Execute the next command and substitue {profile_name}, {model_for_planning_stage}, {model_for_execution_stage}, {model_for_verification_stage} with values:
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs '{profile_name}:{"planning": "{model_for_planning_stage}", "execution": "{model_for_execution_stage}", "verification": "{model_for_verification_stage}"'
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile '{profile_name}:{"planning": "{model_for_planning_stage}", "execution": "{model_for_execution_stage}", "verification": "{model_for_verification_stage}"'
 ```
 
 ## Step 7: Check for changes
