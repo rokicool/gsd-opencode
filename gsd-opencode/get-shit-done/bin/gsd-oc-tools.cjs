@@ -14,6 +14,9 @@
  *   update-opencode-json    Update opencode.json agent models from profile config
  *   validate-models         Validate model IDs against opencode catalog
  *   set-profile             Switch profile with interactive model selection
+ *   set-profile-phase16     Switch profile in oc_config.json (three modes)
+ *   pivot-profile           Alias for set-profile-phase16
+ *   get-profile             Get current profile or specific profile from oc_config.json
  *   help                    Show this help message
  */
 
@@ -46,13 +49,15 @@ Available Commands:
   update-opencode-json    Update opencode.json agent models from profile config (creates backup)
   validate-models         Validate one or more model IDs against opencode catalog
   set-profile             Switch profile with interactive model selection wizard
+  set-profile-phase16     Switch profile in oc_config.json (three modes: no name, with name, inline JSON)
+  pivot-profile           Alias for set-profile-phase16
   get-profile             Get current profile or specific profile from oc_config.json
   help                    Show this help message
 
 Options:
   --verbose              Enable verbose output (stderr)
   --raw                  Output raw values instead of JSON envelope
-  --dry-run              Preview changes without applying (update-opencode-json only)
+  --dry-run              Preview changes without applying (update-opencode-json, set-profile-phase16)
 
 Examples:
   node gsd-oc-tools.cjs check-opencode-json
@@ -60,6 +65,10 @@ Examples:
   node gsd-oc-tools.cjs update-opencode-json --dry-run
   node gsd-oc-tools.cjs validate-models opencode/glm-4.7
   node gsd-oc-tools.cjs set-profile genius
+  node gsd-oc-tools.cjs set-profile-phase16                     # Validate current profile
+  node gsd-oc-tools.cjs set-profile-phase16 genius              # Switch to profile
+  node gsd-oc-tools.cjs set-profile-phase16 'custom:{...}'      # Create profile
+  node gsd-oc-tools.cjs pivot-profile genius                    # Alias for set-profile-phase16
   node gsd-oc-tools.cjs get-profile
   node gsd-oc-tools.cjs get-profile genius
   node gsd-oc-tools.cjs get-profile --raw
@@ -108,6 +117,18 @@ switch (command) {
   case 'get-profile': {
     const getProfile = require('./gsd-oc-commands/get-profile.cjs');
     getProfile(cwd, flags);
+    break;
+  }
+
+  case 'set-profile-phase16': {
+    const setProfilePhase16 = require('./gsd-oc-commands/set-profile-phase16.cjs');
+    setProfilePhase16(cwd, flags);
+    break;
+  }
+
+  case 'pivot-profile': {
+    const pivotProfile = require('./gsd-oc-commands/pivot-profile.cjs');
+    pivotProfile(cwd, flags);
     break;
   }
 
