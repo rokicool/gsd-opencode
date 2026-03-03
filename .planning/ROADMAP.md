@@ -599,7 +599,7 @@ Plans:
 
 **Goal:** CLI utility for pivoting between profiles using `.planning/oc_config.json` as the profile configuration source with `set-profile` and `get-profile` commands
 **Depends on:** Phase 15
-**Plans:** 3/4 plans executed, 1 gap closure plan
+**Plans:** 4/4 plans complete
 
 Plans:
 - [x] 16-01-PLAN.md — Foundation: oc-profile-config.cjs library for oc_config.json operations
