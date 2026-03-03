@@ -3,20 +3,19 @@
 You are executing the `/gsd-set-profile` command. Switch the project's active model profile (simple/smart/genius) with optional model reuse.
 
 This command reads/writes:
-- `.planning/config.json` — profile state (profile_type, models)
-- `opencode.json` — agent model assignments (derived from profile)
+- `.planning/oc_config.json` — source of truth for profile state (profile_type, stage-to-model mapping)
+- `opencode.json` — agent model assignments (derived from profile; updated automatically by CLI)
 
-Do NOT modify agent .md files. Profile switching updates `opencode.json` in the project root.
+Do NOT modify agent .md files. Profile switching only updates these two JSON files.
 </role>
 
 <context>
-**Invocation styles:**
+## Invocation
 
-1. No args (interactive wizard): `/gsd-set-profile`
-2. Positional with type: `/gsd-set-profile simple|smart|genius`
+1. **Interactive wizard (no args):** `/gsd-set-profile`
+2. **Direct switch (positional arg):** `/gsd-set-profile simple|smart|genius`
 
-
-**Stage-to-agent mapping (11 agents):**
+## Stage-to-Agent Mapping (11 agents)
 
 | Stage        | Agents |
 |--------------|--------|
@@ -24,264 +23,136 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 | Execution    | gsd-executor, gsd-debugger |
 | Verification | gsd-verifier, gsd-integration-checker |
 
-**Profile names:**
+## Profile Types
 
-- **Simple**: 1 model total — all stages use same model
-- **Smart**: 2 models — planning+execution share model, verification uses different
-- **Genius**: 3 models — each stage can have different model
+| Profile  | Models | Stage assignment |
+|----------|--------|-----------------|
+| Simple   | 1      | All stages use the same model |
+| Smart    | 2      | Planning + Execution share one model; Verification uses a different model |
+| Genius   | 3      | Each stage uses a different model |
 
+## Output Format (reused throughout)
+
+When displaying profile state, always use this format:
+
+```
+Active profile: **{profile_name}**
+
+| Stage        | Model |
+|--------------|-------|
+| Planning     | {models.planning} |
+| Execution    | {models.execution} |
+| Verification | {models.verification} |
+```
 </context>
 
 <behavior>
 
-## Step 1: Load config
+## Step 1: Load current profile
 
-Run set-profile without args to get current state:
+Run `get-profile` to read the current state from `.planning/oc_config.json`:
 
 ```bash
 node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs get-profile
 ```
 
-Parse the JSON output:
+Parse the JSON response:
 
-**If config missing:**
-```json
-{
-  "success": false,
-  "error": { "code": "CONFIG_NOT_FOUND", "message": "..." }
-}
-```
-- Go to **Step 3**
+- **`success: true`** — Extract `data` (keyed by profile name) containing `planning`, `execution`, `verification` model IDs. Display the profile using the Output Format. Continue to Step 2.
+- **`success: false` with `CONFIG_NOT_FOUND`** — No profile exists yet. Skip display, go directly to Step 2.
 
-**Success returns current state for interactive mode:**
-```json
-{
-  "success": true,
-  "data": {
-    "simple": {
-      "planning": "bailian-coding-plan/qwen3-coder-plus",
-      "execution": "bailian-coding-plan/qwen3-coder-plus",
-      "verification": "bailian-coding-plan/qwen3-coder-plus"
-    }
-  }
-}
-```
+## Step 2: Determine target profile
 
-## Step 2: Display current state
+### Path A — Positional argument provided
 
-If profile exists:
+If the user typed `/gsd-set-profile {type}` where `{type}` is one of `simple`, `smart`, `genius`:
 
-``` markdown
-Active profile: **{profile_name}**
-
-Current configuration:
-| Stage        | Model |
-|--------------|-------|
-| planning     | {models.planning} |
-| execution    | {models.execution} |
-| verification | {models.verification} |
-```
-
-## Step 3: Determine requested profile
-
-**A) Check for positional argument:**
-- If user typed `/gsd-set-profile simple|smart|genius`, use that as `newProfileType`
-
-Execute:
+Attempt to switch to the saved profile:
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile {newProfileType}
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile {type}
 ```
-Parse the JSON output:
 
-If error and there is no such a profile:
-```json
-{
-  "success": false,
-  "error": {
-    "code": "PROFILE_NOT_FOUND",
-    "message": "No model assignments found for profile \"simple\""
-  }
-}
-```
-Go to **B) Interactive picker (no args):**
+- **`success: true`** — The profile already has saved model assignments. Display the updated configuration using the Output Format. Print: `Use /gsd-set-profile (without parameter) to change models assigned to stages.` **Stop.**
+- **`PROFILE_NOT_FOUND` error** — No saved models for this profile type. Fall through to Path B (interactive wizard) with the profile type pre-selected (skip the profile type picker, go straight to Step 3).
 
-If success: 
+### Path B — No argument (interactive wizard)
 
-```json
-{
-  "success": true,
-  "data": {
-    "profile": "smart",
-    "models": {
-      "planning": "bailian-coding-plan/qwen3-coder-plus",
-      "execution": "bailian-coding-plan/qwen3-coder-plus",
-      "verification": "bailian-coding-plan/qwen3-coder-plus"
-    },
-    "backup": ".planning/backups/20260303035841-oc_config.json",
-    "updated": [
-      {
-        "agent": "gsd-planner",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      },
-      {
-        "agent": "gsd-plan-checker",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      },
-      {
-        "agent": "gsd-phase-researcher",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      },
-      {
-        "agent": "gsd-roadmapper",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      },
-      {
-        "agent": "gsd-project-researcher",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      },
-      {
-        "agent": "gsd-research-synthesizer",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      },
-      {
-        "agent": "gsd-codebase-mapper",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      },
-      {
-        "agent": "gsd-executor",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      },
-      {
-        "agent": "gsd-debugger",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      },
-      {
-        "agent": "gsd-verifier",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      },
-      {
-        "agent": "gsd-integration-checker",
-        "model": "bailian-coding-plan/qwen3-coder-plus"
-      }
-    ],
-    "configPath": ".planning/oc_config.json"
-  }
-}
-```
-- Show the current config in this format:
-
-Active profile: {profile_name}
-
-Current configuration:
-| Stage        | Model |
-|--------------|-------|
-| planning     | {models.planning} |
-| execution    | {models.execution} |
-| verification | {models.verification} |
-
-- Print: ' */gsd-set-profile* (without parameter) if you need to change models assigned to stages'
-- Stop.
-
-**B) Interactive picker (no args):**
-
-Use question tool:
+Prompt the user to choose a profile type using the question tool:
 
 ```json
 {
   "header": "Profile Type",
   "question": "Select a profile type for model configuration",
   "options": [
-    { "label": "Simple", "description": "1 model for all gsd stages (easiest setup)" },
-    { "label": "Smart", "description": "2 models: advanced for planning & execution, cheaper for verification stages" },
-    { "label": "Genius", "description": "3 models: different model for planning, execution, or verification stages" },
+    { "label": "Simple", "description": "1 model for all GSD stages (easiest setup)" },
+    { "label": "Smart", "description": "2 models: advanced for planning & execution, cheaper for verification" },
+    { "label": "Genius", "description": "3 models: different model for each stage" },
     { "label": "Cancel", "description": "Exit without changes" }
   ]
 }
 ```
 
-If Cancel selected, print cancellation message and stop.
+- If **Cancel** selected: print cancellation message and **stop**.
+- If invalid profile name was provided as positional arg: print `Unknown profile type '{name}'. Valid options: simple, smart, genius` and show this picker.
 
-**C) Invalid profile handling:**
+## Step 3: Model selection
 
-If invalid profile name:
-- Print: `Unknown profile type '{name}'. Valid options: simple, smart, genius`
-- Fall back to interactive picker
+Based on the selected profile type, collect model choices. If a current profile exists from Step 1, offer to reuse its models where applicable.
 
-## Step 4: Model selection wizard
+### Simple (1 model)
 
+Ask the user (via question tool) if they want to keep the current model (only if one exists from Step 1).
+- **Yes:** Use existing model for all three stages. Go to Step 4.
+- **No** (or no current model exists): Load the `gsd-oc-select-model` skill. Select one model for "Simple Profile - All stages".
 
-### Simple Profile (1 model)
+Assign the selected model to `planning`, `execution`, and `verification`.
 
-Using question tool ask user if they want to use the current model.
+### Smart (2 models)
 
-If yes, store the selected model and go to **Step 5**.
+Load the `gsd-oc-select-model` skill, then:
 
-If no, use gsd-oc-select-model skill to select model for "Simple Profile - One model to rule them all".
+1. Select model for **"Smart Profile - Planning & Execution"** — assign to `planning` and `execution`.
+2. Select model for **"Smart Profile - Verification"** — assign to `verification`.
 
-### Smart Profile (2 models)
+### Genius (3 models)
 
+Load the `gsd-oc-select-model` skill, then:
 
-**First model** (planning + execution):
+1. Select model for **"Genius Profile - Planning"** — assign to `planning`.
+2. Select model for **"Genius Profile - Execution"** — assign to `execution`.
+3. Select model for **"Genius Profile - Verification"** — assign to `verification`.
 
-Use gsd-oc-select-model skill to select model for "Smart Profile - Planning & Execution"
+## Step 4: Apply changes
 
-**Second model** (verification):
+Using the collected values (`profile_name`, `model_for_planning_stage`, `model_for_execution_stage`, `model_for_verification_stage`), execute:
 
-Use gsd-oc-select-model skill to select model for "Smart Profile - Verification"
-
-### Genius Profile (3 models)
-
-Parse the prompts for stages "planning", "execution", "verification":
-
-**First model** (planning):
-
-Use gsd-oc-select-model skill to select model for "Genius Profile - Planning"
-
-**Second model** (execution):
-
-Use gsd-oc-select-model skill to select model for "Genius Profile - Execution"
-
-**Third model** (verification):
-
-Use gsd-oc-select-model skill to select model for "Genius Profile - Verification"
-
-
-## Step 5: Apply changes
-
-- Prepare
-
-{profile_name}
-{model_for_planning_stage}
-{model_for_execution_stage}
-{model_for_verification_stage}
-
-from the previous answers.
-
-- Execute the next command and substitue {profile_name}, {model_for_planning_stage}, {model_for_execution_stage}, {model_for_verification_stage} with values:
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile '{profile_name}:{"planning": "{model_for_planning_stage}", "execution": "{model_for_execution_stage}", "verification": "{model_for_verification_stage}"'
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile '{profile_name}:{"planning": "{model_for_planning_stage}", "execution": "{model_for_execution_stage}", "verification": "{model_for_verification_stage}"}'
 ```
 
-## Step 7: Check for changes
+Parse the response. On success, the CLI updates both `.planning/oc_config.json` and `opencode.json` (with automatic backup).
 
-```text
-✓ Updated {targetProfile} profile:
+## Step 5: Confirm result
+
+Display the updated profile using the Output Format, prefixed with a checkmark:
+
+```
+Done! Updated {profile_name} profile:
 
 | Stage        | Model |
 |--------------|-------|
-| planning     | {newPreset.planning} |
-| execution    | {newPreset.execution} |
-| verification | {newPreset.verification} |
+| Planning     | {models.planning} |
+| Execution    | {models.execution} |
+| Verification | {models.verification} |
 ```
 
 </behavior>
 
 <notes>
-- Use question tool for ALL user input
-- Always show full model IDs (e.g., `opencode/glm-4.7-free`)
-- Use gsd-oc-tools.cjs for validation and file operations
-- Backup files are created automatically by update-opencode-json
-- **Source of truth:** `oc-config.json` stores profile_type and models; `opencode.json` is derived
-- Model selection uses gsd-oc-select-model skill via the set-profile command
-- Commands support --verbose for debug output and --raw for machine-readable output
+- Use the question tool for ALL user input — never prompt via text.
+- Always display full model IDs (e.g., `bailian-coding-plan/qwen3-coder-plus`), never abbreviate.
+- All file reads/writes go through `gsd-oc-tools.cjs` — do not manually edit JSON files.
+- Backups are created automatically by the CLI when writing changes.
+- `.planning/oc_config.json` is the source of truth; `opencode.json` is always derived from it.
+- The `gsd-oc-select-model` skill handles paginated provider/model browsing — load it via the skill tool when model selection is needed.
 </notes>
