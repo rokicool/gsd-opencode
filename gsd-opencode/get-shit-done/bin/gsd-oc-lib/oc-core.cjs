@@ -17,15 +17,14 @@ const path = require('path');
  * @param {*} rawValue - The raw value to output if raw=true
  */
 function output(result, raw = false, rawValue = null) {
-  let outputData;
+  let outputStr;
 
   if (raw && rawValue !== null) {
-    outputData = rawValue;
+    // rawValue is already stringified, use it directly
+    outputStr = rawValue;
   } else {
-    outputData = result;
+    outputStr = JSON.stringify(result, null, 2);
   }
-
-  const outputStr = JSON.stringify(outputData, null, 2);
 
   // Large payload handling (>50KB)
   if (outputStr.length > 50 * 1024) {
