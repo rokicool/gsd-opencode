@@ -599,11 +599,11 @@ Plans:
 
 **Goal:** CLI utility for pivoting between profiles using `.planning/oc_config.json` as the profile configuration source with `set-profile` and `get-profile` commands
 **Depends on:** Phase 15
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
-- [ ] 16-01-PLAN.md — Foundation: oc-profile-config.cjs library for oc_config.json operations
-- [ ] 16-02-PLAN.md — get-profile command with two operation modes (current profile, specific profile)
+- [x] 16-01-PLAN.md — Foundation: oc-profile-config.cjs library for oc_config.json operations
+- [x] 16-02-PLAN.md — get-profile command with two operation modes (current profile, specific profile)
 - [ ] 16-03-PLAN.md — set-profile-phase16 and pivot-profile commands with three operation modes
 
 ---

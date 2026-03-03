@@ -8,10 +8,10 @@
 ## Current Position
 
 **Current Phase:** 16
-**Current Plan:** 01 Complete
-**Status:** Phase 16 Plan 01 complete
+**Current Plan:** 02 Complete
+**Status:** Phase 16 Plan 02 complete
 **Overall Progress:** 83/83 requirements (v1 + Phase 10 + Phase 11 + Phase 12 + Phase 13 partial + Phase 14 + Phase 15)
-**Next Phase:** Phase 16 Plan 02 (set-profile command)
+**Next Phase:** Phase 16 Plan 03 (next plan) or Phase 17
 
 ```
 [████████████████████████████████████████] 100% (65/65 requirements)
@@ -39,7 +39,7 @@
 | Phase 13: copy-from-original script | 🟢 Completed | 1/1 | None |
 | Phase 14: gsd-oc-tools.cjs for quick operations | 🟢 Completed | 2/2 | None |
 | Phase 15: fix set-profile script | 🟢 Completed | 1/1 | None |
-| Phase 16: pivot profile support | 🟡 In Progress | 1/3 | None |
+| Phase 16: pivot profile support | 🟡 In Progress | 2/3 | None |
 
 ---
 
@@ -64,6 +64,8 @@
 | Phase 15 P01 | 23 min | 7 tasks | 2 files |
 | Phase 15-fix-set-profile-script P01 | 23min | 7 tasks | 2 files |
 | Phase 16-pivot-profile-support P01 | 11min | 2 tasks | 6 files |
+| Phase 16-pivot-profile-support P02 | 15 min | 3 tasks | 4 files |
+| Phase 16-pivot-profile-support P02 | 15 min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -74,6 +76,8 @@
 | Backup system in .planning/backups/ | Timestamped backups protect against data loss | 2026-03-02 |
 | Opencode.json merge preserves non-gsd agents | Only update gsd-* agents, leave all others untouched | 2026-03-02 |
 | Create-or-update pattern for opencode.json | applyProfileToOpencode creates file with $schema and agent object when missing, updates when present | 2026-03-02 |
+| get-profile two operation modes | Mode 1 (no params) requires current_oc_profile, Mode 2 (profile name) does not | 2026-03-03 |
+| Raw output without JSON envelope | --raw flag outputs profile directly for programmatic consumption | 2026-03-03 |
 
 | Decision | Rationale | Date |
 |----------|-----------|------|
@@ -181,14 +185,21 @@ None currently.
 
 ## Session Continuity
 
-**Last Session:** 2026-03-03T02:00:29.794Z
-**Stopped at:** Completed 16-01-PLAN.md
+**Last Session:** 2026-03-03T02:15:00Z
+**Stopped at:** Completed 16-02-PLAN.md
 **Resume file:** None
-**Current Focus:** Phase 15 Plan 01 complete - set-profile fixed with two modes, validation, backup
-**Next Action:** Phase 16 (pivot profile support)
+**Current Focus:** Phase 16 Plan 02 complete - get-profile command with two operation modes
+**Next Action:** Phase 16 Plan 03 or Phase 17 planning
 
 ### Recently Completed
 
+- ✓ **PHASE 16 PLAN 02 COMPLETE** — get-profile command for retrieving profile definitions
+  - Task 1: Created get-profile.cjs with two operation modes (117 lines)
+  - Task 2: Created 16 unit tests with 100% pass rate (435 lines)
+  - Task 3: Registered command in gsd-oc-tools.cjs
+  - Auto-fixed: Rule 1 bug in oc-core.cjs output() double-stringification
+  - All CONTEXT requirements satisfied (CONTEXT-01, CONTEXT-02, CONTEXT-08, CONTEXT-09)
+  - Commits: 7516b11, 4799fd8, a630614
 - ✓ **PHASE 16 ADDED** — pivot profile support
   - Phase directory created: `.planning/phases/16-pivot-profile-support/`
   - Roadmap updated with Phase 16 entry
