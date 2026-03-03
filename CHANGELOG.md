@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.3] - 2026-03-03
+
+Overview: Major CLI tools release introducing gsd-oc-tools.cjs with comprehensive profile management, validation commands, and atomic transaction support. Added separate oc_config.json for profile configuration, pre-flight model validation, and vitest testing infrastructure.
+
+### Added
+
+- gsd-oc-tools.cjs CLI utility with six commands: check-opencode-json, check-config-json, update-opencode-json, set-profile, get-profile, and validate-models in `gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs`
+- oc-profile-config.cjs library with validateProfile, applyProfileWithValidation, and atomic transaction with rollback support in `gsd-opencode/get-shit-done/bin/gsd-oc-lib/oc-profile-config.cjs`
+- oc-config.cjs library for profile configuration operations with loadProfileConfig and applyProfileToOpencode in `gsd-opencode/get-shit-done/bin/gsd-oc-lib/oc-config.cjs`
+- oc-core.cjs shared utilities for output formatting, error handling, and backup creation in `gsd-opencode/get-shit-done/bin/gsd-oc-lib/oc-core.cjs`
+- oc-models.cjs for model catalog operations and validation in `gsd-opencode/get-shit-done/bin/gsd-oc-lib/oc-models.cjs`
+- gsd-check-profile command definition routing to oc-check-profile workflow in `gsd-opencode/commands/gsd/gsd-check-profile.md`
+- Profile validation workflow checking both opencode.json and oc_config.json in `gsd-opencode/get-shit-done/workflows/oc-check-profile.md`
+- Vitest testing framework with comprehensive unit tests (45 tests across get-profile, oc-profile-config, and pivot-profile) in `gsd-opencode/get-shit-done/bin/test/`
+- Test fixtures for valid and invalid configurations in `gsd-opencode/get-shit-done/bin/test/fixtures/`
+
+### Changed
+
+- Migrated profile configuration from config.json to separate `.planning/oc_config.json` to avoid conflicts
+- Renamed config key from current_os_profile to current_oc_profile with auto-migration for backward compatibility
+- Restructured profile format from profiles.{type} to profiles.presets.{profile_name} with planning/execution/verification model assignments
+- Rewrote set-profile command with three operation modes: validate current, switch profile, and create inline profile
+- Added pre-flight model validation ensuring all models validated before any file modifications
+- Enhanced update-opencode-json with create-or-update pattern that creates opencode.json when missing
+- Updated oc-core.cjs output() function to fix raw output double-stringification bug
+- Updated ROADMAP.md and STATE.md with Phase 14, 15, 16 completion status and key decisions
+
+### Fixed
+
+- Fixed oc-core.cjs raw output double-stringification in output() function when raw=true flag used
+- Fixed profile structure mismatch to support both profiles.models.{category} and profiles.{type} structures
+- Fixed set-profile to create opencode.json when missing instead of requiring it to exist
+- Fixed test model IDs to match actual opencode catalog (bailian-coding-plan/qwen3.5-plus)
+- Fixed vitest configuration to discover tests in get-shit-done/bin/test/ directory
+
+### Removed
+
+- Removed legacy auto-migration logic (LEGACY_PROFILE_MAP constant) from set-profile.cjs
+- Removed .translate-backups/backups.json legacy backup tracking file
+
 ## [1.20.2] - 2026-02-27
 
 Overview: Updated subagent type references from "task" to "general" across workflow files for compatibility with the current agent system. Added path replacement rule for future installations.

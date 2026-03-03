@@ -87,6 +87,16 @@ I just love both GSD and OpenCode. I felt like having GSD available only for Cla
 
 — **Roman**
 
+## Version 1.20.3 - New gsd-opencode model profile system
+
+  I had to give up on supporting original GSD model profile system. Claude Code uses three different models: Opus, Sonnet, and Haiku. In OpenCode we are blessed with dozens of providers and hundreds of models. GSD model profile system is not suitable for us.
+  
+  So, I had to redesign it and call it 'simple|smart|genius' for now. I hope, it will solve unexpected stops.
+
+- `/gsd-settings` - *Does not make any changes to the model-agent assignment anymore*. It asks about the model profile - but does nothing. You have to execute `/gsd-set-profile` yourself.
+- `/gsd-check-profile` - Checks the gsd-opencode config files and informs about issues (if there are any).
+- `/gsd-set-profile` - You main interface to control what model to use on what stage. Try it! No, really, **Try it!**
+
 ## Version 1.20.0 - We are catching up with original v1.20.5
 
 As usual, you can find all changes that TACHES made in the [original CHANGELOG.md v1.9.4 -> v1.20.5](https://github.com/glittercowboy/get-shit-done/blob/main/CHANGELOG.md)
