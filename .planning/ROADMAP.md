@@ -595,6 +595,17 @@ Plans:
 Plans:
 - [ ] 15-01-PLAN.md — Fix set-profile with validation, backups, and proper JSON output (7 tasks, SETPROFILE-01 to SETPROFILE-07)
 
+### Phase 16: pivot profile support
+
+**Goal:** CLI utility for pivoting between profiles using `.planning/oc_config.json` as the profile configuration source with `set-profile` and `get-profile` commands
+**Depends on:** Phase 15
+**Plans:** 1/3 plans executed
+
+Plans:
+- [ ] 16-01-PLAN.md — Foundation: oc-profile-config.cjs library for oc_config.json operations
+- [ ] 16-02-PLAN.md — get-profile command with two operation modes (current profile, specific profile)
+- [ ] 16-03-PLAN.md — set-profile-phase16 and pivot-profile commands with three operation modes
+
 ---
 
 *Roadmap created: 2026-02-09*
