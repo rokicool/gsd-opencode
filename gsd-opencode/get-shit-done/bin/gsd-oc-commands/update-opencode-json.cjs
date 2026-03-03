@@ -1,7 +1,7 @@
 /**
  * update-opencode-json.cjs — Update opencode.json agent models from profile config
  *
- * Command module that updates opencode.json model assignments based on profile configuration.
+ * Command module that updates opencode.json model assignments based on oc_config.json structure.
  * Creates timestamped backup before modifications.
  * Outputs JSON envelope format with update results.
  *
@@ -11,7 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const { output, error, createBackup } = require('../gsd-oc-lib/oc-core.cjs');
-const { applyProfileToOpencode, VALID_PROFILES } = require('../gsd-oc-lib/oc-config.cjs');
+const { applyProfileToOpencode } = require('../gsd-oc-lib/oc-config.cjs');
 
 /**
  * Main command function
@@ -24,21 +24,21 @@ function updateOpencodeJson(cwd, args) {
   const dryRun = args.includes('--dry-run');
   
   const opencodePath = path.join(cwd, 'opencode.json');
-  const configPath = path.join(cwd, '.planning', 'config.json');
+  const configPath = path.join(cwd, '.planning', 'oc_config.json');
   
   // Check if opencode.json exists
   if (!fs.existsSync(opencodePath)) {
     error('opencode.json not found in current directory', 'CONFIG_NOT_FOUND');
   }
   
-  // Check if .planning/config.json exists
+  // Check if .planning/oc_config.json exists
   if (!fs.existsSync(configPath)) {
-    error('.planning/config.json not found', 'CONFIG_NOT_FOUND');
+    error('.planning/oc_config.json not found', 'CONFIG_NOT_FOUND');
   }
   
   if (verbose) {
     console.error(`[verbose] opencode.json: ${opencodePath}`);
-    console.error(`[verbose] config.json: ${configPath}`);
+    console.error(`[verbose] oc_config.json: ${configPath}`);
     console.error(`[verbose] dry-run: ${dryRun}`);
   }
   
@@ -48,21 +48,24 @@ function updateOpencodeJson(cwd, args) {
     const content = fs.readFileSync(configPath, 'utf8');
     config = JSON.parse(content);
   } catch (err) {
-    error('Failed to parse .planning/config.json', 'INVALID_JSON');
+    error('Failed to parse .planning/oc_config.json', 'INVALID_JSON');
   }
   
-  // Validate profile_type
-  const profileType = config.profile_type || config.profiles?.profile_type;
-  if (!profileType) {
-    error('profile_type not found in config.json', 'PROFILE_NOT_FOUND');
+  // Validate current_oc_profile
+  const profileName = config.current_oc_profile;
+  if (!profileName) {
+    error('current_oc_profile not found in oc_config.json', 'PROFILE_NOT_FOUND');
   }
   
-  if (!VALID_PROFILES.includes(profileType)) {
-    error(`Invalid profile_type: "${profileType}". Valid profiles: ${VALID_PROFILES.join(', ')}`, 'INVALID_PROFILE');
+  // Validate profile exists in profiles.presets
+  const presets = config.profiles?.presets;
+  if (!presets || !presets[profileName]) {
+    const availableProfiles = presets ? Object.keys(presets).join(', ') : 'none';
+    error(`Profile "${profileName}" not found in profiles.presets. Available profiles: ${availableProfiles}`, 'PROFILE_NOT_FOUND');
   }
   
   if (verbose) {
-    console.error(`[verbose] Profile type: ${profileType}`);
+    console.error(`[verbose] Profile name: ${profileName}`);
   }
   
   // Dry-run mode: preview changes without modifying
@@ -76,13 +79,10 @@ function updateOpencodeJson(cwd, args) {
       const opencodeContent = fs.readFileSync(opencodePath, 'utf8');
       const opencodeData = JSON.parse(opencodeContent);
       
-      const profiles = config.profiles || {};
-      // Support both structures: profiles.models or direct profile.{type}
-      let profileModels;
-      if (profiles.models && typeof profiles.models === 'object') {
-        profileModels = profiles.models;
-      } else {
-        profileModels = profiles[profileType] || {};
+      const profileModels = presets[profileName];
+      
+      if (!profileModels.planning && !profileModels.execution && !profileModels.verification) {
+        error(`No model assignments found for profile "${profileName}"`, 'PROFILE_NOT_FOUND');
       }
       
       // Determine which agents would be updated
@@ -154,12 +154,12 @@ function updateOpencodeJson(cwd, args) {
     console.error(`[verbose] Backup created: ${backupPath}`);
   }
   
-  // Apply profile to opencode.json
+  // Apply profile to opencode.json using the existing function which already supports oc_config.json
   if (verbose) {
     console.error('[verbose] Applying profile to opencode.json...');
   }
   
-  const result = applyProfileToOpencode(opencodePath, configPath);
+  const result = applyProfileToOpencode(opencodePath, configPath, profileName);
   
   if (!result.success) {
     // Restore backup on failure
@@ -176,8 +176,8 @@ function updateOpencodeJson(cwd, args) {
   
   if (verbose) {
     console.error(`[verbose] Updated ${result.updated.length} agent(s)`);
-    for (const agentName of result.updated) {
-      console.error(`[verbose]   - ${agentName}`);
+    for (const { agent } of result.updated) {
+      console.error(`[verbose]   - ${agent}`);
     }
   }
   

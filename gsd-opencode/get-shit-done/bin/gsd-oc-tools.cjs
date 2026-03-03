@@ -11,10 +11,9 @@
  * Available Commands:
  *   check-opencode-json     Validate model IDs in opencode.json
  *   check-config-json       Validate profile configuration in .planning/config.json
- *   update-opencode-json    Update opencode.json agent models from profile config
+ *   update-opencode-json    Update opencode.json agent models from oc_config profile 
  *   validate-models         Validate model IDs against opencode catalog
  *   set-profile             Switch profile with interactive model selection
-
  *   get-profile             Get current profile or specific profile from oc_config.json
  *   help                    Show this help message
  */
@@ -45,7 +44,7 @@ Usage: node gsd-oc-tools.cjs <command> [options]
 Available Commands:
   check-opencode-json     Validate model IDs in opencode.json against opencode models catalog
   check-config-json       Validate profile configuration in .planning/config.json
-  update-opencode-json    Update opencode.json agent models from profile config (creates backup)
+  update-opencode-json    Update opencode.json agent models from oc_config profile (creates backup)
   validate-models         Validate one or more model IDs against opencode catalog
   set-profile             Switch profile with interactive model selection wizard
   get-profile             Get current profile or specific profile from oc_config.json
