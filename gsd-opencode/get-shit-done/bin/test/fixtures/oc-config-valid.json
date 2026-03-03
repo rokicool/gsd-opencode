@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "presets": {
+      "simple": {
+        "planning": "bailian-coding-plan/qwen3.5-plus",
+        "execution": "bailian-coding-plan/qwen3.5-plus",
+        "verification": "bailian-coding-plan/qwen3.5-plus"
+      },
+      "smart": {
+        "planning": "bailian-coding-plan/qwen3.5-plus",
+        "execution": "bailian-coding-plan/qwen3.5-plus",
+        "verification": "bailian-coding-plan/qwen3.5-plus"
+      },
+      "genius": {
+        "planning": "bailian-coding-plan/qwen3.5-plus",
+        "execution": "bailian-coding-plan/qwen3.5-plus",
+        "verification": "bailian-coding-plan/qwen3.5-plus"
+      }
+    }
+  },
+  "current_oc_profile": "smart"
+}

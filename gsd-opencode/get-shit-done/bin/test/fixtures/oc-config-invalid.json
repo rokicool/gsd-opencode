@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "presets": {
+      "incomplete": {
+        "planning": "bailian-coding-plan/qwen3.5-plus"
+      },
+      "invalid-models": {
+        "planning": "invalid-model-xyz-12345",
+        "execution": "another-invalid-model-67890",
+        "verification": "yet-another-invalid-abcde"
+      }
+    }
+  }
+}
