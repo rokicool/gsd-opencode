@@ -10,8 +10,9 @@
  *
  * Available Commands:
  *   check-opencode-json     Validate model IDs in opencode.json
- *   check-config-json       Validate profile configuration in .planning/config.json
- *   update-opencode-json    Update opencode.json agent models from oc_config profile 
+ *   check-config-json       Validate profile configuration in .planning/oc_config.json (migrated from config.json)
+ *   check-oc-config-json    Validate profile configuration in .planning/oc_config.json
+ *   update-opencode-json    Update opencode.json agent models from oc_config profile
  *   validate-models         Validate model IDs against opencode catalog
  *   set-profile             Switch profile with interactive model selection
  *   get-profile             Get current profile or specific profile from oc_config.json
@@ -43,7 +44,8 @@ Usage: node gsd-oc-tools.cjs <command> [options]
 
 Available Commands:
   check-opencode-json     Validate model IDs in opencode.json against opencode models catalog
-  check-config-json       Validate profile configuration in .planning/config.json
+  check-config-json       Validate profile configuration in .planning/oc_config.json (migrated from config.json)
+  check-oc-config-json    Validate profile configuration in .planning/oc_config.json
   update-opencode-json    Update opencode.json agent models from oc_config profile (creates backup)
   validate-models         Validate one or more model IDs against opencode catalog
   set-profile             Switch profile with interactive model selection wizard
@@ -83,8 +85,15 @@ switch (command) {
   }
 
   case 'check-config-json': {
-    const checkConfigJson = require('./gsd-oc-commands/check-config-json.cjs');
-    checkConfigJson(cwd, flags);
+    // Updated implementation: validates .planning/oc_config.json (migrated from old config.json format)
+    const checkOcConfigJson = require('./gsd-oc-commands/check-oc-config-json.cjs');
+    checkOcConfigJson(cwd, flags);
+    break;
+  }
+
+  case 'check-oc-config-json': {
+    const checkOcConfigJson = require('./gsd-oc-commands/check-oc-config-json.cjs');
+    checkOcConfigJson(cwd, flags);
     break;
   }
 
