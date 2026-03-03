@@ -14,7 +14,7 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 
 1. No args (interactive wizard): `/gsd-set-profile`
 2. Positional with type: `/gsd-set-profile simple|smart|genius`
-3. With reuse flag: `/gsd-set-profile smart --reuse`
+
 
 **Stage-to-agent mapping (11 agents):**
 

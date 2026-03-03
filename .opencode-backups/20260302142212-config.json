@@ -1,0 +1,21 @@
+{
+  "mode": "yolo",
+  "depth": "standard",
+  "parallelization": true,
+  "commit_docs": false,
+  "model_profile": "quality",
+  "profiles": {
+    "profile_type": "genius",
+    "models": {
+      "planning": "bailian-coding-plan/qwen3.5-plus",
+      "execution": "bailian-coding-plan/qwen3.5-plus",
+      "verification": "bailian-coding-plan/qwen3.5-plus"
+    }
+  },
+  "workflow": {
+    "research": true,
+    "plan_check": true,
+    "verifier": true
+  },
+  "current_os_profile": "genius"
+}
