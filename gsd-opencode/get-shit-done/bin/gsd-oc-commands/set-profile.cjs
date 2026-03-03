@@ -192,11 +192,6 @@ function setProfilePhase16(cwd, args) {
       }
     }
 
-    // Check profile doesn't already exist
-    if (config.profiles?.presets?.[profileName]) {
-      error(`Profile "${profileName}" already exists. Use a different name.`, 'PROFILE_EXISTS');
-    }
-
     // Create backup
     if (!fs.existsSync(backupsDir)) {
       fs.mkdirSync(backupsDir, { recursive: true });
