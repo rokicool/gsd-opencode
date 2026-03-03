@@ -39,7 +39,7 @@ Do NOT modify agent .md files. Profile switching updates `opencode.json` in the 
 Run set-profile without args to get current state:
 
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile --raw
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs get-profile
 ```
 
 Parse the JSON output:
@@ -51,23 +51,18 @@ Parse the JSON output:
   "error": { "code": "CONFIG_NOT_FOUND", "message": "..." }
 }
 ```
-- Print: `Error: No GSD project found. Run /gsd-new-project first.`
-- Stop.
+- Go to **Step 3**
 
 **Success returns current state for interactive mode:**
 ```json
 {
   "success": true,
   "data": {
-    "mode": "model_selection",
-    "targetProfile": null,
-    "stages": ["planning", ...],
-    "currentModels": {
-      "planning": "opencode/model",
-      "execution": "opencode/model",
-      "verification": "opencode/model"
-    },
-    "prompt": [...]
+    "simple": {
+      "planning": "bailian-coding-plan/qwen3-coder-plus",
+      "execution": "bailian-coding-plan/qwen3-coder-plus",
+      "verification": "bailian-coding-plan/qwen3-coder-plus"
+    }
   }
 }
 ```
@@ -77,7 +72,7 @@ Parse the JSON output:
 If profile exists:
 
 ```
-Active profile: {profile_type}
+Active profile: {profile_name}
 
 Current configuration:
 | Stage        | Model |
@@ -92,15 +87,104 @@ Current configuration:
 **A) Check for positional argument:**
 - If user typed `/gsd-set-profile simple|smart|genius`, use that as `newProfileType`
 
+Execute:
+```bash
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile {newProfileType}
+```
+Parse the JSON output:
+
+If error and there is no such a profile:
+```json
+{
+  "success": false,
+  "error": {
+    "code": "PROFILE_NOT_FOUND",
+    "message": "No model assignments found for profile \"simple\""
+  }
+}
+```
+Go to **B) Interactive picker (no args):**
+
+If success: 
+
+```json
+{
+  "success": true,
+  "data": {
+    "profile": "smart",
+    "models": {
+      "planning": "bailian-coding-plan/qwen3-coder-plus",
+      "execution": "bailian-coding-plan/qwen3-coder-plus",
+      "verification": "bailian-coding-plan/qwen3-coder-plus"
+    },
+    "backup": ".planning/backups/20260303035841-oc_config.json",
+    "updated": [
+      {
+        "agent": "gsd-planner",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      },
+      {
+        "agent": "gsd-plan-checker",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      },
+      {
+        "agent": "gsd-phase-researcher",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      },
+      {
+        "agent": "gsd-roadmapper",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      },
+      {
+        "agent": "gsd-project-researcher",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      },
+      {
+        "agent": "gsd-research-synthesizer",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      },
+      {
+        "agent": "gsd-codebase-mapper",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      },
+      {
+        "agent": "gsd-executor",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      },
+      {
+        "agent": "gsd-debugger",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      },
+      {
+        "agent": "gsd-verifier",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      },
+      {
+        "agent": "gsd-integration-checker",
+        "model": "bailian-coding-plan/qwen3-coder-plus"
+      }
+    ],
+    "configPath": ".planning/oc_config.json"
+  }
+}
+```
+- Show the current config in this format:
+
+Active profile: {profile_name}
+
+Current configuration:
+| Stage        | Model |
+|--------------|-------|
+| planning     | {models.planning} |
+| execution    | {models.execution} |
+| verification | {models.verification} |
+
+- Print: ' */gsd-set-profile* (without parameter) if you need to change models assigned to stages'
+- Stop.
+
 **B) Interactive picker (no args):**
 
-Run set-profile command without profile argument:
-
-```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile --raw
-```
-
-Parse the output and use question tool:
+Use question tool:
 
 ```json
 {
@@ -125,34 +209,17 @@ If invalid profile name:
 
 ## Step 4: Model selection wizard
 
-Run set-profile command to get model selection prompts:
-
-```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs set-profile {newProfileType}
-```
-
-Parse the output and use gsd-oc-select-model skill for each required stage.
 
 ### Simple Profile (1 model)
 
-Parse the prompt for stage "all":
+Using question tool ask user if they want to use the current model.
 
-```json
-{
-  "context": "Simple Profile - One model to rule them all",
-  "current": "opencode/glm-4.7"
-}
-```
-
-Using question tool ask user if they want to use current model.
-
-If yes, store the selected model and go to **Step 7**.
+If yes, store the selected model and go to **Step 5**.
 
 If no, use gsd-oc-select-model skill to select model for "Simple Profile - One model to rule them all".
 
 ### Smart Profile (2 models)
 
-Parse the prompts for stages "planning_execution" and "verification":
 
 **First model** (planning + execution):
 
@@ -178,76 +245,24 @@ Use gsd-oc-select-model skill to select model for "Genius Profile - Execution"
 
 Use gsd-oc-select-model skill to select model for "Genius Profile - Verification"
 
-## Step 5: Validate selected models
 
-Before writing files, validate models exist:
+## Step 5: Apply changes
 
+- Prepare
+
+{profile_name}
+{model_for_planning_stage}
+{model_for_execution_stage}
+{model_for_verification_stage}
+
+from the previous answers.
+
+- Execute the next command and substitue {profile_name}, {model_for_planning_stage}, {model_for_execution_stage}, {model_for_verification_stage} with values:
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs validate-models {model1} {model2} {model3}
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs '{profile_name}:{"planning": "{model_for_planning_stage}", "execution": "{model_for_execution_stage}", "verification": "{model_for_verification_stage}"'
 ```
-
-Parse the output:
-
-```json
-{
-  "success": true,
-  "data": {
-    "total": 3,
-    "valid": 3,
-    "invalid": 0,
-    "models": [
-      { "model": "opencode/glm-4.7", "valid": true },
-      { "model": "opencode/other", "valid": true },
-      { "model": "opencode/third", "valid": true }
-    ]
-  }
-}
-```
-
-If any model invalid (success: false):
-- Print error with list of missing models
-- Stop. Do NOT write config files.
-
-## Step 6: Apply changes
-
-Run update-opencode-json to apply profile changes:
-
-```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs update-opencode-json --verbose
-```
-
-This command:
-1. Reads `.planning/config.json` (already updated with new models)
-2. Creates timestamped backup of `opencode.json`
-3. Updates agent model assignments based on profile
-4. Outputs results:
-
-```json
-{
-  "success": true,
-  "data": {
-    "backup": ".opencode-backups/20250101-120000-000-opencode.json",
-    "updated": ["gsd-planner", "gsd-executor", ...],
-    "dryRun": false,
-    "details": [...]
-  }
-}
-```
-
-**If update fails:**
-- Error is output with code and message
-- Restore from backup if possible
-- Print error and stop
 
 ## Step 7: Check for changes
-
-Compare old and new models. If no changes were made:
-```
-No changes made to {targetProfile} profile.
-```
-Stop.
-
-## Step 8: Report success
 
 ```text
 ✓ Updated {targetProfile} profile:
@@ -259,16 +274,6 @@ Stop.
 | verification | {newPreset.verification} |
 ```
 
-If `targetProfile` is the active profile:
-```text
-Note: This is your active profile. Quit and relaunch OpenCode to apply model changes.
-```
-
-If `targetProfile` is NOT the active profile:
-```text
-To use this profile, run: /gsd-set-profile {targetProfile}
-```
-
 </behavior>
 
 <notes>
@@ -276,7 +281,7 @@ To use this profile, run: /gsd-set-profile {targetProfile}
 - Always show full model IDs (e.g., `opencode/glm-4.7-free`)
 - Use gsd-oc-tools.cjs for validation and file operations
 - Backup files are created automatically by update-opencode-json
-- **Source of truth:** `config.json` stores profile_type and models; `opencode.json` is derived
+- **Source of truth:** `oc-config.json` stores profile_type and models; `opencode.json` is derived
 - Model selection uses gsd-oc-select-model skill via the set-profile command
 - Commands support --verbose for debug output and --raw for machine-readable output
 </notes>
