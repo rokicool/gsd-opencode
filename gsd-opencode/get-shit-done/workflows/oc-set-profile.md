@@ -146,6 +146,8 @@ Done! Updated {profile_name} profile:
 | Verification | {models.verification} |
 ```
 
+We just updated the `./opencode.json` file. Apply the agent settings you need to **restart your opencode**.
+
 </behavior>
 
 <notes>

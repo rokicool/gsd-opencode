@@ -1,132 +1,131 @@
-<purpose>
-Quick validation workflow that checks both opencode.json and .planning/config.json for profile/model configuration issues.
+<role>
+You are executing the `/gsd-check-profile` command. Validate profile configuration across both `opencode.json` and `.planning/oc_config.json`, then report results.
 
-Fast path: "✓ Profile configuration valid" when both checks pass
-Detailed path: Structured error display with what's wrong and how to fix
-</purpose>
+This is a **read-only diagnostic**. Do NOT modify any files or attempt to fix issues. When problems are found, recommend `/gsd-set-profile` and stop.
+</role>
 
 <required_reading>
-read all files referenced by the invoking prompt's execution_context before starting.
+Read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
-<process>
+<context>
+## What Gets Validated
 
-<step name="check_opencode_json">
-Run validation on opencode.json:
+| Check | File | Validates |
+|-------|------|-----------|
+| `check-opencode-json` | `opencode.json` | All agent model IDs exist in the opencode models catalog |
+| `check-config-json` | `.planning/oc_config.json` | Profile structure is valid, current profile exists in presets, all stage model IDs exist in catalog |
+
+## CLI Tool
+
+All validation runs through `gsd-oc-tools.cjs`. Both commands output a JSON envelope with `success`, `data`, and optional `error` fields. Exit code 0 = valid, exit code 1 = issues found.
+
+## JSON Response Shapes
+
+**check-opencode-json** (exit 0 or 1):
+```json
+{
+  "success": true,
+  "data": { "valid": true|false, "total": N, "validCount": N, "invalidCount": N, "issues": [{ "agent": "...", "model": "...", "reason": "..." }] },
+  "error": { "code": "INVALID_MODEL_ID", "message": "..." }
+}
+```
+
+**check-config-json** (exit 0 or 1):
+```json
+{
+  "success": true|false,
+  "data": { "passed": true|false, "current_oc_profile": "...", "profile_data": {...}, "issues": [{ "field": "...", "value": "...", "reason": "..." }] },
+  "error": { "code": "INVALID_PROFILE|CONFIG_NOT_FOUND|INVALID_JSON", "message": "..." }
+}
+```
+</context>
+
+<behavior>
+
+## Step 1: Run both validations
+
+Execute both checks and capture their output and exit codes:
 
 ```bash
-OPENCODE_RESULT=$(node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs check-opencode-json 2>&1)
-OPENCODE_EXIT=$?
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs check-opencode-json
 ```
-
-Parse JSON output:
-- If exit code 0: opencode.json is valid
-- If exit code 1: opencode.json has invalid model IDs
-- Extract error details from JSON output
-</step>
-
-<step name="check_config_json">
-Run validation on .planning/config.json:
 
 ```bash
-CONFIG_RESULT=$(node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs check-config-json 2>&1)
-CONFIG_EXIT=$?
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs check-config-json
 ```
 
-Parse JSON output:
-- If exit code 0: config.json is valid
-- If exit code 1: config.json has invalid profile configurations
-- Extract error details from JSON output
-</step>
+Parse both JSON responses. Note: `CONFIG_NOT_FOUND` from `check-config-json` means `.planning/oc_config.json` does not exist — treat this as a failure with a clear message (profile has not been set up yet).
 
-<step name="evaluate_results">
-Evaluate both validation results:
+## Step 2: Report results
 
-```
-if OPENCODE_EXIT == 0 AND CONFIG_EXIT == 0:
-  Display success message
-  EXIT 0
+### Both checks pass (exit 0 + exit 0)
 
-else:
-  Display detailed error report
-  Display /gsd-set-profile recommendation
-  EXIT 1
-```
-</step>
-
-<step name="display_success">
-When both checks pass:
+Display the short success summary and stop:
 
 ```
-✓ Profile configuration valid
+Profile configuration valid
 
-  opencode.json:        ✓ All model IDs valid
-  .planning/config.json: ✓ Profile configuration valid
-
-All GSD agents are properly configured.
+  opencode.json          All model IDs valid
+  .planning/oc_config.json   Profile configuration valid
 ```
-</step>
 
-<step name="display_errors">
-When validation fails:
+**Stop here.** No further output needed.
+
+### One or both checks fail
+
+Display a structured diagnostic report:
 
 ```
-✗ Profile configuration issues found
+Profile configuration issues found
 
-=== opencode.json ===
-[If OPENCODE_EXIT == 0]
-✓ All model IDs valid
+--- opencode.json ---
 
-[If OPENCODE_EXIT == 1]
-✗ {N} invalid model ID(s) found:
+[If valid]
+  All model IDs valid
 
-  Agent: {agent_name}
-  Current: {invalid_model_id}
-  Issue: {error_reason}
+[If invalid — iterate over data.issues]
+  {N} invalid model ID(s):
 
-=== .planning/config.json ===
-[If CONFIG_EXIT == 0]
-✓ Profile configuration valid
+    Agent:   {issue.agent}
+    Current: {issue.model}
+    Issue:   {issue.reason}
 
-[If CONFIG_EXIT == 1]
-✗ {N} invalid profile configuration(s) found:
+    (repeat for each issue)
 
-  Field: {field_name}
-  Current: {current_value}
-  Issue: {error_reason}
+--- .planning/oc_config.json ---
 
-=== How to Fix ===
+[If valid]
+  Profile configuration valid
 
-1. Review the issues above
-2. Run /gsd-set-profile <profile> to apply a valid profile
-   Available profiles: simple, smart, genius
-3. Or manually edit opencode.json / .planning/config.json
+[If CONFIG_NOT_FOUND]
+  .planning/oc_config.json not found — no profile configured yet
 
-Example:
-  /gsd-set-profile smart
+[If invalid — iterate over data.issues]
+  {N} profile configuration issue(s):
+
+    Field:   {issue.field}
+    Current: {issue.value}
+    Issue:   {issue.reason}
+
+    (repeat for each issue)
+
+--- Recommendation ---
+
+Run /gsd-set-profile to configure a valid profile.
+Available profile types: simple, smart, genius
+
+Example: /gsd-set-profile smart
 ```
-</step>
 
-<step name="verbose_output">
-When --verbose flag is provided:
+**Stop here.** Do not offer to fix anything. Do not edit files.
 
-```bash
-if flags.includes('--verbose'):
-  echo "[verbose] Checking opencode.json..."
-  echo "[verbose] Checking .planning/config.json..."
-  echo "[verbose] opencode.json result: {valid|invalid}"
-  echo "[verbose] config.json result: {valid|invalid}"
-  echo "[verbose] Validation complete"
-```
-</step>
+</behavior>
 
-</process>
-
-<success_criteria>
-- [ ] opencode.json validated against model catalog
-- [ ] .planning/config.json validated for profile configuration
-- [ ] Clear pass/fail output displayed
-- [ ] /gsd-set-profile recommendation provided when issues found
-- [ ] Fast path when both checks pass
-- [ ] Detailed error explanations when checks fail
-</success_criteria>
+<notes>
+- This workflow is strictly diagnostic — never modify `opencode.json`, `.planning/oc_config.json`, or any other file.
+- When issues are found, always recommend `/gsd-set-profile` as the resolution path. Do not suggest manual editing.
+- Always display full model IDs (e.g., `bailian-coding-plan/qwen3-coder-plus`), never abbreviate.
+- `CONFIG_NOT_FOUND` is a common case for new projects — frame it as "no profile configured yet", not as an error.
+- Both `check-config-json` and `check-oc-config-json` route to the same validator. Use `check-config-json` (shorter).
+</notes>
