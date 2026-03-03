@@ -46,6 +46,7 @@ Available Commands:
   update-opencode-json    Update opencode.json agent models from profile config (creates backup)
   validate-models         Validate one or more model IDs against opencode catalog
   set-profile             Switch profile with interactive model selection wizard
+  get-profile             Get current profile or specific profile from oc_config.json
   help                    Show this help message
 
 Options:
@@ -59,6 +60,9 @@ Examples:
   node gsd-oc-tools.cjs update-opencode-json --dry-run
   node gsd-oc-tools.cjs validate-models opencode/glm-4.7
   node gsd-oc-tools.cjs set-profile genius
+  node gsd-oc-tools.cjs get-profile
+  node gsd-oc-tools.cjs get-profile genius
+  node gsd-oc-tools.cjs get-profile --raw
 `.trim();
 
   console.log(helpText);
@@ -98,6 +102,12 @@ switch (command) {
   case 'set-profile': {
     const setProfile = require('./gsd-oc-commands/set-profile.cjs');
     setProfile(cwd, flags);
+    break;
+  }
+
+  case 'get-profile': {
+    const getProfile = require('./gsd-oc-commands/get-profile.cjs');
+    getProfile(cwd, flags);
     break;
   }
 
