@@ -61,6 +61,7 @@ Parse the response:
 - **`success: true` with `action: "permission_exists"`** — Permission already configured. Continue to Step 1.
 - **`success: true` with `action: "add_permission"`** — Permission would be added. Execute without `--dry-run`:
 
+Attempt to switch to the saved profile:
 ```bash
 node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs allow-read-config
 ```
