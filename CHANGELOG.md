@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.4] - 2026-03-05
+
+Overview: Added allow-read-config command to gsd-oc-tools.cjs for managing external_directory permissions. Introduced automated GSD config folder access configuration with comprehensive test coverage and workflow integration.
+
+### Added
+
+- allow-read-config.cjs command for adding external_directory permission to read GSD config folder in `gsd-opencode/get-shit-done/bin/gsd-oc-commands/allow-read-config.cjs`
+- Comprehensive test suite for allow-read-config command with 5 tests covering permission creation, idempotency, dry-run mode, backup creation, and verbose output in `gsd-opencode/get-shit-done/bin/test/allow-read-config.test.cjs`
+- GSD config read permission step in oc-set-profile.md workflow to ensure access to `~/.config/opencode/get-shit-done/` in `gsd-opencode/get-shit-done/workflows/oc-set-profile.md`
+
+### Changed
+
+- Updated gsd-oc-tools.cjs help text and command routing to include allow-read-config command in `gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs`
+- Updated opencode.json with external_directory permission for `/Users/roki/.config/opencode/get-shit-done/**` in `opencode.json`
+
 ## [1.20.3] - 2026-03-03
 
 Overview: Major CLI tools release introducing gsd-oc-tools.cjs with comprehensive profile management, validation commands, and atomic transaction support. Added separate oc_config.json for profile configuration, pre-flight model validation, and vitest testing infrastructure.

@@ -37,7 +37,7 @@
   },
   "permission": {
     "external_directory": {
-      "/Users/roki/.config/opencode/get-shit-done/**": "allow"
+      "~/.config/opencode/get-shit-done/**": "allow"
     }
   }
 }
