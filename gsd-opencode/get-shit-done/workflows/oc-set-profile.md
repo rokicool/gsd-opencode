@@ -5,6 +5,7 @@ You are executing the `/gsd-set-profile` command. Switch the project's active mo
 This command reads/writes:
 - `.planning/oc_config.json` — source of truth for profile state (profile_type, stage-to-model mapping)
 - `opencode.json` — agent model assignments (derived from profile; updated automatically by CLI)
+- `opencode.json` — external_directory permissions for reading GSD config folder (added automatically)
 
 Do NOT modify agent .md files. Profile switching only updates these two JSON files.
 </role>
@@ -47,6 +48,26 @@ Active profile: **{profile_name}**
 </context>
 
 <behavior>
+
+## Step 0: Ensure GSD config read permission
+
+Before any profile operations, ensure opencode.json has permission to read the GSD config folder:
+
+```bash
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs allow-read-config --dry-run
+```
+
+Parse the response:
+- **`success: true` with `action: "permission_exists"`** — Permission already configured. Continue to Step 1.
+- **`success: true` with `action: "add_permission"`** — Permission would be added. Execute without `--dry-run`:
+
+```bash
+node ~/.config/opencode/get-shit-done/bin/gsd-oc-tools.cjs allow-read-config
+```
+
+- **`success: false`** — Handle error appropriately.
+
+This ensures gsd-opencode can access workflow files, templates, and configuration from `~/.config/opencode/get-shit-done/`.
 
 ## Step 1: Load current profile
 
@@ -147,6 +168,8 @@ Done! Updated {profile_name} profile:
 ```
 
 We just updated the `./opencode.json` file. Apply the agent settings you need to **restart your opencode**.
+
+Note: GSD config read permission has been configured to allow access to `~/.config/opencode/get-shit-done/`.
 
 </behavior>
 

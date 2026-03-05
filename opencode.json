@@ -34,5 +34,10 @@
     "gsd-integration-checker": {
       "model": "bailian-coding-plan/MiniMax-M2.5"
     }
+  },
+  "permission": {
+    "external_directory": {
+      "/Users/roki/.config/opencode/get-shit-done/**": "allow"
+    }
   }
 }

@@ -16,6 +16,7 @@
  *   validate-models         Validate model IDs against opencode catalog
  *   set-profile             Switch profile with interactive model selection
  *   get-profile             Get current profile or specific profile from oc_config.json
+ *   allow-read-config       Add external_directory permission to read GSD config folder
  *   help                    Show this help message
  */
 
@@ -50,12 +51,13 @@ Available Commands:
   validate-models         Validate one or more model IDs against opencode catalog
   set-profile             Switch profile with interactive model selection wizard
   get-profile             Get current profile or specific profile from oc_config.json
+  allow-read-config       Add external_directory permission to read ~/.config/opencode/get-shit-done/**
   help                    Show this help message
 
 Options:
   --verbose              Enable verbose output (stderr)
-  --raw                  Output raw values instead of JSON envelope
-  --dry-run              Preview changes without applying (update-opencode-json)
+  --raw                  Output raw value instead of JSON envelope
+  --dry-run              Preview changes without applying (update-opencode-json, allow-read-config)
 
 Examples:
   node gsd-oc-tools.cjs check-opencode-json
@@ -66,6 +68,8 @@ Examples:
   node gsd-oc-tools.cjs get-profile
   node gsd-oc-tools.cjs get-profile genius
   node gsd-oc-tools.cjs get-profile --raw
+  node gsd-oc-tools.cjs allow-read-config
+  node gsd-oc-tools.cjs allow-read-config --dry-run
 `.trim();
 
   console.log(helpText);
@@ -121,9 +125,11 @@ switch (command) {
     break;
   }
 
-
-
-
+  case 'allow-read-config': {
+    const allowReadConfig = require('./gsd-oc-commands/allow-read-config.cjs');
+    allowReadConfig(cwd, flags);
+    break;
+  }
 
   default:
     error(`Unknown command: ${command}\nRun 'node gsd-oc-tools.cjs help' for available commands.`);
