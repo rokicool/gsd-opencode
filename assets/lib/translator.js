@@ -263,27 +263,36 @@ export class TextTranslator {
 
     // Apply the replacement with case preservation
     result = content.replace(rule.regex, (match, ...args) => {
+      // args = [fullMatch, group1, group2, ..., offset, fullString]
+      const captureGroups = args.slice(0, -2);
+
       // Handle special transforms
       if (rule.transform === 'tools_list_to_yaml') {
-        // args[0] is the captured group (the tools list)
-        const toolsList = args[0];
+        const toolsList = captureGroups[0];
         const tools = toolsList.split(',').map(t => t.trim()).filter(t => t);
         return 'tools:\n' + tools.map(t => `  ${t}: true`).join('\n');
       }
 
+      // Substitute backreferences ($1, $2, etc.) with captured groups
+      let replacement = processedReplacement;
+      for (let i = 0; i < captureGroups.length; i++) {
+        const placeholder = new RegExp(`\\$${i + 1}`, 'g');
+        replacement = replacement.replace(placeholder, captureGroups[i] || '');
+      }
+
       if (rule.caseSensitive) {
-        return processedReplacement;
+        return replacement;
       }
       // All uppercase: GSD -> GSD-OPENCODE
       if (match === match.toUpperCase() && match !== match.toLowerCase()) {
-        return processedReplacement.toUpperCase();
+        return replacement.toUpperCase();
       }
       // Title case (first letter uppercase): Gsd -> Gsd-opencode
       if (match[0] === match[0].toUpperCase()) {
-        return processedReplacement.charAt(0).toUpperCase() + processedReplacement.slice(1);
+        return replacement.charAt(0).toUpperCase() + replacement.slice(1);
       }
       // Default (lowercase): gsd -> gsd-opencode
-      return processedReplacement;
+      return replacement;
     });
 
     return { content: result, changes };
