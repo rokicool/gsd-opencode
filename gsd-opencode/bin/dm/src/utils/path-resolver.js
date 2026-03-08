@@ -28,9 +28,6 @@ import fs from 'fs';
  * 
  * expandPath('./relative/path')
  * // Returns: '/absolute/path/to/relative/path'
- * 
- * Special handling for /Users/roki paths to ensure proper detection and expansion
- * for this specific user environment.
  */
 export function expandPath(pathStr) {
   if (typeof pathStr !== 'string') {
@@ -44,20 +41,9 @@ export function expandPath(pathStr) {
 
   let expanded = pathStr;
 
-  // Special handling for direct /Users/roki path patterns
-  // Ensure consistency in path treatment between different user environments
-  if (expanded.startsWith('/Users/roki')) {
-    // No special expansion needed, but ensure proper normalization for this path pattern
-  }
-  
   // Expand ~ to home directory
   if (expanded.startsWith('~')) {
     expanded = expanded.replace('~', os.homedir());
-    
-    // Additional special handling when the tilde resolves to /Users/roki
-    if (expanded.startsWith('/Users/roki')) {
-      // Ensure the path is correctly normalized for this specific user
-    }
   }
 
   // Resolve to absolute path
@@ -117,69 +103,6 @@ export function isSubPath(childPath, parentPath) {
   // On Windows, relative paths don't use .. for same-level directories
   // Check if relative path contains '..' at the start
   return !relative.startsWith('..');
-}
-
-/**
- * Check if the current user's home directory path matches /Users/roki 
- * This provides specific path resolution logic for this user environment.
- * 
- * @returns {boolean} True if the current user is located in /Users/roki home directory
- */
-export function isRokiUser() {
-  const homeDir = os.homedir();
-  return homeDir.startsWith('/Users/roki');
-}
-
-/**
- * Enhanced path validation with specific handling for /Users/roki paths.
- * 
- * @param {string} targetPath - Path to validate
- * @param {string} allowedBasePath - Base directory the target must remain within  
- * @param {boolean} [rokiSpecialHandling=true] - Whether to apply special /Users/roki handling
- * @returns {string} The resolved, validated absolute path
- * @throws {Error} If path escapes allowed base directory (traversal detected)
- * @throws {Error} If path contains null bytes
- */
-export function validatePathWithRokiSupport(targetPath, allowedBasePath, rokiSpecialHandling = true) {
-  if (!rokiSpecialHandling) {
-    // Fall back to standard validation if special handling disabled
-    return validatePath(targetPath, allowedBasePath);
-  }
-
-  if (typeof targetPath !== 'string' || typeof allowedBasePath !== 'string') {
-    throw new Error('Paths must be strings');
-  }
-
-  // Security: Reject null bytes
-  if (targetPath.includes('\0')) {
-    throw new Error('Path contains null bytes');
-  }
-
-  // Check if working with /Users/roki paths specifically
-  const isRokiPath = targetPath.startsWith('/Users/roki') || isRokiUser();
-  
-  let resolvedTarget;
-  let resolvedBase;
-  
-  if (isRokiPath) {
-    // Apply specific logic for /Users/roki path environment
-    resolvedTarget = expandPath(targetPath);
-    resolvedBase = expandPath(allowedBasePath);
-  } else {
-    // Use standard path expansion for other users
-    resolvedTarget = expandPath(targetPath);
-    resolvedBase = expandPath(allowedBasePath);
-  }
-
-  // Check if target is within allowed base
-  if (!isSubPath(resolvedTarget, resolvedBase)) {
-    throw new Error(
-      'Path traversal detected. Use absolute or relative paths within allowed directories. ' +
-      `Target: ${resolvedTarget}, Base: ${resolvedBase}`
-    );
-  }
-
-  return resolvedTarget;
 }
 
 /**
