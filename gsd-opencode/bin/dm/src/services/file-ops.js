@@ -485,8 +485,12 @@ export class FileOperations {
       if (PATH_PATTERNS.tildeConfigReference) {
         PATH_PATTERNS.tildeConfigReference.lastIndex = 0; // Reset regex
       }
+      const hasHomeRef = PATH_PATTERNS.homeConfigReference && PATH_PATTERNS.homeConfigReference.test(content);
+      if (PATH_PATTERNS.homeConfigReference) {
+        PATH_PATTERNS.homeConfigReference.lastIndex = 0; // Reset regex
+      }
 
-      if (!hasGsdRef && !hasAbsRef && !hasTildeRef) {
+      if (!hasGsdRef && !hasAbsRef && !hasTildeRef && !hasHomeRef) {
         await fs.copyFile(sourcePath, targetPath, fsConstants.COPYFILE_FICLONE);
         return;
       }
@@ -516,6 +520,15 @@ export class FileOperations {
       if (this.scopeManager.scope === 'local' && PATH_PATTERNS.absoluteReference) {
         content = content.replace(
           PATH_PATTERNS.absoluteReference,
+          () => targetDir + '/'
+        );
+      }
+
+      // For local installs, replace literal $HOME/.config/opencode/ with local path
+      // This handles shell-style references like: node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs
+      if (this.scopeManager.scope === 'local' && PATH_PATTERNS.homeConfigReference) {
+        content = content.replace(
+          PATH_PATTERNS.homeConfigReference,
           () => targetDir + '/'
         );
       }

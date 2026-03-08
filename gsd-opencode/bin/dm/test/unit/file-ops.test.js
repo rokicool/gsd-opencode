@@ -323,6 +323,65 @@ This document references:
     });
   });
 
+  describe('$HOME/.config/opencode/ reference replacement', () => {
+    it('local install should replace $HOME/.config/opencode/ with ./.opencode/', async () => {
+      // Arrange: Create a test file with $HOME/.config/opencode/ references
+      const scopeManager = new ScopeManager({ scope: 'local' });
+      const fileOps = new FileOperations(scopeManager, logger);
+
+      const sourceContent = `# Test Document
+
+This document uses shell-style references:
+- node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs
+- source $HOME/.config/opencode/scripts/env.sh
+- cat $HOME/.config/opencode/config.json
+`;
+      const sourcePath = path.join(tempDir, 'home-ref-source.md');
+      const targetPath = path.join(tempDir, 'home-ref-output.md');
+      await fs.writeFile(sourcePath, sourceContent, 'utf-8');
+
+      // Act: Copy the file using FileOperations
+      await fileOps._copyFile(sourcePath, targetPath);
+
+      // Assert: read the output and verify replacements
+      const content = await fs.readFile(targetPath, 'utf-8');
+
+      // Verify NO $HOME/.config/opencode/ references remain
+      expect(content).not.toContain('$HOME/.config/opencode/');
+
+      // Verify all references are replaced with relative local path
+      expect(content).toContain('./.opencode/get-shit-done/bin/gsd-tools.cjs');
+      expect(content).toContain('./.opencode/scripts/env.sh');
+      expect(content).toContain('./.opencode/config.json');
+    });
+
+    it('global install should preserve $HOME/.config/opencode/ references', async () => {
+      // Arrange: Create a test file with $HOME/.config/opencode/ references
+      const scopeManager = new ScopeManager({ scope: 'global' });
+      const fileOps = new FileOperations(scopeManager, logger);
+
+      const sourceContent = `# Test Document
+
+This document uses shell-style references:
+- node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs
+- source $HOME/.config/opencode/scripts/env.sh
+`;
+      const sourcePath = path.join(tempDir, 'home-ref-global-source.md');
+      const targetPath = path.join(tempDir, 'home-ref-global-output.md');
+      await fs.writeFile(sourcePath, sourceContent, 'utf-8');
+
+      // Act: Copy the file using FileOperations
+      await fileOps._copyFile(sourcePath, targetPath);
+
+      // Assert: read the output and verify $HOME/.config/opencode/ is preserved
+      const content = await fs.readFile(targetPath, 'utf-8');
+
+      // For global installs, $HOME/.config/opencode/ should stay unchanged
+      expect(content).toContain('$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs');
+      expect(content).toContain('$HOME/.config/opencode/scripts/env.sh');
+    });
+  });
+
   describe('Nested directory handling', () => {
     it('should replace paths in deeply nested .md files', async () => {
       // Arrange
