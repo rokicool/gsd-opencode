@@ -18,7 +18,7 @@ Overview: Added allow-read-config command to gsd-oc-tools.cjs for managing exter
 ### Changed
 
 - Updated gsd-oc-tools.cjs help text and command routing to include allow-read-config command in `gsd-opencode/get-shit-done/bin/gsd-oc-tools.cjs`
-- Updated opencode.json with external_directory permission for `$HOME/.config/opencode/get-shit-done/**` in `opencode.json`
+- Updated opencode.json with external_directory permission for `/Users/roki/.config/opencode/get-shit-done/**` in `opencode.json`
 
 ## [1.20.3] - 2026-03-03
 
