@@ -389,7 +389,6 @@ v1 is successful when:
 | 5 | Create profile validation workflow | 2026-03-01 | c736845 | | [5-create-a-workflow-in-gsd-opencode-get-sh](./quick/5-create-a-workflow-in-gsd-opencode-get-sh/) |
 | 6 | Add set-profile validation and remove legacy migration | 2026-03-02 | daf2e11 | Verified | [6-gsd-oc-tools-cjs-set-profile-should-not-](./quick/6-gsd-oc-tools-cjs-set-profile-should-not-/) |
 | 7 | Fix set-profile to create opencode.json when missing | 2026-03-02 | f80ec5a | | [7-fix-set-profile-to-not-migrate-and-creat](./quick/7-fix-set-profile-to-not-migrate-and-creat/) |
-| 8 | Add support for /Users/roki to installation manager | 2026-03-08 | a547cc6 | | [8-add-support-for-users-roki-to-installati](./quick/8-add-support-for-users-roki-to-installati/) |
 
 - ✓ **PHASE 14 PLAN 02 COMPLETE** — update-opencode-json command with profile-driven model updates
   - oc-config.cjs library with loadProfileConfig and applyProfileToOpencode
@@ -402,4 +401,4 @@ v1 is successful when:
 ---
 
 *State initialized: 2026-02-09*  
-*Last updated: 2026-03-08 (Quick Task 8 Complete — Add support for /Users/roki to installation manager)*
+*Last updated: 2026-03-02 (Quick Task 6 Complete — set-profile validation and legacy cleanup)*
