@@ -3,12 +3,12 @@ name: gsd-add-tests
 description: Generate tests for a completed phase based on UAT criteria and implementation
 argument-hint: "<phase> [additional instructions]"
 allowed-tools:
-  - read
-  - write
-  - edit
-  - bash
-  - glob
-  - grep
+   read: true
+   write: true
+   edit: true
+   bash: true
+   glob: true
+   grep: true
   - task
   - question
 argument-instructions: |

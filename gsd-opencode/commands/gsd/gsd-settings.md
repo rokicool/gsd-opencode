@@ -2,9 +2,9 @@
 name: gsd-settings
 description: Configure GSD workflow toggles and model profile
 allowed-tools:
-  - read
-  - write
-  - bash
+   read: true
+   write: true
+   bash: true
   - question
 ---
 

@@ -158,11 +158,8 @@ export class CliFormatter {
    */
   formatProgress(current, total, fileName) {
     const percentage = Math.round((current / total) * 100);
-    const barLength = 30;
-    const filledLength = Math.round((current / total) * barLength);
-    const bar = '█'.repeat(filledLength) + '░'.repeat(barLength - filledLength);
 
-    const line = `\r  ${this.colorize(bar, 'cyan')} ${percentage}% (${current}/${total}) ${this.truncatePath(fileName, 40)}`;
+    const line = `\r  ${percentage}% (${current}/${total}) ${this.truncatePath(fileName, 80)}`;
     return line;
   }
 

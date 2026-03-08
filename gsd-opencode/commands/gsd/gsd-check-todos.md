@@ -3,9 +3,9 @@ name: gsd-check-todos
 description: List pending todos and select one to work on
 argument-hint: [area filter]
 allowed-tools:
-  - read
-  - write
-  - bash
+   read: true
+   write: true
+   bash: true
   - question
 ---
 

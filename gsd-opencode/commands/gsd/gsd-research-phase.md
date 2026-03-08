@@ -3,8 +3,8 @@ name: gsd-research-phase
 description: Research how to implement a phase (standalone - usually use /gsd-plan-phase instead)
 argument-hint: "[phase]"
 allowed-tools:
-  - read
-  - bash
+   read: true
+   bash: true
   - task
 ---
 

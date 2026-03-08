@@ -3,9 +3,9 @@ name: gsd-set-profile
 description: Switch model profile for GSD agents (simple/smart/genius)
 argument-hint: <profile>
 allowed-tools:
-  - read
-  - write
-  - bash
+   read: true
+   write: true
+   bash: true
 ---
 
 <objective>

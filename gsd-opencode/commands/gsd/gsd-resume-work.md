@@ -2,9 +2,9 @@
 name: gsd-resume-work
 description: Resume work from previous session with full context restoration
 allowed-tools:
-  - read
-  - bash
-  - write
+   read: true
+   bash: true
+   write: true
   - question
   - command
 ---

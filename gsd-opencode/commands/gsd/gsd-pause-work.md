@@ -2,9 +2,9 @@
 name: gsd-pause-work
 description: Create context handoff when pausing work mid-phase
 allowed-tools:
-  - read
-  - write
-  - bash
+   read: true
+   write: true
+   bash: true
 ---
 
 <objective>

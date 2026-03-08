@@ -3,12 +3,12 @@ name: gsd-quick
 description: Execute a quick task with GSD guarantees (atomic commits, state tracking) but skip optional agents
 argument-hint: "[--full] [--discuss]"
 allowed-tools:
-  - read
-  - write
-  - edit
-  - glob
-  - grep
-  - bash
+   read: true
+   write: true
+   edit: true
+   glob: true
+   grep: true
+   bash: true
   - task
   - question
 ---

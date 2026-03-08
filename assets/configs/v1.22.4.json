@@ -1,0 +1,38 @@
+{
+  "_description": "Supplemental translation rules for v1.22.4 -- fixes remaining forbidden strings",
+  "include": ["gsd-opencode/**"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "**/oc-*",
+    "**/*-oc-*"
+  ],
+  "rules": [
+    {
+      "pattern": "skill=\"gsd:plan-phase\"",
+      "replacement": "skill=\"gsd-plan-phase\"",
+      "description": "Fix: Transform skill argument gsd:plan-phase to gsd-plan-phase"
+    },
+    {
+      "pattern": "skill=\"gsd:execute-phase\"",
+      "replacement": "skill=\"gsd-execute-phase\"",
+      "description": "Fix: Transform skill argument gsd:execute-phase to gsd-execute-phase"
+    },
+    {
+      "pattern": "skill=\"gsd:research-phase\"",
+      "replacement": "skill=\"gsd-research-phase\"",
+      "description": "Fix: Transform skill argument gsd:research-phase to gsd-research-phase"
+    },
+    {
+      "pattern": "skill=\"gsd:verify-phase\"",
+      "replacement": "skill=\"gsd-verify-phase\"",
+      "description": "Fix: Transform skill argument gsd:verify-phase to gsd-verify-phase"
+    },
+    {
+      "pattern": "skill=\"gsd:discuss-phase\"",
+      "replacement": "skill=\"gsd-discuss-phase\"",
+      "description": "Fix: Transform skill argument gsd:discuss-phase to gsd-discuss-phase"
+    }
+  ]
+}
