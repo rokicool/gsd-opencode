@@ -4,6 +4,12 @@ description: Reapply local modifications after a GSD update
 allowed-tools: read, write, edit, bash, glob, grep, question
 ---
 
+<objective>
+Reapply previously backed-up local modifications after a GSD update.
+
+When GSD performs updates, it may overwrite user-modified files. This command detects and merges user's saved local modifications from backup patches back into the new version, using intelligent comparison to handle cases where the upstream file has also changed.
+</objective>
+
 <purpose>
 After a GSD update wipes and reinstalls files, this command merges user's previously saved local modifications back into the new version. Uses intelligent comparison to handle cases where the upstream file also changed.
 </purpose>
