@@ -188,8 +188,8 @@ None currently.
 
 ## Session Continuity
 
-**Last Session:** 2026-03-08T13:14:59.765Z
-**Stopped at:** Completed 9-PLAN.md - replace /Users/roki paths with $HOME
+**Last Session:** 2026-03-03T02:54:13.224Z
+**Stopped at:** Completed 16-04-PLAN.md - pivot-profile test coverage
 **Resume file:** None
 **Current Focus:** Phase 16 Plan 04 complete - pivot-profile test coverage - get-profile command with two operation modes
 **Next Action:** Phase 16 Plan 03 or Phase 17 planning
@@ -390,7 +390,6 @@ v1 is successful when:
 | 6 | Add set-profile validation and remove legacy migration | 2026-03-02 | daf2e11 | Verified | [6-gsd-oc-tools-cjs-set-profile-should-not-](./quick/6-gsd-oc-tools-cjs-set-profile-should-not-/) |
 | 7 | Fix set-profile to create opencode.json when missing | 2026-03-02 | f80ec5a | | [7-fix-set-profile-to-not-migrate-and-creat](./quick/7-fix-set-profile-to-not-migrate-and-creat/) |
 | 8 | Add support for /Users/roki to installation manager | 2026-03-08 | a547cc6 | | [8-add-support-for-users-roki-to-installati](./quick/8-add-support-for-users-roki-to-installati/) |
-| 9 | Replace /Users/roki with $HOME literally in installation manager | 2026-03-08 | 1fa7e40 | | [9-replace-users-roki-with-home-literally-s](./quick/9-replace-users-roki-with-home-literally-s/) |
 
 - ✓ **PHASE 14 PLAN 02 COMPLETE** — update-opencode-json command with profile-driven model updates
   - oc-config.cjs library with loadProfileConfig and applyProfileToOpencode
@@ -403,4 +402,4 @@ v1 is successful when:
 ---
 
 *State initialized: 2026-02-09*  
-*Last updated: 2026-03-08 (Quick Task 9 Complete — Replace /Users/roki with $HOME in installation manager)*
+*Last updated: 2026-03-08 (Quick Task 8 Complete — Add support for /Users/roki to installation manager)*
