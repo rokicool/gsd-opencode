@@ -9,16 +9,43 @@ read all files referenced by the invoking prompt's execution_context before star
 <process>
 
 <step name="get_installed_version">
-Detect whether GSD is installed locally or globally by checking both locations:
+Detect whether GSD is installed locally or globally by checking both locations and validating install integrity:
 
 ```bash
-# Check local first (takes priority)
-# Paths templated at install time for runtime compatibility
-if [ -f ./.OpenCode/get-shit-done/VERSION ]; then
-  cat ./.OpenCode/get-shit-done/VERSION
+# Check local first (takes priority only if valid)
+# Detect runtime config directory (supports OpenCode, OpenCode, Gemini)
+LOCAL_VERSION_FILE="" LOCAL_MARKER_FILE="" LOCAL_DIR=""
+for dir in .OpenCode .config/opencode .opencode .gemini; do
+  if [ -f "./$dir/get-shit-done/VERSION" ]; then
+    LOCAL_VERSION_FILE="./$dir/get-shit-done/VERSION"
+    LOCAL_MARKER_FILE="./$dir/get-shit-done/workflows/update.md"
+    LOCAL_DIR="$(cd "./$dir" 2>/dev/null && pwd)"
+    break
+  fi
+done
+GLOBAL_VERSION_FILE="" GLOBAL_MARKER_FILE="" GLOBAL_DIR=""
+for dir in .OpenCode .config/opencode .opencode .gemini; do
+  if [ -f "$HOME/$dir/get-shit-done/VERSION" ]; then
+    GLOBAL_VERSION_FILE="$HOME/$dir/get-shit-done/VERSION"
+    GLOBAL_MARKER_FILE="$HOME/$dir/get-shit-done/workflows/update.md"
+    GLOBAL_DIR="$(cd "$HOME/$dir" 2>/dev/null && pwd)"
+    break
+  fi
+done
+
+# Only treat as LOCAL if the resolved paths differ (prevents misdetection when CWD=$HOME)
+IS_LOCAL=false
+if [ -n "$LOCAL_VERSION_FILE" ] && [ -f "$LOCAL_VERSION_FILE" ] && [ -f "$LOCAL_MARKER_FILE" ] && grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+' "$LOCAL_VERSION_FILE"; then
+  if [ -z "$GLOBAL_DIR" ] || [ "$LOCAL_DIR" != "$GLOBAL_DIR" ]; then
+    IS_LOCAL=true
+  fi
+fi
+
+if [ "$IS_LOCAL" = true ]; then
+  cat "$LOCAL_VERSION_FILE"
   echo "LOCAL"
-elif [ -f ~/.config/opencode/get-shit-done/VERSION ]; then
-  cat ~/.config/opencode/get-shit-done/VERSION
+elif [ -n "$GLOBAL_VERSION_FILE" ] && [ -f "$GLOBAL_VERSION_FILE" ] && [ -f "$GLOBAL_MARKER_FILE" ] && grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+' "$GLOBAL_VERSION_FILE"; then
+  cat "$GLOBAL_VERSION_FILE"
   echo "GLOBAL"
 else
   echo "UNKNOWN"
@@ -26,8 +53,8 @@ fi
 ```
 
 Parse output:
-- If last line is "LOCAL": installed version is first line, use `--local` flag for update
-- If last line is "GLOBAL": installed version is first line, use `--global` flag for update
+- If last line is "LOCAL": local install is valid; installed version is first line; use `--local`
+- If last line is "GLOBAL": local missing/invalid, global install is valid; installed version is first line; use `--global`
 - If "UNKNOWN": proceed to install step (treat as version 0.0.0)
 
 **If VERSION file missing:**
@@ -122,7 +149,7 @@ Exit.
 - `get-shit-done/` will be wiped and replaced
 - `agents/gsd-*` files will be replaced
 
-(Paths are relative to your install location: `~/.config/opencode/` for global, `./.OpenCode/` for local)
+(Paths are relative to your install location: `$HOME/.config/opencode/` for global, `./.OpenCode/` for local)
 
 Your custom files in other locations are preserved:
 - Custom commands not in `commands/gsd/` ✓
@@ -147,28 +174,27 @@ Run the update using the install type detected in step 1:
 
 **If LOCAL install:**
 ```bash
-npx gsd-opencode --local
+npx -y gsd-opencode@latest --local
 ```
 
 **If GLOBAL install (or unknown):**
 ```bash
-npx gsd-opencode --global
+npx -y gsd-opencode@latest --global
 ```
 
 Capture output. If install fails, show error and exit.
 
 Clear the update cache so statusline indicator disappears:
 
-**If LOCAL install:**
 ```bash
-rm -f ./.OpenCode/cache/gsd-update-check.json
+# Clear update cache across all runtime directories
+for dir in .OpenCode .config/opencode .opencode .gemini; do
+  rm -f "./$dir/cache/gsd-update-check.json"
+  rm -f "$HOME/$dir/cache/gsd-update-check.json"
+done
 ```
 
-**If GLOBAL install:**
-```bash
-rm -f ~/.config/opencode/cache/gsd-update-check.json
-```
-(Paths are templated at install time for runtime compatibility)
+The SessionStart hook (`gsd-check-update.js`) writes to the detected runtime's cache directory, so all paths must be cleared to prevent stale update indicators.
 </step>
 
 <step name="display_result">

@@ -7,6 +7,8 @@ tools:
   glob: true
   grep: true
 color: "#008000"
+skills:
+  - gsd-plan-checker-workflow
 ---
 
 <role>
@@ -35,7 +37,7 @@ Before verifying, discover project context:
 
 **Project instructions:** read `./AGENTS.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
-**Project skills:** Check `.agents/skills/` directory if it exists:
+**Project skills:** Check `.OpenCode/skills/` or `.agents/skills/` directory if either exists:
 1. List available skills (subdirectories)
 2. read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during verification
@@ -318,102 +320,61 @@ issue:
 
 ## Dimension 8: Nyquist Compliance
 
-<dimension_8_skip_condition>
-Skip this entire dimension if:
-- workflow.nyquist_validation is false in .planning/config.json
-- The phase being checked has no RESEARCH.md (researcher was skipped)
-- The RESEARCH.md has no "Validation Architecture" section (researcher ran without Nyquist)
+Skip if: `workflow.nyquist_validation` is explicitly set to `false` in config.json (absent key = enabled), phase has no RESEARCH.md, or RESEARCH.md has no "Validation Architecture" section. Output: "Dimension 8: SKIPPED (nyquist_validation disabled or not applicable)"
 
-If skipped, output: "Dimension 8: SKIPPED (nyquist_validation disabled or not applicable)"
-</dimension_8_skip_condition>
+### Check 8e — VALIDATION.md Existence (Gate)
 
-<dimension_8_context>
-This dimension enforces the Nyquist-Shannon Sampling Theorem for AI code generation:
-if OpenCode's executor produces output at high frequency (one task per commit), feedback
-must run at equally high frequency. A plan that produces code without pre-defined
-automated verification is under-sampled — errors will be statistically missed.
+Before running checks 8a-8d, verify VALIDATION.md exists:
 
-The gsd-phase-researcher already determined WHAT to test. This dimension verifies
-that the planner correctly incorporated that information into the actual task plans.
-</dimension_8_context>
+```bash
+ls "${PHASE_DIR}"/*-VALIDATION.md 2>/dev/null
+```
+
+**If missing:** **BLOCKING FAIL** — "VALIDATION.md not found for phase {N}. Re-run `/gsd-plan-phase {N} --research` to regenerate."
+Skip checks 8a-8d entirely. Report Dimension 8 as FAIL with this single issue.
+
+**If exists:** Proceed to checks 8a-8d.
 
 ### Check 8a — Automated Verify Presence
 
-For EACH `<task>` element in EACH plan file for this phase:
-
-1. Does `<verify>` contain an `<automated>` command (or structured equivalent)?
-2. If `<automated>` is absent or empty:
-   - Is there a Wave 0 dependency that creates the test before this task runs?
-   - If no Wave 0 dependency exists → **BLOCKING FAIL**
-3. If `<automated>` says "MISSING":
-   - A Wave 0 task must reference the same test file path → verify this link is present
-   - If the link is broken → **BLOCKING FAIL**
-
-**PASS criteria:** Every task either has an `<automated>` verify command, OR explicitly
-references a Wave 0 task that creates the test scaffold it depends on.
+For each `<task>` in each plan:
+- `<verify>` must contain `<automated>` command, OR a Wave 0 dependency that creates the test first
+- If `<automated>` is absent with no Wave 0 dependency → **BLOCKING FAIL**
+- If `<automated>` says "MISSING", a Wave 0 task must reference the same test file path → **BLOCKING FAIL** if link broken
 
 ### Check 8b — Feedback Latency Assessment
 
-Review each `<automated>` command in the plans:
-
-1. Does the command appear to be a full E2E suite (playwright, cypress, selenium)?
-   - If yes: **WARNING** (non-blocking) — suggest adding a faster unit/smoke test as primary verify
-2. Does the command include `--watchAll` or equivalent watch mode flags?
-   - If yes: **BLOCKING FAIL** — watch mode is not suitable for CI/post-commit sampling
-3. Does the command include `sleep`, `wait`, or arbitrary delays > 30 seconds?
-   - If yes: **WARNING** — flag as latency risk
+For each `<automated>` command:
+- Full E2E suite (playwright, cypress, selenium) → **WARNING** — suggest faster unit/smoke test
+- Watch mode flags (`--watchAll`) → **BLOCKING FAIL**
+- Delays > 30 seconds → **WARNING**
 
 ### Check 8c — Sampling Continuity
 
-Review ALL tasks across ALL plans for this phase in wave order:
-
-1. Map each task to its wave number
-2. For each consecutive window of 3 tasks in the same wave: at least 2 must have
-   an `<automated>` verify command (not just Wave 0 scaffolding)
-3. If any 3 consecutive implementation tasks all lack automated verify: **BLOCKING FAIL**
+Map tasks to waves. Per wave, any consecutive window of 3 implementation tasks must have ≥2 with `<automated>` verify. 3 consecutive without → **BLOCKING FAIL**.
 
 ### Check 8d — Wave 0 Completeness
 
-If any plan contains `<automated>MISSING</automated>` or references Wave 0:
+For each `<automated>MISSING</automated>` reference:
+- Wave 0 task must exist with matching `<files>` path
+- Wave 0 plan must execute before dependent task
+- Missing match → **BLOCKING FAIL**
 
-1. Does a Wave 0 task exist for every MISSING reference?
-2. Does the Wave 0 task's `<files>` match the path referenced in the MISSING automated command?
-3. Is the Wave 0 task in a plan that executes BEFORE the dependent task?
-
-**FAIL condition:** Any MISSING automated verify without a matching Wave 0 task.
-
-### Dimension 8 Output Block
-
-Include this block in the plan-checker report:
+### Dimension 8 Output
 
 ```
 ## Dimension 8: Nyquist Compliance
 
-### Automated Verify Coverage
-| task | Plan | Wave | Automated Command | Latency | Status |
-|------|------|------|-------------------|---------|--------|
-| {task name} | {plan} | {wave} | `{command}` | ~{N}s | ✅ PASS / ❌ FAIL |
+| task | Plan | Wave | Automated Command | Status |
+|------|------|------|-------------------|--------|
+| {task} | {plan} | {wave} | `{command}` | ✅ / ❌ |
 
-### Sampling Continuity Check
-Wave {N}: {X}/{Y} tasks verified → ✅ PASS / ❌ FAIL
-
-### Wave 0 Completeness
-- {test file} → Wave 0 task present ✅ / MISSING ❌
-
-### Overall Nyquist Status: ✅ PASS / ❌ FAIL
-
-### Revision Instructions (if FAIL)
-Return to planner with the following required changes:
-{list of specific fixes needed}
+Sampling: Wave {N}: {X}/{Y} verified → ✅ / ❌
+Wave 0: {test file} → ✅ present / ❌ MISSING
+Overall: ✅ PASS / ❌ FAIL
 ```
 
-### Revision Loop Behavior
-
-If Dimension 8 FAILS:
-- Return to `gsd-planner` with the specific revision instructions above
-- The planner must address ALL failing checks before returning
-- This follows the same loop behavior as existing dimensions
-- Maximum 3 revision loops for Dimension 8 before escalating to user
+If FAIL: return to planner with specific fixes. Same revision loop as other dimensions (max 3 loops).
 
 </verification_dimensions>
 
@@ -423,7 +384,8 @@ If Dimension 8 FAILS:
 
 Load phase operation context:
 ```bash
-INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init phase-op "${PHASE_ARG}")
+INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
+if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
 Extract from init JSON: `phase_dir`, `phase_number`, `has_plans`, `plan_count`.
@@ -434,7 +396,7 @@ Orchestrator provides CONTEXT.md content in the verification prompt. If provided
 ls "$phase_dir"/*-PLAN.md 2>/dev/null
 # read research for Nyquist validation data
 cat "$phase_dir"/*-RESEARCH.md 2>/dev/null
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "$phase_number"
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "$phase_number"
 ls "$phase_dir"/*-BRIEF.md 2>/dev/null
 ```
 
@@ -447,7 +409,7 @@ Use gsd-tools to validate plan structure:
 ```bash
 for plan in "$PHASE_DIR"/*-PLAN.md; do
   echo "=== $plan ==="
-  PLAN_STRUCTURE=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs verify plan-structure "$plan")
+  PLAN_STRUCTURE=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" verify plan-structure "$plan")
   echo "$PLAN_STRUCTURE"
 done
 ```
@@ -465,7 +427,7 @@ Map errors/warnings to verification dimensions:
 Extract must_haves from each plan using gsd-tools:
 
 ```bash
-MUST_HAVES=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs frontmatter get "$PLAN_PATH" --field must_haves)
+MUST_HAVES=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" frontmatter get "$PLAN_PATH" --field must_haves)
 ```
 
 Returns JSON: `{ truths: [...], artifacts: [...], key_links: [...] }`
@@ -503,12 +465,14 @@ Session persists     | 01    | 3     | COVERED
 
 For each requirement: find covering task(s), verify action is specific, flag gaps.
 
+**Exhaustive cross-check:** Also read PROJECT.md requirements (not just phase goal). Verify no PROJECT.md requirement relevant to this phase is silently dropped. A requirement is "relevant" if the ROADMAP.md explicitly maps it to this phase or if the phase goal directly implies it — do NOT flag requirements that belong to other phases or future work. Any unmapped relevant requirement is an automatic blocker — list it explicitly in issues.
+
 ## Step 5: Validate task Structure
 
 Use gsd-tools plan-structure verification (already run in Step 2):
 
 ```bash
-PLAN_STRUCTURE=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs verify plan-structure "$PLAN_PATH")
+PLAN_STRUCTURE=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" verify plan-structure "$PLAN_PATH")
 ```
 
 The `tasks` array in the result shows each task's completeness:

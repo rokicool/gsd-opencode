@@ -25,11 +25,11 @@ Brownfield equivalent of new-project. Project exists, PROJECT.md has history. Ga
 </objective>
 
 <execution_context>
-@~/.config/opencode/get-shit-done/workflows/new-milestone.md
-@~/.config/opencode/get-shit-done/references/questioning.md
-@~/.config/opencode/get-shit-done/references/ui-brand.md
-@~/.config/opencode/get-shit-done/templates/project.md
-@~/.config/opencode/get-shit-done/templates/requirements.md
+@$HOME/.config/opencode/get-shit-done/workflows/new-milestone.md
+@$HOME/.config/opencode/get-shit-done/references/questioning.md
+@$HOME/.config/opencode/get-shit-done/references/ui-brand.md
+@$HOME/.config/opencode/get-shit-done/templates/project.md
+@$HOME/.config/opencode/get-shit-done/templates/requirements.md
 </execution_context>
 
 <context>
@@ -39,6 +39,6 @@ Project and milestone context files are resolved inside the workflow (`init new-
 </context>
 
 <process>
-Execute the new-milestone workflow from @~/.config/opencode/get-shit-done/workflows/new-milestone.md end-to-end.
+Execute the new-milestone workflow from @$HOME/.config/opencode/get-shit-done/workflows/new-milestone.md end-to-end.
 Preserve all workflow gates (validation, questioning, research, requirements, roadmap approval, commits).
 </process>

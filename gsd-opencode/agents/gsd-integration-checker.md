@@ -7,6 +7,8 @@ tools:
   grep: true
   glob: true
 color: "#0000FF"
+skills:
+  - gsd-integration-workflow
 ---
 
 <role>

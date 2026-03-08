@@ -10,6 +10,14 @@ tools:
   webfetch: true
   mcp__context7__*: true
 color: "#008000"
+skills:
+  - gsd-planner-workflow
+# hooks:
+#   PostToolUse:
+#     - matcher: "write|edit"
+#       hooks:
+#         - type: command
+#           command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -40,7 +48,7 @@ Before planning, discover project context:
 
 **Project instructions:** read `./AGENTS.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
-**Project skills:** Check `.agents/skills/` directory if it exists:
+**Project skills:** Check `.OpenCode/skills/` or `.agents/skills/` directory if either exists:
 1. List available skills (subdirectories)
 2. read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during planning
@@ -164,21 +172,19 @@ Every task has four required fields:
 - Good: "Create POST endpoint accepting {email, password}, validates using bcrypt against User table, returns JWT in httpOnly cookie with 15-min expiry. Use jose library (not jsonwebtoken - CommonJS issues with Edge runtime)."
 - Bad: "Add authentication", "Make login work"
 
-**<verify>:** How to prove the task is complete. Supports structured format:
+**<verify>:** How to prove the task is complete.
 
 ```xml
 <verify>
   <automated>pytest tests/test_module.py::test_behavior -x</automated>
-  <manual>Optional: human-readable description of what to check</manual>
-  <sampling_rate>run after this task commits, before next task begins</sampling_rate>
 </verify>
 ```
 
 - Good: Specific automated command that runs in < 60 seconds
 - Bad: "It works", "Looks good", manual-only verification
-- Simple format also accepted: `npm test` passes, `curl -X POST /api/auth/login` returns 200 with Set-Cookie header
+- Simple format also accepted: `npm test` passes, `curl -X POST /api/auth/login` returns 200
 
-**Nyquist Rule:** Every `<verify>` must include an `<automated>` command. If no test exists yet for this behavior, set `<automated>MISSING — Wave 0 must create {test_file} first</automated>` and create a Wave 0 task that generates the test scaffold.
+**Nyquist Rule:** Every `<verify>` must include an `<automated>` command. If no test exists yet, set `<automated>MISSING — Wave 0 must create {test_file} first</automated>` and create a Wave 0 task that generates the test scaffold.
 
 **<done>:** Acceptance criteria - measurable state of completion.
 - Good: "Valid credentials return 200 + JWT cookie, invalid credentials return 401"
@@ -209,6 +215,16 @@ Each task: **15-60 minutes** OpenCode execution time.
 
 **Combine signals:** One task sets up for the next, separate tasks touch same file, neither meaningful alone.
 
+## Interface-First task Ordering
+
+When a plan creates new interfaces consumed by subsequent tasks:
+
+1. **First task: Define contracts** — Create type files, interfaces, exports
+2. **Middle tasks: Implement** — Build against the defined contracts
+3. **Last task: Wire** — Connect implementations to consumers
+
+This prevents the "scavenger hunt" anti-pattern where executors explore the codebase to understand contracts. They receive the contracts in the plan itself.
+
 ## Specificity Examples
 
 | TOO VAGUE | JUST RIGHT |
@@ -232,6 +248,26 @@ Each task: **15-60 minutes** OpenCode execution time.
 **Standard tasks:** UI layout/styling, configuration, glue code, one-off scripts, simple CRUD with no business logic.
 
 **Why TDD gets own plan:** TDD requires RED→GREEN→REFACTOR cycles consuming 40-50% context. Embedding in multi-task plans degrades quality.
+
+**task-level TDD** (for code-producing tasks in standard plans): When a task creates or modifies production code, add `tdd="true"` and a `<behavior>` block to make test expectations explicit before implementation:
+
+```xml
+<task type="auto" tdd="true">
+  <name>task: [name]</name>
+  <files>src/feature.ts, src/feature.test.ts</files>
+  <behavior>
+    - Test 1: [expected behavior]
+    - Test 2: [edge case]
+  </behavior>
+  <action>[Implementation after tests pass]</action>
+  <verify>
+    <automated>npm test -- --filter=feature</automated>
+  </verify>
+  <done>[Criteria]</done>
+</task>
+```
+
+Exceptions where `tdd="true"` is not needed: `type="checkpoint:*"` tasks, configuration-only files, documentation, migration scripts, glue code wiring existing tested components, styling-only changes.
 
 ## User Setup Detection
 
@@ -342,15 +378,15 @@ Plans should complete within ~50% context (not 80%). No context anxiety, quality
 
 **CONSIDER splitting:** >5 files total, complex domains, uncertainty about approach, natural semantic boundaries.
 
-## Depth Calibration
+## Granularity Calibration
 
-| Depth | Typical Plans/Phase | Tasks/Plan |
-|-------|---------------------|------------|
-| Quick | 1-3 | 2-3 |
+| Granularity | Typical Plans/Phase | Tasks/Plan |
+|-------------|---------------------|------------|
+| Coarse | 1-3 | 2-3 |
 | Standard | 3-5 | 2-3 |
-| Comprehensive | 5-10 | 2-3 |
+| Fine | 5-10 | 2-3 |
 
-Derive plans from actual work. Depth determines compression tolerance, not a target. Don't pad small work to hit a number. Don't compress complex work to look efficient.
+Derive plans from actual work. Granularity determines compression tolerance, not a target. Don't pad small work to hit a number. Don't compress complex work to look efficient.
 
 ## Context Per task Estimates
 
@@ -399,8 +435,8 @@ Output: [Artifacts created]
 </objective>
 
 <execution_context>
-@~/.config/opencode/get-shit-done/workflows/execute-plan.md
-@~/.config/opencode/get-shit-done/templates/summary.md
+@$HOME/.config/opencode/get-shit-done/workflows/execute-plan.md
+@$HOME/.config/opencode/get-shit-done/templates/summary.md
 </execution_context>
 
 <context>
@@ -453,6 +489,69 @@ After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 | `must_haves` | Yes | Goal-backward verification criteria |
 
 Wave numbers are pre-computed during planning. Execute-phase reads `wave` directly from frontmatter.
+
+## Interface Context for Executors
+
+**Key insight:** "The difference between handing a contractor blueprints versus telling them 'build me a house.'"
+
+When creating plans that depend on existing code or create new interfaces consumed by other plans:
+
+### For plans that USE existing code:
+After determining `files_modified`, extract the key interfaces/types/exports from the codebase that executors will need:
+
+```bash
+# Extract type definitions, interfaces, and exports from relevant files
+grep -n "export\|interface\|type\|class\|function" {relevant_source_files} 2>/dev/null | head -50
+```
+
+Embed these in the plan's `<context>` section as an `<interfaces>` block:
+
+```xml
+<interfaces>
+<!-- Key types and contracts the executor needs. Extracted from codebase. -->
+<!-- Executor should use these directly — no codebase exploration needed. -->
+
+From src/types/user.ts:
+```typescript
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: Date;
+}
+```
+
+From src/api/auth.ts:
+```typescript
+export function validateToken(token: string): Promise<User | null>;
+export function createSession(user: User): Promise<SessionToken>;
+```
+</interfaces>
+```
+
+### For plans that CREATE new interfaces:
+If this plan creates types/interfaces that later plans depend on, include a "Wave 0" skeleton step:
+
+```xml
+<task type="auto">
+  <name>task 0: write interface contracts</name>
+  <files>src/types/newFeature.ts</files>
+  <action>Create type definitions that downstream plans will implement against. These are the contracts — implementation comes in later tasks.</action>
+  <verify>File exists with exported types, no implementation</verify>
+  <done>Interface file committed, types exported</done>
+</task>
+```
+
+### When to include interfaces:
+- Plan touches files that import from other modules → extract those module's exports
+- Plan creates a new API endpoint → extract the request/response types
+- Plan modifies a component → extract its props interface
+- Plan depends on a previous plan's output → extract the types from that plan's files_modified
+
+### When to skip:
+- Plan is self-contained (creates everything from scratch, no imports)
+- Plan is pure configuration (no code interfaces involved)
+- Level 0 discovery (all patterns already established)
 
 ## Context Section Rules
 
@@ -760,15 +859,20 @@ grep -l "status: diagnosed" "$phase_dir"/*-UAT.md 2>/dev/null
 </task>
 ```
 
-**7. write PLAN.md files:**
+**7. Assign waves using standard dependency analysis** (same as `assign_waves` step):
+- Plans with no dependencies → wave 1
+- Plans that depend on other gap closure plans → max(dependency waves) + 1
+- Also consider dependencies on existing (non-gap) plans in the phase
+
+**8. write PLAN.md files:**
 
 ```yaml
 ---
 phase: XX-name
 plan: NN              # Sequential after existing
 type: execute
-wave: 1               # Gap closures typically single wave
-depends_on: []
+wave: N               # Computed from depends_on (see assign_waves)
+depends_on: [...]     # Other plans this depends on (gap or existing)
 files_modified: [...]
 autonomous: true
 gap_closure: true     # Flag for tracking
@@ -836,7 +940,7 @@ Group by plan, dimension, severity.
 ### Step 6: Commit
 
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "fix($PHASE): revise plans based on checker feedback" --files .planning/phases/$PHASE-*/$PHASE-*-PLAN.md
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "fix($PHASE): revise plans based on checker feedback" --files .planning/phases/$PHASE-*/$PHASE-*-PLAN.md
 ```
 
 ### Step 7: Return Revision Summary
@@ -875,7 +979,8 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "fix($PHASE): rev
 Load planning context:
 
 ```bash
-INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init plan-phase "${PHASE}")
+INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init plan-phase "${PHASE}")
+if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
 Extract from init JSON: `planner_model`, `researcher_model`, `checker_model`, `commit_docs`, `research_enabled`, `phase_dir`, `phase_number`, `has_research`, `has_context`.
@@ -931,7 +1036,7 @@ Apply discovery level protocol (see discovery_levels section).
 
 **Step 1 — Generate digest index:**
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs history-digest
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" history-digest
 ```
 
 **Step 2 — Select relevant phases (typically 2-4):**
@@ -963,6 +1068,16 @@ For phases not selected, retain from digest:
 - `patterns`: Conventions to follow
 
 **From STATE.md:** Decisions → constrain approach. Pending todos → candidates.
+
+**From RETROSPECTIVE.md (if exists):**
+```bash
+cat .planning/RETROSPECTIVE.md 2>/dev/null | tail -100
+```
+
+read the most recent milestone retrospective and cross-milestone trends. Extract:
+- **Patterns to follow** from "What Worked" and "Patterns Established"
+- **Patterns to avoid** from "What Was Inefficient" and "Key Lessons"
+- **Cost patterns** to inform model selection and agent strategy
 </step>
 
 <step name="gather_phase_context">
@@ -1028,7 +1143,7 @@ Apply goal-backward methodology (see goal_backward section):
 </step>
 
 <step name="estimate_scope">
-Verify each plan fits context budget: 2-3 tasks, ~50% target. Split if necessary. Check depth setting.
+Verify each plan fits context budget: 2-3 tasks, ~50% target. Split if necessary. Check granularity setting.
 </step>
 
 <step name="confirm_breakdown">
@@ -1049,7 +1164,7 @@ Include all frontmatter fields.
 Validate each created PLAN.md using gsd-tools:
 
 ```bash
-VALID=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs frontmatter validate "$PLAN_PATH" --schema plan)
+VALID=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" frontmatter validate "$PLAN_PATH" --schema plan)
 ```
 
 Returns JSON: `{ valid, missing, present, schema }`
@@ -1062,7 +1177,7 @@ Required plan frontmatter fields:
 Also validate plan structure:
 
 ```bash
-STRUCTURE=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs verify plan-structure "$PLAN_PATH")
+STRUCTURE=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" verify plan-structure "$PLAN_PATH")
 ```
 
 Returns JSON: `{ valid, errors, warnings, task_count, tasks }`
@@ -1099,7 +1214,7 @@ Plans:
 
 <step name="git_commit">
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs($PHASE): create phase plan" --files .planning/phases/$PHASE-*/$PHASE-*-PLAN.md .planning/ROADMAP.md
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs($PHASE): create phase plan" --files .planning/phases/$PHASE-*/$PHASE-*-PLAN.md .planning/ROADMAP.md
 ```
 </step>
 

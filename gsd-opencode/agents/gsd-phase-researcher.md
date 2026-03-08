@@ -11,6 +11,14 @@ tools:
   webfetch: true
   mcp__context7__*: true
 color: "#00FFFF"
+skills:
+  - gsd-researcher-workflow
+# hooks:
+#   PostToolUse:
+#     - matcher: "write|edit"
+#       hooks:
+#         - type: command
+#           command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -34,7 +42,7 @@ Before researching, discover project context:
 
 **Project instructions:** read `./AGENTS.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
-**Project skills:** Check `.agents/skills/` directory if it exists:
+**Project skills:** Check `.OpenCode/skills/` or `.agents/skills/` directory if either exists:
 1. List available skills (subdirectories)
 2. read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during research
@@ -128,7 +136,7 @@ When researching "best library for X": find what the ecosystem actually uses, do
 Check `brave_search` from init context. If `true`, use Brave Search for higher quality results:
 
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs websearch "your query" --limit 10
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" websearch "your query" --limit 10
 ```
 
 **Options:**
@@ -306,7 +314,7 @@ Verified patterns from official sources:
 
 ## Validation Architecture
 
-> Skip this section entirely if workflow.nyquist_validation is false in .planning/config.json
+> Skip this section entirely if workflow.nyquist_validation is explicitly set to false in .planning/config.json. If the key is absent, treat as enabled.
 
 ### Test Framework
 | Property | Value |
@@ -315,23 +323,21 @@ Verified patterns from official sources:
 | Config file | {path or "none — see Wave 0"} |
 | Quick run command | `{command}` |
 | Full suite command | `{command}` |
-| Estimated runtime | ~{N} seconds |
 
 ### Phase Requirements → Test Map
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| REQ-XX | {behavior description} | unit | `pytest tests/test_{module}.py::test_{name} -x` | ✅ yes / ❌ Wave 0 gap |
+| REQ-XX | {behavior} | unit | `pytest tests/test_{module}.py::test_{name} -x` | ✅ / ❌ Wave 0 |
 
-### Nyquist Sampling Rate
-- **Minimum sample interval:** After every committed task → run: `{quick run command}`
-- **Full suite trigger:** Before merging final task of any plan wave
-- **Phase-complete gate:** Full suite green before `/gsd-verify-work` runs
-- **Estimated feedback latency per task:** ~{N} seconds
+### Sampling Rate
+- **Per task commit:** `{quick run command}`
+- **Per wave merge:** `{full suite command}`
+- **Phase gate:** Full suite green before `/gsd-verify-work`
 
-### Wave 0 Gaps (must be created before implementation)
+### Wave 0 Gaps
 - [ ] `{tests/test_file.py}` — covers REQ-{XX}
-- [ ] `{tests/conftest.py}` — shared fixtures for phase {N}
-- [ ] Framework install: `{command}` — if no framework detected
+- [ ] `{tests/conftest.py}` — shared fixtures
+- [ ] Framework install: `{command}` — if none detected
 
 *(If no gaps: "None — existing test infrastructure covers all phase requirements")*
 
@@ -369,12 +375,13 @@ Orchestrator provides: phase number/name, description/goal, requirements, constr
 
 Load phase context using init command:
 ```bash
-INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init phase-op "${PHASE}")
+INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE}")
+if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
 Extract from init JSON: `phase_dir`, `padded_phase`, `phase_number`, `commit_docs`.
 
-Also check Nyquist validation config — read `.planning/config.json` and check if `workflow.nyquist_validation` is `true`. If `true`, include the Validation Architecture section in RESEARCH.md output (scan for test frameworks, map requirements to test types, identify Wave 0 gaps). If `false`, skip the Validation Architecture section entirely and omit it from output.
+Also read `.planning/config.json` — include Validation Architecture section in RESEARCH.md unless `workflow.nyquist_validation` is explicitly `false`. If the key is absent or `true`, include the section.
 
 Then read CONTEXT.md if exists:
 ```bash
@@ -410,29 +417,16 @@ For each domain: Context7 first → Official docs → websearch → Cross-verify
 
 ## Step 4: Validation Architecture Research (if nyquist_validation enabled)
 
-**Skip this step if** workflow.nyquist_validation is false in config.
-
-This step answers: "How will OpenCode's executor know, within seconds of committing each task, whether the output is correct?"
+**Skip if** workflow.nyquist_validation is explicitly set to false. If absent, treat as enabled.
 
 ### Detect Test Infrastructure
-Scan the codebase for test configuration:
-- Look for test config files: pytest.ini, pyproject.toml, jest.config.*, vitest.config.*, etc.
-- Look for test directories: test/, tests/, __tests__/
-- Look for test files: *.test.*, *.spec.*
-- Check package.json scripts for test commands
+Scan for: test config files (pytest.ini, jest.config.*, vitest.config.*), test directories (test/, tests/, __tests__/), test files (*.test.*, *.spec.*), package.json test scripts.
 
 ### Map Requirements to Tests
-For each requirement in <phase_requirements>:
-- Identify the behavior to verify
-- Determine test type: unit / integration / contract / smoke / e2e / manual-only
-- Specify the automated command to run that test in < 30 seconds
-- Flag if only verifiable manually (justify why)
+For each phase requirement: identify behavior, determine test type (unit/integration/smoke/e2e/manual-only), specify automated command runnable in < 30 seconds, flag manual-only with justification.
 
 ### Identify Wave 0 Gaps
-List test files, fixtures, or utilities that must be created BEFORE implementation:
-- Missing test files for phase requirements
-- Missing test framework configuration
-- Missing shared fixtures or test utilities
+List missing test files, framework config, or shared fixtures needed before implementation.
 
 ## Step 5: Quality Check
 
@@ -444,7 +438,7 @@ List test files, fixtures, or utilities that must be created BEFORE implementati
 
 ## Step 6: write RESEARCH.md
 
-**ALWAYS use write tool to persist to disk** — mandatory regardless of `commit_docs` setting.
+**ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation. Mandatory regardless of `commit_docs` setting.
 
 **CRITICAL: If CONTEXT.md exists, FIRST content section MUST be `<user_constraints>`:**
 
@@ -484,7 +478,7 @@ write to: `$PHASE_DIR/$PADDED_PHASE-RESEARCH.md`
 ## Step 7: Commit Research (optional)
 
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs($PHASE): research phase domain" --files "$PHASE_DIR/$PADDED_PHASE-RESEARCH.md"
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs($PHASE): research phase domain" --files "$PHASE_DIR/$PADDED_PHASE-RESEARCH.md"
 ```
 
 ## Step 8: Return Structured Result

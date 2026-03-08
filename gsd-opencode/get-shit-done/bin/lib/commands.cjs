@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { safeReadFile, loadConfig, isGitIgnored, execGit, normalizePhaseName, getArchivedPhaseDirs, generateSlugInternal, getMilestoneInfo, resolveModelInternal, MODEL_PROFILES, output, error, findPhaseInternal } = require('./core.cjs');
+const { safeReadFile, loadConfig, isGitIgnored, execGit, normalizePhaseName, comparePhaseNum, getArchivedPhaseDirs, generateSlugInternal, getMilestoneInfo, resolveModelInternal, MODEL_PROFILES, toPosixPath, output, error, findPhaseInternal } = require('./core.cjs');
 const { extractFrontmatter } = require('./frontmatter.cjs');
 
 function cmdGenerateSlug(text, raw) {
@@ -68,7 +68,7 @@ function cmdListTodos(cwd, area, raw) {
           created: createdMatch ? createdMatch[1].trim() : 'unknown',
           title: titleMatch ? titleMatch[1].trim() : 'Untitled',
           area: todoArea,
-          path: path.join('.planning', 'todos', 'pending', file),
+          path: toPosixPath(path.join('.planning', 'todos', 'pending', file)),
         });
       } catch {}
     }
@@ -204,17 +204,12 @@ function cmdResolveModel(cwd, agentType, raw) {
 
   const config = loadConfig(cwd);
   const profile = config.model_profile || 'balanced';
+  const model = resolveModelInternal(cwd, agentType);
 
   const agentModels = MODEL_PROFILES[agentType];
-  if (!agentModels) {
-    const result = { model: 'sonnet', profile, unknown_agent: true };
-    output(result, raw, 'sonnet');
-    return;
-  }
-
-  const resolved = agentModels[profile] || agentModels['balanced'] || 'sonnet';
-  const model = resolved === 'opus' ? 'inherit' : resolved;
-  const result = { model, profile };
+  const result = agentModels
+    ? { model, profile }
+    : { model, profile, unknown_agent: true };
   output(result, raw, model);
 }
 
@@ -304,6 +299,7 @@ function cmdSummaryExtract(cwd, summaryPath, fields, raw) {
     tech_added: (fm['tech-stack'] && fm['tech-stack'].added) || [],
     patterns: fm['patterns-established'] || [],
     decisions: parseDecisions(fm['key-decisions']),
+    requirements_completed: fm['requirements-completed'] || [],
   };
 
   // If fields specified, filter to only those fields
@@ -394,14 +390,10 @@ function cmdProgressRender(cwd, format, raw) {
 
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort((a, b) => {
-      const aNum = parseFloat(a.match(/^(\d+(?:\.\d+)?)/)?.[1] || '0');
-      const bNum = parseFloat(b.match(/^(\d+(?:\.\d+)?)/)?.[1] || '0');
-      return aNum - bNum;
-    });
+    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort((a, b) => comparePhaseNum(a, b));
 
     for (const dir of dirs) {
-      const dm = dir.match(/^(\d+(?:\.\d+)?)-?(.*)/);
+      const dm = dir.match(/^(\d+(?:\.\d+)*)-?(.*)/);
       const phaseNum = dm ? dm[1] : dir;
       const phaseName = dm && dm[2] ? dm[2].replace(/-/g, ' ') : '';
       const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
@@ -421,7 +413,7 @@ function cmdProgressRender(cwd, format, raw) {
     }
   } catch {}
 
-  const percent = totalPlans > 0 ? Math.round((totalSummaries / totalPlans) * 100) : 0;
+  const percent = totalPlans > 0 ? Math.min(100, Math.round((totalSummaries / totalPlans) * 100)) : 0;
 
   if (format === 'table') {
     // Render markdown table
@@ -536,7 +528,7 @@ function cmdScaffold(cwd, type, options, raw) {
   }
 
   fs.writeFileSync(filePath, content, 'utf-8');
-  const relPath = path.relative(cwd, filePath);
+  const relPath = toPosixPath(path.relative(cwd, filePath));
   output({ created: true, path: relPath }, raw, relPath);
 }
 

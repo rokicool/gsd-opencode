@@ -28,7 +28,7 @@ OpenCode's training data is 6-18 months stale. Always verify.
 2. **Official docs** - When Context7 lacks coverage
 3. **websearch LAST** - For comparisons and trends only
 
-See ~/.config/opencode/get-shit-done/templates/discovery.md `<discovery_protocol>` for full protocol.
+See $HOME/.config/opencode/get-shit-done/templates/discovery.md `<discovery_protocol>` for full protocol.
 </source_hierarchy>
 
 <process>
@@ -107,7 +107,7 @@ For: Choosing between options, new external integration.
 
 5. **Cross-verify:** Any websearch finding → confirm with Context7/official docs.
 
-6. **Create DISCOVERY.md** using ~/.config/opencode/get-shit-done/templates/discovery.md structure:
+6. **Create DISCOVERY.md** using $HOME/.config/opencode/get-shit-done/templates/discovery.md structure:
 
    - Summary with recommendation
    - Key findings per option
@@ -126,7 +126,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 **Process:**
 
-1. **Scope the discovery** using ~/.config/opencode/get-shit-done/templates/discovery.md:
+1. **Scope the discovery** using $HOME/.config/opencode/get-shit-done/templates/discovery.md:
 
    - Define clear scope
    - Define include/exclude boundaries
@@ -160,7 +160,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 6. **Create comprehensive DISCOVERY.md:**
 
-   - Full structure from ~/.config/opencode/get-shit-done/templates/discovery.md
+   - Full structure from $HOME/.config/opencode/get-shit-done/templates/discovery.md
    - Quality report with source attribution
    - Confidence by finding
    - If LOW confidence on any critical finding → add validation checkpoints
@@ -184,7 +184,7 @@ Ask: What do we need to learn before we can plan this phase?
   </step>
 
 <step name="create_discovery_scope">
-Use ~/.config/opencode/get-shit-done/templates/discovery.md.
+Use $HOME/.config/opencode/get-shit-done/templates/discovery.md.
 
 Include:
 

@@ -5,7 +5,7 @@ Create executable phase prompts (PLAN.md files) for a roadmap phase with integra
 <required_reading>
 read all files referenced by the invoking prompt's execution_context before starting.
 
-@~/.config/opencode/get-shit-done/references/ui-brand.md
+@$HOME/.config/opencode/get-shit-done/references/ui-brand.md
 </required_reading>
 
 <process>
@@ -15,10 +15,11 @@ read all files referenced by the invoking prompt's execution_context before star
 Load all context in one call (paths only to minimize orchestrator context):
 
 ```bash
-INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init plan-phase "$PHASE")
+INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init plan-phase "$PHASE")
+if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
-Parse JSON for: `researcher_model`, `planner_model`, `checker_model`, `research_enabled`, `plan_checker_enabled`, `nyquist_validation_enabled`, `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `plan_count`, `planning_exists`, `roadmap_exists`.
+Parse JSON for: `researcher_model`, `planner_model`, `checker_model`, `research_enabled`, `plan_checker_enabled`, `nyquist_validation_enabled`, `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `plan_count`, `planning_exists`, `roadmap_exists`, `phase_req_ids`.
 
 **File paths (for <files_to_read> blocks):** `state_path`, `roadmap_path`, `requirements_path`, `context_path`, `research_path`, `verification_path`, `uat_path`. These are null if files don't exist.
 
@@ -26,7 +27,9 @@ Parse JSON for: `researcher_model`, `planner_model`, `checker_model`, `research_
 
 ## 2. Parse and Normalize Arguments
 
-Extract from $ARGUMENTS: phase number (integer or decimal like `2.1`), flags (`--research`, `--skip-research`, `--gaps`, `--skip-verify`).
+Extract from $ARGUMENTS: phase number (integer or decimal like `2.1`), flags (`--research`, `--skip-research`, `--gaps`, `--skip-verify`, `--prd <filepath>`).
+
+Extract `--prd <filepath>` from $ARGUMENTS. If present, set PRD_FILE to the filepath.
 
 **If no phase number:** Detect next unplanned phase from roadmap.
 
@@ -40,12 +43,102 @@ mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 ## 3. Validate Phase
 
 ```bash
-PHASE_INFO=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "${PHASE}")
+PHASE_INFO=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}")
 ```
 
 **If `found` is false:** Error with available phases. **If `found` is true:** Extract `phase_number`, `phase_name`, `goal` from JSON.
 
+## 3.5. Handle PRD Express Path
+
+**Skip if:** No `--prd` flag in arguments.
+
+**If `--prd <filepath>` provided:**
+
+1. read the PRD file:
+```bash
+PRD_CONTENT=$(cat "$PRD_FILE" 2>/dev/null)
+if [ -z "$PRD_CONTENT" ]; then
+  echo "Error: PRD file not found: $PRD_FILE"
+  exit 1
+fi
+```
+
+2. Display banner:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► PRD EXPRESS PATH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Using PRD: {PRD_FILE}
+Generating CONTEXT.md from requirements...
+```
+
+3. Parse the PRD content and generate CONTEXT.md. The orchestrator should:
+   - Extract all requirements, user stories, acceptance criteria, and constraints from the PRD
+   - Map each to a locked decision (everything in the PRD is treated as a locked decision)
+   - Identify any areas the PRD doesn't cover and mark as "OpenCode's Discretion"
+   - Create CONTEXT.md in the phase directory
+
+4. write CONTEXT.md:
+```markdown
+# Phase [X]: [Name] - Context
+
+**Gathered:** [date]
+**Status:** Ready for planning
+**Source:** PRD Express Path ({PRD_FILE})
+
+<domain>
+## Phase Boundary
+
+[Extracted from PRD — what this phase delivers]
+
+</domain>
+
+<decisions>
+## Implementation Decisions
+
+{For each requirement/story/criterion in the PRD:}
+### [Category derived from content]
+- [Requirement as locked decision]
+
+### OpenCode's Discretion
+[Areas not covered by PRD — implementation details, technical choices]
+
+</decisions>
+
+<specifics>
+## Specific Ideas
+
+[Any specific references, examples, or concrete requirements from PRD]
+
+</specifics>
+
+<deferred>
+## Deferred Ideas
+
+[Items in PRD explicitly marked as future/v2/out-of-scope]
+[If none: "None — PRD covers phase scope"]
+
+</deferred>
+
+---
+
+*Phase: XX-name*
+*Context gathered: [date] via PRD Express Path*
+```
+
+5. Commit:
+```bash
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): generate context from PRD" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
+```
+
+6. Set `context_content` to the generated CONTEXT.md content and continue to step 5 (Handle Research).
+
+**Effect:** This completely bypasses step 4 (Load CONTEXT.md) since we just created it. The rest of the workflow (research, planning, verification) proceeds normally with the PRD-derived context.
+
 ## 4. Load CONTEXT.md
+
+**Skip if:** PRD express path was used (CONTEXT.md already created in step 3.5).
 
 Check `context_path` from init JSON.
 
@@ -83,8 +176,7 @@ Display banner:
 ### Spawn gsd-phase-researcher
 
 ```bash
-PHASE_DESC=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "${PHASE}" | jq -r '.section')
-PHASE_REQ_IDS=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap get-phase "${PHASE}" | jq -r '.section // empty' | grep -i "Requirements:" | head -1 | sed 's/.*Requirements:\*\*\s*//' | sed 's/[\[\]]//g' | tr ',' '\n' | sed 's/^ *//;s/ *$//' | grep -v '^$' | tr '\n' ',' | sed 's/,$//')
+PHASE_DESC=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}" | jq -r '.section')
 ```
 
 Research prompt:
@@ -106,7 +198,7 @@ Answer: "What do I need to know to PLAN this phase well?"
 **Phase requirement IDs (MUST address):** {phase_req_ids}
 
 **Project instructions:** read ./AGENTS.md if exists — follow project-specific guidelines
-**Project skills:** Check .agents/skills/ directory (if exists) — read SKILL.md files, research should account for project skill patterns
+**Project skills:** Check .OpenCode/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, research should account for project skill patterns
 </additional_context>
 
 <output>
@@ -116,8 +208,8 @@ write to: {phase_dir}/{phase_num}-RESEARCH.md
 
 ```
 task(
-  prompt="First, read ~/.config/opencode/agents/gsd-phase-researcher.md for your role and instructions.\n\n" + research_prompt,
-  subagent_type="general",
+  prompt=research_prompt,
+  subagent_type="gsd-phase-researcher",
   model="{researcher_model}",
   description="Research Phase {phase}"
 )
@@ -128,30 +220,26 @@ task(
 - **`## RESEARCH COMPLETE`:** Display confirmation, continue to step 6
 - **`## RESEARCH BLOCKED`:** Display blocker, offer: 1) Provide context, 2) Skip research, 3) Abort
 
-## 5.5. Create Validation Strategy (if Nyquist enabled)
+## 5.5. Create Validation Strategy
 
-**Skip if:** `nyquist_validation_enabled` is false from INIT JSON.
-
-After researcher completes, check if RESEARCH.md contains a Validation Architecture section:
+MANDATORY unless `nyquist_validation_enabled` is false.
 
 ```bash
 grep -l "## Validation Architecture" "${PHASE_DIR}"/*-RESEARCH.md 2>/dev/null
 ```
 
 **If found:**
-1. read validation template from `~/.config/opencode/get-shit-done/templates/VALIDATION.md`
-2. write to `${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md`
-3. Fill frontmatter: replace `{N}` with phase number, `{phase-slug}` with phase slug, `{date}` with current date
-4. If `commit_docs` is true:
+1. read template: `$HOME/.config/opencode/get-shit-done/templates/VALIDATION.md`
+2. write to `${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md` (use write tool)
+3. Fill frontmatter: `{N}` → phase number, `{phase-slug}` → slug, `{date}` → current date
+4. Verify:
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit-docs "docs(phase-${PHASE}): add validation strategy"
+test -f "${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md" && echo "VALIDATION_CREATED=true" || echo "VALIDATION_CREATED=false"
 ```
+5. If `VALIDATION_CREATED=false`: STOP — do not proceed to Step 6
+6. If `commit_docs`: `commit-docs "docs(phase-${PHASE}): add validation strategy"`
 
-**If not found (and nyquist enabled):** Display warning:
-```
-⚠ Nyquist validation enabled but researcher did not produce a Validation Architecture section.
-  Continuing without validation strategy. Plans may fail Dimension 8 check.
-```
+**If not found:** Warn and continue — plans may fail Dimension 8.
 
 ## 6. Check Existing Plans
 
@@ -166,14 +254,29 @@ ls "${PHASE_DIR}"/*-PLAN.md 2>/dev/null
 Extract from INIT JSON:
 
 ```bash
-STATE_PATH=$(echo "$INIT" | jq -r '.state_path // empty')
-ROADMAP_PATH=$(echo "$INIT" | jq -r '.roadmap_path // empty')
-REQUIREMENTS_PATH=$(echo "$INIT" | jq -r '.requirements_path // empty')
-RESEARCH_PATH=$(echo "$INIT" | jq -r '.research_path // empty')
-VERIFICATION_PATH=$(echo "$INIT" | jq -r '.verification_path // empty')
-UAT_PATH=$(echo "$INIT" | jq -r '.uat_path // empty')
-CONTEXT_PATH=$(echo "$INIT" | jq -r '.context_path // empty')
+STATE_PATH=$(printf '%s\n' "$INIT" | jq -r '.state_path // empty')
+ROADMAP_PATH=$(printf '%s\n' "$INIT" | jq -r '.roadmap_path // empty')
+REQUIREMENTS_PATH=$(printf '%s\n' "$INIT" | jq -r '.requirements_path // empty')
+RESEARCH_PATH=$(printf '%s\n' "$INIT" | jq -r '.research_path // empty')
+VERIFICATION_PATH=$(printf '%s\n' "$INIT" | jq -r '.verification_path // empty')
+UAT_PATH=$(printf '%s\n' "$INIT" | jq -r '.uat_path // empty')
+CONTEXT_PATH=$(printf '%s\n' "$INIT" | jq -r '.context_path // empty')
 ```
+
+## 7.5. Verify Nyquist Artifacts
+
+Skip if `nyquist_validation_enabled` is false.
+
+```bash
+VALIDATION_EXISTS=$(ls "${PHASE_DIR}"/*-VALIDATION.md 2>/dev/null | head -1)
+```
+
+If missing and Nyquist enabled — ask user:
+1. Re-run: `/gsd-plan-phase {PHASE} --research`
+2. Disable Nyquist in config
+3. Continue anyway (plans fail Dimension 8)
+
+Proceed to Step 8 only if user selects 2 or 3.
 
 ## 8. Spawn gsd-planner Agent
 
@@ -206,7 +309,7 @@ Planner prompt:
 **Phase requirement IDs (every ID MUST appear in a plan's `requirements` field):** {phase_req_ids}
 
 **Project instructions:** read ./AGENTS.md if exists — follow project-specific guidelines
-**Project skills:** Check .agents/skills/ directory (if exists) — read SKILL.md files, plans should account for project skill rules
+**Project skills:** Check .OpenCode/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, plans should account for project skill rules
 </planning_context>
 
 <downstream_consumer>
@@ -229,8 +332,8 @@ Output consumed by /gsd-execute-phase. Plans need:
 
 ```
 task(
-  prompt="First, read ~/.config/opencode/agents/gsd-planner.md for your role and instructions.\n\n" + filled_prompt,
-  subagent_type="general",
+  prompt=filled_prompt,
+  subagent_type="gsd-planner",
   model="{planner_model}",
   description="Plan Phase {phase}"
 )
@@ -271,7 +374,7 @@ Checker prompt:
 **Phase requirement IDs (MUST ALL be covered):** {phase_req_ids}
 
 **Project instructions:** read ./AGENTS.md if exists — verify plans honor project guidelines
-**Project skills:** Check .agents/skills/ directory (if exists) — verify plans account for project skill rules
+**Project skills:** Check .OpenCode/skills/ or .agents/skills/ directory (if either exists) — verify plans account for project skill rules
 </verification_context>
 
 <expected_output>
@@ -326,8 +429,8 @@ Return what changed.
 
 ```
 task(
-  prompt="First, read ~/.config/opencode/agents/gsd-planner.md for your role and instructions.\n\n" + revision_prompt,
-  subagent_type="general",
+  prompt=revision_prompt,
+  subagent_type="gsd-planner",
   model="{planner_model}",
   description="Revise Phase {phase} plans"
 )
@@ -350,12 +453,19 @@ Route to `<offer_next>` OR `auto_advance` depending on flags/config.
 Check for auto-advance trigger:
 
 1. Parse `--auto` flag from $ARGUMENTS
-2. read `workflow.auto_advance` from config:
+2. **Sync chain flag with intent** — if user invoked manually (no `--auto`), clear the ephemeral chain flag from any previous interrupted `--auto` chain. This does NOT touch `workflow.auto_advance` (the user's persistent settings preference):
    ```bash
-   AUTO_CFG=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
+   if [[ ! "$ARGUMENTS" =~ --auto ]]; then
+     node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false 2>/dev/null
+   fi
+   ```
+3. read both the chain flag and user preference:
+   ```bash
+   AUTO_CHAIN=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
+   AUTO_CFG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
 
-**If `--auto` flag present OR `AUTO_CFG` is true:**
+**If `--auto` flag present OR `AUTO_CHAIN` is true OR `AUTO_CFG` is true:**
 
 Display banner:
 ```
@@ -363,43 +473,15 @@ Display banner:
  GSD ► AUTO-ADVANCING TO EXECUTE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Plans ready. Spawning execute-phase...
+Plans ready. Launching execute-phase...
 ```
 
-Spawn execute-phase as task with direct workflow file reference (do NOT use skill tool — Skills don't resolve inside task subagents):
+Launch execute-phase using the skill tool to avoid nested task sessions (which cause runtime freezes due to deep agent nesting):
 ```
-task(
-  prompt="
-    <objective>
-    You are the execute-phase orchestrator. Execute all plans for Phase ${PHASE}: ${PHASE_NAME}.
-    </objective>
-
-    <execution_context>
-    @~/.config/opencode/get-shit-done/workflows/execute-phase.md
-    @~/.config/opencode/get-shit-done/references/checkpoints.md
-    @~/.config/opencode/get-shit-done/references/tdd.md
-    @~/.config/opencode/get-shit-done/references/model-profile-resolution.md
-    </execution_context>
-
-    <arguments>
-    PHASE=${PHASE}
-    ARGUMENTS='${PHASE} --auto --no-transition'
-    </arguments>
-
-    <instructions>
-    1. read execute-phase.md from execution_context for your complete workflow
-    2. Follow ALL steps: initialize, handle_branching, validate_phase, discover_and_group_plans, execute_waves, aggregate_results, close_parent_artifacts, verify_phase_goal, update_roadmap
-    3. The --no-transition flag means: after verification + roadmap update, STOP and return status. Do NOT run transition.md.
-    4. When spawning executor agents, use subagent_type='gsd-executor' with the existing @file pattern from the workflow
-    5. When spawning verifier agents, use subagent_type='gsd-verifier'
-    6. Preserve the classifyHandoffIfNeeded workaround (spot-check on that specific error)
-    7. Do NOT use the skill tool or /gsd- commands
-    </instructions>
-  ",
-  subagent_type="general",
-  description="Execute Phase ${PHASE}"
-)
+skill(skill="gsd-execute-phase", args="${PHASE} --auto --no-transition")
 ```
+
+The `--no-transition` flag tells execute-phase to return status after verification instead of chaining further. This keeps the auto-advance chain flat — each phase runs at the same nesting level rather than spawning deeper task agents.
 
 **Handle execute-phase return:**
 - **PHASE COMPLETE** → Display final summary:

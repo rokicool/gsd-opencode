@@ -23,7 +23,7 @@ Routes to the add-todo workflow which handles:
 </objective>
 
 <execution_context>
-@~/.config/opencode/get-shit-done/workflows/add-todo.md
+@$HOME/.config/opencode/get-shit-done/workflows/add-todo.md
 </execution_context>
 
 <context>
@@ -33,7 +33,7 @@ State is resolved in-workflow via `init todos` and targeted reads.
 </context>
 
 <process>
-**Follow the add-todo workflow** from `@~/.config/opencode/get-shit-done/workflows/add-todo.md`.
+**Follow the add-todo workflow** from `@$HOME/.config/opencode/get-shit-done/workflows/add-todo.md`.
 
 The workflow handles all logic including:
 1. Directory ensuring

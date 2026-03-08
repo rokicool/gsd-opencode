@@ -1,0 +1,22 @@
+{
+  "patterns": ["gsd-opencode/**/*"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "*oc-*",
+    "*-oc-*"
+  ],
+  "rules": [
+    {"pattern": "Claude Code", "replacement": "OpenCode"},
+    {"pattern": "ClaudeCode", "replacement": "OpenCode"},
+    {"pattern": "claude-code", "replacement": "opencode"},
+    {"pattern": "claude", "replacement": "opencode"},
+    {"pattern": "Claude", "replacement": "OpenCode"},
+    {"pattern": "CLAUDE", "replacement": "OPENCODE"},
+    {"pattern": "\\.claude/", "replacement": ".opencode/"},
+    {"pattern": "\\.claude$", "replacement": ".opencode"},
+    {"pattern": "CC ", "replacement": "OC "},
+    {"pattern": "\\bCC\\b", "replacement": "OC"}
+  ]
+}

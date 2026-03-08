@@ -10,6 +10,14 @@ tools:
   glob: true
   websearch: true
 color: "#FFA500"
+skills:
+  - gsd-debugger-workflow
+# hooks:
+#   PostToolUse:
+#     - matcher: "write|edit"
+#       hooks:
+#         - type: command
+#           command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -747,7 +755,7 @@ DEBUG_RESOLVED_DIR=.planning/debug/resolved
 
 ```markdown
 ---
-status: gathering | investigating | fixing | verifying | resolved
+status: gathering | investigating | fixing | verifying | awaiting_human_verify | resolved
 trigger: "[verbatim user input]"
 created: [ISO timestamp]
 updated: [ISO timestamp]
@@ -811,10 +819,10 @@ files_changed: []
 ## Status Transitions
 
 ```
-gathering -> investigating -> fixing -> verifying -> resolved
-                  ^            |           |
-                  |____________|___________|
-                  (if verification fails)
+gathering -> investigating -> fixing -> verifying -> awaiting_human_verify -> resolved
+                  ^            |           |                 |
+                  |____________|___________|_________________|
+                  (if verification fails or user reports issue)
 ```
 
 ## Resume Behavior
@@ -855,6 +863,8 @@ ls .planning/debug/*.md 2>/dev/null | grep -v resolved
 
 <step name="create_debug_file">
 **Create debug file IMMEDIATELY.**
+
+**ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
 
 1. Generate slug from user input (lowercase, hyphens, max 30 chars)
 2. `mkdir -p .planning/debug`
@@ -917,6 +927,7 @@ Based on status:
 - "investigating" -> Continue investigation_loop from Current Focus
 - "fixing" -> Continue fix_and_verify
 - "verifying" -> Continue verification
+- "awaiting_human_verify" -> Wait for checkpoint response and either finalize or continue investigation
 </step>
 
 <step name="return_diagnosis">
@@ -976,11 +987,52 @@ Update status to "fixing".
 - Update status to "verifying"
 - Test against original Symptoms
 - If verification FAILS: status -> "investigating", return to investigation_loop
-- If verification PASSES: Update Resolution.verification, proceed to archive_session
+- If verification PASSES: Update Resolution.verification, proceed to request_human_verification
+</step>
+
+<step name="request_human_verification">
+**Require user confirmation before marking resolved.**
+
+Update status to "awaiting_human_verify".
+
+Return:
+
+```markdown
+## CHECKPOINT REACHED
+
+**Type:** human-verify
+**Debug Session:** .planning/debug/{slug}.md
+**Progress:** {evidence_count} evidence entries, {eliminated_count} hypotheses eliminated
+
+### Investigation State
+
+**Current Hypothesis:** {from Current Focus}
+**Evidence So Far:**
+- {key finding 1}
+- {key finding 2}
+
+### Checkpoint Details
+
+**Need verification:** confirm the original issue is resolved in your real workflow/environment
+
+**Self-verified checks:**
+- {check 1}
+- {check 2}
+
+**How to check:**
+1. {step 1}
+2. {step 2}
+
+**Tell me:** "confirmed fixed" OR what's still failing
+```
+
+Do NOT move file to `resolved/` in this step.
 </step>
 
 <step name="archive_session">
-**Archive resolved debug session.**
+**Archive resolved debug session after human confirmation.**
+
+Only run this step when checkpoint response confirms the fix works end-to-end.
 
 Update status to "resolved".
 
@@ -992,7 +1044,8 @@ mv .planning/debug/{slug}.md .planning/debug/resolved/
 **Check planning config using state load (commit_docs is available from the output):**
 
 ```bash
-INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state load)
+INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state load)
+if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 # commit_docs is in the JSON output
 ```
 
@@ -1009,7 +1062,7 @@ Root cause: {root_cause}"
 
 Then commit planning docs via CLI (respects `commit_docs` config automatically):
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: resolve debug {slug}" --files .planning/debug/resolved/{slug}.md
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: resolve debug {slug}" --files .planning/debug/resolved/{slug}.md
 ```
 
 Report completion and offer next steps.
@@ -1137,6 +1190,8 @@ Orchestrator presents checkpoint to user, gets response, spawns fresh continuati
 **Commit:** {hash}
 ```
 
+Only return this after human verification confirms the fix.
+
 ## INVESTIGATION INCONCLUSIVE
 
 ```markdown
@@ -1186,7 +1241,8 @@ Check for mode flags in prompt context:
 **goal: find_and_fix** (default)
 - Find root cause, then fix and verify
 - Complete full debugging cycle
-- Archive session when verified
+- Require human-verify checkpoint after self-verification
+- Archive session only after user confirmation
 
 **Default mode (no flags):**
 - Interactive debugging with user

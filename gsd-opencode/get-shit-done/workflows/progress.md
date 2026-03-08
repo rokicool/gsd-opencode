@@ -12,7 +12,8 @@ read all files referenced by the invoking prompt's execution_context before star
 **Load progress context (paths only):**
 
 ```bash
-INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init progress)
+INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init progress)
+if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
 Extract from init JSON: `project_exists`, `roadmap_exists`, `state_exists`, `phases`, `current_phase`, `next_phase`, `milestone_version`, `completed_count`, `phase_count`, `paused_at`, `state_path`, `roadmap_path`, `project_path`, `config_path`.
@@ -40,8 +41,8 @@ If missing both ROADMAP.md and PROJECT.md: suggest `/gsd-new-project`.
 **Use structured extraction from gsd-tools:**
 
 Instead of reading full files, use targeted tools to get only the data needed for the report:
-- `ROADMAP=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap analyze)`
-- `STATE=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state-snapshot)`
+- `ROADMAP=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)`
+- `STATE=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state-snapshot)`
 
 This minimizes orchestrator context usage.
 </step>
@@ -50,7 +51,7 @@ This minimizes orchestrator context usage.
 **Get comprehensive roadmap analysis (replaces manual parsing):**
 
 ```bash
-ROADMAP=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap analyze)
+ROADMAP=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
 ```
 
 This returns structured JSON with:
@@ -69,7 +70,7 @@ Use this instead of manually reading/parsing ROADMAP.md.
 - Find the 2-3 most recent SUMMARY.md files
 - Use `summary-extract` for efficient parsing:
   ```bash
-  node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs summary-extract <path> --fields one_liner
+  node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" summary-extract <path> --fields one_liner
   ```
 - This shows "what we've been working on"
   </step>
@@ -88,7 +89,7 @@ Use this instead of manually reading/parsing ROADMAP.md.
 
 ```bash
 # Get formatted progress bar
-PROGRESS_BAR=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs progress bar --raw)
+PROGRESS_BAR=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" progress bar --raw)
 ```
 
 Present:
@@ -97,7 +98,7 @@ Present:
 # [Project Name]
 
 **Progress:** {PROGRESS_BAR}
-**Profile:** [simple/smart/custom]
+**Profile:** [simple/smart/genius]
 
 ## Recent Work
 - [Phase X, Plan Y]: [what was accomplished - 1 line from summary-extract]

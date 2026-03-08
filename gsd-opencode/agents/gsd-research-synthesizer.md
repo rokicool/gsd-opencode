@@ -6,6 +6,14 @@ tools:
   write: true
   bash: true
 color: "#800080"
+skills:
+  - gsd-synthesizer-workflow
+# hooks:
+#   PostToolUse:
+#     - matcher: "write|edit"
+#       hooks:
+#         - type: command
+#           command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -125,7 +133,9 @@ Identify gaps that couldn't be resolved and need attention during planning.
 
 ## Step 6: write SUMMARY.md
 
-Use template: ~/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
+**ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
+
+Use template: $HOME/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
 
 write to `.planning/research/SUMMARY.md`
 
@@ -134,7 +144,7 @@ write to `.planning/research/SUMMARY.md`
 The 4 parallel researcher agents write files but do NOT commit. You commit everything together.
 
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs: complete project research" --files .planning/research/
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: complete project research" --files .planning/research/
 ```
 
 ## Step 8: Return Summary
@@ -145,7 +155,7 @@ Return brief confirmation with key points for the orchestrator.
 
 <output_format>
 
-Use template: ~/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
+Use template: $HOME/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
 
 Key sections:
 - Executive Summary (2-3 paragraphs)

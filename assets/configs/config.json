@@ -25,7 +25,9 @@
     "**/*.jpg",
     "**/*.gif",
     "**/*.ico",
-    "**/*.svg"
+    "**/*.svg",
+    "**/oc-*",
+    "**/*-oc-*"
   ],
   "maxFileSize": 10485760,
   "rules": [
@@ -95,20 +97,26 @@
       "description": "Catch-all for remaining ./original/get-shit-done path references"
     },
     {
+      "pattern": "$HOME/.claude/get-shit-done/",
+      "replacement": "$HOME/.config/opencode/get-shit-done/",
+      "caseSensitive": true,
+      "description": "Transform Claude path with get-shit-done subdirectory"
+    },
+    {
       "pattern": "~/.claude/get-shit-done/",
-      "replacement": "~/.config/opencode/get-shit-done/",
+      "replacement": "$HOME/.config/opencode/get-shit-done/",
       "caseSensitive": true,
       "description": "Transform Claude path with get-shit-done subdirectory"
     },
     {
       "pattern": "~/.claude/",
-      "replacement": "~/.config/opencode/",
+      "replacement": "$HOME/.config/opencode/",
       "caseSensitive": true,
       "description": "Transform Claude config path to OpenCode (with trailing slash)"
     },
     {
       "pattern": "~/.claude",
-      "replacement": "~/.config/opencode",
+      "replacement": "$HOME/.config/opencode",
       "caseSensitive": true,
       "description": "Transform Claude config path to OpenCode (without trailing slash)"
     },
@@ -631,7 +639,13 @@
     },
     {
       "pattern": "~/.claude/config.json",
-      "replacement": "~/.config/opencode/opencode.json",
+      "replacement": "$HOME/.config/opencode/opencode.json",
+      "caseSensitive": true,
+      "description": "Transform Claude config file path to OpenCode config file"
+    },
+    {
+      "pattern": "$HOME/.claude/config.json",
+      "replacement": "$HOME/.config/opencode/opencode.json",
       "caseSensitive": true,
       "description": "Transform Claude config file path to OpenCode config file"
     },

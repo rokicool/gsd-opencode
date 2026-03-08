@@ -8,6 +8,14 @@ tools:
   glob: true
   write: true
 color: "#00FFFF"
+skills:
+  - gsd-mapper-workflow
+# hooks:
+#   PostToolUse:
+#     - matcher: "write|edit"
+#       hooks:
+#         - type: command
+#           command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -153,7 +161,7 @@ write document(s) to `.planning/codebase/` using the templates below.
 3. If something is not found, use "Not detected" or "Not applicable"
 4. Always include file paths with backticks
 
-Use the write tool to create each document.
+**ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
 </step>
 
 <step name="return_confirmation">

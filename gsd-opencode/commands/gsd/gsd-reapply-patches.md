@@ -1,16 +1,7 @@
 ---
-name: gsd-reapply-patches
 description: Reapply local modifications after a GSD update
 allowed-tools: read, write, edit, bash, glob, grep, question
 ---
-
-<objective>
-Reapply user's local modifications to GSD files after an update overwrites them.
-
-Purpose: After a GSD update wipes and reinstalls files, this command merges user's previously saved local modifications back into the new version using intelligent comparison to handle cases where the upstream file also changed.
-
-Output: A report showing which patches were merged, skipped (already upstream), or had conflicts that required user resolution.
-</objective>
 
 <purpose>
 After a GSD update wipes and reinstalls files, this command merges user's previously saved local modifications back into the new version. Uses intelligent comparison to handle cases where the upstream file also changed.
@@ -23,11 +14,24 @@ After a GSD update wipes and reinstalls files, this command merges user's previo
 Check for local patches directory:
 
 ```bash
-# Global install (path templated at install time)
-PATCHES_DIR=~/.config/opencode/gsd-local-patches
-# Local install fallback
+# Global install — detect runtime config directory
+if [ -d "$HOME/.config/opencode/gsd-local-patches" ]; then
+  PATCHES_DIR="$HOME/.config/opencode/gsd-local-patches"
+elif [ -d "$HOME/.opencode/gsd-local-patches" ]; then
+  PATCHES_DIR="$HOME/.opencode/gsd-local-patches"
+elif [ -d "$HOME/.gemini/gsd-local-patches" ]; then
+  PATCHES_DIR="$HOME/.gemini/gsd-local-patches"
+else
+  PATCHES_DIR="$HOME/.OpenCode/gsd-local-patches"
+fi
+# Local install fallback — check all runtime directories
 if [ ! -d "$PATCHES_DIR" ]; then
-  PATCHES_DIR=./.OpenCode/gsd-local-patches
+  for dir in .config/opencode .opencode .gemini .OpenCode; do
+    if [ -d "./$dir/gsd-local-patches" ]; then
+      PATCHES_DIR="./$dir/gsd-local-patches"
+      break
+    fi
+  done
 fi
 ```
 

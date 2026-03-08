@@ -12,7 +12,7 @@ Default: `simple` if not set or config missing.
 
 ## Lookup Table
 
-@~/.config/opencode/get-shit-done/references/model-profiles.md
+@$HOME/.config/opencode/get-shit-done/references/model-profiles.md
 
 Look up the agent in the table for the resolved profile. Pass the model parameter to task calls:
 

@@ -1,7 +1,7 @@
 ---
 name: gsd-quick
 description: Execute a quick task with GSD guarantees (atomic commits, state tracking) but skip optional agents
-argument-hint: "[--full]"
+argument-hint: "[--full] [--discuss]"
 allowed-tools:
   - read
   - write
@@ -20,13 +20,17 @@ Quick mode is the same system with a shorter path:
 - Quick tasks live in `.planning/quick/` separate from planned phases
 - Updates STATE.md "Quick Tasks Completed" table (NOT ROADMAP.md)
 
-**Default:** Skips research, plan-checker, verifier. Use when you know exactly what to do.
+**Default:** Skips research, discussion, plan-checker, verifier. Use when you know exactly what to do.
+
+**`--discuss` flag:** Lightweight discussion phase before planning. Surfaces assumptions, clarifies gray areas, captures decisions in CONTEXT.md. Use when the task has ambiguity worth resolving upfront.
 
 **`--full` flag:** Enables plan-checking (max 2 iterations) and post-execution verification. Use when you want quality guarantees without full milestone ceremony.
+
+Flags are composable: `--discuss --full` gives discussion + plan-checking + verification.
 </objective>
 
 <execution_context>
-@~/.config/opencode/get-shit-done/workflows/quick.md
+@$HOME/.config/opencode/get-shit-done/workflows/quick.md
 </execution_context>
 
 <context>
@@ -36,6 +40,6 @@ Context files are resolved inside the workflow (`init quick`) and delegated via 
 </context>
 
 <process>
-Execute the quick workflow from @~/.config/opencode/get-shit-done/workflows/quick.md end-to-end.
+Execute the quick workflow from @$HOME/.config/opencode/get-shit-done/workflows/quick.md end-to-end.
 Preserve all workflow gates (validation, task description, planning, execution, state updates, commits).
 </process>

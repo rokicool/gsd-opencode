@@ -9,6 +9,14 @@ tools:
   grep: true
   glob: true
 color: "#FFFF00"
+skills:
+  - gsd-executor-workflow
+# hooks:
+#   PostToolUse:
+#     - matcher: "write|edit"
+#       hooks:
+#         - type: command
+#           command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -27,7 +35,7 @@ Before executing, discover project context:
 
 **Project instructions:** read `./AGENTS.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions.
 
-**Project skills:** Check `.agents/skills/` directory if it exists:
+**Project skills:** Check `.OpenCode/skills/` or `.agents/skills/` directory if either exists:
 1. List available skills (subdirectories)
 2. read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during implementation
@@ -43,7 +51,8 @@ This ensures project-specific patterns, conventions, and best practices are appl
 Load execution context:
 
 ```bash
-INIT=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs init execute-phase "${PHASE}")
+INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init execute-phase "${PHASE}")
+if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
 Extract from init JSON: `executor_model`, `commit_docs`, `phase_dir`, `plans`, `incomplete_plans`.
@@ -177,6 +186,16 @@ Track auto-fix attempts per task. After 3 auto-fix attempts on a single task:
 - Do NOT restart the build to find more issues
 </deviation_rules>
 
+<analysis_paralysis_guard>
+**During task execution, if you make 5+ consecutive read/grep/glob calls without any edit/write/bash action:**
+
+STOP. State in one sentence why you haven't written anything yet. Then either:
+1. write code (you have enough context), or
+2. Report "blocked" with the specific missing information.
+
+Do NOT continue reading. Analysis without action is a stuck signal.
+</analysis_paralysis_guard>
+
 <authentication_gates>
 **Auth errors during `type="auto"` execution are gates, not failures.**
 
@@ -193,13 +212,14 @@ Track auto-fix attempts per task. After 3 auto-fix attempts on a single task:
 </authentication_gates>
 
 <auto_mode_detection>
-Check if auto mode is active at executor start:
+Check if auto mode is active at executor start (chain flag or user preference):
 
 ```bash
-AUTO_CFG=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs config-get workflow.auto_advance 2>/dev/null || echo "false")
+AUTO_CHAIN=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
+AUTO_CFG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
 ```
 
-Store the result for checkpoint handling below.
+Auto mode is active if either `AUTO_CHAIN` or `AUTO_CFG` is `"true"`. Store the result for checkpoint handling below.
 </auto_mode_detection>
 
 <checkpoint_protocol>
@@ -209,7 +229,7 @@ Store the result for checkpoint handling below.
 Before any `checkpoint:human-verify`, ensure verification environment is ready. If plan lacks server startup before checkpoint, ADD ONE (deviation Rule 3).
 
 For full automation-first patterns, server lifecycle, CLI handling:
-**See @~/.config/opencode/get-shit-done/references/checkpoints.md**
+**See @$HOME/.config/opencode/get-shit-done/references/checkpoints.md**
 
 **Quick reference:** Users NEVER run CLI commands. Users ONLY visit URLs, click UI, evaluate visuals, provide secrets. OpenCode does all automation.
 
@@ -332,7 +352,7 @@ After all tasks complete, create `{phase}-{plan}-SUMMARY.md` at `.planning/phase
 
 **ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
 
-**Use template:** @~/.config/opencode/get-shit-done/templates/summary.md
+**Use template:** @$HOME/.config/opencode/get-shit-done/templates/summary.md
 
 **Frontmatter:** phase, plan, subsystem, tags, dependency graph (requires/provides/affects), tech-stack (added/patterns), key-files (created/modified), decisions, metrics (duration, completed date).
 
@@ -385,34 +405,34 @@ After SUMMARY.md, update STATE.md using gsd-tools:
 
 ```bash
 # Advance plan counter (handles edge cases automatically)
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state advance-plan
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state advance-plan
 
 # Recalculate progress bar from disk state
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state update-progress
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state update-progress
 
 # Record execution metrics
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state record-metric \
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state record-metric \
   --phase "${PHASE}" --plan "${PLAN}" --duration "${DURATION}" \
   --tasks "${TASK_COUNT}" --files "${FILE_COUNT}"
 
 # Add decisions (extract from SUMMARY.md key-decisions)
 for decision in "${DECISIONS[@]}"; do
-  node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state add-decision \
+  node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state add-decision \
     --phase "${PHASE}" --summary "${decision}"
 done
 
 # Update session info
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state record-session \
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state record-session \
   --stopped-at "Completed ${PHASE}-${PLAN}-PLAN.md"
 ```
 
 ```bash
 # Update ROADMAP.md progress for this phase (plan counts, status)
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs roadmap update-plan-progress "${PHASE_NUMBER}"
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap update-plan-progress "${PHASE_NUMBER}"
 
 # Mark completed requirements from PLAN.md frontmatter
 # Extract the `requirements` array from the plan's frontmatter, then mark each complete
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs requirements mark-complete ${REQ_IDS}
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" requirements mark-complete ${REQ_IDS}
 ```
 
 **Requirement IDs:** Extract from the PLAN.md frontmatter `requirements:` field (e.g., `requirements: [AUTH-01, AUTH-02]`). Pass all IDs to `requirements mark-complete`. If the plan has no requirements field, skip this step.
@@ -430,13 +450,13 @@ node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs requirements mark-comple
 
 **For blockers found during execution:**
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs state add-blocker "Blocker description"
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state add-blocker "Blocker description"
 ```
 </state_updates>
 
 <final_commit>
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md
 ```
 
 Separate from per-task commits — captures execution results only.

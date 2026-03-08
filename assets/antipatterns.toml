@@ -32,5 +32,6 @@ forbidden_strings = [
         "name: set-profile",
         "websearch, webfetch, mcp__context7__*",
         "workflows/set-profile.md",
-        "quality/balanced/budget"
+        "quality/balanced/budget",
+        "gsd:"
         ]

@@ -122,7 +122,7 @@ Repeat for all milestones in the cleanup set.
 Commit the changes:
 
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "chore: archive phase directories from completed milestones" --files .planning/milestones/ .planning/phases/
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "chore: archive phase directories from completed milestones" --files .planning/milestones/ .planning/phases/
 ```
 
 </step>

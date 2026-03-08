@@ -1,0 +1,21 @@
+{
+  "patterns": ["gsd-opencode/**/*"],
+  "include": ["gsd-opencode/**/*"],
+  "exclude": [
+    "gsd-opencode/node_modules/**",
+    "gsd-opencode/.git/**",
+    "gsd-opencode/.translate-backups/**",
+    "gsd-opencode/**/*oc-*",
+    "gsd-opencode/**/*-oc-*"
+  ],
+  "rules": [
+    {"pattern": "Claude Code", "replacement": "OpenCode"},
+    {"pattern": "ClaudeCode", "replacement": "OpenCode"},
+    {"pattern": "CLAUDE CODE", "replacement": "OPENCODE"},
+    {"pattern": "claude", "replacement": "opencode"},
+    {"pattern": "Claude", "replacement": "OpenCode"},
+    {"pattern": "CLAUDE", "replacement": "OPENCODE"},
+    {"pattern": ".claude", "replacement": ".opencode"}
+  ],
+  "maxFileSize": 10485760
+}

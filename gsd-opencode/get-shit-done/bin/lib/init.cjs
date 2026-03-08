@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { loadConfig, resolveModelInternal, findPhaseInternal, getRoadmapPhaseInternal, pathExistsInternal, generateSlugInternal, getMilestoneInfo, normalizePhaseName, output, error } = require('./core.cjs');
+const { loadConfig, resolveModelInternal, findPhaseInternal, getRoadmapPhaseInternal, pathExistsInternal, generateSlugInternal, getMilestoneInfo, normalizePhaseName, toPosixPath, output, error } = require('./core.cjs');
 
 function cmdInitExecutePhase(cwd, phase, raw) {
   if (!phase) {
@@ -15,6 +15,13 @@ function cmdInitExecutePhase(cwd, phase, raw) {
   const config = loadConfig(cwd);
   const phaseInfo = findPhaseInternal(cwd, phase);
   const milestone = getMilestoneInfo(cwd);
+
+  const roadmapPhase = getRoadmapPhaseInternal(cwd, phase);
+  const reqMatch = roadmapPhase?.section?.match(/^\*\*Requirements\*\*:[^\S\n]*([^\n]*)$/m);
+  const reqExtracted = reqMatch
+    ? reqMatch[1].replace(/[\[\]]/g, '').split(',').map(s => s.trim()).filter(Boolean).join(', ')
+    : null;
+  const phase_req_ids = (reqExtracted && reqExtracted !== 'TBD') ? reqExtracted : null;
 
   const result = {
     // Models
@@ -35,6 +42,7 @@ function cmdInitExecutePhase(cwd, phase, raw) {
     phase_number: phaseInfo?.phase_number || null,
     phase_name: phaseInfo?.phase_name || null,
     phase_slug: phaseInfo?.phase_slug || null,
+    phase_req_ids,
 
     // Plan inventory
     plans: phaseInfo?.plans || [],
@@ -80,6 +88,13 @@ function cmdInitPlanPhase(cwd, phase, raw) {
   const config = loadConfig(cwd);
   const phaseInfo = findPhaseInternal(cwd, phase);
 
+  const roadmapPhase = getRoadmapPhaseInternal(cwd, phase);
+  const reqMatch = roadmapPhase?.section?.match(/^\*\*Requirements\*\*:[^\S\n]*([^\n]*)$/m);
+  const reqExtracted = reqMatch
+    ? reqMatch[1].replace(/[\[\]]/g, '').split(',').map(s => s.trim()).filter(Boolean).join(', ')
+    : null;
+  const phase_req_ids = (reqExtracted && reqExtracted !== 'TBD') ? reqExtracted : null;
+
   const result = {
     // Models
     researcher_model: resolveModelInternal(cwd, 'gsd-phase-researcher'),
@@ -99,6 +114,7 @@ function cmdInitPlanPhase(cwd, phase, raw) {
     phase_name: phaseInfo?.phase_name || null,
     phase_slug: phaseInfo?.phase_slug || null,
     padded_phase: phaseInfo?.phase_number?.padStart(2, '0') || null,
+    phase_req_ids,
 
     // Existing artifacts
     has_research: phaseInfo?.has_research || false,
@@ -123,19 +139,19 @@ function cmdInitPlanPhase(cwd, phase, raw) {
       const files = fs.readdirSync(phaseDirFull);
       const contextFile = files.find(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
       if (contextFile) {
-        result.context_path = path.join(phaseInfo.directory, contextFile);
+        result.context_path = toPosixPath(path.join(phaseInfo.directory, contextFile));
       }
       const researchFile = files.find(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
       if (researchFile) {
-        result.research_path = path.join(phaseInfo.directory, researchFile);
+        result.research_path = toPosixPath(path.join(phaseInfo.directory, researchFile));
       }
       const verificationFile = files.find(f => f.endsWith('-VERIFICATION.md') || f === 'VERIFICATION.md');
       if (verificationFile) {
-        result.verification_path = path.join(phaseInfo.directory, verificationFile);
+        result.verification_path = toPosixPath(path.join(phaseInfo.directory, verificationFile));
       }
       const uatFile = files.find(f => f.endsWith('-UAT.md') || f === 'UAT.md');
       if (uatFile) {
-        result.uat_path = path.join(phaseInfo.directory, uatFile);
+        result.uat_path = toPosixPath(path.join(phaseInfo.directory, uatFile));
       }
     } catch {}
   }
@@ -406,19 +422,19 @@ function cmdInitPhaseOp(cwd, phase, raw) {
       const files = fs.readdirSync(phaseDirFull);
       const contextFile = files.find(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
       if (contextFile) {
-        result.context_path = path.join(phaseInfo.directory, contextFile);
+        result.context_path = toPosixPath(path.join(phaseInfo.directory, contextFile));
       }
       const researchFile = files.find(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
       if (researchFile) {
-        result.research_path = path.join(phaseInfo.directory, researchFile);
+        result.research_path = toPosixPath(path.join(phaseInfo.directory, researchFile));
       }
       const verificationFile = files.find(f => f.endsWith('-VERIFICATION.md') || f === 'VERIFICATION.md');
       if (verificationFile) {
-        result.verification_path = path.join(phaseInfo.directory, verificationFile);
+        result.verification_path = toPosixPath(path.join(phaseInfo.directory, verificationFile));
       }
       const uatFile = files.find(f => f.endsWith('-UAT.md') || f === 'UAT.md');
       if (uatFile) {
-        result.uat_path = path.join(phaseInfo.directory, uatFile);
+        result.uat_path = toPosixPath(path.join(phaseInfo.directory, uatFile));
       }
     } catch {}
   }
@@ -453,7 +469,7 @@ function cmdInitTodos(cwd, area, raw) {
           created: createdMatch ? createdMatch[1].trim() : 'unknown',
           title: titleMatch ? titleMatch[1].trim() : 'Untitled',
           area: todoArea,
-          path: path.join('.planning', 'todos', 'pending', file),
+          path: '.planning/todos/pending/' + file,
         });
       } catch {}
     }
@@ -595,7 +611,7 @@ function cmdInitProgress(cwd, raw) {
     const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
 
     for (const dir of dirs) {
-      const match = dir.match(/^(\d+(?:\.\d+)?)-?(.*)/);
+      const match = dir.match(/^(\d+(?:\.\d+)*)-?(.*)/);
       const phaseNumber = match ? match[1] : dir;
       const phaseName = match && match[2] ? match[2] : null;
 
@@ -613,7 +629,7 @@ function cmdInitProgress(cwd, raw) {
       const phaseInfo = {
         number: phaseNumber,
         name: phaseName,
-        directory: path.join('.planning', 'phases', dir),
+        directory: '.planning/phases/' + dir,
         status,
         plan_count: plans.length,
         summary_count: summaries.length,

@@ -86,13 +86,13 @@ Be specific enough for a fresh OpenCode to understand immediately.
 
 Use `current-timestamp` for last_updated field. You can use init todos (which provides timestamps) or call directly:
 ```bash
-timestamp=$(node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs current-timestamp full --raw)
+timestamp=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" current-timestamp full --raw)
 ```
 </step>
 
 <step name="commit">
 ```bash
-node ~/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/phases/*/.continue-here.md
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/phases/*/.continue-here.md
 ```
 </step>
 
