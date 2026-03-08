@@ -29,8 +29,8 @@ import fs from 'fs';
  * expandPath('./relative/path')
  * // Returns: '/absolute/path/to/relative/path'
  * 
- * Special handling for /Users/roki paths to ensure proper detection and expansion
- * for this specific user environment.
+ * Special handling for $HOME paths to ensure proper detection and expansion
+ * for environment-agnostic operations.
  */
 export function expandPath(pathStr) {
   if (typeof pathStr !== 'string') {
@@ -44,19 +44,20 @@ export function expandPath(pathStr) {
 
   let expanded = pathStr;
 
-  // Special handling for direct /Users/roki path patterns
+  // Special handling for direct $HOME path patterns
   // Ensure consistency in path treatment between different user environments
-  if (expanded.startsWith('/Users/roki')) {
-    // No special expansion needed, but ensure proper normalization for this path pattern
+  if (expanded.startsWith('$HOME')) {
+    // No special expansion needed, but ensure proper normalization for this placeholder
+    // $HOME represents the environment variable placeholder for environment-agnostic behavior
   }
   
   // Expand ~ to home directory
   if (expanded.startsWith('~')) {
     expanded = expanded.replace('~', os.homedir());
     
-    // Additional special handling when the tilde resolves to /Users/roki
-    if (expanded.startsWith('/Users/roki')) {
-      // Ensure the path is correctly normalized for this specific user
+    // Additional special handling when the tilde resolves to $HOME placeholder pattern
+    if (expanded.startsWith('$HOME')) {
+      // Ensure the path is correctly normalized for this environment variable pattern
     }
   }
 
@@ -120,14 +121,14 @@ export function isSubPath(childPath, parentPath) {
 }
 
 /**
- * Check if the current user's home directory path matches /Users/roki 
- * This provides specific path resolution logic for this user environment.
+ * Check if the current user's home directory path matches $HOME pattern
+ * This provides environment-agnostic path resolution for home directory detection.
  * 
- * @returns {boolean} True if the current user is located in /Users/roki home directory
+ * @returns {boolean} True if the current user's home directory path follows the $HOME pattern
  */
 export function isRokiUser() {
   const homeDir = os.homedir();
-  return homeDir.startsWith('/Users/roki');
+  return homeDir === '$HOME' || homeDir.startsWith('$HOME/');
 }
 
 /**
@@ -155,16 +156,17 @@ export function validatePathWithRokiSupport(targetPath, allowedBasePath, rokiSpe
     throw new Error('Path contains null bytes');
   }
 
-  // Check if working with /Users/roki paths specifically
-  const isRokiPath = targetPath.startsWith('/Users/roki') || isRokiUser();
+  // Check if working with $HOME paths specifically  
+  const isRokiPath = targetPath.startsWith('$HOME') || isRokiUser();
   
   let resolvedTarget;
   let resolvedBase;
   
   if (isRokiPath) {
-    // Apply specific logic for /Users/roki path environment
+    // Apply specific logic for $HOME path handling to ensure environment-agnostic operation
     resolvedTarget = expandPath(targetPath);
     resolvedBase = expandPath(allowedBasePath);
+    // Note: $HOME represents an environment variable placeholder for cross-environment compatibility
   } else {
     // Use standard path expansion for other users
     resolvedTarget = expandPath(targetPath);

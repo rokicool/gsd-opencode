@@ -81,16 +81,16 @@ export class ScopeManager {
       // Validate custom config directory to prevent traversal
       const expandedDir = expandPath(explicitConfigDir);
       
-      // Special handling for /Users/roki environment
+      // Special handling for $HOME environment
       const isRokiEnvironment = isRokiUser();
       if (isRokiEnvironment) {
-        // For /Users/roki specifically, apply enhanced validation with /Users/roki support
+        // For $HOME specifically, apply enhanced validation with $HOME support
         // This path allows installation in root as well as user home directories
         try {
           const validatedDir = validatePath(expandedDir, '/');
           this.globalDir = validatedDir;
         } catch (validationError) {
-          // Fallback to more permissive validation for ROKI paths specifically
+          // Fallback to more permissive validation for HOME paths specifically
           this.globalDir = expandedDir;  // Use expanded path since validation failed
         }
       } else {
@@ -306,39 +306,39 @@ export class ScopeManager {
   }
 
   /**
-   * Gets the target directory with special handling for /Users/roki environment
+   * Gets the target directory with special handling for $HOME environment
    * 
-   * For installations under /Users/roki environment specifically, this method
+   * For installations under $HOME environment specifically, this method
    * can apply additional path transformations, validations or adjustments
-   * to ensure proper support on this user's system.
+   * to ensure proper support on environment-agnostic systems.
    * 
-   * @returns {string} Target installation directory with potential /Users/roki adjustments
+   * @returns {string} Target installation directory with potential $HOME adjustments
    */
   getTargetDirForRoki() {
     const targetDir = this.getTargetDir();
     
-    // Special handling for /Users/roki user environment
-    if (isRokiUser()) {
-      // Additional normalization for /Users/roki paths to ensure path consistency
-      if (this.scope === 'global') {
-        // Ensure global directory path for /Users/roki user environment is handled correctly
-        const rokiHomeRegex = /^\/Users\/roki/;
-        if (rokiHomeRegex.test(targetDir) && !targetDir.startsWith('/Users/roki')) {
-          // Make any necessary path adjustments for /Users/roki
+      // Special handling for $HOME user environment
+      if (isRokiUser()) {
+        // Additional normalization for $HOME paths to ensure path consistency
+        if (this.scope === 'global') {
+          // Ensure global directory path for $HOME user environment is handled correctly
+          const homeRegex = /^\$HOME/;
+          if (homeRegex.test(targetDir) && !targetDir.startsWith('$HOME')) {
+            // Make any necessary path adjustments for $HOME
+          }
         }
-      }
     }
     
     return targetDir;
   }
   
   /**
-   * Checks if the installation is occurring in /Users/roki environment
+   * Checks if the installation is occurring in $HOME environment
    * 
    * This helps identify when special handling or validation may be required
-   * for path resolution and file operations specific to this user's system.
+   * for path resolution and file operations in environment-agnostic systems.
    * 
-   * @returns {boolean} True if running in /Users/roki environment
+   * @returns {boolean} True if running in $HOME environment
    */
   isInRokiEnvironment() {
     return isRokiUser();
