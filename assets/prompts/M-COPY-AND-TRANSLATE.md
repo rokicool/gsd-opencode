@@ -6,11 +6,12 @@
 
 ## Context
 
-This project maintains `gsd-opencode/` as an adapted fork of the upstream `original/get-shit-done/` submodule. The sync workflow has three phases:
+This project maintains `gsd-opencode/` as an adapted fork of the upstream `original/get-shit-done/` submodule. The sync workflow has four phases:
 
 1. **Copy** -- pull latest files from the submodule into `gsd-opencode/`
 2. **Translate** -- replace Claude Code naming, paths, tools, and commands with OpenCode equivalents
-3. **Validate** -- ensure zero forbidden strings remain in the translated files
+3. **Add Agents Mode** -- inject `mode: subagent` into all agent definition files
+4. **Validate** -- ensure zero forbidden strings remain in the translated files
 
 ### Tools
 
@@ -92,7 +93,42 @@ Produce a brief report with:
 
 The primary config is `assets/configs/config.json`. It contains all translation rules (URLs, paths, commands, tool names, profile names, colors, HTML tags, etc.).
 
-### 2a. Preview translations
+---
+
+## Step 2B: Add Agents Mode
+
+Add `mode: subagent` declaration to all agent definition files. See [M-ADD-AGENTS-MODE.md](./M-ADD-AGENTS-MODE.md) for details.
+
+### 2Ba. Preview
+
+```bash
+node assets/bin/gsd-translate-in-place.js assets/configs/add-agent-mode.json --show-diff
+```
+
+**What to check:**
+- All agent files in `gsd-opencode/agents/` are listed
+- Each file shows exactly one replacement: `mode: subagent` added after `description:`
+- No duplicate `mode:` lines are created (files with existing `mode:` are skipped)
+
+### 2Bb. Apply
+
+```bash
+node assets/bin/gsd-translate-in-place.js assets/configs/add-agent-mode.json --apply
+```
+
+### 2Bc. Verify
+
+```bash
+node assets/bin/gsd-translate-in-place.js assets/configs/add-agent-mode.json
+```
+
+**Expected output**: 0 changes remaining (all agent files have `mode: subagent`).
+
+---
+
+## Step 3: Translate -- Supplemental Rules (If Needed)
+
+### 3a. Preview translations
 
 ```bash
 node assets/bin/gsd-translate-in-place.js assets/configs/config.json --show-diff
@@ -103,13 +139,13 @@ node assets/bin/gsd-translate-in-place.js assets/configs/config.json --show-diff
 - Scan the diffs for any unexpected changes (false positives)
 - Verify no `oc-` or `-oc-` files appear in the output
 
-### 2b. Apply translations
+### 3b. Apply translations
 
 ```bash
 node assets/bin/gsd-translate-in-place.js assets/configs/config.json --apply
 ```
 
-### 2c. Verify translations applied
+### 3c. Verify translations applied
 
 ```bash
 node assets/bin/gsd-translate-in-place.js assets/configs/config.json
@@ -119,7 +155,7 @@ node assets/bin/gsd-translate-in-place.js assets/configs/config.json
 
 ---
 
-## Step 3: Validate -- Check for Forbidden Strings
+## Step 4: Validate -- Check for Forbidden Strings
 
 ```bash
 node assets/bin/check-forbidden-strings.js
@@ -142,11 +178,11 @@ The workflow is complete. Produce a final summary report:
 
 Forbidden strings remain that the base config did not cover. You must create a supplemental config and re-translate:
 
-#### 3a. Create a version-specific config file
+#### 4a. Create a version-specific config file
 
 File path: `assets/configs/$VERSION.json` (e.g., `assets/configs/v1.22.4.json`)
 
-Structure the config to target only the remaining violations:
+Structure the config to target only the remaining violations from Step 4:
 
 ```json
 {
@@ -175,7 +211,7 @@ Structure the config to target only the remaining violations:
 - Order rules from most-specific to least-specific (longer patterns first)
 - Do not duplicate rules already in `assets/configs/config.json`
 
-#### 3b. Re-run translation with both configs
+#### 4b. Re-run translation with both configs
 
 ```bash
 # Preview
@@ -185,15 +221,15 @@ node assets/bin/gsd-translate-in-place.js assets/configs/config.json assets/conf
 node assets/bin/gsd-translate-in-place.js assets/configs/config.json assets/configs/$VERSION.json --apply
 ```
 
-#### 3c. Re-run forbidden strings check
+#### 4c. Re-run forbidden strings check
 
 ```bash
 node assets/bin/check-forbidden-strings.js
 ```
 
-#### 3d. Iterate if needed
+#### 4d. Iterate if needed
 
-Repeat steps 3a-3c. **Maximum 3 iterations.** If violations persist after 3 attempts:
+Repeat steps 4a-4c. **Maximum 3 iterations.** If violations persist after 3 attempts:
 - List remaining violations with file paths and line numbers
 - Explain why each could not be auto-fixed (may require manual context-aware edits)
 - Stop and report to the user for manual resolution
@@ -220,7 +256,13 @@ When the workflow completes (forbidden strings check passes), produce this repor
 - Files modified: N
 - Total replacements: N
 
-### Step 3: Validate
+### Step 2B: Add Agents Mode
+- Config used: assets/configs/add-agent-mode.json
+- Agent files processed: N
+- Files with mode added: N
+- Files skipped (already had mode): N
+
+### Step 4: Validate
 - Forbidden strings check: PASSED
 - Iterations required: N
 

@@ -389,6 +389,7 @@ v1 is successful when:
 | 5 | Create profile validation workflow | 2026-03-01 | c736845 | | [5-create-a-workflow-in-gsd-opencode-get-sh](./quick/5-create-a-workflow-in-gsd-opencode-get-sh/) |
 | 6 | Add set-profile validation and remove legacy migration | 2026-03-02 | daf2e11 | Verified | [6-gsd-oc-tools-cjs-set-profile-should-not-](./quick/6-gsd-oc-tools-cjs-set-profile-should-not-/) |
 | 7 | Fix set-profile to create opencode.json when missing | 2026-03-02 | f80ec5a | | [7-fix-set-profile-to-not-migrate-and-creat](./quick/7-fix-set-profile-to-not-migrate-and-creat/) |
+| 8 | Add mode: subagent to all agent definitions in gsd-opencode/agents/ | 2026-03-09 | 36a3aa7 | | [8-add-mode-subagent-to-all-agent-definitio](./quick/8-add-mode-subagent-to-all-agent-definitio/) |
 
 - ✓ **PHASE 14 PLAN 02 COMPLETE** — update-opencode-json command with profile-driven model updates
   - oc-config.cjs library with loadProfileConfig and applyProfileToOpencode
@@ -401,4 +402,4 @@ v1 is successful when:
 ---
 
 *State initialized: 2026-02-09*  
-*Last updated: 2026-03-02 (Quick Task 6 Complete — set-profile validation and legacy cleanup)*
+*Last updated: 2026-03-09 (Quick Task 8 Complete — Add mode: subagent to all agent definitions)*

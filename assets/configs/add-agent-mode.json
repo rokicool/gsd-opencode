@@ -1,0 +1,19 @@
+{
+  "_description": "Add 'mode: subagent' to all agent definitions in gsd-opencode/agents/ after description line. Skips files that already have mode: field.",
+  "include": ["gsd-opencode/agents/*.md"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "assets/**"
+  ],
+  "rules": [
+    {
+      "pattern": "(^---\\r?\\nname: .+\\r?\\ndescription: .+\\r?\\n)(?!.*mode:)",
+      "replacement": "$1mode: subagent\n",
+      "description": "Add 'mode: subagent' after description line only if mode: field is not already present in frontmatter",
+      "isRegex": true,
+      "multiline": true
+    }
+  ]
+}

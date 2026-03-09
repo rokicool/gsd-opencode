@@ -1,6 +1,5 @@
 {
   "mode": "yolo",
-  "depth": "standard",
   "parallelization": true,
   "commit_docs": false,
   "model_profile": "quality",
@@ -28,5 +27,6 @@
     "plan_check": true,
     "verifier": true
   },
-  "current_oc_profile": "quality"
+  "current_oc_profile": "quality",
+  "granularity": "standard"
 }
