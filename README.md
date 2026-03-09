@@ -87,6 +87,14 @@ I just love both GSD and OpenCode. I felt like having GSD available only for Cla
 
 — **Roman**
 
+## Vestion 1.22.0 - We are catching up with original v1.22.4 (2026-03-03)
+
+As usual, you can find all changes that TACHES made in the [original CHANGELOG.md v1.20.5 -> v1.22.4](https://github.com/gsd-build/get-shit-done/blob/main/CHANGELOG.md)
+
+The main theme for these changes - the original GSD uses the correct sysntax to execute agents. So, there will be no unexpected stops OR Gsd-Planner remains active after the planning is done.
+
+On our the side of gsd-opencode there are several fixes and a lot of backend changes.
+
 ## Version 1.20.3 - New gsd-opencode model profile system
 
   I had to give up on supporting original GSD model profile system. Claude Code uses three different models: Opus, Sonnet, and Haiku. In OpenCode we are blessed with dozens of providers and hundreds of models. GSD model profile system is not suitable for us.
@@ -177,6 +185,12 @@ People who want to describe what they want and have it built correctly — witho
 
 ```bash
 npx gsd-opencode
+
+# OR
+
+npm install gsd-opencode -g
+gsd-opencode install
+
 ```
 
 That's it. Verify with `/gsd-help`.
@@ -193,6 +207,12 @@ Update with:
 
 ```bash
 npx gsd-opencode@latest
+
+# OR
+
+npm install gsd-opencode@latest -g
+gsd-opencode install
+
 ```
 
 <details>
@@ -270,7 +290,7 @@ If you prefer not to use that flag, add this to your project's `.opencode/settin
 
 ---
 
-## Distribution System
+## Distribution Manager (gsd-opencode specific)
 
 GSD-OpenCode includes a comprehensive package manager for installing, maintaining, and updating the GSD system. Once installed via npm, you have access to a full CLI for managing your GSD installation.
 
@@ -375,7 +395,39 @@ The system:
 
 Walk away, come back to completed work with clean git history.
 
-**Creates:** `{phase}-{N}-SUMMARY.md`, `{phase}-VERIFICATION.md`
+**How Wave Execution Works:**
+
+Plans are grouped into "waves" based on dependencies. Within each wave, plans run in parallel. Waves run sequentially.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  PHASE EXECUTION                                                    │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  WAVE 1 (parallel)          WAVE 2 (parallel)          WAVE 3       │
+│  ┌─────────┐ ┌─────────┐    ┌─────────┐ ┌─────────┐    ┌─────────┐  │
+│  │ Plan 01 │ │ Plan 02 │ →  │ Plan 03 │ │ Plan 04 │ →  │ Plan 05 │  │
+│  │         │ │         │    │         │ │         │    │         │  │
+│  │ User    │ │ Product │    │ Orders  │ │ Cart    │    │ Checkout│  │
+│  │ Model   │ │ Model   │    │ API     │ │ API     │    │ UI      │  │
+│  └─────────┘ └─────────┘    └─────────┘ └─────────┘    └─────────┘  │
+│       │           │              ↑           ↑              ↑       │
+│       └───────────┴──────────────┴───────────┘              │       │
+│              Dependencies: Plan 03 needs Plan 01            │       │
+│                          Plan 04 needs Plan 02              │       │
+│                          Plan 05 needs Plans 03 + 04        │       │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Why waves matter:**
+- Independent plans → Same wave → Run in parallel
+- Dependent plans → Later wave → Wait for dependencies
+- File conflicts → Sequential plans or same plan
+
+This is why "vertical slices" (Plan 01: User feature end-to-end) parallelize better than "horizontal layers" (Plan 01: All models, Plan 02: All APIs).
+
+**Creates:** `{phase_num}-{N}-SUMMARY.md`, `{phase_num}-VERIFICATION.md`
 
 ---
 
@@ -553,8 +605,8 @@ You're never locked in. The system adapts.
 |---------|--------------|
 | `/gsd-progress` | Where am I? What's next? |
 | `/gsd-help` | Show all commands and usage guide |
-| `/gsd-whats-new` | See what changed since your installed version |
 | `/gsd-update` | Update GSD with changelog preview |
+| `/gsd-join-discord` | Join the GSD Discord community |
 
 ### Brownfield
 
@@ -606,9 +658,13 @@ GSD stores project settings in `.planning/config.json`. Configure during `/gsd-n
 | `mode` | `yolo`, `interactive` | `interactive` | Auto-approve vs confirm at each step |
 | `depth` | `quick`, `standard`, `comprehensive` | `standard` | Planning thoroughness (phases × plans) |
 
-### Model Profiles
+### Model Profiles (gsd-opencode specific)
 
-Control which OpenCode model each agent uses. Balance quality vs token spend.
+| Profile | Planning | Execution | Verification | 
+|---------|---------|---------|------------------|
+| Simple  | First model | First model | First model |
+| Smart   | First model | First model | Second model |
+| Genius  | First model | Second model | Third model |
 
 #### How It Works
 
@@ -626,12 +682,12 @@ Two files manage model assignments:
 
 | File | Purpose |
 |------|---------|
-| `.planning/config.json` | **Source of truth** — stores profiles, presets, and overrides |
+| `.planning/oc-config.json` | **Source of truth** — stores profiles |
 | `opencode.json` | **Derived config** — agent-to-model mappings read by OpenCode |
 
 When you change profiles or models, GSD updates both files. OpenCode reads `opencode.json` at startup.
 
-#### Presets vs Overrides
+#### Presets 
 
 **Presets** define the base models for each profile:
 
@@ -639,37 +695,24 @@ When you change profiles or models, GSD updates both files. OpenCode reads `open
 {
   "profiles": {
     "presets": {
-      "quality": { "planning": "anthropic/claude-sonnet-4", "execution": "anthropic/claude-sonnet-4", "verification": "anthropic/claude-sonnet-4" },
-      "balanced": { "planning": "anthropic/claude-sonnet-4", "execution": "openai/gpt-4o-mini", "verification": "openai/gpt-4o-mini" },
-      "budget": { "planning": "openai/gpt-4o-mini", "execution": "openai/gpt-4o-mini", "verification": "openai/gpt-4o-mini" }
-    }
-  }
-}
-```
-
-**Overrides** let you customize a single stage without changing the preset:
-
-```json
-{
-  "profiles": {
-    "custom_overrides": {
-      "balanced": {
-        "planning": "anthropic/claude-opus-4"  // Override just planning stage
+      "genius": {
+        "planning": "bailian-coding-plan/qwen3.5-plus",
+        "execution": "bailian-coding-plan/kimi-k2.5",
+        "verification": "bailian-coding-plan/MiniMax-M2.5"
       }
     }
-  }
+  },
+  "current_oc_profile": "genius"
 }
 ```
-
-The **effective model** = override (if set) || preset.
 
 #### First-Run Setup
 
-On first use (or when running `/gsd-settings` → Reset presets), the **Preset Setup Wizard** runs:
+On first use (or when running `/gsd-set-profile` → Reset presets), the **Preset Setup Wizard** runs:
 
 1. Queries `opencode models` to discover available models
 2. Prompts you to select models for each profile/stage (9 selections total)
-3. Saves configuration to `.planning/config.json`
+3. Saves configuration to `.planning/oc-config.json`
 4. Generates `opencode.json` with agent mappings
 
 This ensures your presets use models actually available in your OpenCode installation.
@@ -678,18 +721,18 @@ This ensures your presets use models actually available in your OpenCode install
 
 | Command | What it does |
 |---------|--------------|
-| `/gsd-settings` | Full interactive menu: switch profiles, set/clear overrides, reset presets, toggle workflow agents |
-| `/gsd-set-profile <profile>` | Quick switch between quality/balanced/budget profiles |
-| `/gsd-set-model [profile]` | Configure which models a profile's presets use |
+| `/gsd-set-profile` | Full interactive menu: switch profiles, set/clear overrides, reset presets, toggle workflow agents |
+| `/gsd-set-profile <profile>` | Quick switch between simple/smart/genius profiles |
+
 
 **Examples:**
 
 ```bash
-# Switch to budget profile
-/gsd-set-profile budget
+# Switch to simple profile
+/gsd-set-profile simple
 
 # Configure balanced profile's models interactively
-/gsd-set-model balanced
+/gsd-set-profile balanced
 
 # Open full settings menu
 /gsd-settings
@@ -699,9 +742,9 @@ This ensures your presets use models actually available in your OpenCode install
 
 When configuring your presets:
 
-- **quality** — Use your most capable model for all stages. Best for critical architecture work.
-- **balanced** — Strong model for planning (decisions matter), mid-tier for execution/verification (follows instructions).
-- **budget** — Mid-tier for code writing, lightweight for research/verification. Best for high-volume work.
+- **simple** — Use your most capable model for all stages. Best for critical architecture work.
+- **smart** — Strong model for planning (decisions matter), mid-tier for execution/verification (follows instructions).
+- **genius** — Strong model for planning (decisions matter), mid-tier for execution/verification (follows instructions), lightweight for research/verification. Best for high-volume work.
 
 #### Important: Restart Required
 
