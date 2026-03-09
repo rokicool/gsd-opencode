@@ -6,7 +6,7 @@ permissions:
    bash: true
    write: true
    question: true
-   command: true
+   task: true
 ---
 
 <objective>

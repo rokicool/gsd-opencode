@@ -1,7 +1,7 @@
 ---
 name: gsd-roadmapper
-mode: subagent
 description: Creates project roadmaps with phase breakdown, requirement mapping, success criteria derivation, and coverage validation. Spawned by /gsd-new-project orchestrator.
+mode: subagent
 tools:
   read: true
   write: true

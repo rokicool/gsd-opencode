@@ -1,7 +1,7 @@
 ---
 name: gsd-debugger
-mode: subagent
 description: Investigates bugs using scientific method, manages debug sessions, handles checkpoints. Spawned by /gsd-debug orchestrator.
+mode: subagent
 tools:
   read: true
   write: true

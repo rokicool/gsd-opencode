@@ -1,11 +1,7 @@
 ---
-name: gsd-reapply-patches
 description: Reapply local modifications after a GSD update
 permissions: read, write, edit, bash, glob, grep, question
 ---
-<objective>
-Reapply previously saved local modifications back into the GSD system after an update. Merge user's customizations with the new upstream versions, handling conflicts appropriately and preserving user modifications while incorporating upstream changes.
-</objective>
 
 <purpose>
 After a GSD update wipes and reinstalls files, this command merges user's previously saved local modifications back into the new version. Uses intelligent comparison to handle cases where the upstream file also changed.
