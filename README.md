@@ -1,6 +1,6 @@
 <div align="left">
 
-# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.20.5 - 2026-02-19)
+# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.22.4 - 2026-03-03)
 
 **A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (Adapted for OpenCode by rokicool and enthusiasts)**
 

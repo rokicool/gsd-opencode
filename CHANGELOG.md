@@ -5,6 +5,67 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.22.0] - 2026-03-08
+
+Overview: Synchronized with upstream GSD v1.22.4 to fix agent execution syntax and prevent unexpected stops. Simplified model profile system from quality/balanced/budget to simple/smart/genius with updated configuration file structure. Enhanced copy and translate services for upstream synchronization.
+
+### Added
+
+- gsd-join-discord command definition routing to Discord community link in `gsd-opencode/commands/gsd/gsd-join-discord.md`
+- M-COPY-AND-TRANSLATE.md workflow prompt for copying and translating changes from upstream GSD repository in `assets/prompts/M-COPY-AND-TRANSLATE.md`
+- h-copy-and-translate.md meta prompt for copy and translate operations in `assets/prompts/completed/h-copy-and-translate.md`
+- v1.22.4.json supplemental translation config to fix remaining forbidden strings in `assets/configs/v1.22.4.json`
+- skills sections with workflow references to all agent files (gsd-codebase-mapper, gsd-debugger, gsd-executor, gsd-integration-checker, gsd-nyquist-auditor, gsd-phase-researcher, gsd-plan-checker, gsd-planner, gsd-project-researcher, gsd-research-synthesizer, gsd-roadmapper, gsd-verifier) in `gsd-opencode/agents/`
+- hooks configuration for ESLint integration to all agent files in `gsd-opencode/agents/`
+- awaiting_human_verify status to debug workflow state machine in `gsd-opencode/agents/gsd-executor.md`
+- Wave execution diagram explaining parallel/sequential plan execution in `README.md`
+
+### Changed
+
+- Renamed model profiles from quality/balanced/budget to simple/smart/genius across all command and workflow files in `gsd-opencode/commands/gsd/` and `gsd-opencode/get-shit-done/workflows/`
+- Changed configuration file from `.planning/config.json` to `.planning/oc-config.json` in `README.md`, command files, and workflow files
+- Updated README.md with version 1.22.0 section documenting upstream sync and enhanced wave execution documentation in `README.md`
+- Updated model profile examples with new model references (bailian-coding-plan/qwen3.5-plus, bailian-coding-plan/kimi-k2.5, bailian-coding-plan/MiniMax-M2.5) in `README.md`
+- Renamed assets/bin scripts: COPY.md to GSD-COPY-FROM-ORIGINAL.md, TRANSLATION.md to GSD-TRANSLATE-IN-PLACE.md, translate.js to gsd-translate-in-place.js in `assets/bin/`
+- Enhanced translator.js with improved regex backreference substitution for capture groups in `assets/lib/translator.js`
+- Updated cli.js progress bar output and increased path truncation from 40 to 80 characters in `assets/lib/cli.js`
+- Added docs/ directory to sync mapping in SyncService.js in `assets/copy-services/SyncService.js`
+- Updated gsd-debugger.md with human verification checkpoint before resolving issues in `gsd-opencode/agents/gsd-debugger.md`
+- Added explicit write tool instruction for file creation to gsd-codebase-mapper.md in `gsd-opencode/agents/gsd-codebase-mapper.md`
+- Updated executor agent to check both .OpenCode/skills/ and .agents/skills/ paths in `gsd-opencode/agents/gsd-executor.md`
+- Updated command table in README.md: removed /gsd-whats-new, added /gsd-join-discord in `README.md`
+- Changed section heading from "Distribution System" to "Distribution Manager (gsd-opencode specific)" in `README.md`
+- Updated output file naming convention from {phase}-{N}-SUMMARY.md to {phase_num}-{N}-SUMMARY.md in `README.md`
+- Updated gsd-tools.cjs state management and config handling in `gsd-opencode/get-shit-done/bin/gsd-tools.cjs`
+- Updated all library files in bin/lib/ for v1.22.4 compatibility in `gsd-opencode/get-shit-done/bin/lib/`
+- Updated reference documentation for model profiles, phase calculation, and verification patterns in `gsd-opencode/get-shit-done/references/`
+
+### Deprecated
+
+- Old model profile names quality/balanced/budget in favor of simple/smart/genius in `README.md` and workflow files
+- .planning/config.json replaced by .planning/oc-config.json for OpenCode-specific configuration in multiple files
+
+### Removed
+
+- Removed custom_overrides section from model profile documentation in `README.md`
+- Removed /gsd-whats-new command from quick reference command table in `README.md`
+- Deleted old version-specific translation configs: 1-20-4.json, 1-20-5.json, 1-20-5-2.json in `assets/configs/`
+- Deleted AI-generated translation configs: glm47-made-config.json, glm5-made-config.json, grok-made-config.json, kimi25-made-config.json in `assets/configs/`
+
+### Fixed
+
+- Fixed config path resolution from ~/.claude/ to $HOME/.config/opencode/ for more reliable path handling in `assets/configs/config.json`
+- Fixed skill attribute patterns from skill="gsd:plan-phase" to skill="gsd-plan-phase" (colon to dash) in `assets/configs/v1.22.4.json`
+- Fixed file creation instructions to explicitly use write tool instead of bash heredoc in `gsd-opencode/agents/gsd-codebase-mapper.md` and `gsd-opencode/agents/gsd-debugger.md`
+- Fixed debug workflow to require human verification checkpoint before marking issues as resolved in `gsd-opencode/agents/gsd-debugger.md`
+- Fixed state load command to handle @file: prefix properly in `gsd-opencode/agents/gsd-debugger.md`
+- Added "gsd:" to forbidden strings list in antipatterns.toml to catch remaining colon-format command references in `assets/antipatterns.toml`
+
+### Security
+
+- Hardened config path resolution by changing ~/.claude/ references to $HOME/.config/opencode/ for more reliable path resolution in multiple files
+- Added explicit protection rules for oc-* and -oc-* files during sync operations in `assets/prompts/M-COPY-AND-TRANSLATE.md`
+
 ## [1.20.4] - 2026-03-05
 
 Overview: Added allow-read-config command to gsd-oc-tools.cjs for managing external_directory permissions. Introduced automated GSD config folder access configuration with comprehensive test coverage and workflow integration.

@@ -10,8 +10,8 @@ permissions:
    grep: true
    question: true
    task: true
-  - mcp__context7__resolve-library-id
-  - mcp__context7__query-docs
+   mcp__context7__resolve-library-id: true
+   mcp__context7__query-docs: true
 ---
 
 <objective>

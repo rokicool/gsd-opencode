@@ -221,8 +221,24 @@
       "description": "Transform Task tool to lowercase task"
     },
     {
+      "pattern": "(^[\\s]*For each library/framework:\\r?[\\s]*- mcp__context7__resolve-library-id)",
+      "replacement": "$1 ",
+      "caseSensitive": true,
+      "isRegex": true,
+      "description": "exclude this specific case from regexp"
+    },
+    {
       "_comment": "regex for tools",
-      "pattern": "^([\\s]*)- (read|write|edit|bash|glob|grep|question|task|webfetch|mcp__context7__\\*|todowrite)$",
+      "pattern": "^([\\s]*)- (read|write|edit|bash|glob|grep|question|task|webfetch|todowrite)$",
+      "replacement": "$1 $2: true",
+      "caseSensitive": true,
+      "isRegex": true,
+      "transform": "",
+      "description": ""
+    },
+    {
+      "_comment": "regex for tools",
+      "pattern": "^([\\s]*)- (mcp__context7__[^\\s]*)$",
       "replacement": "$1 $2: true",
       "caseSensitive": true,
       "isRegex": true,
