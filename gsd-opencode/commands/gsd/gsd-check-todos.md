@@ -2,7 +2,7 @@
 name: gsd-check-todos
 description: List pending todos and select one to work on
 argument-hint: [area filter]
-allowed-tools:
+permissions:
    read: true
    write: true
    bash: true

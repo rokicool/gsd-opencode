@@ -2,7 +2,7 @@
 name: gsd-list-phase-assumptions
 description: Surface OpenCode's assumptions about a phase approach before planning
 argument-hint: "[phase]"
-allowed-tools:
+permissions:
    read: true
    bash: true
    grep: true

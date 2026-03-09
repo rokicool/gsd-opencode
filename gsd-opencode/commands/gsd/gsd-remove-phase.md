@@ -2,7 +2,7 @@
 name: gsd-remove-phase
 description: Remove a future phase from roadmap and renumber subsequent phases
 argument-hint: <phase-number>
-allowed-tools:
+permissions:
    read: true
    write: true
    bash: true

@@ -2,7 +2,7 @@
 name: gsd-add-phase
 description: Add phase to end of current milestone in roadmap
 argument-hint: <description>
-allowed-tools:
+permissions:
    read: true
    write: true
    bash: true

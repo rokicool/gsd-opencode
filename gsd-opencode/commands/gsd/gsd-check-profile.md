@@ -1,9 +1,9 @@
 ---
 name: gsd-check-profile
 description: Validate gsd-opencode profile configuration
-allowed-tools:
-  - read: true
-  - bash: true
+permissions:
+  read: true
+  bash: true
 ---
 <objective>
 Validate gsd-opencode profile configuration across both `opencode.json` and `.planning/oc_config.json`, then report results.

@@ -2,7 +2,7 @@
 name: gsd-health
 description: Diagnose planning directory health and optionally repair issues
 argument-hint: [--repair]
-allowed-tools:
+permissions:
    read: true
    bash: true
    write: true

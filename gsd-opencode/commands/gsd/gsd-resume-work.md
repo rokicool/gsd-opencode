@@ -1,12 +1,12 @@
 ---
 name: gsd-resume-work
 description: Resume work from previous session with full context restoration
-allowed-tools:
+permissions:
    read: true
    bash: true
    write: true
    question: true
-  - command
+   command: true
 ---
 
 <objective>

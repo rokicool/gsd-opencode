@@ -1,7 +1,7 @@
 ---
 name: gsd-plan-milestone-gaps
 description: Create phases to close all gaps identified by milestone audit
-allowed-tools:
+permissions:
    read: true
    write: true
    bash: true

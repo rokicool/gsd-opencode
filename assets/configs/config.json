@@ -91,14 +91,10 @@
       "description": "Transform Claude config path to OpenCode (without trailing slash)"
     },
     {
-      "pattern": "/gsd:set-profile <profile> — switch model profile",
+      "pattern": "/gsd:set-profile <profile> — switch model profile(?!/choose models)",
       "replacement": "/gsd-set-profile <profile> — switch model profile/choose models",
-      "description": "Transform command /gsd:set-profile"
-    },
-    {
-      "pattern": "/gsd-set-profile <profile> — switch model profile",
-      "replacement": "/gsd-set-profile <profile> — switch model profile/choose models",
-      "description": "Transform command /gsd:set-profile"
+      "description": "Transform command /gsd:set-profile",
+      "isRegex": true
     },
     {
       "pattern": "/gsd:",
@@ -226,8 +222,17 @@
     },
     {
       "_comment": "regex for tools",
-      "pattern": "^([\\s]*)- (read|write|edit|bash|glob|grep|question|task|webfetch|mcp__context7__*)$",
+      "pattern": "^([\\s]*)- (read|write|edit|bash|glob|grep|question|task|webfetch|mcp__context7__\\*|todowrite)$",
       "replacement": "$1 $2: true",
+      "caseSensitive": true,
+      "isRegex": true,
+      "transform": "",
+      "description": ""
+    },
+    {
+      "_comment": "regex for tools",
+      "pattern": "^([\\s]*)- (command)$",
+      "replacement": "$1 task: true",
       "caseSensitive": true,
       "isRegex": true,
       "transform": "",
@@ -236,11 +241,20 @@
     {
       "_comment": "Generic regex fallback for any remaining tools: lines",
       "pattern": "^tools: ([a-z0-9_*, ]+)$",
-      "replacement": "tools:\\n  $1: true",
+      "replacement": "permissions:\\n  $1: true",
       "caseSensitive": true,
       "isRegex": true,
       "transform": "tools_list_to_yaml",
       "description": "Generic regex to convert any remaining tools list to YAML map"
+    },
+    {
+      "_comment": "Generic regex fallback for any remaining tools: lines",
+      "pattern": "allowed-tools:",
+      "replacement": "permissions:",
+      "caseSensitive": true,
+      "isRegex": false,
+      "transform": "allowed-tools to permissions",
+      "description": ""
     },
     {
       "pattern": "<sub>",

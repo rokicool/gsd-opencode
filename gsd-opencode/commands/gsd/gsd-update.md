@@ -1,7 +1,7 @@
 ---
 name: gsd-update
 description: Update GSD to latest version with changelog display
-allowed-tools:
+permissions:
    bash: true
    question: true
 ---
