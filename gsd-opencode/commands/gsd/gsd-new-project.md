@@ -6,8 +6,8 @@ allowed-tools:
    read: true
    bash: true
    write: true
-  - task
-  - question
+   task: true
+   question: true
 ---
 <context>
 **Flags:**

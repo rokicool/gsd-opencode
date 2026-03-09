@@ -9,8 +9,8 @@ allowed-tools:
    bash: true
    glob: true
    grep: true
-  - task
-  - question
+   task: true
+   question: true
 ---
 <objective>
 Audit Nyquist validation coverage for a completed phase. Three states:

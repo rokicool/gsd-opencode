@@ -9,8 +9,8 @@ allowed-tools:
    glob: true
    grep: true
    bash: true
-  - task
-  - question
+   task: true
+   question: true
 ---
 <objective>
 Execute small, ad-hoc tasks with GSD guarantees (atomic commits, STATE.md tracking).

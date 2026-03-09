@@ -9,8 +9,8 @@ allowed-tools:
    bash: true
    glob: true
    grep: true
-  - task
-  - question
+   task: true
+   question: true
 argument-instructions: |
   Parse the argument as a phase number (integer, decimal, or letter-suffix), plus optional free-text instructions.
   Example: /gsd-add-tests 12

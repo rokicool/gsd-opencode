@@ -8,7 +8,7 @@ allowed-tools:
    glob: true
    grep: true
    write: true
-  - task
+   task: true
 ---
 
 <objective>

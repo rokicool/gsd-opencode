@@ -7,7 +7,7 @@ allowed-tools:
    bash: true
    glob: true
    grep: true
-  - question
+   question: true
 ---
 <objective>
 Create all phases necessary to close gaps identified by `/gsd-audit-milestone`.

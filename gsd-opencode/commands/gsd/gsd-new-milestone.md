@@ -6,8 +6,8 @@ allowed-tools:
    read: true
    write: true
    bash: true
-  - task
-  - question
+   task: true
+   question: true
 ---
 <objective>
 Start a new milestone: questioning → research (optional) → requirements → roadmap.

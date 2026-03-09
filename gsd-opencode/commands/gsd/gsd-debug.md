@@ -5,8 +5,8 @@ argument-hint: [issue description]
 allowed-tools:
    read: true
    bash: true
-  - task
-  - question
+   task: true
+   question: true
 ---
 
 <objective>

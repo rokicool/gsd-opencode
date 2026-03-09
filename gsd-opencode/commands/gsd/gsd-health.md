@@ -6,7 +6,7 @@ allowed-tools:
    read: true
    bash: true
    write: true
-  - question
+   question: true
 ---
 <objective>
 Validate `.planning/` directory integrity and report actionable issues. Checks for missing files, invalid configurations, inconsistent state, and orphaned plans.

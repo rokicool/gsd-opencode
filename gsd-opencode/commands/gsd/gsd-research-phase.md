@@ -5,7 +5,7 @@ argument-hint: "[phase]"
 allowed-tools:
    read: true
    bash: true
-  - task
+   task: true
 ---
 
 <objective>

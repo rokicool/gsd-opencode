@@ -8,8 +8,8 @@ allowed-tools:
    bash: true
    glob: true
    grep: true
-  - question
-  - task
+   question: true
+   task: true
   - mcp__context7__resolve-library-id
   - mcp__context7__query-docs
 ---

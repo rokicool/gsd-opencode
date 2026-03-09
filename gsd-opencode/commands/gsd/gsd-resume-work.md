@@ -5,7 +5,7 @@ allowed-tools:
    read: true
    bash: true
    write: true
-  - question
+   question: true
   - command
 ---
 

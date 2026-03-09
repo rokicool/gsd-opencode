@@ -9,9 +9,9 @@ allowed-tools:
    glob: true
    grep: true
    bash: true
-  - task
+   task: true
   - todowrite
-  - question
+   question: true
 ---
 <objective>
 Execute all plans in a phase using wave-based parallel execution.

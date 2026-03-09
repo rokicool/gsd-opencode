@@ -7,7 +7,7 @@ allowed-tools:
    glob: true
    grep: true
    bash: true
-  - task
+   task: true
    write: true
 ---
 <objective>

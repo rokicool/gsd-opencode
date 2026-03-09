@@ -226,7 +226,7 @@
     },
     {
       "_comment": "regex for tools",
-      "pattern": "^([\\s]*)- (read|write|edit|bash|glob|grep)$",
+      "pattern": "^([\\s]*)- (read|write|edit|bash|glob|grep|question|task|webfetch|mcp__context7__*)$",
       "replacement": "$1 $2: true",
       "caseSensitive": true,
       "isRegex": true,

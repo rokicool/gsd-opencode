@@ -5,7 +5,7 @@ allowed-tools:
    read: true
    write: true
    bash: true
-  - question
+   question: true
 ---
 
 <objective>

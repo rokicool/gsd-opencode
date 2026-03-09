@@ -9,8 +9,8 @@ allowed-tools:
    bash: true
    glob: true
    grep: true
-  - task
-  - webfetch
+   task: true
+   webfetch: true
   - mcp__context7__*
 ---
 <objective>
