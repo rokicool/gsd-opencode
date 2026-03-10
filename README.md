@@ -87,7 +87,13 @@ I just love both GSD and OpenCode. I felt like having GSD available only for Cla
 
 — **Roman**
 
-## Vestion 1.22.0 - We are catching up with original v1.22.4 (2026-03-03)
+## Version 1.22.1
+
+I decided to add 'mode: subagent' property to all custom agents. It should not affect any GSD functionality. However, it should remove unnecessary agents out of the list, available by Tab.
+
+Feel free to complain if I missed anything.
+
+## Version 1.22.0 - We are catching up with original v1.22.4 (2026-03-03)
 
 As usual, you can find all changes that TACHES made in the [original CHANGELOG.md v1.20.5 -> v1.22.4](https://github.com/gsd-build/get-shit-done/blob/main/CHANGELOG.md)
 
