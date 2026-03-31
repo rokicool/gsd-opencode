@@ -17,6 +17,11 @@ Debug issues using scientific method with subagent isolation.
 **Why subagent:** Investigation burns context fast (reading files, forming hypotheses, testing). Fresh 200k context per investigation. Main context stays lean for user interaction.
 </objective>
 
+<available_agent_types>
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
+- gsd-debugger — Diagnoses and fixes issues
+</available_agent_types>
+
 <context>
 User's issue: $ARGUMENTS
 

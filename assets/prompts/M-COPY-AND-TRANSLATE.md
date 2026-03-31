@@ -34,6 +34,7 @@ Before starting, verify these conditions. If any fail, fix them before proceedin
 ```bash
 # 1. Submodule must be initialized and up to date
 git submodule update --init --recursive
+cd original/get-shit-done && git fetch --tags && git checkout $(git tag --sort=-creatordate | head -1)
 
 # 2. Dependencies must be installed
 npm install --prefix assets

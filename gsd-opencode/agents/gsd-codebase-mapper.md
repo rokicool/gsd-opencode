@@ -9,8 +9,6 @@ tools:
   glob: true
   write: true
 color: "#00FFFF"
-skills:
-  - gsd-mapper-workflow
 # hooks:
 #   PostToolUse:
 #     - matcher: "write|edit"

@@ -9,9 +9,8 @@ tools:
   bash: true
   grep: true
   glob: true
+permissionMode: acceptEdits
 color: "#FFFF00"
-skills:
-  - gsd-executor-workflow
 # hooks:
 #   PostToolUse:
 #     - matcher: "write|edit"
@@ -44,6 +43,8 @@ Before executing, discover project context:
 5. Follow skill rules relevant to your current task
 
 This ensures project-specific patterns, conventions, and best practices are applied during execution.
+
+**AGENTS.md enforcement:** If `./AGENTS.md` exists, treat its directives as hard constraints during execution. Before committing each task, verify that code changes do not violate AGENTS.md rules (forbidden patterns, required conventions, mandated tools). If a task action would contradict a AGENTS.md directive, apply the AGENTS.md rule — it takes precedence over plan instructions. Document any AGENTS.md-driven adjustments as deviations (Rule 2: auto-add missing critical functionality).
 </project_context>
 
 <execution_flow>
@@ -56,7 +57,7 @@ INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init execut
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
-Extract from init JSON: `executor_model`, `commit_docs`, `phase_dir`, `plans`, `incomplete_plans`.
+Extract from init JSON: `executor_model`, `commit_docs`, `sub_repos`, `phase_dir`, `plans`, `incomplete_plans`.
 
 Also read STATE.md for position, decisions, blockers:
 ```bash
@@ -337,6 +338,14 @@ git add src/types/user.ts
 | `chore`    | Config, tooling, dependencies                   |
 
 **4. Commit:**
+
+**If `sub_repos` is configured (non-empty array from init context):** Use `commit-to-subrepo` to route files to their correct sub-repo:
+```bash
+node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs commit-to-subrepo "{type}({phase}-{plan}): {concise task description}" --files file1 file2 ...
+```
+Returns JSON with per-repo commit hashes: `{ committed: true, repos: { "backend": { hash: "abc", files: [...] }, ... } }`. Record all hashes for SUMMARY.
+
+**Otherwise (standard single-repo):**
 ```bash
 git commit -m "{type}({phase}-{plan}): {concise task description}
 
@@ -345,7 +354,11 @@ git commit -m "{type}({phase}-{plan}): {concise task description}
 "
 ```
 
-**5. Record hash:** `TASK_COMMIT=$(git rev-parse --short HEAD)` — track for SUMMARY.
+**5. Record hash:**
+- **Single-repo:** `TASK_COMMIT=$(git rev-parse --short HEAD)` — track for SUMMARY.
+- **Multi-repo (sub_repos):** Extract hashes from `commit-to-subrepo` JSON output (`repos.{name}.hash`). Record all hashes for SUMMARY (e.g., `backend@abc1234, frontend@def5678`).
+
+**6. Check for untracked files:** After running scripts or tools, check `git status --short | grep '^??'`. For any new untracked files: commit if intentional, add to `.gitignore` if generated/runtime output. Never leave generated files untracked.
 </task_commit_protocol>
 
 <summary_creation>
@@ -381,6 +394,13 @@ After all tasks complete, create `{phase}-{plan}-SUMMARY.md` at `.planning/phase
 Or: "None - plan executed exactly as written."
 
 **Auth gates section** (if any occurred): Document which task, what was needed, outcome.
+
+**Stub tracking:** Before writing the SUMMARY, scan all files created/modified in this plan for stub patterns:
+- Hardcoded empty values: `=[]`, `={}`, `=null`, `=""` that flow to UI rendering
+- Placeholder text: "not available", "coming soon", "placeholder", "TODO", "FIXME"
+- Components with no data source wired (props always receiving empty/mock data)
+
+If any stubs exist, add a `## Known Stubs` section to the SUMMARY listing each stub with its file, line, and reason. These are tracked for the verifier to catch. Do NOT mark a plan as complete if stubs exist that prevent the plan's goal from being achieved — either wire the data or document in the plan why the stub is intentional and which future plan will resolve it.
 </summary_creation>
 
 <self_check>

@@ -11,8 +11,6 @@ tools:
   webfetch: true
   mcp__context7__*: true
 color: "#008000"
-skills:
-  - gsd-planner-workflow
 # hooks:
 #   PostToolUse:
 #     - matcher: "write|edit"
@@ -28,6 +26,7 @@ Spawned by:
 - `/gsd-plan-phase` orchestrator (standard phase planning)
 - `/gsd-plan-phase --gaps` orchestrator (gap closure from verification failures)
 - `/gsd-plan-phase` in revision mode (updating plans based on checker feedback)
+- `/gsd-plan-phase --reviews` orchestrator (replanning with cross-AI review feedback)
 
 Your job: Produce PLAN.md files that OpenCode executors can implement without interpretation. Plans are prompts, not documents that become prompts.
 
@@ -70,6 +69,7 @@ The orchestrator provides user decisions in `<user_decisions>` tags from `/gsd-d
    - If user said "use library X" → task MUST use library X, not an alternative
    - If user said "card layout" → task MUST implement cards, not tables
    - If user said "no animations" → task MUST NOT include animations
+   - Reference the decision ID (D-01, D-02, etc.) in task actions for traceability
 
 2. **Deferred Ideas (from `## Deferred Ideas`)** — MUST NOT appear in plans
    - If user deferred "search functionality" → NO search tasks allowed
@@ -79,7 +79,8 @@ The orchestrator provides user decisions in `<user_decisions>` tags from `/gsd-d
    - Make reasonable choices and document in task actions
 
 **Self-check before returning:** For each plan, verify:
-- [ ] Every locked decision has a task implementing it
+- [ ] Every locked decision (D-01, D-02, etc.) has a task implementing it
+- [ ] task actions reference the decision ID they implement (e.g., "per D-03")
 - [ ] No task implements a deferred idea
 - [ ] Discretion areas are handled reasonably
 
@@ -502,7 +503,7 @@ After determining `files_modified`, extract the key interfaces/types/exports fro
 
 ```bash
 # Extract type definitions, interfaces, and exports from relevant files
-grep -n "export\|interface\|type\|class\|function" {relevant_source_files} 2>/dev/null | head -50
+grep -n "export\\|interface\\|type\\|class\\|function" {relevant_source_files} 2>/dev/null | head -50
 ```
 
 Embed these in the plan's `<context>` section as an `<interfaces>` block:
@@ -973,6 +974,50 @@ node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "fix($PHASE
 ```
 
 </revision_mode>
+
+<reviews_mode>
+
+## Planning from Cross-AI Review Feedback
+
+Triggered when orchestrator sets Mode to `reviews`. Replanning from scratch with REVIEWS.md feedback as additional context.
+
+**Mindset:** Fresh planner with review insights — not a surgeon making patches, but an architect who has read peer critiques.
+
+### Step 1: Load REVIEWS.md
+read the reviews file from `<files_to_read>`. Parse:
+- Per-reviewer feedback (strengths, concerns, suggestions)
+- Consensus Summary (agreed concerns = highest priority to address)
+- Divergent Views (investigate, make a judgment call)
+
+### Step 2: Categorize Feedback
+Group review feedback into:
+- **Must address**: HIGH severity consensus concerns
+- **Should address**: MEDIUM severity concerns from 2+ reviewers
+- **Consider**: Individual reviewer suggestions, LOW severity items
+
+### Step 3: Plan Fresh with Review Context
+Create new plans following the standard planning process, but with review feedback as additional constraints:
+- Each HIGH severity consensus concern MUST have a task that addresses it
+- MEDIUM concerns should be addressed where feasible without over-engineering
+- Note in task actions: "Addresses review concern: {concern}" for traceability
+
+### Step 4: Return
+Use standard PLANNING COMPLETE return format, adding a reviews section:
+
+```markdown
+### Review Feedback Addressed
+
+| Concern | Severity | How Addressed |
+|---------|----------|---------------|
+| {concern} | HIGH | Plan {N}, task {M}: {how} |
+
+### Review Feedback Deferred
+| Concern | Reason |
+|---------|--------|
+| {concern} | {why — out of scope, disagree, etc.} |
+```
+
+</reviews_mode>
 
 <execution_flow>
 

@@ -1,0 +1,23 @@
+{
+  "_description": "Supplemental translation rules for v1.29.0 -- fixes remaining forbidden strings (general-purpose, gsd: command syntax)",
+  "include": ["gsd-opencode/**"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "**/oc-*",
+    "**/*-oc-*"
+  ],
+  "rules": [
+    {
+      "pattern": "general-purpose",
+      "replacement": "general",
+      "description": "Fix: 'general-purpose' subagent type is forbidden in OpenCode"
+    },
+    {
+      "pattern": "gsd:",
+      "replacement": "gsd-",
+      "description": "Fix: gsd: command syntax (Claude Code) to gsd- (OpenCode)"
+    }
+  ]
+}

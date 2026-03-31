@@ -63,7 +63,7 @@ Use existing area from step 2 if similar match exists.
 <step name="check_duplicates">
 ```bash
 # Search for key words from title in existing todos
-grep -l -i "[key words from title]" .planning/todos/pending/*.md 2>/dev/null
+grep -l -i "[key words from title]" .planning/todos/pending/*.md 2>/dev/null || true
 ```
 
 If potential duplicate found:

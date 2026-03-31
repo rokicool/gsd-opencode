@@ -264,13 +264,21 @@
       "description": "Generic regex to convert any remaining tools list to YAML map"
     },
     {
-      "_comment": "Generic regex fallback for any remaining tools: lines",
+      "_comment": "allowed-tools with inline tool list (e.g. 'allowed-tools: Read, Write, Edit')",
+      "pattern": "^allowed-tools: ([A-Za-z, ]+)$",
+      "replacement": "permissions",
+      "caseSensitive": true,
+      "isRegex": true,
+      "transform": "allowed_tools_inline_to_yaml",
+      "description": "Convert inline allowed-tools list to YAML permissions map"
+    },
+    {
+      "_comment": "allowed-tools without inline list (multiline, already handled by - Read rules)",
       "pattern": "allowed-tools:",
       "replacement": "permissions:",
       "caseSensitive": true,
       "isRegex": false,
-      "transform": "allowed-tools to permissions",
-      "description": ""
+      "description": "Rename allowed-tools key to permissions for multiline format"
     },
     {
       "pattern": "<sub>",
@@ -321,6 +329,12 @@
       "description": "Transform named color purple to hex"
     },
     {
+      "pattern": "color: magenta",
+      "replacement": "color: \"#FF00FF\"",
+      "caseSensitive": true,
+      "description": "Transform named color purple to hex"
+    },
+    {
       "pattern": "All arguments become",
       "replacement": "$ARGUMENTS become",
       "caseSensitive": true,
@@ -333,6 +347,16 @@
       "description": "Transform general-purpose subagent type to general"
     },
     {
+      "pattern": "'general-purpose'",
+      "replacement": "'general'",
+      "description": "Fix: quoted general-purpose subagent type name to general"
+    },
+    {
+      "pattern": "general-purpose research agent",
+      "replacement": "general research agent",
+      "description": "Fix: general-purpose research agent description in discuss-phase-assumptions"
+    },
+    {
       "pattern": "subagent_type=\"Explore\"",
       "replacement": "subagent_type=\"explore\"",
       "caseSensitive": true,
@@ -343,6 +367,16 @@
       "replacement": "subagent_type=\"general\"",
       "caseSensitive": true,
       "description": "Transform task subagent type to general"
+    },
+    {
+      "pattern": "skill(skill=\"gsd:",
+      "replacement": "skill(skill=\"gsd-",
+      "description": "Fix: v1.30.0 introduced skill() calls with gsd: prefix instead of gsd- prefix"
+    },
+    {
+      "pattern": "`gsd:discuss-phase`",
+      "replacement": "`gsd-discuss-phase`",
+      "description": "Fix: standalone gsd:discuss-phase reference in autonomous.md note"
     },
     {
       "pattern": "CLAUDE.md",

@@ -273,6 +273,19 @@ export class TextTranslator {
         return 'tools:\n' + tools.map(t => `  ${t}: true`).join('\n');
       }
 
+      if (rule.transform === 'allowed_tools_inline_to_yaml') {
+        const toolsList = captureGroups[0];
+        const tools = toolsList.split(',').map(t => t.trim()).filter(t => t);
+        const toolNameMap = {
+          'Read': 'read', 'Write': 'write', 'Edit': 'edit', 'Bash': 'bash',
+          'Glob': 'glob', 'Grep': 'grep', 'WebSearch': 'websearch',
+          'WebFetch': 'webfetch', 'Task': 'task', 'TodoWrite': 'todowrite',
+          'AskUserQuestion': 'question', 'Question': 'question'
+        };
+        const mapped = tools.map(t => toolNameMap[t] || t.toLowerCase());
+        return 'permissions:\n' + mapped.map(t => `  ${t}: true`).join('\n');
+      }
+
       // Substitute backreferences ($1, $2, etc.) with captured groups
       let replacement = processedReplacement;
       for (let i = 0; i < captureGroups.length; i++) {
