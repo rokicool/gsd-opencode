@@ -449,6 +449,11 @@
       "description": "gsd-reapply-patches.md"
     },
     {
+      "pattern": "Manage parallel workstreams for concurrent milestone work.",
+      "replacement": "<objective>\nManage parallel workstreams for concurrent milestone work.\n</objective>",
+      "description": "gsd-reapply-patches.md"
+    },
+    {
       "pattern": "Show the following output to the user verbatim, with no extra commentary:",
       "replacement": "",
       "description": "gsd-set-profile"

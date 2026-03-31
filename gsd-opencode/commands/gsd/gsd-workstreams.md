@@ -5,7 +5,9 @@ description: Manage parallel workstreams — list, create, switch, status, progr
 
 # /gsd-workstreams
 
+<objective>
 Manage parallel workstreams for concurrent milestone work.
+</objective>
 
 ## Usage
 
