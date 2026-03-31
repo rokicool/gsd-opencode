@@ -1,8 +1,8 @@
-<purpose>
+<objective>
 
 Drive all remaining milestone phases autonomously. For each incomplete phase: discuss → plan → execute using skill() flat invocations. Pauses only for explicit user decisions (grey area acceptance, blockers, validation requests). Re-reads ROADMAP.md after each phase to catch dynamically inserted phases.
 
-</purpose>
+</objective>
 
 <required_reading>
 

@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Switch the model profile used by GSD agents. Controls which OpenCode model each agent uses, balancing quality vs token spend.
-</purpose>
+</objective>
 
 <required_reading>
 read all files referenced by the invoking prompt's execution_context before starting.

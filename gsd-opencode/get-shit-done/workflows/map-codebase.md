@@ -1,10 +1,10 @@
-<purpose>
+<objective>
 Orchestrate parallel codebase mapper agents to analyze codebase and produce structured documents in .planning/codebase/
 
 Each agent has fresh context, explores a specific focus area, and **writes documents directly**. The orchestrator only receives confirmation + line counts, then writes a summary.
 
 Output: .planning/codebase/ folder with 7 structured documents about the codebase state.
-</purpose>
+</objective>
 
 <available_agent_types>
 Valid GSD subagent types (use exact names — do not fall back to 'general'):

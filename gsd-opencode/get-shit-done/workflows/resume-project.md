@@ -6,9 +6,9 @@ Use this workflow when:
 - User returns after time away from project
 </trigger>
 
-<purpose>
+<objective>
 Instantly restore full project context so "Where were we?" has an immediate, complete answer.
-</purpose>
+</objective>
 
 <required_reading>
 @$HOME/.config/opencode/get-shit-done/references/continuation-format.md

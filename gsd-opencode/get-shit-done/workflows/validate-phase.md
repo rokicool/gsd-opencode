@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Audit Nyquist validation gaps for a completed phase. Generate missing tests. Update VALIDATION.md.
-</purpose>
+</objective>
 
 <required_reading>
 @$HOME/.config/opencode/get-shit-done/references/ui-brand.md

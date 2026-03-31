@@ -1,4 +1,4 @@
-<purpose>
+<objective>
 Capture a forward-looking idea as a structured seed file with trigger conditions.
 Seeds auto-surface during /gsd-new-milestone when trigger conditions match the
 new milestone's scope.
@@ -8,7 +8,7 @@ Seeds beat deferred items because they:
 - Define WHEN to surface (trigger conditions, not manual scanning)
 - Track breadcrumbs (code references, related decisions)
 - Auto-present at the right time via new-milestone scan
-</purpose>
+</objective>
 
 <process>
 

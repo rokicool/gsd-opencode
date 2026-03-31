@@ -1,10 +1,10 @@
-<purpose>
+<objective>
 Orchestrate parallel debug agents to investigate UAT gaps and find root causes.
 
 After UAT finds gaps, spawn one debug agent per gap. Each agent investigates autonomously with symptoms pre-filled from UAT. Collect root causes, update UAT.md gaps with diagnosis, then hand off to plan-phase --gaps with actual diagnoses.
 
 Orchestrator stays lean: parse gaps, spawn agents, collect results, update UAT.
-</purpose>
+</objective>
 
 <available_agent_types>
 Valid GSD subagent types (use exact names — do not fall back to 'general'):

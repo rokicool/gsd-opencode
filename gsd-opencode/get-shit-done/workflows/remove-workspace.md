@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Remove a GSD workspace, cleaning up git worktrees and deleting the workspace directory.
-</purpose>
+</objective>
 
 <required_reading>
 read all files referenced by the invoking prompt's execution_context before starting.

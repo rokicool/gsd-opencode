@@ -1,7 +1,7 @@
-<purpose>
+<objective>
 Zero-friction idea capture. One write call, one confirmation line. No questions, no prompts.
 Runs inline — no task, no question, no bash.
-</purpose>
+</objective>
 
 <required_reading>
 read all files referenced by the invoking prompt's execution_context before starting.

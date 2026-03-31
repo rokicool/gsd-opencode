@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Autonomous repair operator for failed task verification. Invoked by execute-plan when a task fails its done-criteria. Proposes and attempts structured fixes before escalating to the user.
-</purpose>
+</objective>
 
 <inputs>
 - FAILED_TASK: task number, name, and done-criteria from the plan

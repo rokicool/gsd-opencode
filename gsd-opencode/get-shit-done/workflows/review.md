@@ -1,4 +1,4 @@
-<purpose>
+<objective>
 Cross-AI peer review — invoke external AI CLIs to independently review phase plans.
 Each CLI gets the same prompt (PROJECT.md context, phase plans, requirements) and
 produces structured feedback. Results are combined into REVIEWS.md for the planner
@@ -6,7 +6,7 @@ to incorporate via --reviews flag.
 
 This implements adversarial review: different AI models catch different blind spots.
 A plan that survives review from 2-3 independent AI systems is more robust.
-</purpose>
+</objective>
 
 <process>
 

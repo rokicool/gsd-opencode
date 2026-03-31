@@ -11,9 +11,9 @@ permissions:
   question: true
 ---
 
-<purpose>
+<objective>
 After a GSD update wipes and reinstalls files, this command merges user's previously saved local modifications back into the new version. Uses intelligent comparison to handle cases where the upstream file also changed.
-</purpose>
+</objective>
 
 <process>
 

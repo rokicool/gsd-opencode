@@ -1,8 +1,8 @@
-<purpose>
+<objective>
 Research how to implement a phase. Spawns gsd-phase-researcher with phase context.
 
 Standalone research command. For most workflows, use `/gsd-plan-phase` which integrates research automatically.
-</purpose>
+</objective>
 
 <available_agent_types>
 Valid GSD subagent types (use exact names — do not fall back to 'general'):

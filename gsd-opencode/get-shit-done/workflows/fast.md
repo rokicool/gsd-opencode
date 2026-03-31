@@ -1,4 +1,4 @@
-<purpose>
+<objective>
 Execute a trivial task inline without subagent overhead. No PLAN.md, no task spawning,
 no research, no plan checking. Just: understand → do → commit → log.
 
@@ -6,7 +6,7 @@ For tasks like: fix a typo, update a config value, add a missing import, rename 
 variable, commit uncommitted work, add a .gitignore entry, bump a version number.
 
 Use /gsd-quick for anything that needs multi-step planning or research.
-</purpose>
+</objective>
 
 <process>
 

@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Execute a phase prompt (PLAN.md) and create the outcome summary (SUMMARY.md).
-</purpose>
+</objective>
 
 <required_reading>
 read STATE.md before any operation to load project context.

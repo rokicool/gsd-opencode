@@ -1,8 +1,8 @@
-<purpose>
+<objective>
 Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /new, and feeds gaps into /gsd-plan-phase --gaps.
 
 User tests, OpenCode records. One test at a time. Plain text responses.
-</purpose>
+</objective>
 
 <available_agent_types>
 Valid GSD subagent types (use exact names — do not fall back to 'general'):

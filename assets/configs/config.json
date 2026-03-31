@@ -439,8 +439,13 @@
       "description": "Use OpenCode related process instead of Claude Code's one"
     },
     {
-      "pattern": "<purpose>\n      After a GSD update wipes and reinstalls files, this command merges user's previously saved local modifications back into the new version. Uses intelligent comparison to handle cases where the upstream file also changed.\n      </purpose>",
-      "replacement": "<objective>\n      After a GSD update wipes and reinstalls files, this command merges user's previously saved local modifications back into the new version. Uses intelligent comparison to handle cases where the upstream file also changed.\n      </objective>",
+      "pattern": "<purpose>",
+      "replacement": "<objective>",
+      "description": "gsd-reapply-patches.md"
+    },
+    {
+      "pattern": "</purpose>",
+      "replacement": "</objective>",
       "description": "gsd-reapply-patches.md"
     },
     {

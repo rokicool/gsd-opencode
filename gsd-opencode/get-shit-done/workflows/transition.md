@@ -26,13 +26,13 @@ verification. Users should never be told to run `/gsd-transition`.
 
 </required_reading>
 
-<purpose>
+<objective>
 
 Mark current phase complete and advance to next. This is the natural point where progress tracking and PROJECT.md evolution happen.
 
 "Planning next phase" = "current phase is done"
 
-</purpose>
+</objective>
 
 <process>
 
