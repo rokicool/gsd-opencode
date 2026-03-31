@@ -1,0 +1,33 @@
+{
+  "_description": "Supplemental translation rules for v1.28.0 -- fixes remaining forbidden strings after base translation",
+  "include": ["gsd-opencode/**"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "**/oc-*",
+    "**/*-oc-*"
+  ],
+  "rules": [
+    {
+      "pattern": "rokicool/get-shit-done",
+      "replacement": "anomalyco/opencode",
+      "description": "Fix: GitHub badge/star-history references use wrong repo path"
+    },
+    {
+      "pattern": "skill(skill=\"gsd:",
+      "replacement": "skill(skill=\"gsd-",
+      "description": "Fix: skill() function calls use colon instead of dash"
+    },
+    {
+      "pattern": "`gsd:",
+      "replacement": "`gsd-",
+      "description": "Fix: Code references in backticks use colon instead of dash"
+    },
+    {
+      "pattern": "general-purpose",
+      "replacement": "generic",
+      "description": "Fix: Remove forbidden general-purpose term (use 'generic' instead)"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 ---
 name: gsd-discuss-phase
-description: Gather phase context through adaptive questioning before planning
-argument-hint: "<phase> [--auto]"
+description: Gather phase context through adaptive questioning before planning. Use --auto to skip interactive questions (OpenCode picks recommended defaults).
+argument-hint: "<phase> [--auto] [--batch] [--analyze] [--text]"
 permissions:
    read: true
    write: true
@@ -30,6 +30,7 @@ Extract implementation decisions that downstream agents need — researcher and 
 
 <execution_context>
 @$HOME/.config/opencode/get-shit-done/workflows/discuss-phase.md
+@$HOME/.config/opencode/get-shit-done/workflows/discuss-phase-assumptions.md
 @$HOME/.config/opencode/get-shit-done/templates/context.md
 </execution_context>
 
@@ -40,43 +41,16 @@ Context files are resolved in-workflow using `init phase-op` and roadmap/state t
 </context>
 
 <process>
-1. Validate phase number (error if missing or not in roadmap)
-2. Check if CONTEXT.md exists (offer update/view/skip if yes)
-3. **Load prior context** — read PROJECT.md, REQUIREMENTS.md, STATE.md, and all prior CONTEXT.md files
-4. **Scout codebase** — Find reusable assets, patterns, and integration points
-5. **Analyze phase** — Check prior decisions, skip already-decided areas, generate remaining gray areas
-6. **Present gray areas** — Multi-select: which to discuss? Annotate with prior decisions + code context
-7. **Deep-dive each area** — 4 questions per area, code-informed options, Context7 for library choices
-8. **write CONTEXT.md** — Sections match areas discussed + code_context section
-9. Offer next steps (research or plan)
+**Mode routing:**
+```bash
+DISCUSS_MODE=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.discuss_mode 2>/dev/null || echo "discuss")
+```
 
-**CRITICAL: Scope guardrail**
-- Phase boundary from ROADMAP.md is FIXED
-- Discussion clarifies HOW to implement, not WHETHER to add more
-- If user suggests new capabilities: "That's its own phase. I'll note it for later."
-- Capture deferred ideas — don't lose them, don't act on them
+If `DISCUSS_MODE` is `"assumptions"`: read and execute @$HOME/.config/opencode/get-shit-done/workflows/discuss-phase-assumptions.md end-to-end.
 
-**Domain-aware gray areas:**
-Gray areas depend on what's being built. Analyze the phase goal:
-- Something users SEE → layout, density, interactions, states
-- Something users CALL → responses, errors, auth, versioning
-- Something users RUN → output format, flags, modes, error handling
-- Something users READ → structure, tone, depth, flow
-- Something being ORGANIZED → criteria, grouping, naming, exceptions
+If `DISCUSS_MODE` is `"discuss"` (or unset, or any other value): read and execute @$HOME/.config/opencode/get-shit-done/workflows/discuss-phase.md end-to-end.
 
-Generate 3-4 **phase-specific** gray areas, not generic categories.
-
-**Probing depth:**
-- Ask 4 questions per area before checking
-- "More questions about [area], or move to next?"
-- If more → ask 4 more, check again
-- After all areas → "Ready to create context?"
-
-**Do NOT ask about (OpenCode handles these):**
-- Technical implementation
-- Architecture choices
-- Performance concerns
-- Scope expansion
+**MANDATORY:** The execution_context files listed above ARE the instructions. read the workflow file BEFORE taking any action. The objective and success_criteria sections in this command file are summaries — the workflow file contains the complete step-by-step process with all required behaviors, config checks, and interaction patterns. Do not improvise from the summary.
 </process>
 
 <success_criteria>

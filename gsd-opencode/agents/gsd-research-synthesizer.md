@@ -7,8 +7,6 @@ tools:
   write: true
   bash: true
 color: "#800080"
-skills:
-  - gsd-synthesizer-workflow
 # hooks:
 #   PostToolUse:
 #     - matcher: "write|edit"

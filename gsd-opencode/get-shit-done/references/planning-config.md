@@ -11,7 +11,8 @@ Configuration options for `.planning/` directory behavior.
 "git": {
   "branching_strategy": "none",
   "phase_branch_template": "gsd/phase-{phase}-{slug}",
-  "milestone_branch_template": "gsd/{milestone}-{slug}"
+  "milestone_branch_template": "gsd/{milestone}-{slug}",
+  "quick_branch_template": null
 }
 ```
 
@@ -22,6 +23,7 @@ Configuration options for `.planning/` directory behavior.
 | `git.branching_strategy` | `"none"` | Git branching approach: `"none"`, `"phase"`, or `"milestone"` |
 | `git.phase_branch_template` | `"gsd/phase-{phase}-{slug}"` | Branch template for phase strategy |
 | `git.milestone_branch_template` | `"gsd/{milestone}-{slug}"` | Branch template for milestone strategy |
+| `git.quick_branch_template` | `null` | Optional branch template for quick-task runs |
 </config_schema>
 
 <commit_docs_behavior>

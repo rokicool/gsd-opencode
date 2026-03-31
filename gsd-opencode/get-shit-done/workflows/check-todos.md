@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 List all pending todos, allow selection, load full context for the selected todo, and route to appropriate action.
-</purpose>
+</objective>
 
 <required_reading>
 read all files referenced by the invoking prompt's execution_context before starting.

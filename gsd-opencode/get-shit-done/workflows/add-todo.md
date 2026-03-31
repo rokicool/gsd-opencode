@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Capture an idea, task, or issue that surfaces during a GSD session as a structured todo for later work. Enables "thought → capture → continue" flow without losing context.
-</purpose>
+</objective>
 
 <required_reading>
 read all files referenced by the invoking prompt's execution_context before starting.
@@ -63,7 +63,7 @@ Use existing area from step 2 if similar match exists.
 <step name="check_duplicates">
 ```bash
 # Search for key words from title in existing todos
-grep -l -i "[key words from title]" .planning/todos/pending/*.md 2>/dev/null
+grep -l -i "[key words from title]" .planning/todos/pending/*.md 2>/dev/null || true
 ```
 
 If potential duplicate found:

@@ -1,8 +1,8 @@
-<purpose>
+<objective>
 Generate unit and E2E tests for a completed phase based on its SUMMARY.md, CONTEXT.md, and implementation. Classifies each changed file into TDD (unit), E2E (browser), or Skip categories, presents a test plan for user approval, then generates tests following RED-GREEN conventions.
 
 Users currently hand-craft `/gsd-quick` prompts for test generation after each phase. This workflow standardizes the process with proper classification, quality gates, and gap reporting.
-</purpose>
+</objective>
 
 <required_reading>
 read all files referenced by the invoking prompt's execution_context before starting.
@@ -146,7 +146,7 @@ find . -type d -name "*test*" -o -name "*spec*" -o -name "*__tests__*" 2>/dev/nu
 # Find existing test files for convention matching
 find . -type f \( -name "*.test.*" -o -name "*.spec.*" -o -name "*Tests.fs" -o -name "*Test.fs" \) 2>/dev/null | head -20
 # Check for test runners
-ls package.json *.sln 2>/dev/null
+ls package.json *.sln 2>/dev/null || true
 ```
 
 Identify:
@@ -243,7 +243,7 @@ For each approved E2E test:
 
 1. **Check for existing tests** covering the same scenario:
    ```bash
-   grep -r "{scenario keyword}" {e2e test directory} 2>/dev/null
+   grep -r "{scenario keyword}" {e2e test directory} 2>/dev/null || true
    ```
    If found, extend rather than duplicate.
 

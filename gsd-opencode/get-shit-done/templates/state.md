@@ -73,7 +73,7 @@ Stopped at: [Description of last completed action]
 Resume file: [Path to .continue-here*.md if exists, otherwise "None"]
 ```
 
-<purpose>
+<objective>
 
 STATE.md is the project's short-term memory spanning all phases and sessions.
 
@@ -85,7 +85,7 @@ STATE.md is the project's short-term memory spanning all phases and sessions.
 - Contains digest of accumulated context
 - Enables instant session restoration
 
-</purpose>
+</objective>
 
 <lifecycle>
 

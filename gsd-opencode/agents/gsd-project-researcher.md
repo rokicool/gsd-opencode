@@ -11,9 +11,9 @@ tools:
   websearch: true
   webfetch: true
   mcp__context7__*: true
+  mcp__firecrawl__*: true
+  mcp__exa__*: true
 color: "#00FFFF"
-skills:
-  - gsd-researcher-workflow
 # hooks:
 #   PostToolUse:
 #     - matcher: "write|edit"
@@ -127,6 +127,31 @@ If `brave_search: false` (or not set), use built-in websearch tool instead.
 
 Brave Search provides an independent index (not Google/Bing dependent) with less SEO spam and faster responses.
 
+### Exa Semantic Search (MCP)
+
+Check `exa_search` from orchestrator context. If `true`, use Exa for research-heavy, semantic queries:
+
+```
+mcp__exa__web_search_exa with query: "your semantic query"
+```
+
+**Best for:** Research questions where keyword search fails — "best approaches to X", finding technical/academic content, discovering niche libraries, ecosystem exploration. Returns semantically relevant results rather than keyword matches.
+
+If `exa_search: false` (or not set), fall back to websearch or Brave Search.
+
+### Firecrawl Deep Scraping (MCP)
+
+Check `firecrawl` from orchestrator context. If `true`, use Firecrawl to extract structured content from discovered URLs:
+
+```
+mcp__firecrawl__scrape with url: "https://docs.example.com/guide"
+mcp__firecrawl__search with query: "your query" (web search + auto-scrape results)
+```
+
+**Best for:** Extracting full page content from documentation, blog posts, GitHub READMEs, comparison articles. Use after finding a relevant URL from Exa, websearch, or known docs. Returns clean markdown instead of raw HTML.
+
+If `firecrawl: false` (or not set), fall back to webfetch.
+
 ## Verification Protocol
 
 **websearch findings must be verified:**
@@ -149,7 +174,7 @@ Never present LOW confidence findings as authoritative.
 | MEDIUM | websearch verified with official source, multiple credible sources agree | State with attribution |
 | LOW | websearch only, single source, unverified | Flag as needing validation |
 
-**Source priority:** Context7 → Official Docs → Official GitHub → websearch (verified) → websearch (unverified)
+**Source priority:** Context7 → Exa (verified) → Firecrawl (official docs) → Official GitHub → Brave/websearch (verified) → websearch (unverified)
 
 </tool_strategy>
 

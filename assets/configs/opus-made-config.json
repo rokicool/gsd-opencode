@@ -12,9 +12,7 @@
     "**/*.yml",
     "**/*.toml"
   ],
-  "include": [
-    "gsd-opencode/**"
-  ],
+  "include": ["gsd-opencode/**"],
   "exclude": [
     "node_modules/**",
     ".git/**",
@@ -630,6 +628,12 @@
     {
       "pattern": "color: purple",
       "replacement": "color: \"#800080\"",
+      "caseSensitive": true,
+      "description": "Transform named color purple to hex"
+    },
+    {
+      "pattern": "color: magenta",
+      "replacement": "color: \"#FF00FF\"",
       "caseSensitive": true,
       "description": "Transform named color purple to hex"
     },

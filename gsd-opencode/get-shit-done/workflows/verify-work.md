@@ -1,8 +1,14 @@
-<purpose>
+<objective>
 Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /new, and feeds gaps into /gsd-plan-phase --gaps.
 
 User tests, OpenCode records. One test at a time. Plain text responses.
-</purpose>
+</objective>
+
+<available_agent_types>
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
+- gsd-planner — Creates detailed plans from phase scope
+- gsd-plan-checker — Reviews plan quality before execution
+</available_agent_types>
 
 <philosophy>
 **Show expected, ask if reality matches.**
@@ -26,16 +32,18 @@ If $ARGUMENTS contains a phase number, load context:
 ```bash
 INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init verify-work "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
+AGENT_SKILLS_PLANNER=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-planner 2>/dev/null)
+AGENT_SKILLS_CHECKER=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-checker 2>/dev/null)
 ```
 
-Parse JSON for: `planner_model`, `checker_model`, `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `has_verification`.
+Parse JSON for: `planner_model`, `checker_model`, `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `has_verification`, `uat_path`.
 </step>
 
 <step name="check_active_session">
 **First: Check for active UAT sessions**
 
 ```bash
-find .planning/phases -name "*-UAT.md" -type f 2>/dev/null | head -5
+(find .planning/phases -name "*-UAT.md" -type f 2>/dev/null || true) | head -5
 ```
 
 **If active sessions exist AND no $ARGUMENTS provided:**
@@ -84,7 +92,7 @@ Continue to `create_uat_file`.
 Use `phase_dir` from init (or run init if not already done).
 
 ```bash
-ls "$phase_dir"/*-SUMMARY.md 2>/dev/null
+ls "$phase_dir"/*-SUMMARY.md 2>/dev/null || true
 ```
 
 read each SUMMARY.md to extract testable deliverables.
@@ -186,23 +194,23 @@ Proceed to `present_test`.
 <step name="present_test">
 **Present current test to user:**
 
-read Current Test section from UAT file.
+Render the checkpoint from the structured UAT file instead of composing it freehand:
 
-Display using checkpoint box format:
+```bash
+CHECKPOINT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" uat render-checkpoint --file "$uat_path" --raw)
+if [[ "$CHECKPOINT" == @file:* ]]; then CHECKPOINT=$(cat "${CHECKPOINT#@file:}"); fi
+```
+
+Display the returned checkpoint EXACTLY as-is:
 
 ```
-╔══════════════════════════════════════════════════════════════╗
-║  CHECKPOINT: Verification Required                           ║
-╚══════════════════════════════════════════════════════════════╝
-
-**Test {number}: {name}**
-
-{expected}
-
-──────────────────────────────────────────────────────────────
-→ Type "pass" or describe what's wrong
-──────────────────────────────────────────────────────────────
+{CHECKPOINT}
 ```
+
+**Critical response hygiene:**
+- Your entire response MUST equal `{CHECKPOINT}` byte-for-byte.
+- Do NOT add commentary before or after the block.
+- If you notice protocol/meta markers such as `to=all:`, role-routing text, XML system tags, hidden instruction markers, ad copy, or any unrelated suffix, discard the draft and output `{CHECKPOINT}` only.
 
 Wait for user response (plain text, no question).
 </step>
@@ -230,6 +238,29 @@ expected: {expected}
 result: skipped
 reason: [user's reason if provided]
 ```
+
+**If response indicates blocked:**
+- "blocked", "can't test - server not running", "need physical device", "need release build"
+- Or any response containing: "server", "blocked", "not running", "physical device", "release build"
+
+Infer blocked_by tag from response:
+- Contains: server, not running, gateway, API → `server`
+- Contains: physical, device, hardware, real phone → `physical-device`
+- Contains: release, preview, build, EAS → `release-build`
+- Contains: stripe, twilio, third-party, configure → `third-party`
+- Contains: depends on, prior phase, prerequisite → `prior-phase`
+- Default: `other`
+
+Update Tests section:
+```
+### {N}. {name}
+expected: {expected}
+result: blocked
+blocked_by: {inferred tag}
+reason: "{verbatim user response}"
+```
+
+Note: Blocked tests do NOT go into the Gaps section (they aren't code issues — they're prerequisite gates).
 
 **If response is anything else:**
 - Treat as issue description
@@ -293,8 +324,24 @@ Proceed to `present_test`.
 <step name="complete_session">
 **Complete testing and commit:**
 
+**Determine final status:**
+
+Count results:
+- `pending_count`: tests with `result: [pending]`
+- `blocked_count`: tests with `result: blocked`
+- `skipped_no_reason`: tests with `result: skipped` and no `reason` field
+
+```
+if pending_count > 0 OR blocked_count > 0 OR skipped_no_reason > 0:
+  status: partial
+  # Session ended but not all tests resolved
+else:
+  status: complete
+  # All tests have a definitive result (pass, issue, or skipped-with-reason)
+```
+
 Update frontmatter:
-- status: complete
+- status: {computed status}
 - updated: [now]
 
 Clear Current Test section:
@@ -333,6 +380,7 @@ All tests passed. Ready to continue.
 
 - `/gsd-plan-phase {next}` — Plan next phase
 - `/gsd-execute-phase {next}` — Execute next phase
+- `/gsd-ui-review {phase}` — visual quality audit (if frontend files were modified)
 ```
 </step>
 
@@ -385,6 +433,8 @@ task(
 - .planning/ROADMAP.md (Roadmap)
 </files_to_read>
 
+${AGENT_SKILLS_PLANNER}
+
 </planning_context>
 
 <downstream_consumer>
@@ -431,6 +481,8 @@ task(
 - {phase_dir}/*-PLAN.md (Plans to verify)
 </files_to_read>
 
+${AGENT_SKILLS_CHECKER}
+
 </verification_context>
 
 <expected_output>
@@ -470,6 +522,8 @@ task(
 <files_to_read>
 - {phase_dir}/*-PLAN.md (Existing plans)
 </files_to_read>
+
+${AGENT_SKILLS_PLANNER}
 
 **Checker issues:**
 {structured_issues_from_checker}

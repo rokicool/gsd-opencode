@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.22.2] - 2026-03-30
+
+Overview: Major upstream sync from GSD v1.30.0 adding autonomous execution, fast mode, UI design pipeline, multi-project workspaces, user profiling, forensics, and 25 new slash commands. Full documentation now available in four additional locales (ja-JP, ko-KR, pt-BR, zh-CN). Added `mode: subagent` declarations to all agent definition files.
+
+### Added
+
+- `/gsd-autonomous` command and `autonomous` workflow for end-to-end autonomous project execution
+- `/gsd-fast` command and `fast` workflow for rapid-fire task execution
+- `/gsd-do` command and `do` workflow for direct task execution without full planning
+- `/gsd-forensics` command and `forensics` workflow for post-mortem investigation and debugging
+- `/gsd-thread` command for threaded conversation management
+- `/gsd-workstreams` command and `workstream.cjs` library for multi-stream work management with `--workstream` flag
+- `/gsd-profile-user` command, `profile-user` workflow, `gsd-user-profiler` agent, `profile-pipeline.cjs`, and `profile-output.cjs` for building and maintaining user preference profiles
+- `/gsd-ui-phase` command, `ui-phase` workflow, `gsd-ui-researcher` agent, `gsd-ui-auditor` agent, `gsd-ui-checker` agent for complete UI design and review pipeline
+- `/gsd-ui-review` command and `ui-review` workflow for retroactive UI audits
+- `/gsd-ship` command and `ship` workflow for streamlined shipping and release
+- `/gsd-pr-branch` command and `pr-branch` workflow for PR branch creation and management
+- `/gsd-manager` command and `manager` workflow for manager-level project oversight
+- `/gsd-session-report` command and `session-report` workflow for session summary generation
+- `/gsd-stats` command and `stats` workflow for project and milestone statistics
+- `/gsd-note` command and `note` workflow for quick note-taking during work
+- `/gsd-add-backlog` and `/gsd-review-backlog` commands for backlog item management
+- `/gsd-milestone-summary` command and `milestone-summary` workflow for milestone overview generation
+- `/gsd-new-workspace`, `/gsd-list-workspaces`, and `/gsd-remove-workspace` commands and workflows for multi-project workspace management
+- `/gsd-next` command and `next` workflow for determining and starting the next task
+- `/gsd-plant-seed` command and `plant-seed` workflow for seeding new project ideas
+- `/gsd-audit-uat` command, `audit-uat` workflow, and `uat.cjs` library for user acceptance testing audits
+- `/gsd-review` command and `review` workflow for structured code review
+- `gsd-advisor-researcher` agent for researching gray area decisions with comparison tables
+- `gsd-assumptions-analyzer` agent and `discuss-phase-assumptions` workflow for assumption analysis during discuss phase
+- `model-profiles.cjs` library for model profile definitions
+- `security.cjs` library for security utility functions
+- `node-repair` workflow for automated Node.js dependency repair
+- `UI-SPEC.md`, `claude-md.md`, `dev-preferences.md`, `discussion-log.md`, and `user-profile.md` templates
+- `user-profiling.md` and `workstream-flag.md` reference documentation
+- `superpowers/plans/2026-03-18-materialize-new-project-config.md` and `superpowers/specs/2026-03-20-multi-project-workspaces-design.md` design documents
+- Skill definitions (SKILL.md) for gsd-audit-milestone, gsd-cleanup, gsd-complete-milestone, gsd-discuss-phase, gsd-execute-phase, gsd-plan-phase, gsd-ui-phase, gsd-ui-review, and gsd-verify-work
+- `mode: subagent` declarations added to all 18 agent definition files in `gsd-opencode/agents/`
+- Full Japanese (ja-JP) documentation: AGENTS, ARCHITECTURE, CLI-TOOLS, COMMANDS, CONFIGURATION, FEATURES, README, USER-GUIDE, context-monitor, and workflow-discuss-mode
+- Full Korean (ko-KR) documentation: AGENTS, ARCHITECTURE, CLI-TOOLS, COMMANDS, CONFIGURATION, FEATURES, README, USER-GUIDE, context-monitor, and workflow-discuss-mode
+- Brazilian Portuguese (pt-BR) documentation: AGENTS, ARCHITECTURE, CLI-TOOLS, COMMANDS, CONFIGURATION, FEATURES, README, USER-GUIDE, context-monitor, and workflow-discuss-mode
+- Simplified Chinese (zh-CN) documentation: README, USER-GUIDE, and full references subdirectory (checkpoints, continuation-format, decimal-phase-calculation, git-integration, git-planning-commit, model-profile-resolution, model-profiles, phase-argument-parsing, planning-config, questioning, tdd, ui-brand, verification-patterns)
+
+### Changed
+
+- Updated 12 existing agents (codebase-mapper, debugger, executor, integration-checker, nyquist-auditor, phase-researcher, plan-checker, planner, project-researcher, research-synthesizer, roadmapper, verifier) with improved behavior
+- Enhanced 8 existing commands (discuss-phase, execute-phase, plan-phase, research-phase, debug, quick, reapply-patches, set-profile)
+- Improved 30 existing workflows including execute-phase, plan-phase, discuss-phase, new-project, new-milestone, health, help, settings, and update
+- Updated 12 CLI library modules (commands, config, core, frontmatter, init, milestone, phase, roadmap, state, template, verify, gsd-tools) for v1.30.0 compatibility
+- Modified templates: config.json, context.md, phase-prompt.md, project.md, and UAT.md
+- Updated 7 reference documents: checkpoints, decimal-phase-calculation, git-integration, model-profile-resolution, model-profiles, phase-argument-parsing, and planning-config
+
 ## [1.22.0] - 2026-03-08
 
 Overview: Synchronized with upstream GSD v1.22.4 to fix agent execution syntax and prevent unexpected stops. Simplified model profile system from quality/balanced/budget to simple/smart/genius with updated configuration file structure. Enhanced copy and translate services for upstream synchronization.

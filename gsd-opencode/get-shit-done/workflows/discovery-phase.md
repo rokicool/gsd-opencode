@@ -1,11 +1,11 @@
-<purpose>
+<objective>
 Execute discovery at the appropriate depth level.
 Produces DISCOVERY.md (for Level 2-3) that informs PLAN.md creation.
 
 Called from plan-phase.md's mandatory_discovery step with a depth parameter.
 
 NOTE: For comprehensive ecosystem research ("how do experts build this"), use /gsd-research-phase instead, which produces RESEARCH.md.
-</purpose>
+</objective>
 
 <depth_levels>
 **This workflow supports three depth levels:**
@@ -93,7 +93,7 @@ For: Choosing between options, new external integration.
 
    ```
    For each library/framework:
-   - mcp__context7__resolve-library-id  
+   - mcp__context7__resolve-library-id 
    - mcp__context7__get-library-docs (mode: "code" for API, "info" for concepts)
    ```
 

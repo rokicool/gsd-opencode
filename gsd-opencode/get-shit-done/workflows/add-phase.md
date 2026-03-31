@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Add a new integer phase to the end of the current milestone in the roadmap. Automatically calculates next phase number, creates phase directory, and updates roadmap structure.
-</purpose>
+</objective>
 
 <required_reading>
 read all files referenced by the invoking prompt's execution_context before starting.

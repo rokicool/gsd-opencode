@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Create all phases necessary to close gaps identified by `/gsd-audit-milestone`. Reads MILESTONE-AUDIT.md, groups gaps into logical phases, creates phase entries in ROADMAP.md, and offers to plan each phase. One command creates all fix phases — no manual `/gsd-add-phase` per gap.
-</purpose>
+</objective>
 
 <required_reading>
 read all files referenced by the invoking prompt's execution_context before starting.
@@ -12,7 +12,7 @@ read all files referenced by the invoking prompt's execution_context before star
 
 ```bash
 # Find the most recent audit file
-ls -t .planning/v*-MILESTONE-AUDIT.md 2>/dev/null | head -1
+(ls -t .planning/v*-MILESTONE-AUDIT.md 2>/dev/null || true) | head -1
 ```
 
 Parse YAML frontmatter to extract structured gaps:
@@ -65,8 +65,7 @@ Gap: Flow "View dashboard" broken at data fetch
 Find highest existing phase:
 ```bash
 # Get sorted phase list, extract last one
-PHASES=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" phases list)
-HIGHEST=$(printf '%s\n' "$PHASES" | jq -r '.directories[-1]')
+HIGHEST=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" phases list --pick directories[-1])
 ```
 
 New phases continue from there:

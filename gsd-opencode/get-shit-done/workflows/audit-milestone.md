@@ -1,10 +1,15 @@
-<purpose>
+<objective>
 Verify milestone achieved its definition of done by aggregating phase verifications, checking cross-phase integration, and assessing requirements coverage. Reads existing VERIFICATION.md files (phases already verified during execute-phase), aggregates tech debt and deferred gaps, then spawns integration checker for cross-phase wiring.
-</purpose>
+</objective>
 
 <required_reading>
 read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
+
+<available_agent_types>
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
+- gsd-integration-checker — Checks cross-phase integration
+</available_agent_types>
 
 <process>
 
@@ -13,6 +18,7 @@ read all files referenced by the invoking prompt's execution_context before star
 ```bash
 INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init milestone-op)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
+AGENT_SKILLS_CHECKER=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-integration-checker 2>/dev/null)
 ```
 
 Extract from init JSON: `milestone_version`, `milestone_name`, `phase_count`, `completed_phases`, `commit_docs`.
@@ -73,7 +79,8 @@ Milestone Requirements:
 
 MUST map each integration finding to affected requirement IDs where applicable.
 
-Verify cross-phase wiring and E2E user flows.",
+Verify cross-phase wiring and E2E user flows.
+${AGENT_SKILLS_CHECKER}",
   subagent_type="gsd-integration-checker",
   model="{integration_checker_model}"
 )
@@ -105,7 +112,8 @@ For each phase's VERIFICATION.md, extract the expanded requirements table:
 For each phase's SUMMARY.md, extract `requirements-completed` from YAML frontmatter:
 ```bash
 for summary in .planning/phases/*-*/*-SUMMARY.md; do
-  node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" summary-extract "$summary" --fields requirements_completed | jq -r '.requirements_completed'
+  [ -e "$summary" ] || continue
+  node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" summary-extract "$summary" --fields requirements_completed --pick requirements_completed
 done
 ```
 
@@ -133,7 +141,7 @@ For each REQ-ID, determine status using all three sources:
 Skip if `workflow.nyquist_validation` is explicitly `false` (absent = enabled).
 
 ```bash
-NYQUIST_CONFIG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config get workflow.nyquist_validation --raw 2>/dev/null)
+NYQUIST_CONFIG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.nyquist_validation --raw 2>/dev/null)
 ```
 
 If `false`: skip entirely.

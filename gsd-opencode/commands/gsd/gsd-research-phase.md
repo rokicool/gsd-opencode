@@ -23,6 +23,11 @@ Research how to implement a phase. Spawns gsd-phase-researcher agent with phase 
 **Why subagent:** Research burns context fast (websearch, Context7 queries, source verification). Fresh 200k context for investigation. Main context stays lean for user interaction.
 </objective>
 
+<available_agent_types>
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
+- gsd-phase-researcher — Researches technical approaches for a phase
+</available_agent_types>
+
 <context>
 Phase number: $ARGUMENTS (required)
 

@@ -1,10 +1,15 @@
-<purpose>
+<objective>
 Orchestrate parallel debug agents to investigate UAT gaps and find root causes.
 
 After UAT finds gaps, spawn one debug agent per gap. Each agent investigates autonomously with symptoms pre-filled from UAT. Collect root causes, update UAT.md gaps with diagnosis, then hand off to plan-phase --gaps with actual diagnoses.
 
 Orchestrator stays lean: parse gaps, spawn agents, collect results, update UAT.
-</purpose>
+</objective>
+
+<available_agent_types>
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
+- gsd-debugger — Diagnoses and fixes issues
+</available_agent_types>
 
 <paths>
 DEBUG_DIR=.planning/debug
@@ -73,14 +78,21 @@ This runs in parallel - all gaps investigated simultaneously.
 </step>
 
 <step name="spawn_agents">
+**Load agent skills:**
+
+```bash
+AGENT_SKILLS_DEBUGGER=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-debugger 2>/dev/null)
+```
+
 **Spawn debug agents in parallel:**
 
 For each gap, fill the debug-subagent-prompt template and spawn:
 
 ```
 task(
-  prompt=filled_debug_subagent_prompt + "\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>",
+  prompt=filled_debug_subagent_prompt + "\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>\n${AGENT_SKILLS_DEBUGGER}",
   subagent_type="gsd-debugger",
+  isolation="worktree",
   description="Debug: {truth_short}"
 )
 ```

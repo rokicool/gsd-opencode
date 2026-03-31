@@ -32,9 +32,8 @@ With existing decimals:
 ## Extract Values
 
 ```bash
-DECIMAL_INFO=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal "${AFTER_PHASE}")
-DECIMAL_PHASE=$(printf '%s\n' "$DECIMAL_INFO" | jq -r '.next')
-BASE_PHASE=$(printf '%s\n' "$DECIMAL_INFO" | jq -r '.base_phase')
+DECIMAL_PHASE=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal "${AFTER_PHASE}" --pick next)
+BASE_PHASE=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" phase next-decimal "${AFTER_PHASE}" --pick base_phase)
 ```
 
 Or with --raw flag:

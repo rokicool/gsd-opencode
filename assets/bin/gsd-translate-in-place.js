@@ -19,8 +19,8 @@
  *   2  Runtime error (file I/O, permissions)
  */
 
-import { readFile, writeFile, access } from 'node:fs/promises';
-import { resolve, dirname } from 'node:path';
+import { readFile, writeFile, access, mkdir } from 'node:fs/promises';
+import { resolve, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // Use dynamic import for tinyglobby
@@ -269,6 +269,159 @@ async function loadConfig(configPath) {
   return loadConfigs([configPath]);
 }
 
+async function ensureCommandNames(apply) {
+  const commandsDir = resolve(__dirname, '../../gsd-opencode/commands/gsd');
+
+  let commandFiles;
+  try {
+    commandFiles = await glob(['*.md'], { cwd: commandsDir, onlyFiles: true, absolute: true });
+  } catch {
+    console.log('No command files found to check for missing name: field.');
+    return { fixed: 0, missing: 0 };
+  }
+
+  if (!commandFiles || commandFiles.length === 0) {
+    console.log('No command files found to check for missing name: field.');
+    return { fixed: 0, missing: 0 };
+  }
+
+  let fixed = 0;
+  let missing = 0;
+
+  for (const filePath of commandFiles) {
+    const commandName = basename(filePath, '.md');
+    let content;
+
+    try {
+      content = await readFile(filePath, 'utf-8');
+    } catch {
+      continue;
+    }
+
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!frontmatterMatch) continue;
+
+    const frontmatter = frontmatterMatch[1];
+
+    if (/^name:/m.test(frontmatter)) continue;
+
+    missing++;
+    const newFrontmatter = `name: ${commandName}\n${frontmatter}`;
+    const newContent = content.replace(
+      /^---\n([\s\S]*?)\n---/,
+      `---\n${newFrontmatter}\n---`
+    );
+
+    if (apply) {
+      await writeFile(filePath, newContent, 'utf-8');
+      console.log(`  Fixed missing name: in ${commandName}.md`);
+      fixed++;
+    } else {
+      console.log(`  [dry-run] Would add name: ${commandName} to ${commandName}.md`);
+    }
+  }
+
+  if (missing > 0) {
+    console.log(`Command name check: ${missing} file(s) missing name: field${apply ? `, ${fixed} fixed` : ' (dry-run)'}`);
+  } else {
+    console.log('All command files have name: in frontmatter.');
+  }
+
+  return { fixed, missing };
+}
+
+async function discoverGsdSkillReferences(searchPatterns) {
+  const files = await glob(searchPatterns, {
+    ignore: ['node_modules/**', '.git/**'],
+    onlyFiles: true
+  });
+
+  if (!files || files.length === 0) {
+    return new Set();
+  }
+
+  const skillRefs = new Set();
+  const pattern = /skill\(skill="gsd-([^"]+)"/g;
+
+  for (const file of files) {
+    try {
+      const content = await readFile(file, 'utf-8');
+      let match;
+      while ((match = pattern.exec(content)) !== null) {
+        skillRefs.add(`gsd-${match[1]}`);
+      }
+      pattern.lastIndex = 0;
+    } catch {
+      // skip unreadable files
+    }
+  }
+
+  return skillRefs;
+}
+
+async function generateSkillWrappers(commandNames) {
+  const commandsDir = resolve(__dirname, '../../gsd-opencode/commands/gsd');
+  const skillsBaseDir = resolve(__dirname, '../../gsd-opencode/skills');
+
+  const commandSet = new Set(commandNames);
+  let created = 0;
+  let skipped = 0;
+  let notFound = 0;
+
+  for (const commandName of commandSet) {
+    const commandFile = resolve(commandsDir, `${commandName}.md`);
+    const skillDir = resolve(skillsBaseDir, commandName);
+    const skillFile = resolve(skillDir, 'SKILL.md');
+
+    try {
+      await access(commandFile);
+    } catch {
+      console.warn(`  Command file not found: ${commandName}.md`);
+      notFound++;
+      continue;
+    }
+
+    try {
+      await access(skillFile);
+      skipped++;
+      continue;
+    } catch {
+      // file doesn't exist yet, proceed
+    }
+
+    const content = await readFile(commandFile, 'utf-8');
+
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+    let skillContent;
+
+    if (frontmatterMatch) {
+      const originalFm = frontmatterMatch[1].trim();
+      const body = frontmatterMatch[2];
+
+      const nameMatch = originalFm.match(/^name:\s*(.+)$/m);
+      const commandDisplayName = nameMatch ? nameMatch[1].trim() : commandName;
+
+      const newFrontmatter = [
+        `---`,
+        `name: ${commandName}`,
+        `description: Implementation of ${commandDisplayName} command`,
+        `---`
+      ].join('\n');
+
+      skillContent = newFrontmatter + '\n\n' + body;
+    } else {
+      skillContent = `---\nname: ${commandName}\ndescription: Implementation of ${commandName} command\n---\n\n` + content;
+    }
+
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(skillFile, skillContent, 'utf-8');
+    created++;
+  }
+
+  console.log(`Skill wrappers: created ${created}, skipped ${skipped} (already exist), not found ${notFound}`);
+  return { created, skipped, notFound };
+}
+
 /**
  * Main execution
  */
@@ -483,6 +636,19 @@ async function main() {
   }
 
   console.log('');
+
+  console.log('Checking command files for missing name: in frontmatter...');
+  await ensureCommandNames(args.apply);
+  console.log('');
+
+  const skillRefs = await discoverGsdSkillReferences(config.patterns);
+  if (skillRefs.size > 0) {
+    console.log(`Discovered ${skillRefs.size} gsd skill reference(s): ${[...skillRefs].join(', ')}`);
+    await generateSkillWrappers([...skillRefs]);
+  } else {
+    console.log('No gsd skill references found in processed files.');
+  }
+
   console.log(formatter.formatSuccess('Done!'));
   process.exit(EXIT_SUCCESS);
 }

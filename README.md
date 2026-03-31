@@ -1,6 +1,6 @@
 <div align="left">
 
-# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.22.4 - 2026-03-03)
+# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.30.0 - 2026-03-30)
 
 **A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (Adapted for OpenCode by rokicool and enthusiasts)**
 
@@ -86,6 +86,12 @@ That's what this is. No enterprise roleplay bullshit. Just an incredibly effecti
 I just love both GSD and OpenCode. I felt like having GSD available only for Claude Code is not fair. 
 
 — **Roman**
+
+## Version 1.30.0
+
+We are keeping up with original GSDv1 v1.30.0 (2026-03-30)
+
+There is a controvertial solution I used to support "skill(skill='command-name')" syntax. Apart from that everything is expected to be fully functional.
 
 ## Version 1.22.1
 

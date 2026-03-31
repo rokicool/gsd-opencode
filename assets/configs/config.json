@@ -264,13 +264,21 @@
       "description": "Generic regex to convert any remaining tools list to YAML map"
     },
     {
-      "_comment": "Generic regex fallback for any remaining tools: lines",
+      "_comment": "allowed-tools with inline tool list (e.g. 'allowed-tools: Read, Write, Edit')",
+      "pattern": "^allowed-tools: ([A-Za-z, ]+)$",
+      "replacement": "permissions",
+      "caseSensitive": true,
+      "isRegex": true,
+      "transform": "allowed_tools_inline_to_yaml",
+      "description": "Convert inline allowed-tools list to YAML permissions map"
+    },
+    {
+      "_comment": "allowed-tools without inline list (multiline, already handled by - Read rules)",
       "pattern": "allowed-tools:",
       "replacement": "permissions:",
       "caseSensitive": true,
       "isRegex": false,
-      "transform": "allowed-tools to permissions",
-      "description": ""
+      "description": "Rename allowed-tools key to permissions for multiline format"
     },
     {
       "pattern": "<sub>",
@@ -321,6 +329,12 @@
       "description": "Transform named color purple to hex"
     },
     {
+      "pattern": "color: magenta",
+      "replacement": "color: \"#FF00FF\"",
+      "caseSensitive": true,
+      "description": "Transform named color purple to hex"
+    },
+    {
       "pattern": "All arguments become",
       "replacement": "$ARGUMENTS become",
       "caseSensitive": true,
@@ -333,6 +347,16 @@
       "description": "Transform general-purpose subagent type to general"
     },
     {
+      "pattern": "'general-purpose'",
+      "replacement": "'general'",
+      "description": "Fix: quoted general-purpose subagent type name to general"
+    },
+    {
+      "pattern": "general-purpose research agent",
+      "replacement": "general research agent",
+      "description": "Fix: general-purpose research agent description in discuss-phase-assumptions"
+    },
+    {
       "pattern": "subagent_type=\"Explore\"",
       "replacement": "subagent_type=\"explore\"",
       "caseSensitive": true,
@@ -343,6 +367,16 @@
       "replacement": "subagent_type=\"general\"",
       "caseSensitive": true,
       "description": "Transform task subagent type to general"
+    },
+    {
+      "pattern": "skill(skill=\"gsd:",
+      "replacement": "skill(skill=\"gsd-",
+      "description": "Fix: v1.30.0 introduced skill() calls with gsd: prefix instead of gsd- prefix"
+    },
+    {
+      "pattern": "`gsd:discuss-phase`",
+      "replacement": "`gsd-discuss-phase`",
+      "description": "Fix: standalone gsd:discuss-phase reference in autonomous.md note"
     },
     {
       "pattern": "CLAUDE.md",
@@ -398,6 +432,31 @@
       "pattern": "get-shit-done/workflows/set-profile.md",
       "replacement": "get-shit-done/workflows/oc-set-profile.md",
       "description": "Use OpenCode related process instead of Claude Code's one"
+    },
+    {
+      "pattern": "!`node \"$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs\" config-set-model-profile $ARGUMENTS --raw`",
+      "replacement": "<objective>\n      Switch the model profile used by GSD agents. Controls which OpenCode model each agent uses, balancing quality vs token spend.\n\n      Routes to the set-profile workflow which handles:\n      - Argument validation (simple/smart/genius)\n      - Config file creation if missing\n      - Profile update in config.json\n      - Confirmation with model table display\n      </objective>\n\n      <execution_context>\n      @$HOME/.config/opencode/get-shit-done/workflows/oc-set-profile.md\n      </execution_context>\n\n      <process>\n      **Follow the set-profile workflow** from `@$HOME/.config/opencode/get-shit-done/workflows/oc-set-profile.md`.\n\n      The workflow handles all logic including:\n      1. Profile argument validation\n      2. Config file ensuring\n      3. Config reading and updating\n      4. Model table generation from MODEL_PROFILES\n      5. Confirmation display\n      </process> ",
+      "description": "Use OpenCode related process instead of Claude Code's one"
+    },
+    {
+      "pattern": "<purpose>",
+      "replacement": "<objective>",
+      "description": "gsd-reapply-patches.md"
+    },
+    {
+      "pattern": "</purpose>",
+      "replacement": "</objective>",
+      "description": "gsd-reapply-patches.md"
+    },
+    {
+      "pattern": "Manage parallel workstreams for concurrent milestone work.",
+      "replacement": "<objective>\nManage parallel workstreams for concurrent milestone work.\n</objective>",
+      "description": "gsd-reapply-patches.md"
+    },
+    {
+      "pattern": "Show the following output to the user verbatim, with no extra commentary:",
+      "replacement": "",
+      "description": "gsd-set-profile"
     },
     {
       "pattern": "default: `balanced`",
@@ -495,6 +554,7 @@
     "name: set-profile",
     "subagent_type=\"general-purpose\"",
     "subagent_type=\"Explore\"",
-    "CLAUDE.md"
+    "CLAUDE.md",
+    "config-set-model-profile"
   ]
 }

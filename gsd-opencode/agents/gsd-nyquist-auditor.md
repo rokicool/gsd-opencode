@@ -10,8 +10,6 @@ tools:
    glob: true
    grep: true
 color: "#8B5CF6"
-skills:
-  - gsd-nyquist-auditor-workflow
 ---
 
 <role>
