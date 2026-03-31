@@ -269,6 +269,67 @@ async function loadConfig(configPath) {
   return loadConfigs([configPath]);
 }
 
+async function ensureCommandNames(apply) {
+  const commandsDir = resolve(__dirname, '../../gsd-opencode/commands/gsd');
+
+  let commandFiles;
+  try {
+    commandFiles = await glob(['*.md'], { cwd: commandsDir, onlyFiles: true, absolute: true });
+  } catch {
+    console.log('No command files found to check for missing name: field.');
+    return { fixed: 0, missing: 0 };
+  }
+
+  if (!commandFiles || commandFiles.length === 0) {
+    console.log('No command files found to check for missing name: field.');
+    return { fixed: 0, missing: 0 };
+  }
+
+  let fixed = 0;
+  let missing = 0;
+
+  for (const filePath of commandFiles) {
+    const commandName = basename(filePath, '.md');
+    let content;
+
+    try {
+      content = await readFile(filePath, 'utf-8');
+    } catch {
+      continue;
+    }
+
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!frontmatterMatch) continue;
+
+    const frontmatter = frontmatterMatch[1];
+
+    if (/^name:/m.test(frontmatter)) continue;
+
+    missing++;
+    const newFrontmatter = `name: ${commandName}\n${frontmatter}`;
+    const newContent = content.replace(
+      /^---\n([\s\S]*?)\n---/,
+      `---\n${newFrontmatter}\n---`
+    );
+
+    if (apply) {
+      await writeFile(filePath, newContent, 'utf-8');
+      console.log(`  Fixed missing name: in ${commandName}.md`);
+      fixed++;
+    } else {
+      console.log(`  [dry-run] Would add name: ${commandName} to ${commandName}.md`);
+    }
+  }
+
+  if (missing > 0) {
+    console.log(`Command name check: ${missing} file(s) missing name: field${apply ? `, ${fixed} fixed` : ' (dry-run)'}`);
+  } else {
+    console.log('All command files have name: in frontmatter.');
+  }
+
+  return { fixed, missing };
+}
+
 async function discoverGsdSkillReferences(searchPatterns) {
   const files = await glob(searchPatterns, {
     ignore: ['node_modules/**', '.git/**'],
@@ -574,6 +635,10 @@ async function main() {
     console.log(formatter.formatWarning('This was a dry-run. Use --apply to make changes.'));
   }
 
+  console.log('');
+
+  console.log('Checking command files for missing name: in frontmatter...');
+  await ensureCommandNames(args.apply);
   console.log('');
 
   const skillRefs = await discoverGsdSkillReferences(config.patterns);

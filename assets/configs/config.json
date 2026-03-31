@@ -434,6 +434,16 @@
       "description": "Use OpenCode related process instead of Claude Code's one"
     },
     {
+      "pattern": "!`node \"$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs\" config-set-model-profile $ARGUMENTS --raw`",
+      "replacement": "<objective>\n      Switch the model profile used by GSD agents. Controls which OpenCode model each agent uses, balancing quality vs token spend.\n\n      Routes to the set-profile workflow which handles:\n      - Argument validation (simple/smart/genius)\n      - Config file creation if missing\n      - Profile update in config.json\n      - Confirmation with model table display\n      </objective>\n\n      <execution_context>\n      @$HOME/.config/opencode/get-shit-done/workflows/oc-set-profile.md\n      </execution_context>\n\n      <process>\n      **Follow the set-profile workflow** from `@$HOME/.config/opencode/get-shit-done/workflows/oc-set-profile.md`.\n\n      The workflow handles all logic including:\n      1. Profile argument validation\n      2. Config file ensuring\n      3. Config reading and updating\n      4. Model table generation from MODEL_PROFILES\n      5. Confirmation display\n      </process> ",
+      "description": "Use OpenCode related process instead of Claude Code's one"
+    },
+    {
+      "pattern": "Show the following output to the user verbatim, with no extra commentary:",
+      "replacement": "",
+      "description": "gsd-set-profile"
+    },
+    {
       "pattern": "default: `balanced`",
       "replacement": "default: `simple`",
       "description": "Use simple - one model for all agents - profile"
@@ -529,6 +539,7 @@
     "name: set-profile",
     "subagent_type=\"general-purpose\"",
     "subagent_type=\"Explore\"",
-    "CLAUDE.md"
+    "CLAUDE.md",
+    "config-set-model-profile"
   ]
 }
