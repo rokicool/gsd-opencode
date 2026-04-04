@@ -1,0 +1,181 @@
+{
+  "_description": "Replace task() calls with @subagent_type shorthand syntax for gsd subagent types",
+  "_source": "Claude Code (get-shit-done-cc)",
+  "_target": "OpenCode (gsd-opencode)",
+  "_usage": "node assets/bin/gsd-translate-in-place.js assets/configs/remove-task.json [--apply] [--show-diff]",
+  "include": [
+    "gsd-opencode/commands/gsd/**",
+    "gsd-opencode/get-shit-done/references/**",
+    "gsd-opencode/get-shit-done/templates/**",
+    "gsd-opencode/get-shit-done/workflows/**"
+  ],
+  "exclude": [
+    "node_modules/**",
+    "gsd-opencode/node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "assets/**",
+    "**/*.bak",
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.gif",
+    "**/*.ico",
+    "**/*.svg",
+    "original/**"
+  ],
+  "maxFileSize": 10485760,
+  "rules": [
+    {
+      "_comment": "1a. Multiline task() with variable prompt, model, description (standard 4-line format)",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=(\\w+),\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$2 $1",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() with variable prompt to @subagent shorthand"
+    },
+    {
+      "_comment": "1b. Multiline task() with quoted prompt, model, description",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=\"([^\"]+)\",\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$2 \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() with quoted prompt to @subagent shorthand"
+    },
+    {
+      "_comment": "2a. Single-line task() with variable prompt, model, description",
+      "pattern": "task\\(\\s*prompt=(\\w+)\\s*,\\s*subagent_type=\"(gsd-[^\"]+)\"\\s*,\\s*model=\"[^\"]*\"\\s*,\\s*description=\"[^\"]*\"\\s*\\)",
+      "replacement": "@$2 $1",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace single-line task() with variable prompt to @subagent shorthand"
+    },
+    {
+      "_comment": "2b. Single-line task() with quoted prompt, model, description",
+      "pattern": "task\\(\\s*prompt=\"([^\"]+)\"\\s*,\\s*subagent_type=\"(gsd-[^\"]+)\"\\s*,\\s*model=\"[^\"]*\"\\s*,\\s*description=\"[^\"]*\"\\s*\\)",
+      "replacement": "@$2 \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace single-line task() with quoted prompt to @subagent shorthand"
+    },
+    {
+      "_comment": "3. task() with triple-quoted prompt: task(prompt=\"\"\"...\"\"\", subagent_type=\"gsd-xxx\", ...)",
+      "pattern": "task\\(\\s*prompt=\"\"\"([\\s\\S]*?)\"\"\"\\s*,\\s*subagent_type=\"(gsd-[^\"]+)\"\\s*,\\s*model=\"[^\"]*\"\\s*,\\s*description=\"[^\"]*\"\\s*\\)",
+      "replacement": "@$2 \"\"\"$1\"\"\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace task() with triple-quoted prompt to @subagent shorthand"
+    },
+    {
+      "_comment": "4a. Multiline task() with variable prompt, description only (no model)",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=(\\w+),\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$2 $1",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() without model to @subagent shorthand"
+    },
+    {
+      "_comment": "4b. Single-line task() with variable prompt, description only (no model)",
+      "pattern": "task\\(\\s*prompt=(\\w+)\\s*,\\s*subagent_type=\"(gsd-[^\"]+)\"\\s*,\\s*description=\"[^\"]*\"\\s*\\)",
+      "replacement": "@$2 $1",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace single-line task() without model to @subagent shorthand"
+    },
+    {
+      "_comment": "5a. Multiline task() with variable prompt, extra args (isolation etc), description, no model",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=([^,\\n]+),\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n(?:\\s*\\w+=\"?[^\"]*\"?\\s*,?\\s*\\r?\\n)*\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$2 $1",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() with extra args, no model, to @subagent shorthand"
+    },
+    {
+      "_comment": "6. task() with subagent_type first and triple-quoted prompt",
+      "pattern": "task\\(subagent_type=\"(gsd-[^\"]+)\",\\s*prompt=\"\"\"([\\s\\S]*?)\"\"\"\\s*\\)",
+      "replacement": "@$1 \"\"\"$2\"\"\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace task() with subagent_type first and triple-quoted prompt"
+    },
+    {
+      "_comment": "7. Multiline task() with expression prompt (containing + operator)",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=([^,]+\\+[^,]+),\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",",
+      "replacement": "@$2 $1",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace task() with expression prompt to @subagent shorthand"
+    },
+    {
+      "_comment": "8. Multiline task() with variable prompt and trailing comment",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=(\\w+),\\s*(?:#[^\\n]*)?\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$2 $1",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() with comment to @subagent shorthand"
+    },
+    {
+      "_comment": "9. Multiline task() with variable prompt, trailing comment, model, description",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=(\\w+),\\s*(?:#[^\\n]*)?\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$2 $1",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() with comment and model to @subagent shorthand"
+    },
+    {
+      "_comment": "10. Multiline task() with quoted prompt containing newlines, subagent_type, model (no description)",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=\"([^\"]+\\n[^\"]*)\",\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*model=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$2 \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() with multiline quoted prompt, no description"
+    },
+    {
+      "_comment": "11. Multiline task() with quoted prompt containing newlines, subagent_type, model, description",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=\"([^\"]+\\n[^\"]*)\",\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$2 \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() with multiline quoted prompt to @subagent shorthand"
+    },
+    {
+      "_comment": "12. Multiline task() with subagent_type first, model, extra args, description, quoted prompt at end",
+      "pattern": "task\\(\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n(?:\\s*\\w+=\"?[^\"]*\"?\\s*,\\s*\\r?\\n)*\\s*description=\"[^\"]*\",\\s*\\r?\\n\\s*prompt=\"([^\"]+)\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$1 \"$2\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() with subagent_type first, prompt last to @subagent shorthand"
+    },
+    {
+      "_comment": "13. Multiline task() with subagent_type first, extra args, multiline quoted prompt at end (map-codebase pattern)",
+      "pattern": "task\\(\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n(?:\\s*\\w+=.+\\s*\\r?\\n)*\\s*description=\"[^\"]*\",\\s*\\r?\\n\\s*prompt=\"([^\"]+)\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$1 \"$2\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace task() subagent_type first with prompt last (map-codebase pattern)"
+    },
+    {
+      "_comment": "14. Indented task() with subagent_type first, model, isolation, multiline quoted prompt (execute-phase deep indent)",
+      "pattern": "task\\(\\s*\\r?\\n\\s+subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s+model=\"[^\"]*\",\\s*\\r?\\n\\s+isolation=\"[^\"]*\",\\s*\\r?\\n\\s+prompt=\"([\\s\\S]*?)\"\\s*\\r?\\n\\s+\\)",
+      "replacement": "@$1 \"$2\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace indented task() with subagent_type first, isolation, prompt last (execute-phase deep indent)"
+    },
+    {
+      "_comment": "15. Multiline task() with quoted prompt containing newlines, subagent_type, model, extra args, description",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=\"([^\"]+)\",\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n\\s*\\w+=\"[^\"]*\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$2 \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() with extra arg (isolation) between model and description"
+    },
+    {
+      "_comment": "16. Multiline task() with expression prompt (multi-line + concatenation), subagent_type, model, description",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=\"([^\"]+)\"\\s*\\+[\\s\\S]+?,\\s*\\r?\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@$2 \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace multiline task() with multi-line expression prompt to @subagent shorthand"
+    }
+  ]
+}

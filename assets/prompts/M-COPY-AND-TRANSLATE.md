@@ -11,7 +11,8 @@ This project maintains `gsd-opencode/` as an adapted fork of the upstream `origi
 1. **Copy** -- pull latest files from the submodule into `gsd-opencode/`
 2. **Translate** -- replace Claude Code naming, paths, tools, and commands with OpenCode equivalents
 3. **Add Agents Mode** -- inject `mode: subagent` into all agent definition files
-4. **Validate** -- ensure zero forbidden strings remain in the translated files
+4. **Modify Agent Calls** -- replace `task()` calls with `@subagent_type` shorthand syntax
+5. **Validate** -- ensure zero forbidden strings remain in the translated files
 
 ### Tools
 
@@ -124,6 +125,96 @@ node assets/bin/gsd-translate-in-place.js assets/configs/add-agent-mode.json
 ```
 
 **Expected output**: 0 changes remaining (all agent files have `mode: subagent`).
+
+---
+
+## Step 2C: Modify Agent Calls
+
+Replace `task()` function calls with the OpenCode `@subagent_type` shorthand syntax. The config `assets/configs/remove-task.json` contains regex rules that match the most common `task()` call patterns found in commands, workflows, references, and templates.
+
+**Scope**: Only files in `gsd-opencode/commands/gsd/`, `gsd-opencode/get-shit-done/references/`, `gsd-opencode/get-shit-done/templates/`, and `gsd-opencode/get-shit-done/workflows/`.
+
+**What gets replaced** (examples):
+
+```
+# Before (multiline variable prompt)
+task(
+  prompt=filled_prompt,
+  subagent_type="gsd-phase-researcher",
+  model="{researcher_model}",
+  description="Research Phase {phase}"
+)
+
+# After
+@gsd-phase-researcher filled_prompt
+```
+
+```
+# Before (single-line quoted prompt)
+task(prompt="Stack research", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Stack research")
+
+# After
+@gsd-project-researcher "Stack research"
+```
+
+```
+# Before (triple-quoted prompt)
+task(
+  prompt="""<objective>...""",
+  subagent_type="gsd-planner",
+  model="{planner_model}",
+  description="Plan Phase {phase}"
+)
+
+# After
+@gsd-planner """<objective>..."""
+```
+
+**What does NOT get replaced**: Prose references to `subagent_type=` inside inline code spans (e.g., `` `subagent_type="gsd-executor"` ``) are left untouched -- they are documentation, not function calls.
+
+### 2Ca. Preview
+
+```bash
+node assets/bin/gsd-translate-in-place.js assets/configs/remove-task.json --show-diff
+```
+
+**What to check:**
+- Files affected are only within the scoped directories (commands, references, templates, workflows)
+- Each diff shows a `task(...)` call replaced with an `@subagent_type ...` shorthand
+- No `oc-` or `-oc-` files appear in the output
+- Prose references (inside backticks) are NOT modified
+- Verify the extracted prompt value is correct for each replacement (no truncated prompts)
+
+**Common issues to watch for:**
+- **Truncated multiline prompts**: Some `task()` calls have massive multi-line prompts (50+ lines). If a replacement looks like it captured only part of the prompt, note it for manual review.
+- **Expression prompts**: Prompts using string concatenation (`+`) may only capture the first segment -- verify these replacements look correct.
+- **Unmatched calls**: Not every `task()` variant is covered by regex. Complex patterns (deeply indented, extra args in unusual positions) may need manual conversion.
+
+### 2Cb. Apply
+
+```bash
+node assets/bin/gsd-translate-in-place.js assets/configs/remove-task.json --apply
+```
+
+### 2Cc. Verify
+
+```bash
+node assets/bin/gsd-translate-in-place.js assets/configs/remove-task.json
+```
+
+**Expected output**: 0 changes remaining (all matching `task()` calls already replaced).
+
+### 2Cd. Manual review of unmatched calls
+
+After apply, search for any remaining `task(` calls with `gsd-` subagent types that were not auto-replaced:
+
+```bash
+grep -rn 'subagent_type="gsd-' gsd-opencode/commands/gsd/ gsd-opencode/get-shit-done/references/ gsd-opencode/get-shit-done/templates/ gsd-opencode/get-shit-done/workflows/ || echo "No remaining task() calls"
+```
+
+If results are found:
+- Check if each is a prose reference (inside backticks or plain text) -- these are correct to leave as-is
+- If any are actual `task()` calls that the regex missed, convert them manually following the pattern: `@subagent_type prompt_value`
 
 ---
 
@@ -262,6 +353,12 @@ When the workflow completes (forbidden strings check passes), produce this repor
 - Agent files processed: N
 - Files with mode added: N
 - Files skipped (already had mode): N
+
+### Step 2C: Modify Agent Calls
+- Config used: assets/configs/remove-task.json
+- Files modified: N
+- Total task() calls replaced: N
+- Manual conversions needed: N (list files if any)
 
 ### Step 4: Validate
 - Forbidden strings check: PASSED
