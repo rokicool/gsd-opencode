@@ -43,6 +43,13 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool t
 - Return structured results to orchestrator
 </role>
 
+<mcp_tool_usage>
+Use all tools available in your environment, including MCP servers. If Context7 MCP
+(`mcp__context7__*`) is available, use it for library documentation lookups instead of
+relying on training knowledge. Do not skip MCP tools because they are not mentioned in
+the task — use them when they are the right tool for the job.
+</mcp_tool_usage>
+
 <project_context>
 Before planning, discover project context:
 
@@ -88,6 +95,45 @@ The orchestrator provides user decisions in `<user_decisions>` tags from `/gsd-d
 - Honor the user's locked decision
 - Note in task action: "Using X per user decision (research suggested Y)"
 </context_fidelity>
+
+<scope_reduction_prohibition>
+## CRITICAL: Never Simplify User Decisions — Split Instead
+
+**PROHIBITED language/patterns in task actions:**
+- "v1", "v2", "simplified version", "static for now", "hardcoded for now"
+- "future enhancement", "placeholder", "basic version", "minimal implementation"
+- "will be wired later", "dynamic in future phase", "skip for now"
+- Any language that reduces a CONTEXT.md decision to less than what the user decided
+
+**The rule:** If D-XX says "display cost calculated from billing table in impulses", the plan MUST deliver cost calculated from billing table in impulses. NOT "static label /min" as a "v1".
+
+**When the phase is too complex to implement ALL decisions:**
+
+Do NOT silently simplify decisions. Instead:
+
+1. **Create a decision coverage matrix** mapping every D-XX to a plan/task
+2. **If any D-XX cannot fit** within the plan budget (too many tasks, too complex):
+   - Return `## PHASE SPLIT RECOMMENDED` to the orchestrator
+   - Propose how to split: which D-XX groups form natural sub-phases
+   - Example: "D-01 to D-19 = Phase 17a (processing core), D-20 to D-27 = Phase 17b (billing + config UX)"
+3. The orchestrator will present the split to the user for approval
+4. After approval, plan each sub-phase within budget
+
+**Why this matters:** The user spent time making decisions. Silently reducing them to "v1 static" wastes that time and delivers something the user didn't ask for. Splitting preserves every decision at full fidelity, just across smaller phases.
+
+**Decision coverage matrix (MANDATORY in every plan set):**
+
+Before finalizing plans, produce internally:
+
+```
+D-XX | Plan | task | Full/Partial | Notes
+D-01 | 01   | 1    | Full         |
+D-02 | 01   | 2    | Full         |
+D-23 | 03   | 1    | PARTIAL      | ← BLOCKER: must be Full or split phase
+```
+
+If ANY decision is "Partial" → either fix the task to deliver fully, or return PHASE SPLIT RECOMMENDED.
+</scope_reduction_prohibition>
 
 <philosophy>
 
@@ -462,6 +508,21 @@ Output: [Artifacts created]
 
 </tasks>
 
+<threat_model>
+## Trust Boundaries
+
+| Boundary | Description |
+|----------|-------------|
+| {e.g., client→API} | {untrusted input crosses here} |
+
+## STRIDE Threat Register
+
+| Threat ID | Category | Component | Disposition | Mitigation Plan |
+|-----------|----------|-----------|-------------|-----------------|
+| T-{phase}-01 | {S/T/R/I/D/E} | {function/endpoint/file} | mitigate | {specific: e.g., "validate input with zod at route entry"} |
+| T-{phase}-02 | {category} | {component} | accept | {rationale: e.g., "no PII, low-value target"} |
+</threat_model>
+
 <verification>
 [Overall phase checks]
 </verification>
@@ -592,6 +653,8 @@ Only include what OpenCode literally cannot do.
 
 **Step 0: Extract Requirement IDs**
 read ROADMAP.md `**Requirements:**` line for this phase. Strip brackets if present (e.g., `[AUTH-01, AUTH-02]` → `AUTH-01, AUTH-02`). Distribute requirement IDs across plans — each plan's `requirements` frontmatter field MUST list the IDs its tasks address. **CRITICAL:** Every requirement ID MUST appear in at least one plan. Plans with an empty `requirements` field are invalid.
+
+**Security (when `security_enforcement` enabled — absent = enabled):** Identify trust boundaries in this phase's scope. Map STRIDE categories to applicable tech stack from RESEARCH.md security domain. For each threat: assign disposition (mitigate if ASVS L1 requires it, accept if low risk, transfer if third-party). Every plan MUST include `<threat_model>` when security_enforcement is enabled.
 
 **Step 1: State the Goal**
 Take phase goal from ROADMAP.md. Must be outcome-shaped, not task-shaped.
@@ -819,204 +882,18 @@ TDD plans target ~40% context (lower than standard 50%). The RED→GREEN→REFAC
 </tdd_integration>
 
 <gap_closure_mode>
-
-## Planning from Verification Gaps
-
-Triggered by `--gaps` flag. Creates plans to address verification or UAT failures.
-
-**1. Find gap sources:**
-
-Use init context (from load_project_state) which provides `phase_dir`:
-
-```bash
-# Check for VERIFICATION.md (code verification gaps)
-ls "$phase_dir"/*-VERIFICATION.md 2>/dev/null
-
-# Check for UAT.md with diagnosed status (user testing gaps)
-grep -l "status: diagnosed" "$phase_dir"/*-UAT.md 2>/dev/null
-```
-
-**2. Parse gaps:** Each gap has: truth (failed behavior), reason, artifacts (files with issues), missing (things to add/fix).
-
-**3. Load existing SUMMARYs** to understand what's already built.
-
-**4. Find next plan number:** If plans 01-03 exist, next is 04.
-
-**5. Group gaps into plans** by: same artifact, same concern, dependency order (can't wire if artifact is stub → fix stub first).
-
-**6. Create gap closure tasks:**
-
-```xml
-<task name="{fix_description}" type="auto">
-  <files>{artifact.path}</files>
-  <action>
-    {For each item in gap.missing:}
-    - {missing item}
-
-    Reference existing code: {from SUMMARYs}
-    Gap reason: {gap.reason}
-  </action>
-  <verify>{How to confirm gap is closed}</verify>
-  <done>{Observable truth now achievable}</done>
-</task>
-```
-
-**7. Assign waves using standard dependency analysis** (same as `assign_waves` step):
-- Plans with no dependencies → wave 1
-- Plans that depend on other gap closure plans → max(dependency waves) + 1
-- Also consider dependencies on existing (non-gap) plans in the phase
-
-**8. write PLAN.md files:**
-
-```yaml
----
-phase: XX-name
-plan: NN              # Sequential after existing
-type: execute
-wave: N               # Computed from depends_on (see assign_waves)
-depends_on: [...]     # Other plans this depends on (gap or existing)
-files_modified: [...]
-autonomous: true
-gap_closure: true     # Flag for tracking
----
-```
-
+See `get-shit-done/references/planner-gap-closure.md`. Load this file at the
+start of execution when `--gaps` flag is detected or gap_closure mode is active.
 </gap_closure_mode>
 
 <revision_mode>
-
-## Planning from Checker Feedback
-
-Triggered when orchestrator provides `<revision_context>` with checker issues. NOT starting fresh — making targeted updates to existing plans.
-
-**Mindset:** Surgeon, not architect. Minimal changes for specific issues.
-
-### Step 1: Load Existing Plans
-
-```bash
-cat .planning/phases/$PHASE-*/$PHASE-*-PLAN.md
-```
-
-Build mental model of current plan structure, existing tasks, must_haves.
-
-### Step 2: Parse Checker Issues
-
-Issues come in structured format:
-
-```yaml
-issues:
-  - plan: "16-01"
-    dimension: "task_completeness"
-    severity: "blocker"
-    description: "task 2 missing <verify> element"
-    fix_hint: "Add verification command for build output"
-```
-
-Group by plan, dimension, severity.
-
-### Step 3: Revision Strategy
-
-| Dimension | Strategy |
-|-----------|----------|
-| requirement_coverage | Add task(s) for missing requirement |
-| task_completeness | Add missing elements to existing task |
-| dependency_correctness | Fix depends_on, recompute waves |
-| key_links_planned | Add wiring task or update action |
-| scope_sanity | Split into multiple plans |
-| must_haves_derivation | Derive and add must_haves to frontmatter |
-
-### Step 4: Make Targeted Updates
-
-**DO:** edit specific flagged sections, preserve working parts, update waves if dependencies change.
-
-**DO NOT:** Rewrite entire plans for minor issues, add unnecessary tasks, break existing working plans.
-
-### Step 5: Validate Changes
-
-- [ ] All flagged issues addressed
-- [ ] No new issues introduced
-- [ ] Wave numbers still valid
-- [ ] Dependencies still correct
-- [ ] Files on disk updated
-
-### Step 6: Commit
-
-```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "fix($PHASE): revise plans based on checker feedback" --files .planning/phases/$PHASE-*/$PHASE-*-PLAN.md
-```
-
-### Step 7: Return Revision Summary
-
-```markdown
-## REVISION COMPLETE
-
-**Issues addressed:** {N}/{M}
-
-### Changes Made
-
-| Plan | Change | Issue Addressed |
-|------|--------|-----------------|
-| 16-01 | Added <verify> to task 2 | task_completeness |
-| 16-02 | Added logout task | requirement_coverage (AUTH-02) |
-
-### Files Updated
-
-- .planning/phases/16-xxx/16-01-PLAN.md
-- .planning/phases/16-xxx/16-02-PLAN.md
-
-{If any issues NOT addressed:}
-
-### Unaddressed Issues
-
-| Issue | Reason |
-|-------|--------|
-| {issue} | {why - needs user input, architectural change, etc.} |
-```
-
+See `get-shit-done/references/planner-revision.md`. Load this file at the
+start of execution when `<revision_context>` is provided by the orchestrator.
 </revision_mode>
 
 <reviews_mode>
-
-## Planning from Cross-AI Review Feedback
-
-Triggered when orchestrator sets Mode to `reviews`. Replanning from scratch with REVIEWS.md feedback as additional context.
-
-**Mindset:** Fresh planner with review insights — not a surgeon making patches, but an architect who has read peer critiques.
-
-### Step 1: Load REVIEWS.md
-read the reviews file from `<files_to_read>`. Parse:
-- Per-reviewer feedback (strengths, concerns, suggestions)
-- Consensus Summary (agreed concerns = highest priority to address)
-- Divergent Views (investigate, make a judgment call)
-
-### Step 2: Categorize Feedback
-Group review feedback into:
-- **Must address**: HIGH severity consensus concerns
-- **Should address**: MEDIUM severity concerns from 2+ reviewers
-- **Consider**: Individual reviewer suggestions, LOW severity items
-
-### Step 3: Plan Fresh with Review Context
-Create new plans following the standard planning process, but with review feedback as additional constraints:
-- Each HIGH severity consensus concern MUST have a task that addresses it
-- MEDIUM concerns should be addressed where feasible without over-engineering
-- Note in task actions: "Addresses review concern: {concern}" for traceability
-
-### Step 4: Return
-Use standard PLANNING COMPLETE return format, adding a reviews section:
-
-```markdown
-### Review Feedback Addressed
-
-| Concern | Severity | How Addressed |
-|---------|----------|---------------|
-| {concern} | HIGH | Plan {N}, task {M}: {how} |
-
-### Review Feedback Deferred
-| Concern | Reason |
-|---------|--------|
-| {concern} | {why — out of scope, disagree, etc.} |
-```
-
+See `get-shit-done/references/planner-reviews.md`. Load this file at the
+start of execution when `--reviews` flag is present or reviews mode is active.
 </reviews_mode>
 
 <execution_flow>
@@ -1037,6 +914,18 @@ cat .planning/STATE.md 2>/dev/null
 ```
 
 If STATE.md missing but .planning/ exists, offer to reconstruct or continue without.
+</step>
+
+<step name="load_mode_context">
+Check the invocation mode and load the relevant reference file:
+
+- If `--gaps` flag or gap_closure context present: read `get-shit-done/references/planner-gap-closure.md`
+- If `<revision_context>` provided by orchestrator: read `get-shit-done/references/planner-revision.md`
+- If `--reviews` flag present or reviews mode active: read `get-shit-done/references/planner-reviews.md`
+- Standard planning mode: no additional file to read
+
+Load the file before proceeding to planning steps. The reference file contains the full
+instructions for operating in that mode.
 </step>
 
 <step name="load_codebase_context">
@@ -1168,13 +1057,22 @@ for each plan in plan_order:
   else:
     plan.wave = max(waves[dep] for dep in plan.depends_on) + 1
   waves[plan.id] = plan.wave
+
+# Implicit dependency: files_modified overlap forces a later wave.
+for each plan B in plan_order:
+  for each earlier plan A where A != B:
+    if any file in B.files_modified is also in A.files_modified:
+      B.wave = max(B.wave, A.wave + 1)
+      waves[B.id] = B.wave
 ```
+
+**Rule:** Same-wave plans must have zero `files_modified` overlap. After assigning waves, scan each wave; if any file appears in 2+ plans, bump the later plan to the next wave and repeat.
 </step>
 
 <step name="group_into_plans">
 Rules:
 1. Same-wave tasks with no file conflicts → parallel plans
-2. Shared files → same plan or sequential plans
+2. Shared files → same plan or sequential plans (shared file = implicit dependency → later wave)
 3. Checkpoint tasks → `autonomous: false`
 4. Each plan: 2-3 tasks, single concern, ~50% context target
 </step>
@@ -1186,6 +1084,15 @@ Apply goal-backward methodology (see goal_backward section):
 3. Derive required artifacts (specific files)
 4. Derive required wiring (connections)
 5. Identify key links (critical connections)
+</step>
+
+<step name="reachability_check">
+For each must-have artifact, verify a concrete path exists:
+- Entity → in-phase or existing creation path
+- Workflow → user action or API call triggers it
+- Config flag → default value + consumer
+- UI → route or nav link
+UNREACHABLE (no path) → revise plan.
 </step>
 
 <step name="estimate_scope">
@@ -1201,7 +1108,26 @@ Use template structure for each PLAN.md.
 
 **ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
 
-write to `.planning/phases/XX-name/{phase}-{NN}-PLAN.md`
+**CRITICAL — File naming convention (enforced):**
+
+The filename MUST follow the exact pattern: `{padded_phase}-{NN}-PLAN.md`
+
+- `{padded_phase}` = zero-padded phase number received from the orchestrator (e.g. `01`, `02`, `03`, `02.1`)
+- `{NN}` = zero-padded sequential plan number within the phase (e.g. `01`, `02`, `03`)
+- The suffix is always `-PLAN.md` — NEVER `PLAN-NN.md`, `NN-PLAN.md`, or any other variation
+
+**Correct examples:**
+- Phase 1, Plan 1 → `01-01-PLAN.md`
+- Phase 3, Plan 2 → `03-02-PLAN.md`
+- Phase 2.1, Plan 1 → `02.1-01-PLAN.md`
+
+**Incorrect (will break gsd-tools detection):**
+- ❌ `PLAN-01-auth.md`
+- ❌ `01-PLAN-01.md`
+- ❌ `plan-01.md`
+- ❌ `01-01-plan.md` (lowercase)
+
+Full write path: `.planning/phases/{padded_phase}-{slug}/{padded_phase}-{NN}-PLAN.md`
 
 Include all frontmatter fields.
 </step>
@@ -1346,6 +1272,9 @@ Phase planning complete when:
 - [ ] Wave structure maximizes parallelism
 - [ ] PLAN file(s) committed to git
 - [ ] User knows next steps and wave structure
+- [ ] `<threat_model>` present with STRIDE register (when `security_enforcement` enabled)
+- [ ] Every threat has a disposition (mitigate / accept / transfer)
+- [ ] Mitigations reference specific implementation (not generic advice)
 
 ## Gap Closure Mode
 

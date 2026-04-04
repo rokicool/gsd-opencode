@@ -321,7 +321,7 @@ Workstreams let you work on multiple milestone areas concurrently without state 
 
 ### How It Works
 
-Each workstream maintains its own `.planning/` directory subtree. When you switch workstreams, GSD swaps the active planning context so that `/gsd-progress`, `/gsd-discuss-phase`, `/gsd-plan-phase`, and other commands operate on that workstream's state.
+Each workstream maintains its own `.planning/` directory subtree. When you switch workstreams, GSD swaps the active planning context so that `/gsd-progress`, `/gsd-discuss-phase`, `/gsd-plan-phase`, and other commands operate on that workstream's state. Active context is session-scoped when the runtime exposes a stable session identifier, which prevents one terminal or AI instance from repointing another instance's `STATE.md`.
 
 This is lighter weight than `/gsd-new-workspace` (which creates separate repo worktrees). Workstreams share the same codebase and git history but isolate planning artifacts.
 
@@ -590,7 +590,7 @@ Example quick-task branching:
 - **quality** -- Opus for all decision-making agents, Sonnet for read-only verification. Use when quota is available and the work is critical.
 - **balanced** -- Opus only for planning (where architecture decisions happen), Sonnet for everything else. The default for good reason.
 - **budget** -- Sonnet for anything that writes code, Haiku for research and verification. Use for high-volume work or less critical phases.
-- **inherit** -- All agents use the current session model. Best when switching models dynamically (e.g. OpenCode `/model`), or when using OpenCode with non-Anthropic providers (OpenRouter, local models) to avoid unexpected API costs. For non-OpenCode runtimes (Codex, OpenCode, Gemini CLI), the installer sets `resolve_model_ids: "omit"` automatically -- see [Non-OpenCode Runtimes](#using-non-OpenCode-runtimes-codex-opencode-gemini-cli).
+- **inherit** -- All agents use the current session model. Best when switching models dynamically (e.g. OpenCode or Kilo `/model`), or when using OpenCode with non-Anthropic providers (OpenRouter, local models) to avoid unexpected API costs. For non-OpenCode runtimes (Codex, OpenCode, Gemini CLI, Kilo), the installer sets `resolve_model_ids: "omit"` automatically -- see [Non-OpenCode Runtimes](#using-non-OpenCode-runtimes-codex-opencode-gemini-cli-kilo).
 
 ---
 
@@ -733,7 +733,7 @@ Do not re-run `/gsd-execute-phase`. Use `/gsd-quick` for targeted fixes, or `/gs
 
 Switch to budget profile: `/gsd-set-profile budget`. Disable research and plan-check agents via `/gsd-settings` if the domain is familiar to you (or to OpenCode).
 
-### Using Non-OpenCode Runtimes (Codex, OpenCode, Gemini CLI)
+### Using Non-OpenCode Runtimes (Codex, OpenCode, Gemini CLI, Kilo)
 
 If you installed GSD for a non-OpenCode runtime, the installer already configured model resolution so all agents use the runtime's default model. No manual setup is needed. Specifically, the installer sets `resolve_model_ids: "omit"` in your config, which tells GSD to skip Anthropic model ID resolution and let the runtime choose its own default model.
 
@@ -750,9 +750,9 @@ To assign different models to different agents on a non-OpenCode runtime, add `m
 }
 ```
 
-The installer auto-configures `resolve_model_ids: "omit"` for Gemini CLI, OpenCode, and Codex. If you're manually setting up a non-OpenCode runtime, add it to `.planning/config.json` yourself.
+The installer auto-configures `resolve_model_ids: "omit"` for Gemini CLI, OpenCode, Kilo, and Codex. If you're manually setting up a non-OpenCode runtime, add it to `.planning/config.json` yourself.
 
-See the [Configuration Reference](CONFIGURATION.md#non-OpenCode-runtimes-codex-opencode-gemini-cli) for the full explanation.
+See the [Configuration Reference](CONFIGURATION.md#non-OpenCode-runtimes-codex-opencode-gemini-cli-kilo) for the full explanation.
 
 ### Using OpenCode with Non-Anthropic Providers (OpenRouter, Local)
 

@@ -141,12 +141,7 @@ padded_phase: {padded_phase}
 Omit null file paths from `<files_to_read>`.
 
 ```
-task(
-  prompt=ui_research_prompt,
-  subagent_type="gsd-ui-researcher",
-  model="{UI_RESEARCHER_MODEL}",
-  description="UI Design Contract Phase {N}"
-)
+@gsd-ui-researcher ui_research_prompt
 ```
 
 ## 6. Handle Researcher Return
@@ -192,12 +187,7 @@ ui_safety_gate: {ui_safety_gate config value}
 ```
 
 ```
-task(
-  prompt=ui_checker_prompt,
-  subagent_type="gsd-ui-checker",
-  model="{UI_CHECKER_MODEL}",
-  description="Verify UI-SPEC Phase {N}"
-)
+@gsd-ui-checker ui_checker_prompt
 ```
 
 ## 8. Handle Checker Return
@@ -263,9 +253,9 @@ Dimensions: 6/6 passed
 
 **Plan Phase {N}** — planner will use UI-SPEC.md as design context
 
-`/gsd-plan-phase {N}`
+`/new` then:
 
-*/new first → fresh context window*
+`/gsd-plan-phase {N}`
 
 ───────────────────────────────────────────────────────────────
 ```

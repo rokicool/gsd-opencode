@@ -55,7 +55,7 @@ If plans exist but not all have matching summaries:
 
 **Route 5: All plans have summaries → verify and complete**
 If all plans in the current phase have summaries:
-→ Next action: `/gsd-verify-work` then `/gsd-complete-phase`
+→ Next action: `/gsd-verify-work`
 
 **Route 6: Phase complete, next phase exists → advance**
 If the current phase is complete and the next phase exists in ROADMAP:

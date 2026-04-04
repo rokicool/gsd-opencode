@@ -283,7 +283,7 @@ Use perfil budget:
 /gsd-set-profile budget
 ```
 
-### Runtime não-OpenCode (Codex/OpenCode/Gemini)
+### Runtime não-OpenCode (Codex/OpenCode/Gemini/Kilo)
 
 Use `resolve_model_ids: "omit"` para deixar o runtime resolver modelos padrão.
 

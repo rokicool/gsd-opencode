@@ -70,6 +70,22 @@
   - [Assumptions Discussion Mode](#53-assumptions-discussion-mode)
   - [UI Phase Auto-Detection](#54-ui-phase-auto-detection)
   - [Multi-Runtime Installer Selection](#55-multi-runtime-installer-selection)
+- [v1.29 Features](#v129-features)
+  - [Windsurf Runtime Support](#56-windsurf-runtime-support)
+  - [Internationalized Documentation](#57-internationalized-documentation)
+- [v1.30 Features](#v130-features)
+  - [GSD SDK](#58-gsd-sdk)
+- [v1.31 Features](#v131-features)
+  - [Schema Drift Detection](#59-schema-drift-detection)
+  - [Security Enforcement](#60-security-enforcement)
+  - [Documentation Generation](#61-documentation-generation)
+  - [Discuss Chain Mode](#62-discuss-chain-mode)
+  - [Single-Phase Autonomous](#63-single-phase-autonomous)
+  - [Scope Reduction Detection](#64-scope-reduction-detection)
+  - [Claim Provenance Tagging](#65-claim-provenance-tagging)
+  - [Worktree Toggle](#66-worktree-toggle)
+  - [Project Code Prefixing](#67-project-code-prefixing)
+  - [OpenCode Skills Migration](#68-OpenCode-code-skills-migration)
 
 ---
 
@@ -736,7 +752,7 @@
 **Requirements:**
 - REQ-TODO-01: System MUST capture todo from current conversation context
 - REQ-TODO-02: Todos MUST be stored in `.planning/todos/pending/`
-- REQ-TODO-03: Completed todos MUST move to `.planning/todos/done/`
+- REQ-TODO-03: Completed todos MUST move to `.planning/todos/completed/`
 - REQ-TODO-04: Check-todos MUST list all pending items with selection to work on one
 
 ---
@@ -861,10 +877,10 @@ fix(03-01): correct auth token expiry
 
 ### 36. Multi-Runtime Support
 
-**Purpose:** Run GSD across 6 different AI coding agent runtimes.
+**Purpose:** Run GSD across multiple AI coding agent runtimes.
 
 **Requirements:**
-- REQ-RUNTIME-01: System MUST support OpenCode, OpenCode, Gemini CLI, Codex, Copilot, Antigravity
+- REQ-RUNTIME-01: System MUST support OpenCode, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Antigravity
 - REQ-RUNTIME-02: Installer MUST transform content per runtime (tool names, paths, frontmatter)
 - REQ-RUNTIME-03: Installer MUST support interactive and non-interactive (`--OpenCode --global`) modes
 - REQ-RUNTIME-04: Installer MUST support both global and local installation
@@ -873,12 +889,12 @@ fix(03-01): correct auth token expiry
 
 **Runtime Transformations:**
 
-| Aspect | OpenCode | OpenCode | Gemini | Codex | Copilot | Antigravity |
-|--------|------------|----------|--------|-------|---------|-------------|
-| Commands | Slash commands | Slash commands | Slash commands | Skills (TOML) | Slash commands | Skills |
-| Agent format | OpenCode native | `mode: subagent` | OpenCode native | Skills | Tool mapping | Skills |
-| Hook events | `PostToolUse` | N/A | `AfterTool` | N/A | N/A | N/A |
-| Config | `settings.json` | `opencode.json(c)` | `settings.json` | TOML | Instructions | Config |
+| Aspect | OpenCode | OpenCode | Gemini | Kilo | Codex | Copilot | Antigravity |
+|--------|------------|----------|--------|-------|-------|---------|-------------|
+| Commands | Slash commands | Slash commands | Slash commands | Slash commands | Skills (TOML) | Slash commands | Skills |
+| Agent format | OpenCode native | `mode: subagent` | OpenCode native | `mode: subagent` | Skills | Tool mapping | Skills |
+| Hook events | `PostToolUse` | N/A | `AfterTool` | N/A | N/A | N/A | N/A |
+| Config | `settings.json` | `opencode.json(c)` | `settings.json` | `kilo.json(c)` | TOML | Instructions | Config |
 
 ---
 
@@ -1015,9 +1031,9 @@ When verification returns `human_needed`, items are persisted as a trackable HUM
 
 ### 42. Cross-AI Peer Review
 
-**Command:** `/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--all]`
+**Command:** `/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--coderabbit] [--all]`
 
-**Purpose:** Invoke external AI CLIs (Gemini, OpenCode, Codex) to independently review phase plans. Produces structured REVIEWS.md with per-reviewer feedback.
+**Purpose:** Invoke external AI CLIs (Gemini, OpenCode, Codex, CodeRabbit) to independently review phase plans. Produces structured REVIEWS.md with per-reviewer feedback.
 
 **Requirements:**
 - REQ-REVIEW-01: System MUST detect available AI CLIs on the system
@@ -1288,3 +1304,264 @@ Test suite that scans all agent, workflow, and command files for embedded inject
 1. **Detect** — Identify available AI CLI runtimes on the system
 2. **Prompt** — Present multi-select interface for runtime selection
 3. **Install** — Configure GSD for all selected runtimes in a single session
+
+---
+
+## v1.29 Features
+
+### 56. Windsurf Runtime Support
+
+**Part of:** `npx gsd-opencode`
+
+**Purpose:** Add Windsurf as a supported AI CLI runtime for GSD installation and execution.
+
+**Requirements:**
+- REQ-WINDSURF-01: Installer MUST detect Windsurf runtime and offer it as a target
+- REQ-WINDSURF-02: GSD commands MUST function correctly within Windsurf sessions
+
+**Process:**
+1. **Detect** — Identify Windsurf runtime availability on the system
+2. **Install** — Configure GSD skills and hooks for the Windsurf environment
+
+---
+
+### 57. Internationalized Documentation
+
+**Part of:** `docs/`
+
+**Purpose:** Provide GSD documentation in Portuguese, Korean, and Japanese.
+
+**Requirements:**
+- REQ-I18N-01: Documentation MUST be available in Portuguese (pt), Korean (ko), and Japanese (ja)
+- REQ-I18N-02: Translations MUST stay synchronized with English source documents
+
+**Process:**
+1. **Translate** — Convert core documentation into target languages
+2. **Publish** — Make translated documentation accessible alongside English originals
+
+---
+
+## v1.30 Features
+
+### 58. GSD SDK
+
+**Command:** Programmatic API (headless)
+
+**Purpose:** Headless TypeScript SDK for running GSD workflows programmatically without a CLI session.
+
+**Requirements:**
+- REQ-SDK-01: SDK MUST expose GSD workflow operations as TypeScript functions
+- REQ-SDK-02: SDK MUST support headless execution without interactive prompts
+- REQ-SDK-03: SDK MUST produce the same artifacts as CLI-driven workflows
+
+**Process:**
+1. **Import** — Import GSD SDK into a TypeScript/JavaScript project
+2. **Configure** — Set project path and workflow options programmatically
+3. **Execute** — Run GSD phases (discuss, plan, execute) via API calls
+
+---
+
+## v1.31 Features
+
+### 59. Schema Drift Detection
+
+**Command:** Automatic during `/gsd-execute-phase`
+
+**Purpose:** Detect when ORM schema files are modified without corresponding migration or push commands, preventing false-positive verification.
+
+**Requirements:**
+- REQ-SCHEMA-01: System MUST detect modifications to ORM schema files (Prisma, Drizzle, Payload, Sanity, Mongoose)
+- REQ-SCHEMA-02: System MUST verify corresponding migration/push commands exist when schema changes are detected
+- REQ-SCHEMA-03: System MUST implement two-layer defense: plan-time injection and execute-time gate
+- REQ-SCHEMA-04: System MUST support `GSD_SKIP_SCHEMA_CHECK` env var to override detection
+- REQ-SCHEMA-05: System MUST prevent false-positive verification when schema is modified without migration
+
+**Process:**
+1. **Detect** — Monitor ORM schema file modifications during plan execution
+2. **Verify** — Check that corresponding migration/push commands are present in the plan
+3. **Gate** — Block execution if schema drift is detected without migration (execute-time gate)
+4. **Inject** — Add migration reminders during plan generation (plan-time injection)
+
+**Config:** `GSD_SKIP_SCHEMA_CHECK` environment variable to bypass detection.
+
+---
+
+### 60. Security Enforcement
+
+**Command:** `/gsd-secure-phase <N>`
+
+**Purpose:** Threat-model-anchored security verification for phase implementations.
+
+**Requirements:**
+- REQ-SEC-01: System MUST perform threat-model-anchored verification (not blind scanning)
+- REQ-SEC-02: System MUST support configurable OWASP ASVS verification levels (1-3)
+- REQ-SEC-03: System MUST block phase advancement based on configurable severity threshold
+- REQ-SEC-04: System MUST spawn `gsd-security-auditor` agent for analysis
+
+**Produces:**
+| Artifact | Description |
+|----------|-------------|
+| Security audit report | Threat-model-anchored findings with severity classification |
+
+**Process:**
+1. **Model** — Build threat model from phase implementation context
+2. **Audit** — Spawn `gsd-security-auditor` to verify against threat model
+3. **Gate** — Block phase advancement if findings meet or exceed `security_block_on` severity
+
+**Config:**
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `security_enforcement` | boolean | `true` | Enable threat-model security verification |
+| `security_asvs_level` | number (1-3) | `1` | OWASP ASVS verification level |
+| `security_block_on` | string | `"high"` | Minimum severity to block phase advancement |
+
+---
+
+### 61. Documentation Generation
+
+**Command:** `/gsd-docs-update`
+
+**Purpose:** Generate and verify project documentation with accuracy checks.
+
+**Requirements:**
+- REQ-DOCS-01: System MUST spawn `gsd-doc-writer` agent to generate documentation
+- REQ-DOCS-02: System MUST spawn `gsd-doc-verifier` agent to check accuracy
+- REQ-DOCS-03: System MUST verify generated documentation against actual implementation
+
+**Produces:**
+| Artifact | Description |
+|----------|-------------|
+| Updated project documentation | Generated and verified documentation files |
+
+**Process:**
+1. **Generate** — Spawn `gsd-doc-writer` to create or update documentation from implementation
+2. **Verify** — Spawn `gsd-doc-verifier` to check documentation accuracy against codebase
+3. **Output** — Produce verified documentation with accuracy annotations
+
+---
+
+### 62. Discuss Chain Mode
+
+**Flag:** `/gsd-discuss-phase <N> --chain`
+
+**Purpose:** Auto-chain discuss, plan, and execute phases in one flow to reduce manual command sequencing.
+
+**Requirements:**
+- REQ-CHAIN-01: System MUST auto-chain discuss → plan → execute when `--chain` flag is provided
+- REQ-CHAIN-02: System MUST respect all gate settings between chained phases
+- REQ-CHAIN-03: System MUST halt the chain if any phase fails
+
+**Process:**
+1. **Discuss** — Run discuss-phase to gather context
+2. **Plan** — Automatically invoke plan-phase with gathered context
+3. **Execute** — Automatically invoke execute-phase with generated plan
+
+---
+
+### 63. Single-Phase Autonomous
+
+**Flag:** `/gsd-autonomous --only N`
+
+**Purpose:** Execute just one phase autonomously instead of all remaining phases.
+
+**Requirements:**
+- REQ-ONLY-01: System MUST execute only the specified phase number when `--only N` is provided
+- REQ-ONLY-02: System MUST follow the same discuss → plan → execute flow as full autonomous mode
+- REQ-ONLY-03: System MUST stop after the specified phase completes
+
+**Process:**
+1. **Select** — Identify the target phase from `--only N` argument
+2. **Execute** — Run full autonomous flow (discuss → plan → execute) for that single phase
+3. **Stop** — Halt after the phase completes instead of advancing to the next
+
+---
+
+### 64. Scope Reduction Detection
+
+**Part of:** `/gsd-plan-phase`
+
+**Purpose:** Prevent silent requirement dropping during plan generation with three-layer defense.
+
+**Requirements:**
+- REQ-SCOPE-01: System MUST prohibit planners from reducing scope without explicit justification
+- REQ-SCOPE-02: System MUST have plan-checker verify requirement dimension coverage
+- REQ-SCOPE-03: System MUST have orchestrator recover dropped requirements and re-inject them
+- REQ-SCOPE-04: System MUST implement three-layer defense: planner prohibition, checker dimension, orchestrator recovery
+
+**Process:**
+1. **Prohibit** — Planner instructions explicitly forbid scope reduction
+2. **Check** — Plan-checker verifies all phase requirements are covered in the plan
+3. **Recover** — Orchestrator detects dropped requirements and re-injects them into the planning loop
+
+---
+
+### 65. Claim Provenance Tagging
+
+**Part of:** `/gsd-research-phase`
+
+**Purpose:** Ensure research claims are tagged with source evidence and assumptions are logged separately.
+
+**Requirements:**
+- REQ-PROVENANCE-01: Researcher MUST mark claims with source evidence references
+- REQ-PROVENANCE-02: Assumptions MUST be logged separately from sourced claims
+- REQ-PROVENANCE-03: System MUST distinguish between evidenced facts and inferred assumptions
+
+**Process:**
+1. **Research** — Researcher gathers information from codebase and domain sources
+2. **Tag** — Each claim is annotated with its source (file path, documentation, API response)
+3. **Separate** — Assumptions without direct evidence are logged in a distinct section
+
+---
+
+### 66. Worktree Toggle
+
+**Config:** `workflow.use_worktrees: false`
+
+**Purpose:** Disable git worktree isolation for users who prefer sequential execution.
+
+**Requirements:**
+- REQ-WORKTREE-01: System MUST respect `workflow.use_worktrees` setting when deciding isolation strategy
+- REQ-WORKTREE-02: System MUST default to `true` (worktrees enabled) for backward compatibility
+- REQ-WORKTREE-03: System MUST fall back to sequential execution when worktrees are disabled
+
+**Config:**
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `workflow.use_worktrees` | boolean | `true` | When `false`, disables git worktree isolation |
+
+---
+
+### 67. Project Code Prefixing
+
+**Config:** `project_code: "ABC"`
+
+**Purpose:** Prefix phase directory names with a project code for multi-project disambiguation.
+
+**Requirements:**
+- REQ-PREFIX-01: System MUST prefix phase directories with project code when configured (e.g., `ABC-01-setup/`)
+- REQ-PREFIX-02: System MUST use standard naming when `project_code` is not set
+- REQ-PREFIX-03: System MUST apply prefix consistently across all phase operations
+
+**Config:**
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `project_code` | string | (none) | Prefix for phase directory names |
+
+---
+
+### 68. OpenCode Skills Migration
+
+**Part of:** `npx gsd-opencode`
+
+**Purpose:** Migrate GSD commands to OpenCode 2.1.88+ skills format with backward compatibility.
+
+**Requirements:**
+- REQ-SKILLS-01: Installer MUST write `skills/gsd-*/SKILL.md` for OpenCode 2.1.88+
+- REQ-SKILLS-02: Installer MUST auto-clean legacy `commands/gsd/` directory
+- REQ-SKILLS-03: Installer MUST maintain backward compatibility with older OpenCode versions via Gemini path
+
+**Process:**
+1. **Detect** — Check OpenCode version to determine skills support
+2. **Migrate** — write `skills/gsd-*/SKILL.md` files for each GSD command
+3. **Clean** — Remove legacy `commands/gsd/` directory if skills are installed
+4. **Fallback** — Maintain Gemini path compatibility for older OpenCode versions

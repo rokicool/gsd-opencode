@@ -21,7 +21,7 @@
 
 ## 시스템 개요
 
-GSD는 사용자와 AI 코딩 에이전트(OpenCode, Gemini CLI, OpenCode, Codex, Copilot, Antigravity) 사이에 위치하는 **메타 프롬프팅 프레임워크**입니다. 다음을 제공합니다.
+GSD는 사용자와 AI 코딩 에이전트(OpenCode, Gemini CLI, OpenCode, Kilo, Codex, Copilot, Antigravity) 사이에 위치하는 **메타 프롬프팅 프레임워크**입니다. 다음을 제공합니다.
 
 1. **컨텍스트 엔지니어링** — 작업별로 AI에게 필요한 모든 것을 제공하는 구조화된 아티팩트
 2. **멀티 에이전트 오케스트레이션** — 새로운 컨텍스트 윈도우로 전문화된 에이전트를 생성하는 가벼운 오케스트레이터
@@ -108,7 +108,7 @@ GSD는 사용자와 AI 코딩 에이전트(OpenCode, Gemini CLI, OpenCode, Codex
 
 사용자 대면 진입점입니다. 각 파일은 YAML 전문(name, description, allowed-tools)과 워크플로우를 부트스트랩하는 프롬프트 본문을 포함합니다. 명령어는 다음과 같이 설치됩니다.
 - **OpenCode:** 커스텀 슬래시 명령어 (`/gsd-command-name`)
-- **OpenCode:** 슬래시 명령어 (`/gsd-command-name`)
+- **OpenCode / Kilo:** 슬래시 명령어 (`/gsd-command-name`)
 - **Codex:** Skills (`$gsd-command-name`)
 - **Copilot:** 슬래시 명령어 (`/gsd-command-name`)
 - **Antigravity:** Skills
@@ -362,6 +362,7 @@ $HOME/.config/opencode/                          # OpenCode (전역 설치)
 
 다른 런타임의 동등한 경로입니다.
 - **OpenCode:** `~/.config/opencode/` 또는 `~/.opencode/`
+- **Kilo:** `~/.config/kilo/` 또는 `~/.kilo/`
 - **Gemini CLI:** `~/.gemini/`
 - **Codex:** `~/.codex/` (명령어 대신 skills 사용)
 - **Copilot:** `~/.github/`
@@ -425,12 +426,13 @@ $HOME/.config/opencode/                          # OpenCode (전역 설치)
 
 인스톨러(`bin/install.js`, ~3,000줄)는 다음을 처리합니다.
 
-1. **런타임 감지** — 대화형 프롬프트 또는 CLI 플래그 (`--OpenCode`, `--opencode`, `--gemini`, `--codex`, `--copilot`, `--antigravity`, `--all`)
+1. **런타임 감지** — 대화형 프롬프트 또는 CLI 플래그 (`--OpenCode`, `--opencode`, `--gemini`, `--kilo`, `--codex`, `--copilot`, `--antigravity`, `--all`)
 2. **위치 선택** — 전역(`--global`) 또는 로컬(`--local`)
 3. **파일 배포** — commands, workflows, references, templates, agents, hooks 복사
 4. **런타임 적응** — 런타임별 파일 내용 변환.
    - OpenCode: 그대로 사용
-   - OpenCode: 에이전트 전문을 `name:`, `model: inherit`, `mode: subagent`로 변환
+   - OpenCode: 명령어/에이전트를 OpenCode 호환 플랫 명령어 + 서브에이전트 형식으로 변환
+   - Kilo: Kilo 설정 경로로 OpenCode 변환 파이프라인을 재사용
    - Codex: commands에서 TOML config + skills 생성
    - Copilot: 도구 이름 매핑 (read→read, bash→execute 등)
    - Gemini: 훅 이벤트 이름 조정 (`PostToolUse` 대신 `AfterTool`)
@@ -505,12 +507,13 @@ Runtime Engine (OpenCode / Gemini CLI)
 
 ## 런타임 추상화
 
-GSD는 통합된 명령어/워크플로우 아키텍처를 통해 6개의 AI 코딩 런타임을 지원합니다.
+GSD는 통합된 명령어/워크플로우 아키텍처를 통해 여러 AI 코딩 런타임을 지원합니다.
 
 | 런타임 | 명령어 형식 | 에이전트 시스템 | 설정 위치 |
 |---------|---------------|--------------|-----------------|
 | OpenCode | `/gsd-command` | task 생성 | `$HOME/.config/opencode/` |
 | OpenCode | `/gsd-command` | Subagent 모드 | `~/.config/opencode/` |
+| Kilo | `/gsd-command` | Subagent 모드 | `~/.config/kilo/` |
 | Gemini CLI | `/gsd-command` | task 생성 | `~/.gemini/` |
 | Codex | `$gsd-command` | Skills | `~/.codex/` |
 | Copilot | `/gsd-command` | 에이전트 위임 | `~/.github/` |

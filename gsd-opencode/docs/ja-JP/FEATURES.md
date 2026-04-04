@@ -736,7 +736,7 @@
 **要件:**
 - REQ-TODO-01: システムは現在の会話コンテキストから Todo をキャプチャしなければならない
 - REQ-TODO-02: Todo は `.planning/todos/pending/` に保存されなければならない
-- REQ-TODO-03: 完了した Todo は `.planning/todos/done/` に移動されなければならない
+- REQ-TODO-03: 完了した Todo は `.planning/todos/completed/` に移動されなければならない
 - REQ-TODO-04: check-todos は保留中のすべてのアイテムを一覧表示し、作業するアイテムを選択できなければならない
 
 ---
@@ -861,10 +861,10 @@ fix(03-01): correct auth token expiry
 
 ### 36. マルチランタイムサポート
 
-**目的:** 6つの異なる AI コーディングエージェントランタイムで GSD を実行します。
+**目的:** 複数の AI コーディングエージェントランタイムで GSD を実行します。
 
 **要件:**
-- REQ-RUNTIME-01: システムは OpenCode、OpenCode、Gemini CLI、Codex、Copilot、Antigravity をサポートしなければならない
+- REQ-RUNTIME-01: システムは OpenCode、OpenCode、Gemini CLI、Kilo、Codex、Copilot、Antigravity をサポートしなければならない
 - REQ-RUNTIME-02: インストーラーはランタイムごとにコンテンツを変換しなければならない（ツール名、パス、フロントマター）
 - REQ-RUNTIME-03: インストーラーはインタラクティブおよび非インタラクティブ（`--OpenCode --global`）モードをサポートしなければならない
 - REQ-RUNTIME-04: インストーラーはグローバルとローカルの両方のインストールをサポートしなければならない
@@ -873,12 +873,12 @@ fix(03-01): correct auth token expiry
 
 **ランタイム変換:**
 
-| 側面 | OpenCode | OpenCode | Gemini | Codex | Copilot | Antigravity |
-|------|------------|----------|--------|-------|---------|-------------|
-| コマンド | スラッシュコマンド | スラッシュコマンド | スラッシュコマンド | スキル（TOML） | スラッシュコマンド | スキル |
-| エージェント形式 | OpenCode ネイティブ | `mode: subagent` | OpenCode ネイティブ | スキル | ツールマッピング | スキル |
-| フックイベント | `PostToolUse` | N/A | `AfterTool` | N/A | N/A | N/A |
-| 設定 | `settings.json` | `opencode.json(c)` | `settings.json` | TOML | Instructions | Config |
+| 側面 | OpenCode | OpenCode | Gemini | Kilo | Codex | Copilot | Antigravity |
+|------|------------|----------|--------|-------|-------|---------|-------------|
+| コマンド | スラッシュコマンド | スラッシュコマンド | スラッシュコマンド | スラッシュコマンド | スキル（TOML） | スラッシュコマンド | スキル |
+| エージェント形式 | OpenCode ネイティブ | `mode: subagent` | OpenCode ネイティブ | `mode: subagent` | スキル | ツールマッピング | スキル |
+| フックイベント | `PostToolUse` | N/A | `AfterTool` | N/A | N/A | N/A | N/A |
+| 設定 | `settings.json` | `opencode.json(c)` | `settings.json` | `kilo.json(c)` | TOML | Instructions | Config |
 
 ---
 
@@ -1015,9 +1015,9 @@ fix(03-01): correct auth token expiry
 
 ### 42. クロス AI ピアレビュー
 
-**コマンド:** `/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--all]`
+**コマンド:** `/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--coderabbit] [--all]`
 
-**目的:** 外部の AI CLI（Gemini、OpenCode、Codex）を呼び出して、フェーズプランを独立してレビューします。レビュアーごとのフィードバックを含む構造化された REVIEWS.md を生成します。
+**目的:** 外部の AI CLI（Gemini、OpenCode、Codex、CodeRabbit）を呼び出して、フェーズプランを独立してレビューします。レビュアーごとのフィードバックを含む構造化された REVIEWS.md を生成します。
 
 **要件:**
 - REQ-REVIEW-01: システムはシステム上で利用可能な AI CLI を検出しなければならない

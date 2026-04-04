@@ -24,6 +24,15 @@ CONFIG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state loa
 ```
 
 Extract: `branching_strategy`, `branch_name`.
+
+Detect base branch for PRs and merges:
+```bash
+BASE_BRANCH=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get git.base_branch 2>/dev/null || echo "")
+if [ -z "$BASE_BRANCH" ] || [ "$BASE_BRANCH" = "null" ]; then
+  BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|^refs/remotes/origin/||')
+  BASE_BRANCH="${BASE_BRANCH:-main}"
+fi
+```
 </step>
 
 <step name="preflight_checks">
@@ -46,7 +55,7 @@ Verify the work is ready to ship:
    ```bash
    CURRENT_BRANCH=$(git branch --show-current)
    ```
-   If on `main`/`master`: warn — should be on a feature branch.
+   If on `${BASE_BRANCH}`: warn — should be on a feature branch.
    If branching_strategy is `none`: offer to create a branch now.
 
 4. **Remote configured?**
@@ -74,7 +83,7 @@ If push fails (e.g., no upstream): set upstream:
 git push --set-upstream origin ${CURRENT_BRANCH} 2>&1
 ```
 
-Report: "Pushed `{branch}` to origin ({commit_count} commits ahead of main)"
+Report: "Pushed `{branch}` to origin ({commit_count} commits ahead of ${BASE_BRANCH})"
 </step>
 
 <step name="generate_pr_body">
@@ -141,7 +150,7 @@ Create the PR using the generated body:
 gh pr create \
   --title "Phase ${PHASE_NUMBER}: ${PHASE_NAME}" \
   --body "${PR_BODY}" \
-  --base main
+  --base ${BASE_BRANCH}
 ```
 
 If `--draft` flag was passed: add `--draft`.
@@ -194,7 +203,7 @@ node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${pad
 ## ✓ Phase {X}: {Name} — Shipped
 
 PR: #{number} ({url})
-Branch: {branch} → main
+Branch: {branch} → ${BASE_BRANCH}
 Commits: {count}
 Verification: ✓ Passed
 Requirements: {N} REQ-IDs addressed

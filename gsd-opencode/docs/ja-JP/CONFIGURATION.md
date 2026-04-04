@@ -275,7 +275,7 @@ quick タスクのブランチ設定例：
 
 有効なオーバーライド値: `opus`、`sonnet`、`haiku`、`inherit`、または完全修飾モデル ID（例: `"openai/o3"`、`"google/gemini-2.5-pro"`）。
 
-### 非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI）
+### 非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI、Kilo）
 
 GSD が非 OpenCode ランタイム向けにインストールされると、インストーラーは自動的に `~/.gsd/defaults.json` に `resolve_model_ids: "omit"` を設定します。これにより GSD はすべてのエージェントに対して空のモデルパラメータを返し、各エージェントはランタイムで設定されたモデルを使用します。デフォルトの場合、追加のセットアップは不要です。
 
@@ -310,7 +310,7 @@ GSD が非 OpenCode ランタイム向けにインストールされると、イ
 |----|------|---------|
 | `false`（デフォルト） | OpenCode エイリアス（`opus`、`sonnet`、`haiku`）を返す | OpenCode + ネイティブ Anthropic API |
 | `true` | エイリアスを完全な OpenCode モデル ID（`OpenCode-opus-4-0`）にマッピング | 完全な ID が必要な API を使用する OpenCode |
-| `"omit"` | 空文字列を返す（ランタイムがデフォルトを選択） | 非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI） |
+| `"omit"` | 空文字列を返す（ランタイムがデフォルトを選択） | 非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI、Kilo） |
 
 ### プロファイルの設計思想
 

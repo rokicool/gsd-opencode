@@ -7,6 +7,9 @@
     "verifier": true,
     "auto_advance": false,
     "nyquist_validation": true,
+    "security_enforcement": true,
+    "security_asvs_level": 1,
+    "security_block_on": "high",
     "discuss_mode": "discuss",
     "research_before_questions": false
   },
@@ -40,5 +43,6 @@
   "hooks": {
     "context_warnings": true
   },
+  "project_code": null,
   "agent_skills": {}
 }

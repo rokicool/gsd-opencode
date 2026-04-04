@@ -1,6 +1,7 @@
 ---
 name: gsd-join-discord
 description: Join the GSD Discord community
+permissions: []
 ---
 
 <objective>

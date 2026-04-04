@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { safeReadFile, loadConfig, normalizePhaseName, execGit, findPhaseInternal, getMilestoneInfo, stripShippedMilestones, extractCurrentMilestone, planningDir, planningRoot, output, error, checkAgentsInstalled } = require('./core.cjs');
+const { safeReadFile, loadConfig, normalizePhaseName, escapeRegex, execGit, findPhaseInternal, getMilestoneInfo, stripShippedMilestones, extractCurrentMilestone, planningDir, planningRoot, output, error, checkAgentsInstalled } = require('./core.cjs');
 const { extractFrontmatter, parseMustHavesBlock } = require('./frontmatter.cjs');
 const { writeStateMd } = require('./state.cjs');
 
@@ -757,6 +757,71 @@ function cmdValidateHealth(cwd, options, raw) {
     }
   }
 
+  // ─── Check 9: STATE.md / ROADMAP.md cross-validation ─────────────────────
+  if (fs.existsSync(statePath) && fs.existsSync(roadmapPath)) {
+    try {
+      const stateContent = fs.readFileSync(statePath, 'utf-8');
+      const roadmapContentFull = fs.readFileSync(roadmapPath, 'utf-8');
+
+      // Extract current phase from STATE.md
+      const currentPhaseMatch = stateContent.match(/\*\*Current Phase:\*\*\s*(\S+)/i) ||
+                                 stateContent.match(/Current Phase:\s*(\S+)/i);
+      if (currentPhaseMatch) {
+        const statePhase = currentPhaseMatch[1].replace(/^0+/, '');
+        // Check if ROADMAP shows this phase as already complete
+        const phaseCheckboxRe = new RegExp(`-\\s*\\[x\\].*Phase\\s+0*${escapeRegex(statePhase)}[:\\s]`, 'i');
+        if (phaseCheckboxRe.test(roadmapContentFull)) {
+          // STATE says "current" but ROADMAP says "complete" — divergence
+          const stateStatus = stateContent.match(/\*\*Status:\*\*\s*(.+)/i);
+          const statusVal = stateStatus ? stateStatus[1].trim().toLowerCase() : '';
+          if (statusVal !== 'complete' && statusVal !== 'done') {
+            addIssue('warning', 'W011',
+              `STATE.md says current phase is ${statePhase} (status: ${statusVal || 'unknown'}) but ROADMAP.md shows it as [x] complete — state files may be out of sync`,
+              'Run /gsd-progress to re-derive current position, or manually update STATE.md');
+          }
+        }
+      }
+    } catch { /* intentionally empty — cross-validation is advisory */ }
+  }
+
+  // ─── Check 10: Config field validation ────────────────────────────────────
+  if (fs.existsSync(configPath)) {
+    try {
+      const configRaw = fs.readFileSync(configPath, 'utf-8');
+      const configParsed = JSON.parse(configRaw);
+
+      // Validate branching_strategy
+      const validStrategies = ['none', 'phase', 'milestone'];
+      if (configParsed.branching_strategy && !validStrategies.includes(configParsed.branching_strategy)) {
+        addIssue('warning', 'W012',
+          `config.json: invalid branching_strategy "${configParsed.branching_strategy}"`,
+          `Valid values: ${validStrategies.join(', ')}`);
+      }
+
+      // Validate context_window is a positive integer
+      if (configParsed.context_window !== undefined) {
+        const cw = configParsed.context_window;
+        if (typeof cw !== 'number' || cw <= 0 || !Number.isInteger(cw)) {
+          addIssue('warning', 'W013',
+            `config.json: context_window should be a positive integer, got "${cw}"`,
+            'Set to 200000 (default) or 1000000 (for 1M models)');
+        }
+      }
+
+      // Validate branch templates have required placeholders
+      if (configParsed.phase_branch_template && !configParsed.phase_branch_template.includes('{phase}')) {
+        addIssue('warning', 'W014',
+          'config.json: phase_branch_template missing {phase} placeholder',
+          'Template must include {phase} for phase number substitution');
+      }
+      if (configParsed.milestone_branch_template && !configParsed.milestone_branch_template.includes('{milestone}')) {
+        addIssue('warning', 'W015',
+          'config.json: milestone_branch_template missing {milestone} placeholder',
+          'Template must include {milestone} for version substitution');
+      }
+    } catch { /* parse error already caught in Check 5 */ }
+  }
+
   // ─── Perform repairs if requested ─────────────────────────────────────────
   const repairActions = [];
   if (options.repair && repairs.length > 0) {
@@ -874,6 +939,84 @@ function cmdValidateAgents(cwd, raw) {
   }, raw);
 }
 
+// ─── Schema Drift Detection ──────────────────────────────────────────────────
+
+function cmdVerifySchemaDrift(cwd, phaseArg, skipFlag, raw) {
+  const { detectSchemaFiles, checkSchemaDrift } = require('./schema-detect.cjs');
+
+  if (!phaseArg) {
+    error('Usage: verify schema-drift <phase> [--skip]');
+    return;
+  }
+
+  // Find phase directory
+  const pDir = planningDir(cwd);
+  const phasesDir = path.join(pDir, 'phases');
+  if (!fs.existsSync(phasesDir)) {
+    output({ drift_detected: false, blocking: false, message: 'No phases directory' }, raw);
+    return;
+  }
+
+  // Find matching phase directory
+  let phaseDir = null;
+  const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.isDirectory() && entry.name.includes(phaseArg)) {
+      phaseDir = path.join(phasesDir, entry.name);
+      break;
+    }
+  }
+
+  // Also try exact match
+  if (!phaseDir) {
+    const exact = path.join(phasesDir, phaseArg);
+    if (fs.existsSync(exact)) phaseDir = exact;
+  }
+
+  if (!phaseDir) {
+    output({ drift_detected: false, blocking: false, message: `Phase directory not found: ${phaseArg}` }, raw);
+    return;
+  }
+
+  // Collect files_modified from all PLAN.md files in the phase
+  const allFiles = [];
+  const planFiles = fs.readdirSync(phaseDir).filter(f => f.endsWith('-PLAN.md'));
+  for (const pf of planFiles) {
+    const content = fs.readFileSync(path.join(phaseDir, pf), 'utf-8');
+    // Extract files_modified from frontmatter
+    const fmMatch = content.match(/files_modified:\s*\[([^\]]*)\]/);
+    if (fmMatch) {
+      const files = fmMatch[1].split(',').map(f => f.trim()).filter(Boolean);
+      allFiles.push(...files);
+    }
+  }
+
+  // Collect execution log from SUMMARY.md files
+  let executionLog = '';
+  const summaryFiles = fs.readdirSync(phaseDir).filter(f => f.endsWith('-SUMMARY.md'));
+  for (const sf of summaryFiles) {
+    executionLog += fs.readFileSync(path.join(phaseDir, sf), 'utf-8') + '\n';
+  }
+
+  // Also check git commit messages for push evidence
+  const gitLog = execGit(cwd, ['log', '--oneline', '--all', '-50']);
+  if (gitLog.exitCode === 0) {
+    executionLog += '\n' + gitLog.stdout;
+  }
+
+  const result = checkSchemaDrift(allFiles, executionLog, { skipCheck: !!skipFlag });
+
+  output({
+    drift_detected: result.driftDetected,
+    blocking: result.blocking,
+    schema_files: result.schemaFiles,
+    orms: result.orms,
+    unpushed_orms: result.unpushedOrms,
+    message: result.message,
+    skipped: result.skipped || false,
+  }, raw);
+}
+
 module.exports = {
   cmdVerifySummary,
   cmdVerifyPlanStructure,
@@ -885,4 +1028,5 @@ module.exports = {
   cmdValidateConsistency,
   cmdValidateHealth,
   cmdValidateAgents,
+  cmdVerifySchemaDrift,
 };

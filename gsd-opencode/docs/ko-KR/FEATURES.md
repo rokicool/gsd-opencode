@@ -736,7 +736,7 @@
 **요구사항.**
 - REQ-TODO-01: 현재 대화 컨텍스트에서 할 일을 캡처해야 합니다.
 - REQ-TODO-02: 할 일은 `.planning/todos/pending/`에 저장되어야 합니다.
-- REQ-TODO-03: 완료된 할 일은 `.planning/todos/done/`으로 이동해야 합니다.
+- REQ-TODO-03: 완료된 할 일은 `.planning/todos/completed/`으로 이동해야 합니다.
 - REQ-TODO-04: check-todos는 모든 보류 항목을 나열하고 하나를 선택하여 작업할 수 있어야 합니다.
 
 ---
@@ -861,10 +861,10 @@ fix(03-01): correct auth token expiry
 
 ### 36. Multi-Runtime Support
 
-**목적:** 6가지 다른 AI 코딩 에이전트 런타임에서 GSD를 실행합니다.
+**목적:** 여러 AI 코딩 에이전트 런타임에서 GSD를 실행합니다.
 
 **요구사항.**
-- REQ-RUNTIME-01: OpenCode, OpenCode, Gemini CLI, Codex, Copilot, Antigravity를 지원해야 합니다.
+- REQ-RUNTIME-01: OpenCode, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Antigravity를 지원해야 합니다.
 - REQ-RUNTIME-02: 설치 프로그램은 런타임별로 콘텐츠를 변환해야 합니다(도구 이름, 경로, 프론트매터).
 - REQ-RUNTIME-03: 설치 프로그램은 대화형 및 비대화형(`--OpenCode --global`) 모드를 모두 지원해야 합니다.
 - REQ-RUNTIME-04: 설치 프로그램은 전역 및 로컬 설치를 모두 지원해야 합니다.
@@ -873,12 +873,12 @@ fix(03-01): correct auth token expiry
 
 **런타임 변환.**
 
-| 측면 | OpenCode | OpenCode | Gemini | Codex | Copilot | Antigravity |
-|--------|------------|----------|--------|-------|---------|-------------|
-| 명령어 | 슬래시 명령어 | 슬래시 명령어 | 슬래시 명령어 | Skills(TOML) | 슬래시 명령어 | Skills |
-| 에이전트 형식 | OpenCode native | `mode: subagent` | OpenCode native | Skills | Tool mapping | Skills |
-| 훅 이벤트 | `PostToolUse` | N/A | `AfterTool` | N/A | N/A | N/A |
-| 구성 | `settings.json` | `opencode.json(c)` | `settings.json` | TOML | Instructions | Config |
+| 측면 | OpenCode | OpenCode | Gemini | Kilo | Codex | Copilot | Antigravity |
+|--------|------------|----------|--------|-------|-------|---------|-------------|
+| 명령어 | 슬래시 명령어 | 슬래시 명령어 | 슬래시 명령어 | 슬래시 명령어 | Skills(TOML) | 슬래시 명령어 | Skills |
+| 에이전트 형식 | OpenCode native | `mode: subagent` | OpenCode native | `mode: subagent` | Skills | Tool mapping | Skills |
+| 훅 이벤트 | `PostToolUse` | N/A | `AfterTool` | N/A | N/A | N/A | N/A |
+| 구성 | `settings.json` | `opencode.json(c)` | `settings.json` | `kilo.json(c)` | TOML | Instructions | Config |
 
 ---
 
@@ -1015,9 +1015,9 @@ fix(03-01): correct auth token expiry
 
 ### 42. Cross-AI Peer Review
 
-**명령어:** `/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--all]`
+**명령어:** `/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--coderabbit] [--all]`
 
-**목적:** 외부 AI CLI(Gemini, OpenCode, Codex)를 호출하여 페이즈 계획을 독립적으로 검토합니다. 검토자별 피드백이 담긴 구조화된 REVIEWS.md를 생성합니다.
+**목적:** 외부 AI CLI(Gemini, OpenCode, Codex, CodeRabbit)를 호출하여 페이즈 계획을 독립적으로 검토합니다. 검토자별 피드백이 담긴 구조화된 REVIEWS.md를 생성합니다.
 
 **요구사항.**
 - REQ-REVIEW-01: 시스템에서 사용 가능한 AI CLI를 감지해야 합니다.

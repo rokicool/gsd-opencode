@@ -93,7 +93,7 @@ For: Choosing between options, new external integration.
 
    ```
    For each library/framework:
-   - mcp__context7__resolve-library-id 
+   - mcp__context7__resolve-library-id    
    - mcp__context7__get-library-docs (mode: "code" for API, "info" for concepts)
    ```
 

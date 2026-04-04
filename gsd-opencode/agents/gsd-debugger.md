@@ -10,7 +10,6 @@ tools:
   grep: true
   glob: true
   websearch: true
-permissionMode: acceptEdits
 color: "#FFA500"
 # hooks:
 #   PostToolUse:

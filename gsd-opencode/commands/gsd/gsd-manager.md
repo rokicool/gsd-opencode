@@ -8,6 +8,7 @@ permissions:
    glob: true
    grep: true
    question: true
+  - skill
    task: true
 ---
 <objective>

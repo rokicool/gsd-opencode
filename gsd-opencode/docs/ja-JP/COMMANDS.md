@@ -7,7 +7,7 @@
 ## コマンド構文
 
 - **OpenCode / Gemini / Copilot:** `/gsd-command-name [args]`
-- **OpenCode:** `/gsd-command-name [args]`
+- **OpenCode / Kilo:** `/gsd-command-name [args]`
 - **Codex:** `$gsd-command-name [args]`
 
 ---
@@ -811,6 +811,7 @@ GSDアップデート後にローカルの変更を復元します。
 | `--gemini` | Gemini CLIレビューを含める |
 | `--OpenCode` | OpenCode CLIレビューを含める（別セッション） |
 | `--codex` | Codex CLIレビューを含める |
+| `--coderabbit` | CodeRabbitレビューを含める |
 | `--all` | 利用可能なすべてのCLIを含める |
 
 **生成物:** `{phase}-REVIEWS.md` — `/gsd-plan-phase --reviews` で利用可能

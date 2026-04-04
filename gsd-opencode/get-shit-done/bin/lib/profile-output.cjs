@@ -177,7 +177,11 @@ const CLAUDE_MD_FALLBACKS = {
   stack: 'Technology stack not yet documented. Will populate after codebase mapping or first phase.',
   conventions: 'Conventions not yet established. Will populate as patterns emerge during development.',
   architecture: 'Architecture not yet mapped. Follow existing patterns found in the codebase.',
+  skills: 'No project skills found. Add skills to any of: `.OpenCode/skills/`, `.agents/skills/`, `.cursor/skills/`, or `.github/skills/` with a `SKILL.md` index file.',
 };
+
+// Directories where project skills may live (checked in order)
+const SKILL_SEARCH_DIRS = ['.OpenCode/skills', '.agents/skills', '.cursor/skills', '.github/skills'];
 
 const CLAUDE_MD_WORKFLOW_ENFORCEMENT = [
   'Before using edit, write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.',
@@ -373,6 +377,96 @@ function generateWorkflowSection() {
     source: 'GSD defaults',
     hasFallback: false,
   };
+}
+
+/**
+ * Discover project skills from standard directories and extract frontmatter
+ * (name + description) for each. Returns a table summary for AGENTS.md so
+ * agents know which skills are available at session startup (Layer 1 discovery).
+ */
+function generateSkillsSection(cwd) {
+  const discovered = [];
+
+  for (const dir of SKILL_SEARCH_DIRS) {
+    const absDir = path.join(cwd, dir);
+    if (!fs.existsSync(absDir)) continue;
+
+    let entries;
+    try {
+      entries = fs.readdirSync(absDir, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      // Skip GSD's own installed skills — only surface project-specific skills
+      if (entry.name.startsWith('gsd-')) continue;
+
+      const skillMdPath = path.join(absDir, entry.name, 'SKILL.md');
+      if (!fs.existsSync(skillMdPath)) continue;
+
+      const content = safeReadFile(skillMdPath);
+      if (!content) continue;
+
+      const frontmatter = extractSkillFrontmatter(content);
+      const name = frontmatter.name || entry.name;
+      const description = frontmatter.description || '';
+
+      // Avoid duplicates when same skill dir is symlinked from multiple locations
+      if (discovered.some(s => s.name === name)) continue;
+
+      discovered.push({ name, description, path: `${dir}/${entry.name}` });
+    }
+  }
+
+  if (discovered.length === 0) {
+    return { content: CLAUDE_MD_FALLBACKS.skills, source: 'skills/', hasFallback: true };
+  }
+
+  const lines = ['| skill | Description | Path |', '|-------|-------------|------|'];
+  for (const skill of discovered) {
+    // Sanitize table cell content (escape pipes)
+    const desc = skill.description.replace(/\|/g, '\\|').replace(/\n/g, ' ').trim();
+    const safeName = skill.name.replace(/\|/g, '\\|');
+    lines.push(`| ${safeName} | ${desc} | \`${skill.path}/SKILL.md\` |`);
+  }
+
+  return { content: lines.join('\n'), source: 'skills/', hasFallback: false };
+}
+
+/**
+ * Extract name and description from YAML-like frontmatter in a SKILL.md file.
+ * Handles multi-line description values (continuation lines indented with spaces).
+ */
+function extractSkillFrontmatter(content) {
+  const result = { name: '', description: '' };
+  const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
+  if (!fmMatch) return result;
+
+  const fmBlock = fmMatch[1];
+  const lines = fmBlock.split('\n');
+
+  let currentKey = '';
+  for (const line of lines) {
+    // Top-level key: value
+    const kvMatch = line.match(/^(\w[\w-]*):\s*(.*)/);
+    if (kvMatch) {
+      currentKey = kvMatch[1];
+      const value = kvMatch[2].trim();
+      if (currentKey === 'name') result.name = value;
+      if (currentKey === 'description') result.description = value;
+      continue;
+    }
+    // Continuation line (indented) for multi-line values
+    if (currentKey === 'description' && /^\s+/.test(line)) {
+      result.description += ' ' + line.trim();
+    } else {
+      currentKey = '';
+    }
+  }
+
+  return result;
 }
 
 // ─── Commands ─────────────────────────────────────────────────────────────────
@@ -815,12 +909,13 @@ function cmdGenerateClaudeProfile(cwd, options, raw) {
 }
 
 function cmdGenerateClaudeMd(cwd, options, raw) {
-  const MANAGED_SECTIONS = ['project', 'stack', 'conventions', 'architecture', 'workflow'];
+  const MANAGED_SECTIONS = ['project', 'stack', 'conventions', 'architecture', 'skills', 'workflow'];
   const generators = {
     project: generateProjectSection,
     stack: generateStackSection,
     conventions: generateConventionsSection,
     architecture: generateArchitectureSection,
+    skills: generateSkillsSection,
     workflow: generateWorkflowSection,
   };
   const sectionHeadings = {
@@ -828,6 +923,7 @@ function cmdGenerateClaudeMd(cwd, options, raw) {
     stack: '## Technology Stack',
     conventions: '## Conventions',
     architecture: '## Architecture',
+    skills: '## Project Skills',
     workflow: '## GSD Workflow Enforcement',
   };
 

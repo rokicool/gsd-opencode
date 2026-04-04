@@ -86,6 +86,42 @@ Provide a phase number to start testing (e.g., /gsd-verify-work 4)
 Continue to `create_uat_file`.
 </step>
 
+<step name="automated_ui_verification">
+**Automated UI Verification (when Playwright-MCP is available)**
+
+Before running manual UAT, check whether this phase has a UI component and whether
+`mcp__playwright__*` or `mcp__puppeteer__*` tools are available in the current session.
+
+```
+UI_PHASE_FLAG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_phase --raw 2>/dev/null || echo "true")
+UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
+```
+
+**If Playwright-MCP tools are available in this session (`mcp__playwright__*` tools
+respond to tool calls) AND (`UI_PHASE_FLAG` is `true` OR `UI_SPEC_FILE` is non-empty):**
+
+For each UI checkpoint listed in the phase's UI-SPEC.md (or inferred from SUMMARY.md):
+
+1. Use `mcp__playwright__navigate` (or equivalent) to open the component's URL.
+2. Use `mcp__playwright__screenshot` to capture a screenshot.
+3. Compare the screenshot visually against the spec's stated requirements
+   (dimensions, color, layout, spacing).
+4. Automatically mark checkpoints as **passed** or **needs review** based on the
+   visual comparison — no manual question required for items that clearly match.
+5. Flag items that require human judgment (subjective aesthetics, content accuracy)
+   and present only those as manual UAT questions.
+
+If automated verification is not available, fall back to the standard manual
+checkpoint questions defined in this workflow unchanged. This step is entirely
+conditional: if Playwright-MCP is not configured, behavior is unchanged from today.
+
+**Display summary line before proceeding:**
+```
+UI checkpoints: {N} auto-verified, {M} queued for manual review
+```
+
+</step>
+
 <step name="find_summaries">
 **Find what to test:**
 
@@ -375,11 +411,38 @@ Present summary:
 **If issues > 0:** Proceed to `diagnose_issues`
 
 **If issues == 0:**
+
+```bash
+SECURITY_CFG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.security_enforcement --raw 2>/dev/null || echo "true")
+SECURITY_FILE=$(ls "${PHASE_DIR}"/*-SECURITY.md 2>/dev/null | head -1)
+```
+
+If `SECURITY_CFG` is `true` AND `SECURITY_FILE` is empty:
+```
+⚠ Security enforcement enabled — /gsd-secure-phase {phase} has not run.
+Run before advancing to the next phase.
+
+All tests passed. Ready to continue.
+
+- `/gsd-secure-phase {phase}` — security review (required before advancing)
+- `/gsd-plan-phase {next}` — Plan next phase
+- `/gsd-execute-phase {next}` — Execute next phase
+- `/gsd-ui-review {phase}` — visual quality audit (if frontend files were modified)
+```
+
+If `SECURITY_CFG` is `true` AND `SECURITY_FILE` exists: check frontmatter `threats_open`. If > 0:
+```
+⚠ Security gate: {threats_open} threats open
+  /gsd-secure-phase {phase} — resolve before advancing
+```
+
+If `SECURITY_CFG` is `false` OR (`SECURITY_FILE` exists AND `threats_open` is `0`):
 ```
 All tests passed. Ready to continue.
 
 - `/gsd-plan-phase {next}` — Plan next phase
 - `/gsd-execute-phase {next}` — Execute next phase
+- `/gsd-secure-phase {phase}` — security review
 - `/gsd-ui-review {phase}` — visual quality audit (if frontend files were modified)
 ```
 </step>
@@ -420,8 +483,7 @@ Display:
 Spawn gsd-planner in --gaps mode:
 
 ```
-task(
-  prompt="""
+@gsd-planner """
 <planning_context>
 
 **Phase:** {phase_number}
@@ -441,11 +503,7 @@ ${AGENT_SKILLS_PLANNER}
 Output consumed by /gsd-execute-phase
 Plans must be executable prompts.
 </downstream_consumer>
-""",
-  subagent_type="gsd-planner",
-  model="{planner_model}",
-  description="Plan gap fixes for Phase {phase}"
-)
+"""
 ```
 
 On return:
@@ -470,8 +528,7 @@ Initialize: `iteration_count = 1`
 Spawn gsd-plan-checker:
 
 ```
-task(
-  prompt="""
+@gsd-plan-checker """
 <verification_context>
 
 **Phase:** {phase_number}
@@ -490,11 +547,7 @@ Return one of:
 - ## VERIFICATION PASSED — all checks pass
 - ## ISSUES FOUND — structured issue list
 </expected_output>
-""",
-  subagent_type="gsd-plan-checker",
-  model="{checker_model}",
-  description="Verify Phase {phase} fix plans"
-)
+"""
 ```
 
 On return:
@@ -512,8 +565,7 @@ Display: `Sending back to planner for revision... (iteration {N}/3)`
 Spawn gsd-planner with revision context:
 
 ```
-task(
-  prompt="""
+@gsd-planner """
 <revision_context>
 
 **Phase:** {phase_number}
@@ -534,11 +586,7 @@ ${AGENT_SKILLS_PLANNER}
 read existing PLAN.md files. Make targeted updates to address checker issues.
 Do NOT replan from scratch unless issues are fundamental.
 </instructions>
-""",
-  subagent_type="gsd-planner",
-  model="{planner_model}",
-  description="Revise Phase {phase} plans"
-)
+"""
 ```
 
 After planner returns → spawn checker again (verify_gap_plans logic)

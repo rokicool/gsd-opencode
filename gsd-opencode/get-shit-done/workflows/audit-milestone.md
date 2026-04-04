@@ -67,8 +67,7 @@ With phase context collected:
 Extract `MILESTONE_REQ_IDS` from REQUIREMENTS.md traceability table — all REQ-IDs assigned to phases in this milestone.
 
 ```
-task(
-  prompt="Check cross-phase integration and E2E flows.
+@gsd-integration-checker "Check cross-phase integration and E2E flows.
 
 Phases: {phase_dirs}
 Phase exports: {from SUMMARYs}
@@ -80,10 +79,7 @@ Milestone Requirements:
 MUST map each integration finding to affected requirement IDs where applicable.
 
 Verify cross-phase wiring and E2E user flows.
-${AGENT_SKILLS_CHECKER}",
-  subagent_type="gsd-integration-checker",
-  model="{integration_checker_model}"
-)
+${AGENT_SKILLS_CHECKER}"
 ```
 
 ## 4. Collect Results
@@ -229,9 +225,9 @@ All requirements covered. Cross-phase integration verified. E2E flows complete.
 
 **Complete milestone** — archive and tag
 
-/gsd-complete-milestone {version}
+/new then:
 
-*/new first → fresh context window*
+/gsd-complete-milestone {version}
 
 ───────────────────────────────────────────────────────────────
 
@@ -274,9 +270,9 @@ Phases needing validation: run `/gsd-validate-phase {N}` for each flagged phase.
 
 **Plan gap closure** — create phases to complete milestone
 
-/gsd-plan-milestone-gaps
+/new then:
 
-*/new first → fresh context window*
+/gsd-plan-milestone-gaps
 
 ───────────────────────────────────────────────────────────────
 
@@ -316,9 +312,9 @@ All requirements met. No critical blockers. Accumulated tech debt needs review.
 
 **B. Plan cleanup phase** — address debt before completing
 
-/gsd-plan-milestone-gaps
+/new then:
 
-*/new first → fresh context window*
+/gsd-plan-milestone-gaps
 
 ───────────────────────────────────────────────────────────────
 </offer_next>

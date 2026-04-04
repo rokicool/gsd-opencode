@@ -22,9 +22,14 @@ const VALID_CONFIG_KEYS = new Set([
   'workflow.discuss_mode',
   'workflow.skip_discuss',
   'workflow._auto_chain_active',
-  'git.branching_strategy', 'git.phase_branch_template', 'git.milestone_branch_template', 'git.quick_branch_template',
+  'workflow.use_worktrees',
+  'git.branching_strategy', 'git.base_branch', 'git.phase_branch_template', 'git.milestone_branch_template', 'git.quick_branch_template',
   'planning.commit_docs', 'planning.search_gitignored',
+  'workflow.subagent_timeout',
   'hooks.context_warnings',
+  'project_code', 'phase_naming',
+  'manager.flags.discuss', 'manager.flags.plan', 'manager.flags.execute',
+  'response_language',
 ]);
 
 /**
@@ -132,6 +137,8 @@ function buildNewProjectConfig(userChoices) {
     hooks: {
       context_warnings: true,
     },
+    project_code: null,
+    phase_naming: 'sequential',
     agent_skills: {},
   };
 
@@ -434,6 +441,7 @@ function getCmdConfigSetModelProfileResultMessage(
 }
 
 module.exports = {
+  VALID_CONFIG_KEYS,
   cmdConfigEnsureSection,
   cmdConfigSet,
   cmdConfigGet,

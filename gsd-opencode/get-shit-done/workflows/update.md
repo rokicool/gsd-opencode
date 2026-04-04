@@ -11,28 +11,59 @@ read all files referenced by the invoking prompt's execution_context before star
 <step name="get_installed_version">
 Detect whether GSD is installed locally or globally by checking both locations and validating install integrity.
 
-First, derive `PREFERRED_RUNTIME` from the invoking prompt's `execution_context` path:
+First, derive `PREFERRED_CONFIG_DIR` and `PREFERRED_RUNTIME` from the invoking prompt's `execution_context` path:
+- If the path contains `/get-shit-done/workflows/update.md`, strip that suffix and store the remainder as `PREFERRED_CONFIG_DIR`
 - Path contains `/.codex/` -> `codex`
 - Path contains `/.gemini/` -> `gemini`
-- Path contains `/.config/opencode/` or `/.opencode/` -> `opencode`
+- Path contains `/.config/kilo/` or `/.kilo/`, or `PREFERRED_CONFIG_DIR` contains `kilo.json` / `kilo.jsonc` -> `kilo`
+- Path contains `/.config/opencode/` or `/.opencode/`, or `PREFERRED_CONFIG_DIR` contains `opencode.json` / `opencode.jsonc` -> `opencode`
 - Otherwise -> `OpenCode`
 
+Use `PREFERRED_CONFIG_DIR` when available so custom `--config-dir` installs are checked before default locations.
 Use `PREFERRED_RUNTIME` as the first runtime checked so `/gsd-update` targets the runtime that invoked it.
 
+Kilo config precedence must match the installer: `KILO_CONFIG_DIR` -> `dirname(KILO_CONFIG)` -> `XDG_CONFIG_HOME/kilo` -> `~/.config/kilo`.
+
 ```bash
+expand_home() {
+  case "$1" in
+    "~/"*) printf '%s/%s\n' "$HOME" "${1#~/}" ;;
+    *) printf '%s\n' "$1" ;;
+  esac
+}
+
 # Runtime candidates: "<runtime>:<config-dir>" stored as an array.
 # Using an array instead of a space-separated string ensures correct
 # iteration in both bash and zsh (zsh does not word-split unquoted
 # variables by default). Fixes #1173.
-RUNTIME_DIRS=( "OpenCode:.OpenCode" "opencode:.config/opencode" "opencode:.opencode" "gemini:.gemini" "codex:.codex" )
+RUNTIME_DIRS=( "OpenCode:.OpenCode" "opencode:.config/opencode" "opencode:.opencode" "gemini:.gemini" "kilo:.config/kilo" "kilo:.kilo" "codex:.codex" )
+ENV_RUNTIME_DIRS=()
 
-# PREFERRED_RUNTIME should be set from execution_context before running this block.
-# If not set, infer from runtime env vars; fallback to OpenCode.
+# PREFERRED_CONFIG_DIR / PREFERRED_RUNTIME should be set from execution_context
+# before running this block.
+if [ -n "$PREFERRED_CONFIG_DIR" ]; then
+  PREFERRED_CONFIG_DIR="$(expand_home "$PREFERRED_CONFIG_DIR")"
+  if [ -z "$PREFERRED_RUNTIME" ]; then
+    if [ -f "$PREFERRED_CONFIG_DIR/kilo.json" ] || [ -f "$PREFERRED_CONFIG_DIR/kilo.jsonc" ]; then
+      PREFERRED_RUNTIME="kilo"
+    elif [ -f "$PREFERRED_CONFIG_DIR/opencode.json" ] || [ -f "$PREFERRED_CONFIG_DIR/opencode.jsonc" ]; then
+      PREFERRED_RUNTIME="opencode"
+    elif [ -f "$PREFERRED_CONFIG_DIR/config.toml" ]; then
+      PREFERRED_RUNTIME="codex"
+    fi
+  fi
+fi
+
+# If runtime is still unknown, infer from runtime env vars; fallback to OpenCode.
 if [ -z "$PREFERRED_RUNTIME" ]; then
   if [ -n "$CODEX_HOME" ]; then
     PREFERRED_RUNTIME="codex"
   elif [ -n "$GEMINI_CONFIG_DIR" ]; then
     PREFERRED_RUNTIME="gemini"
+  elif [ -n "$KILO_CONFIG_DIR" ]; then
+    PREFERRED_RUNTIME="kilo"
+  elif [ -n "$KILO_CONFIG" ]; then
+    PREFERRED_RUNTIME="kilo"
   elif [ -n "$OPENCODE_CONFIG_DIR" ] || [ -n "$OPENCODE_CONFIG" ]; then
     PREFERRED_RUNTIME="opencode"
   elif [ -n "$CLAUDE_CONFIG_DIR" ]; then
@@ -42,12 +73,75 @@ if [ -z "$PREFERRED_RUNTIME" ]; then
   fi
 fi
 
+# If execution_context already points at an installed config dir, trust it first.
+# This covers custom --config-dir installs that do not live under the default
+# runtime directories.
+if [ -n "$PREFERRED_CONFIG_DIR" ] && { [ -f "$PREFERRED_CONFIG_DIR/get-shit-done/VERSION" ] || [ -f "$PREFERRED_CONFIG_DIR/get-shit-done/workflows/update.md" ]; }; then
+  INSTALL_SCOPE="GLOBAL"
+  for dir in .OpenCode .config/opencode .opencode .gemini .config/kilo .kilo .codex; do
+    resolved_local="$(cd "./$dir" 2>/dev/null && pwd)"
+    if [ -n "$resolved_local" ] && [ "$resolved_local" = "$PREFERRED_CONFIG_DIR" ]; then
+      INSTALL_SCOPE="LOCAL"
+      break
+    fi
+  done
+
+  if [ -f "$PREFERRED_CONFIG_DIR/get-shit-done/VERSION" ] && grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+' "$PREFERRED_CONFIG_DIR/get-shit-done/VERSION"; then
+    INSTALLED_VERSION="$(cat "$PREFERRED_CONFIG_DIR/get-shit-done/VERSION")"
+  else
+    INSTALLED_VERSION="0.0.0"
+  fi
+
+  echo "$INSTALLED_VERSION"
+  echo "$INSTALL_SCOPE"
+  echo "${PREFERRED_RUNTIME:-OpenCode}"
+  exit 0
+fi
+
+# Absolute global candidates from env overrides (covers custom config dirs).
+if [ -n "$CLAUDE_CONFIG_DIR" ]; then
+  ENV_RUNTIME_DIRS+=( "OpenCode:$(expand_home "$CLAUDE_CONFIG_DIR")" )
+fi
+if [ -n "$GEMINI_CONFIG_DIR" ]; then
+  ENV_RUNTIME_DIRS+=( "gemini:$(expand_home "$GEMINI_CONFIG_DIR")" )
+fi
+if [ -n "$KILO_CONFIG_DIR" ]; then
+  ENV_RUNTIME_DIRS+=( "kilo:$(expand_home "$KILO_CONFIG_DIR")" )
+elif [ -n "$KILO_CONFIG" ]; then
+  ENV_RUNTIME_DIRS+=( "kilo:$(dirname "$(expand_home "$KILO_CONFIG")")" )
+elif [ -n "$XDG_CONFIG_HOME" ]; then
+  ENV_RUNTIME_DIRS+=( "kilo:$(expand_home "$XDG_CONFIG_HOME")/kilo" )
+fi
+if [ -n "$OPENCODE_CONFIG_DIR" ]; then
+  ENV_RUNTIME_DIRS+=( "opencode:$(expand_home "$OPENCODE_CONFIG_DIR")" )
+elif [ -n "$OPENCODE_CONFIG" ]; then
+  ENV_RUNTIME_DIRS+=( "opencode:$(dirname "$(expand_home "$OPENCODE_CONFIG")")" )
+elif [ -n "$XDG_CONFIG_HOME" ]; then
+  ENV_RUNTIME_DIRS+=( "opencode:$(expand_home "$XDG_CONFIG_HOME")/opencode" )
+fi
+if [ -n "$CODEX_HOME" ]; then
+  ENV_RUNTIME_DIRS+=( "codex:$(expand_home "$CODEX_HOME")" )
+fi
+
 # Reorder entries so preferred runtime is checked first.
 ORDERED_RUNTIME_DIRS=()
 for entry in "${RUNTIME_DIRS[@]}"; do
   runtime="${entry%%:*}"
   if [ "$runtime" = "$PREFERRED_RUNTIME" ]; then
     ORDERED_RUNTIME_DIRS+=( "$entry" )
+  fi
+done
+ORDERED_ENV_RUNTIME_DIRS=()
+for entry in "${ENV_RUNTIME_DIRS[@]}"; do
+  runtime="${entry%%:*}"
+  if [ "$runtime" = "$PREFERRED_RUNTIME" ]; then
+    ORDERED_ENV_RUNTIME_DIRS+=( "$entry" )
+  fi
+done
+for entry in "${ENV_RUNTIME_DIRS[@]}"; do
+  runtime="${entry%%:*}"
+  if [ "$runtime" != "$PREFERRED_RUNTIME" ]; then
+    ORDERED_ENV_RUNTIME_DIRS+=( "$entry" )
   fi
 done
 for entry in "${RUNTIME_DIRS[@]}"; do
@@ -72,17 +166,31 @@ for entry in "${ORDERED_RUNTIME_DIRS[@]}"; do
 done
 
 GLOBAL_VERSION_FILE="" GLOBAL_MARKER_FILE="" GLOBAL_DIR="" GLOBAL_RUNTIME=""
-for entry in "${ORDERED_RUNTIME_DIRS[@]}"; do
+for entry in "${ORDERED_ENV_RUNTIME_DIRS[@]}"; do
   runtime="${entry%%:*}"
   dir="${entry#*:}"
-  if [ -f "$HOME/$dir/get-shit-done/VERSION" ] || [ -f "$HOME/$dir/get-shit-done/workflows/update.md" ]; then
+  if [ -f "$dir/get-shit-done/VERSION" ] || [ -f "$dir/get-shit-done/workflows/update.md" ]; then
     GLOBAL_RUNTIME="$runtime"
-    GLOBAL_VERSION_FILE="$HOME/$dir/get-shit-done/VERSION"
-    GLOBAL_MARKER_FILE="$HOME/$dir/get-shit-done/workflows/update.md"
-    GLOBAL_DIR="$(cd "$HOME/$dir" 2>/dev/null && pwd)"
+    GLOBAL_VERSION_FILE="$dir/get-shit-done/VERSION"
+    GLOBAL_MARKER_FILE="$dir/get-shit-done/workflows/update.md"
+    GLOBAL_DIR="$(cd "$dir" 2>/dev/null && pwd)"
     break
   fi
 done
+
+if [ -z "$GLOBAL_RUNTIME" ]; then
+  for entry in "${ORDERED_RUNTIME_DIRS[@]}"; do
+    runtime="${entry%%:*}"
+    dir="${entry#*:}"
+    if [ -f "$HOME/$dir/get-shit-done/VERSION" ] || [ -f "$HOME/$dir/get-shit-done/workflows/update.md" ]; then
+      GLOBAL_RUNTIME="$runtime"
+      GLOBAL_VERSION_FILE="$HOME/$dir/get-shit-done/VERSION"
+      GLOBAL_MARKER_FILE="$HOME/$dir/get-shit-done/workflows/update.md"
+      GLOBAL_DIR="$(cd "$HOME/$dir" 2>/dev/null && pwd)"
+      break
+    fi
+  done
+fi
 
 # Only treat as LOCAL if the resolved paths differ (prevents misdetection when CWD=$HOME)
 IS_LOCAL=false
@@ -123,7 +231,7 @@ echo "$TARGET_RUNTIME"
 Parse output:
 - Line 1 = installed version (`0.0.0` means unknown version)
 - Line 2 = install scope (`LOCAL`, `GLOBAL`, or `UNKNOWN`)
-- Line 3 = target runtime (`OpenCode`, `opencode`, `gemini`, or `codex`)
+- Line 3 = target runtime (`OpenCode`, `opencode`, `gemini`, `kilo`, or `codex`)
 - If scope is `UNKNOWN`, proceed to install step using `--OpenCode --global` fallback.
 
 If multiple runtime installs are detected and the invoking runtime cannot be determined from execution_context, ask the user which runtime to update before running install.
@@ -221,8 +329,8 @@ Exit.
 - `agents/gsd-*` files will be replaced
 
 (Paths are relative to detected runtime install location:
-global: `$HOME/.config/opencode/`, `~/.config/opencode/`, `~/.opencode/`, `~/.gemini/`, or `~/.codex/`
-local: `./.OpenCode/`, `./.config/opencode/`, `./.opencode/`, `./.gemini/`, or `./.codex/`)
+global: `$HOME/.config/opencode/`, `~/.config/opencode/`, `~/.opencode/`, `~/.gemini/`, `~/.config/kilo/`, or `~/.codex/`
+local: `./.OpenCode/`, `./.config/opencode/`, `./.opencode/`, `./.gemini/`, `./.kilo/`, or `./.codex/`)
 
 Your custom files in other locations are preserved:
 - Custom commands not in `commands/gsd/` ✓
@@ -270,14 +378,55 @@ Capture output. If install fails, show error and exit.
 Clear the update cache so statusline indicator disappears:
 
 ```bash
-# Clear update cache across all runtime directories
-for dir in .OpenCode .config/opencode .opencode .gemini .codex; do
+expand_home() {
+  case "$1" in
+    "~/"*) printf '%s/%s\n' "$HOME" "${1#~/}" ;;
+    *) printf '%s\n' "$1" ;;
+  esac
+}
+
+# Clear update cache across preferred, env-derived, and default runtime directories
+CACHE_DIRS=()
+if [ -n "$PREFERRED_CONFIG_DIR" ]; then
+  CACHE_DIRS+=( "$(expand_home "$PREFERRED_CONFIG_DIR")" )
+fi
+if [ -n "$CLAUDE_CONFIG_DIR" ]; then
+  CACHE_DIRS+=( "$(expand_home "$CLAUDE_CONFIG_DIR")" )
+fi
+if [ -n "$GEMINI_CONFIG_DIR" ]; then
+  CACHE_DIRS+=( "$(expand_home "$GEMINI_CONFIG_DIR")" )
+fi
+if [ -n "$KILO_CONFIG_DIR" ]; then
+  CACHE_DIRS+=( "$(expand_home "$KILO_CONFIG_DIR")" )
+elif [ -n "$KILO_CONFIG" ]; then
+  CACHE_DIRS+=( "$(dirname "$(expand_home "$KILO_CONFIG")")" )
+elif [ -n "$XDG_CONFIG_HOME" ]; then
+  CACHE_DIRS+=( "$(expand_home "$XDG_CONFIG_HOME")/kilo" )
+fi
+if [ -n "$OPENCODE_CONFIG_DIR" ]; then
+  CACHE_DIRS+=( "$(expand_home "$OPENCODE_CONFIG_DIR")" )
+elif [ -n "$OPENCODE_CONFIG" ]; then
+  CACHE_DIRS+=( "$(dirname "$(expand_home "$OPENCODE_CONFIG")")" )
+elif [ -n "$XDG_CONFIG_HOME" ]; then
+  CACHE_DIRS+=( "$(expand_home "$XDG_CONFIG_HOME")/opencode" )
+fi
+if [ -n "$CODEX_HOME" ]; then
+  CACHE_DIRS+=( "$(expand_home "$CODEX_HOME")" )
+fi
+
+for dir in "${CACHE_DIRS[@]}"; do
+  if [ -n "$dir" ]; then
+    rm -f "$dir/cache/gsd-update-check.json"
+  fi
+done
+
+for dir in .OpenCode .config/opencode .opencode .gemini .config/kilo .kilo .codex; do
   rm -f "./$dir/cache/gsd-update-check.json"
   rm -f "$HOME/$dir/cache/gsd-update-check.json"
 done
 ```
 
-The SessionStart hook (`gsd-check-update.js`) writes to the detected runtime's cache directory, so all paths must be cleared to prevent stale update indicators.
+The SessionStart hook (`gsd-check-update.js`) writes to the detected runtime's cache directory, so preferred/env-derived paths and default paths must all be cleared to prevent stale update indicators.
 </step>
 
 <step name="display_result">

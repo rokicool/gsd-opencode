@@ -1,7 +1,7 @@
 ---
 name: gsd-debug
 description: Systematic debugging with persistent state across context resets
-argument-hint: [issue description]
+argument-hint: [--diagnose] [issue description]
 permissions:
    read: true
    bash: true
@@ -15,6 +15,9 @@ Debug issues using scientific method with subagent isolation.
 **Orchestrator role:** Gather symptoms, spawn gsd-debugger agent, handle checkpoints, spawn continuations.
 
 **Why subagent:** Investigation burns context fast (reading files, forming hypotheses, testing). Fresh 200k context per investigation. Main context stays lean for user interaction.
+
+**Flags:**
+- `--diagnose` — Diagnose only. Find root cause without applying a fix. Returns a structured Root Cause Report. Use when you want to validate the diagnosis before committing to a fix.
 </objective>
 
 <available_agent_types>
@@ -24,6 +27,10 @@ Valid GSD subagent types (use exact names — do not fall back to 'general'):
 
 <context>
 User's issue: $ARGUMENTS
+
+Parse flags from $ARGUMENTS:
+- If `--diagnose` is present, set `diagnose_only=true` and remove the flag from the issue description.
+- Otherwise, `diagnose_only=false`.
 
 Check for active sessions:
 ```bash
@@ -87,7 +94,7 @@ timeline: {timeline}
 
 <mode>
 symptoms_prefilled: true
-goal: find_and_fix
+goal: {if diagnose_only: "find_root_cause_only", else: "find_and_fix"}
 </mode>
 
 <debug_file>
@@ -96,22 +103,23 @@ Create: .planning/debug/{slug}.md
 ```
 
 ```
-task(
-  prompt=filled_prompt,
-  subagent_type="gsd-debugger",
-  model="{debugger_model}",
-  description="Debug {slug}"
-)
+@gsd-debugger filled_prompt
 ```
 
 ## 4. Handle Agent Return
 
-**If `## ROOT CAUSE FOUND`:**
-- Display root cause and evidence summary
+**If `## ROOT CAUSE FOUND` (diagnose-only mode):**
+- Display root cause, confidence level, files involved, and suggested fix strategies
 - Offer options:
-  - "Fix now" - spawn fix subagent
-  - "Plan fix" - suggest /gsd-plan-phase --gaps
-  - "Manual fix" - done
+  - "Fix now" — spawn a continuation agent with `goal: find_and_fix` to apply the fix (see step 5)
+  - "Plan fix" — suggest `/gsd-plan-phase --gaps`
+  - "Manual fix" — done
+
+**If `## DEBUG COMPLETE` (find_and_fix mode):**
+- Display root cause and fix summary
+- Offer options:
+  - "Plan fix" — suggest `/gsd-plan-phase --gaps` if further work needed
+  - "Done" — mark resolved
 
 **If `## CHECKPOINT REACHED`:**
 - Present checkpoint details to user
@@ -128,9 +136,9 @@ task(
   - "Manual investigation" - done
   - "Add more context" - gather more symptoms, spawn again
 
-## 5. Spawn Continuation Agent (After Checkpoint)
+## 5. Spawn Continuation Agent (After Checkpoint or "Fix now")
 
-When user responds to checkpoint, spawn fresh agent:
+When user responds to checkpoint OR selects "Fix now" from diagnose-only results, spawn fresh agent:
 
 ```markdown
 <objective>
@@ -154,12 +162,7 @@ goal: find_and_fix
 ```
 
 ```
-task(
-  prompt=continuation_prompt,
-  subagent_type="gsd-debugger",
-  model="{debugger_model}",
-  description="Continue debug {slug}"
-)
+@gsd-debugger continuation_prompt
 ```
 
 </process>

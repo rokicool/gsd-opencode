@@ -33,7 +33,8 @@ GSD stores project settings in `.planning/config.json`. Created during `/gsd-new
     "research_before_questions": false,
     "discuss_mode": "discuss",
     "skip_discuss": false,
-    "text_mode": false
+    "text_mode": false,
+    "use_worktrees": true
   },
   "hooks": {
     "context_warnings": true,
@@ -67,6 +68,10 @@ GSD stores project settings in `.planning/config.json`. Created during `/gsd-new
     "always_confirm_destructive": true,
     "always_confirm_external_services": true
   },
+  "project_code": null,
+  "security_enforcement": true,
+  "security_asvs_level": 1,
+  "security_block_on": "high",
   "agent_skills": {}
 }
 ```
@@ -80,6 +85,7 @@ GSD stores project settings in `.planning/config.json`. Created during `/gsd-new
 | `mode` | enum | `interactive`, `yolo` | `interactive` | `yolo` auto-approves decisions; `interactive` confirms at each step |
 | `granularity` | enum | `coarse`, `standard`, `fine` | `standard` | Controls phase count: `coarse` (3-5), `standard` (5-8), `fine` (8-12) |
 | `model_profile` | enum | `quality`, `balanced`, `budget`, `inherit` | `balanced` | Model tier for each agent (see [Model Profiles](#model-profiles)) |
+| `project_code` | string | any short string | (none) | Prefix for phase directory names (e.g., `"ABC"` produces `ABC-01-setup/`). Added in v1.31 |
 
 > **Note:** `granularity` was renamed from `depth` in v1.22.3. Existing configs are auto-migrated.
 
@@ -104,6 +110,7 @@ All workflow toggles follow the **absent = enabled** pattern. If a key is missin
 | `workflow.discuss_mode` | string | `'discuss'` | Controls how `/gsd-discuss-phase` gathers context. `'discuss'` (default) asks questions one-by-one. `'assumptions'` reads the codebase first, generates structured assumptions with confidence levels, and only asks you to correct what's wrong. Added in v1.28 |
 | `workflow.skip_discuss` | boolean | `false` | When `true`, `/gsd-autonomous` bypasses the discuss-phase entirely, writing minimal CONTEXT.md from the ROADMAP phase goal. Useful for projects where developer preferences are fully captured in PROJECT.md/REQUIREMENTS.md. Added in v1.28 |
 | `workflow.text_mode` | boolean | `false` | Replaces question TUI menus with plain-text numbered lists. Required for OpenCode remote sessions (`/rc` mode) where TUI menus don't render. Can also be set per-session with `--text` flag on discuss-phase. Added in v1.28 |
+| `workflow.use_worktrees` | boolean | `true` | When `false`, disables git worktree isolation for parallel execution. Users who prefer sequential execution or whose environment does not support worktrees can disable this. Added in v1.31 |
 
 ### Recommended Presets
 
@@ -191,7 +198,7 @@ Any GSD agent type can receive skills. Common types:
 
 ### How It Works
 
-At spawn time, workflows call `node gsd-tools.cjs agent-skills <type>` to load configured skills. If skills exist for the agent type, they are injected as an `<agent_skills>` block in the task() prompt:
+At spawn time, workflows call `node gsd-tools.cjs agent-skills <type>` to load configured skills. If skills exist for the agent type, they are injected as an `<agent_skills>` block in the @subagent prompt:
 
 ```xml
 <agent_skills>
@@ -299,6 +306,18 @@ Control confirmation prompts during workflows.
 
 ---
 
+## Security Settings
+
+Settings for the security enforcement feature (v1.31). All follow the **absent = enabled** pattern.
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `security_enforcement` | boolean | `true` | Enable threat-model-anchored security verification via `/gsd-secure-phase`. When `false`, security checks are skipped entirely |
+| `security_asvs_level` | number (1-3) | `1` | OWASP ASVS verification level. Level 1 = opportunistic, Level 2 = standard, Level 3 = comprehensive |
+| `security_block_on` | string | `"high"` | Minimum severity that blocks phase advancement. Options: `"high"`, `"medium"`, `"low"` |
+
+---
+
 ## Hook Settings
 
 | Setting | Type | Default | Description |
@@ -342,7 +361,7 @@ Override specific agents without changing the entire profile:
 
 Valid override values: `opus`, `sonnet`, `haiku`, `inherit`, or any fully-qualified model ID (e.g., `"openai/o3"`, `"google/gemini-2.5-pro"`).
 
-### Non-OpenCode Runtimes (Codex, OpenCode, Gemini CLI)
+### Non-OpenCode Runtimes (Codex, OpenCode, Gemini CLI, Kilo)
 
 When GSD is installed for a non-OpenCode runtime, the installer automatically sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This causes GSD to return an empty model parameter for all agents, so each agent uses whatever model the runtime is configured with. No additional setup is needed for the default case.
 
@@ -377,7 +396,7 @@ The intent is the same as the OpenCode profile tiers -- use a stronger model for
 |-------|----------|----------|
 | `false` (default) | Returns OpenCode aliases (`opus`, `sonnet`, `haiku`) | OpenCode with native Anthropic API |
 | `true` | Maps aliases to full OpenCode model IDs (`OpenCode-opus-4-0`) | OpenCode with API that requires full IDs |
-| `"omit"` | Returns empty string (runtime picks its default) | Non-OpenCode runtimes (Codex, OpenCode, Gemini CLI) |
+| `"omit"` | Returns empty string (runtime picks its default) | Non-OpenCode runtimes (Codex, OpenCode, Gemini CLI, Kilo) |
 
 ### Profile Philosophy
 
@@ -397,6 +416,7 @@ The intent is the same as the OpenCode profile tiers -- use a stronger model for
 | `CLAUDE_CONFIG_DIR` | Override default config directory (`$HOME/.config/opencode/`) |
 | `GEMINI_API_KEY` | Detected by context monitor to switch hook event name |
 | `WSL_DISTRO_NAME` | Detected by installer for WSL path handling |
+| `GSD_SKIP_SCHEMA_CHECK` | Skip schema drift detection during execute-phase (v1.31) |
 
 ---
 

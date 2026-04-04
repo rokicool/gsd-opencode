@@ -134,7 +134,7 @@ Usage: `/gsd-do I want to start a new milestone`
 
 ### Quick Mode
 
-**`/gsd-quick [--full] [--discuss] [--research]`**
+**`/gsd-quick [--full] [--validate] [--discuss] [--research]`**
 Execute small, ad-hoc tasks with GSD guarantees but skip optional agents.
 
 Quick mode uses the same system with a shorter path:
@@ -143,14 +143,16 @@ Quick mode uses the same system with a shorter path:
 - Updates STATE.md tracking (not ROADMAP.md)
 
 Flags enable additional quality steps:
+- `--full` — Complete quality pipeline: discussion + research + plan-checking + verification
+- `--validate` — Plan-checking (max 2 iterations) and post-execution verification only
 - `--discuss` — Lightweight discussion to surface gray areas before planning
 - `--research` — Focused research agent investigates approaches before planning
-- `--full` — Adds plan-checking (max 2 iterations) and post-execution verification
 
-Flags are composable: `--discuss --research --full` gives the complete quality pipeline for a single task.
+Granular flags are composable: `--discuss --research --validate` gives the same as `--full`.
 
 Usage: `/gsd-quick`
-Usage: `/gsd-quick --research --full`
+Usage: `/gsd-quick --full`
+Usage: `/gsd-quick --research --validate`
 Result: Creates `.planning/quick/NNN-slug/PLAN.md`, `.planning/quick/NNN-slug/SUMMARY.md`
 
 ---
@@ -343,11 +345,12 @@ Usage: `/gsd-ship 4` or `/gsd-ship 4 --draft`
 
 ---
 
-**`/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--all]`**
+**`/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--coderabbit] [--all]`**
 Cross-AI peer review — invoke external AI CLIs to independently review phase plans.
 
-- Detects available CLIs (gemini, OpenCode, codex)
+- Detects available CLIs (gemini, OpenCode, codex, coderabbit)
 - Each CLI reviews plans independently with the same structured prompt
+- CodeRabbit reviews the current git diff (not a prompt) — may take up to 5 minutes
 - Produces REVIEWS.md with per-reviewer feedback and consensus summary
 - Feed reviews back into planning: `/gsd-plan-phase N --reviews`
 

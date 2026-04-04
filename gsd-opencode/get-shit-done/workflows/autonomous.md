@@ -1,6 +1,6 @@
 <objective>
 
-Drive all remaining milestone phases autonomously. For each incomplete phase: discuss → plan → execute using skill() flat invocations. Pauses only for explicit user decisions (grey area acceptance, blockers, validation requests). Re-reads ROADMAP.md after each phase to catch dynamically inserted phases.
+Drive milestone phases autonomously — all remaining phases, a range via `--from N`/`--to N`, or a single phase via `--only N`. For each incomplete phase: discuss → plan → execute using skill() flat invocations. Pauses only for explicit user decisions (grey area acceptance, blockers, validation requests). Re-reads ROADMAP.md after each phase to catch dynamically inserted phases.
 
 </objective>
 
@@ -16,14 +16,34 @@ read all files referenced by the invoking prompt's execution_context before star
 
 ## 1. Initialize
 
-Parse `$ARGUMENTS` for `--from N` flag:
+Parse `$ARGUMENTS` for `--from N`, `--to N`, `--only N`, and `--interactive` flags:
 
 ```bash
 FROM_PHASE=""
 if echo "$ARGUMENTS" | grep -qE '\-\-from\s+[0-9]'; then
   FROM_PHASE=$(echo "$ARGUMENTS" | grep -oE '\-\-from\s+[0-9]+\.?[0-9]*' | awk '{print $2}')
 fi
+
+TO_PHASE=""
+if echo "$ARGUMENTS" | grep -qE '\-\-to\s+[0-9]'; then
+  TO_PHASE=$(echo "$ARGUMENTS" | grep -oE '\-\-to\s+[0-9]+\.?[0-9]*' | awk '{print $2}')
+fi
+
+ONLY_PHASE=""
+if echo "$ARGUMENTS" | grep -qE '\-\-only\s+[0-9]'; then
+  ONLY_PHASE=$(echo "$ARGUMENTS" | grep -oE '\-\-only\s+[0-9]+\.?[0-9]*' | awk '{print $2}')
+  FROM_PHASE="$ONLY_PHASE"
+fi
+
+INTERACTIVE=""
+if echo "$ARGUMENTS" | grep -q '\-\-interactive'; then
+  INTERACTIVE="true"
+fi
 ```
+
+When `--only` is set, also set `FROM_PHASE` to the same value so existing filter logic applies.
+
+When `--interactive` is set, discuss runs inline with questions (not auto-answered), while plan and execute are dispatched as background agents. This keeps the main context lean — only discuss conversations accumulate — while preserving user input on all design decisions.
 
 Bootstrap via milestone-level init:
 
@@ -48,7 +68,10 @@ Display startup banner:
  Phases: {phase_count} total, {completed_phases} complete
 ```
 
-If `FROM_PHASE` is set, display: `Starting from phase ${FROM_PHASE}`
+If `ONLY_PHASE` is set, display: `Single phase mode: Phase ${ONLY_PHASE}`
+Else if `FROM_PHASE` is set, display: `Starting from phase ${FROM_PHASE}`
+If `TO_PHASE` is set, display: `Stopping after phase ${TO_PHASE}`
+If `INTERACTIVE` is set, display: `Mode: Interactive (discuss inline, plan+execute in background)`
 
 </step>
 
@@ -67,6 +90,26 @@ Parse the JSON `phases` array.
 **Filter to incomplete phases:** Keep only phases where `disk_status !== "complete"` OR `roadmap_complete === false`.
 
 **Apply `--from N` filter:** If `FROM_PHASE` was provided, additionally filter out phases where `number < FROM_PHASE` (use numeric comparison — handles decimal phases like "5.1").
+
+**Apply `--to N` filter:** If `TO_PHASE` was provided, additionally filter out phases where `number > TO_PHASE` (use numeric comparison). This limits execution to phases up through the target phase.
+
+**Apply `--only N` filter:** If `ONLY_PHASE` was provided, additionally filter OUT phases where `number != ONLY_PHASE`. This means the phase list will contain exactly one phase (or zero if already complete).
+
+**If `TO_PHASE` is set and no phases remain** (all phases up to N are already completed):
+
+```
+All phases through ${TO_PHASE} are already completed. Nothing to do.
+```
+
+Exit cleanly.
+
+**If `ONLY_PHASE` is set and no phases remain** (phase already complete):
+
+```
+Phase ${ONLY_PHASE} is already complete. Nothing to do.
+```
+
+Exit cleanly.
 
 **Sort by `number`** in numeric ascending order.
 
@@ -117,7 +160,9 @@ For the current phase, display the progress banner:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Where N = current phase number (from the ROADMAP, e.g., 6), T = total milestone phases (from `phase_count` parsed in initialize step, e.g., 8), P = percentage of all milestone phases completed so far. Calculate P as: (number of phases with `disk_status` "complete" from the latest `roadmap analyze` / T × 100). Use █ for filled and ░ for empty segments in the progress bar (8 characters wide).
+Where N = current phase number (from the ROADMAP, e.g., 63), T = total milestone phases (from `phase_count` parsed in initialize step, e.g., 67). **Important:** T must be `phase_count` (the total number of phases in this milestone), NOT the count of remaining/incomplete phases. When phases are numbered 61-67, T=7 and the banner should read `Phase 63/7` (phase 63, 7 total in milestone), not `Phase 63/3` (which would confuse 3 remaining with 3 total). P = percentage of all milestone phases completed so far. Calculate P as: (number of phases with `disk_status` "complete" from the latest `roadmap analyze` / T × 100). Use █ for filled and ░ for empty segments in the progress bar (8 characters wide).
+
+**Alternative display when phase numbers exceed total** (e.g., multi-milestone projects where phases are numbered globally): If N > T (phase number exceeds milestone phase count), use the format `Phase {N} ({position}/{T})` where `position` is the 1-based index of this phase among incomplete phases being processed. This prevents confusing displays like "Phase 63/5".
 
 **3a. Smart Discuss**
 
@@ -209,15 +254,26 @@ node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${PAD
 
 Proceed to 3b.
 
-**If SKIP_DISCUSS is `false` (or unset):** Execute the smart_discuss step for this phase.
+**If SKIP_DISCUSS is `false` (or unset):**
 
-After smart_discuss completes, verify context was written:
+**IMPORTANT — Discuss must be single-pass in autonomous mode.**
+The discuss step in `--auto` mode MUST NOT loop. If CONTEXT.md already exists after discuss completes, do NOT re-invoke discuss for the same phase. The `has_context` check below is authoritative — once true, discuss is done for this phase regardless of perceived "gaps" in the context file.
+
+**If `INTERACTIVE` is set:** Run the standard discuss-phase skill inline (asks interactive questions, waits for user answers). This preserves user input on all design decisions while keeping plan+execute out of the main context:
+
+```
+skill(skill="gsd-discuss-phase", args="${PHASE_NUM}")
+```
+
+**If `INTERACTIVE` is NOT set:** Execute the smart_discuss step for this phase (batch table proposals, auto-optimized).
+
+After discuss completes (either mode), verify context was written:
 
 ```bash
 PHASE_STATE=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op ${PHASE_NUM})
 ```
 
-Check `has_context`. If false → go to handle_blocker: "Smart discuss for phase ${PHASE_NUM} did not produce CONTEXT.md."
+Check `has_context`. If false → go to handle_blocker: "Discuss for phase ${PHASE_NUM} did not produce CONTEXT.md."
 
 **3a.5. UI Design Contract (Frontend Phases)**
 
@@ -260,6 +316,20 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 
 **3b. Plan**
 
+**If `INTERACTIVE` is set:** Dispatch plan as a background agent to keep the main context lean. While plan runs, the workflow can immediately start discussing the next phase (see step 4).
+
+```
+Agent(
+  description="Plan phase ${PHASE_NUM}: ${PHASE_NAME}",
+  run_in_background=true,
+   prompt="Run plan-phase for phase ${PHASE_NUM}: skill(skill=\"/gsd-plan-phase\", args=\"${PHASE_NUM}\")"
+)
+```
+
+Store the agent task_id. After discuss for the next phase completes (or if no next phase), wait for the plan agent to finish before proceeding to execute.
+
+**If `INTERACTIVE` is NOT set (default):** Run plan inline as before.
+
 ```
 skill(skill="gsd-plan-phase", args="${PHASE_NUM}")
 ```
@@ -268,13 +338,29 @@ Verify plan produced output — re-run `init phase-op` and check `has_plans`. If
 
 **3c. Execute**
 
+**If `INTERACTIVE` is set:** Wait for the plan agent to complete (if not already), verify plans exist, then dispatch execute as a background agent:
+
+```
+Agent(
+  description="Execute phase ${PHASE_NUM}: ${PHASE_NAME}",
+  run_in_background=true,
+   prompt="Run execute-phase for phase ${PHASE_NUM}: /gsd-execute-phase ${PHASE_NUM} --no-transition"
+)
+```
+
+Store the agent task_id. The workflow can now start discussing the next phase while this phase executes in the background. Before starting post-execution routing for this phase, wait for the execute agent to complete.
+
+**If `INTERACTIVE` is NOT set (default):** Run execute inline as before.
+
 ```
 skill(skill="gsd-execute-phase", args="${PHASE_NUM} --no-transition")
 ```
 
 **3d. Post-Execution Routing**
 
-After execute-phase returns, read the verification result:
+**If `INTERACTIVE` is set:** Wait for the execute agent to complete before reading verification results.
+
+After execute-phase returns (or the execute agent completes), read the verification result:
 
 ```bash
 VERIFY_STATUS=$(grep "^status:" "${PHASE_DIR}"/*-VERIFICATION.md 2>/dev/null | head -1 | cut -d: -f2 | tr -d ' ')
@@ -404,7 +490,7 @@ Display the review result summary (score from UI-REVIEW.md if produced). Continu
 
 Run smart discuss for the current phase. Proposes grey area answers in batch tables — the user accepts or overrides per area. Produces identical CONTEXT.md output to regular discuss-phase.
 
-> **Note:** Smart discuss is an autonomous-optimized variant of the `gsd-discuss-phase` skill. It produces identical CONTEXT.md output but uses batch table proposals instead of sequential questioning. The original `discuss-phase` skill remains unchanged (per CTRL-03). Future milestones may extract this to a separate skill file.
+> **Note:** Smart discuss is an autonomous-optimized variant of the `gsd-discuss-phase` skill. It produces identical CONTEXT.md output but uses batch table proposals instead of sequential questioning. The original `gsd-discuss-phase` skill remains unchanged (per CTRL-03). Future milestones may extract this to a separate skill file.
 
 **Inputs:** `PHASE_NUM` from execute_phase. Run init to get phase paths:
 
@@ -686,7 +772,24 @@ Decisions captured: {count} across {area_count} areas
 
 ## 4. Iterate
 
-After each phase completes, re-read ROADMAP.md to catch phases inserted mid-execution (decimal phases like 5.1):
+**If `ONLY_PHASE` is set:** Do not iterate. Proceed directly to lifecycle step (which exits cleanly per single-phase mode).
+
+**If `TO_PHASE` is set and current phase number >= `TO_PHASE`:** The target phase has been reached. Do not iterate further. Display:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► AUTONOMOUS ▸ --to ${TO_PHASE} REACHED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ Completed through phase ${TO_PHASE} as requested.
+ Remaining phases were not executed.
+
+ Resume with: /gsd-autonomous --from ${next_incomplete_phase}
+```
+
+Proceed directly to lifecycle step (which handles partial completion — skips audit/complete/cleanup since not all phases are done). Exit cleanly.
+
+**Otherwise:** After each phase completes, re-read ROADMAP.md to catch phases inserted mid-execution (decimal phases like 5.1):
 
 ```bash
 ROADMAP=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
@@ -695,6 +798,7 @@ ROADMAP=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap 
 Re-filter incomplete phases using the same logic as discover_phases:
 - Keep phases where `disk_status !== "complete"` OR `roadmap_complete === false`
 - Apply `--from N` filter if originally provided
+- Apply `--to N` filter if originally provided
 - Sort by number ascending
 
 read STATE.md fresh:
@@ -707,6 +811,13 @@ Check for blockers in the Blockers/Concerns section. If blockers are found, go t
 
 If incomplete phases remain: proceed to next phase, loop back to execute_phase.
 
+**Interactive mode overlap:** When `INTERACTIVE` is set, the iterate step enables pipeline parallelism:
+1. After discuss completes for Phase N, dispatch plan+execute as background agents
+2. Immediately start discuss for Phase N+1 (the next incomplete phase) while Phase N builds
+3. Before starting plan for Phase N+1, wait for Phase N's execute agent to complete and handle its post-execution routing (verification, gap closure, etc.)
+
+This means the user is always answering discuss questions (lightweight, interactive) while the heavy work (planning, code generation) runs in the background. The main context only accumulates discuss conversations — plan and execute contexts are isolated in their agents.
+
 If all phases complete, proceed to lifecycle step.
 
 </step>
@@ -715,7 +826,23 @@ If all phases complete, proceed to lifecycle step.
 
 ## 5. Lifecycle
 
-After all phases complete, run the milestone lifecycle sequence: audit → complete → cleanup.
+**If `ONLY_PHASE` is set:** Skip lifecycle. A single phase does not trigger audit/complete/cleanup. Display:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► AUTONOMOUS ▸ PHASE ${ONLY_PHASE} COMPLETE ✓
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ Phase ${ONLY_PHASE}: ${PHASE_NAME} — Done
+ Mode: Single phase (--only)
+
+ Lifecycle skipped — run /gsd-autonomous without --only
+ after all phases complete to trigger audit/complete/cleanup.
+```
+
+Exit cleanly.
+
+**Otherwise:** After all phases complete, run the milestone lifecycle sequence: audit → complete → cleanup.
 
 Display lifecycle transition banner:
 
@@ -852,7 +979,7 @@ When any phase operation fails or a blocker is detected, present 3 options via q
  Skipped: {list of skipped phases}
  Remaining: {list of remaining phases}
 
- Resume with: /gsd-autonomous --from {next_phase}
+ Resume with: /gsd-autonomous ${ONLY_PHASE ? "--only " + ONLY_PHASE : "--from " + next_phase}${TO_PHASE ? " --to " + TO_PHASE : ""}
 ```
 
 </step>
@@ -882,10 +1009,28 @@ When any phase operation fails or a blocker is detected, present 3 options via q
 - [ ] Complete-milestone invoked via skill() with ${milestone_version} arg
 - [ ] Cleanup invoked via skill() — internal confirmation is acceptable (CTRL-01)
 - [ ] Final completion banner displayed after lifecycle
-- [ ] Progress bar uses phase number / total milestone phases (not position among incomplete)
+- [ ] Progress bar uses phase number / total milestone phases (not position among incomplete), with fallback display when phase numbers exceed total
 - [ ] Smart discuss documents relationship to discuss-phase with CTRL-03 note
 - [ ] Frontend phases get UI-SPEC generated before planning (step 3a.5) if not already present
 - [ ] Frontend phases get UI review audit after successful execution (step 3d.5) if UI-SPEC exists
 - [ ] UI phase and UI review respect workflow.ui_phase and workflow.ui_review config toggles
 - [ ] UI review is advisory (non-blocking) — phase proceeds to iterate regardless of score
+- [ ] `--only N` restricts execution to exactly one phase
+- [ ] `--only N` skips lifecycle step (audit/complete/cleanup)
+- [ ] `--only N` exits cleanly after single phase completes
+- [ ] `--only N` on already-complete phase exits with message
+- [ ] `--only N` handle_blocker resume message uses --only flag
+- [ ] `--to N` stops execution after phase N completes (halts at iterate step)
+- [ ] `--to N` filters out phases with number > N during discovery
+- [ ] `--to N` displays "Stopping after phase N" in startup banner
+- [ ] `--to N` on already completed target exits with "already completed" message
+- [ ] `--to N` compatible with `--from N` (run phases from M to N)
+- [ ] `--to N` handle_blocker resume message preserves --to flag
+- [ ] `--to N` skips lifecycle when not all milestone phases complete
+- [ ] `--interactive` runs discuss inline via gsd:discuss-phase (asks questions, waits for user)
+- [ ] `--interactive` dispatches plan and execute as background agents (context isolation)
+- [ ] `--interactive` enables pipeline parallelism: discuss Phase N+1 while Phase N builds
+- [ ] `--interactive` main context only accumulates discuss conversations (lean)
+- [ ] `--interactive` waits for background agents before post-execution routing
+- [ ] `--interactive` compatible with `--only`, `--from`, and `--to` flags
 </success_criteria>

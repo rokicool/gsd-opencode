@@ -475,9 +475,9 @@ Exit skill and invoke command("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 
 **Phase [X+1]: [Name]** — [Goal from ROADMAP.md]
 
-`/gsd-discuss-phase [X+1] ${GSD_WS}` — gather context and clarify approach
+`/new` then:
 
-*`/new` first → fresh context window*
+`/gsd-discuss-phase [X+1] ${GSD_WS}` — gather context and clarify approach
 
 ---
 
@@ -500,9 +500,9 @@ Exit skill and invoke command("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 **Phase [X+1]: [Name]** — [Goal from ROADMAP.md]
 *✓ Context gathered, ready to plan*
 
-`/gsd-plan-phase [X+1] ${GSD_WS}`
+`/new` then:
 
-*`/new` first → fresh context window*
+`/gsd-plan-phase [X+1] ${GSD_WS}`
 
 ---
 
@@ -610,9 +610,9 @@ Exit skill and invoke command("/gsd-complete-milestone {version} ${GSD_WS}")
 
 **Complete Milestone {version}** — archive and prepare for next
 
-`/gsd-complete-milestone {version} ${GSD_WS}`
+`/new` then:
 
-*`/new` first → fresh context window*
+`/gsd-complete-milestone {version} ${GSD_WS}`
 
 ---
 

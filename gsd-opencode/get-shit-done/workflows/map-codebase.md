@@ -36,7 +36,7 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 AGENT_SKILLS_MAPPER=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-codebase-mapper 2>/dev/null)
 ```
 
-Extract from init JSON: `mapper_model`, `commit_docs`, `codebase_dir`, `existing_maps`, `has_maps`, `codebase_dir_exists`.
+Extract from init JSON: `mapper_model`, `commit_docs`, `codebase_dir`, `existing_maps`, `has_maps`, `codebase_dir_exists`, `subagent_timeout`.
 </step>
 
 <step name="check_existing">
@@ -108,12 +108,7 @@ Use task tool with `subagent_type="gsd-codebase-mapper"`, `model="{mapper_model}
 **Agent 1: Tech Focus**
 
 ```
-task(
-  subagent_type="gsd-codebase-mapper",
-  model="{mapper_model}",
-  run_in_background=true,
-  description="Map codebase tech stack",
-  prompt="Focus: tech
+@gsd-codebase-mapper "Focus: tech
 
 Analyze this codebase for technology stack and external integrations.
 
@@ -123,18 +118,12 @@ write these documents to .planning/codebase/:
 
 Explore thoroughly. write documents directly using templates. Return confirmation only.
 ${AGENT_SKILLS_MAPPER}"
-)
 ```
 
 **Agent 2: Architecture Focus**
 
 ```
-task(
-  subagent_type="gsd-codebase-mapper",
-  model="{mapper_model}",
-  run_in_background=true,
-  description="Map codebase architecture",
-  prompt="Focus: arch
+@gsd-codebase-mapper "Focus: arch
 
 Analyze this codebase architecture and directory structure.
 
@@ -144,18 +133,12 @@ write these documents to .planning/codebase/:
 
 Explore thoroughly. write documents directly using templates. Return confirmation only.
 ${AGENT_SKILLS_MAPPER}"
-)
 ```
 
 **Agent 3: Quality Focus**
 
 ```
-task(
-  subagent_type="gsd-codebase-mapper",
-  model="{mapper_model}",
-  run_in_background=true,
-  description="Map codebase conventions",
-  prompt="Focus: quality
+@gsd-codebase-mapper "Focus: quality
 
 Analyze this codebase for coding conventions and testing patterns.
 
@@ -165,18 +148,12 @@ write these documents to .planning/codebase/:
 
 Explore thoroughly. write documents directly using templates. Return confirmation only.
 ${AGENT_SKILLS_MAPPER}"
-)
 ```
 
 **Agent 4: Concerns Focus**
 
 ```
-task(
-  subagent_type="gsd-codebase-mapper",
-  model="{mapper_model}",
-  run_in_background=true,
-  description="Map codebase concerns",
-  prompt="Focus: concerns
+@gsd-codebase-mapper "Focus: concerns
 
 Analyze this codebase for technical debt, known issues, and areas of concern.
 
@@ -185,7 +162,6 @@ write this document to .planning/codebase/:
 
 Explore thoroughly. write document directly using template. Return confirmation only.
 ${AGENT_SKILLS_MAPPER}"
-)
 ```
 
 Continue to collect_confirmations.
@@ -199,8 +175,10 @@ Wait for all 4 agents to complete using TaskOutput tool.
 TaskOutput tool:
   task_id: "{task_id from Agent result}"
   block: true
-  timeout: 300000
+  timeout: {subagent_timeout from init context, default 300000}
 ```
+
+> The timeout is configurable via `workflow.subagent_timeout` in `.planning/config.json` (milliseconds). Default: 300000 (5 minutes). Increase for large codebases or slower models.
 
 Call TaskOutput for all 4 agents in parallel (single message with 4 TaskOutput calls).
 
@@ -347,9 +325,9 @@ Created .planning/codebase/:
 
 **Initialize project** — use codebase context for planning
 
-`/gsd-new-project`
+`/new` then:
 
-*`/new` first → fresh context window*
+`/gsd-new-project`
 
 ---
 

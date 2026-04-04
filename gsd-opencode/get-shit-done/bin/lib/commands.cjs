@@ -8,6 +8,33 @@ const { safeReadFile, loadConfig, isGitIgnored, execGit, normalizePhaseName, com
 const { extractFrontmatter } = require('./frontmatter.cjs');
 const { MODEL_PROFILES } = require('./model-profiles.cjs');
 
+/**
+ * Determine phase status by checking plan/summary counts AND verification state.
+ * Introduces "Executed" for phases with all summaries but no passing verification.
+ */
+function determinePhaseStatus(plans, summaries, phaseDir, defaultPending) {
+  if (plans === 0) return defaultPending;
+  if (summaries < plans && summaries > 0) return 'In Progress';
+  if (summaries < plans) return 'Planned';
+
+  // summaries >= plans — check verification
+  try {
+    const files = fs.readdirSync(phaseDir);
+    const verificationFile = files.find(f => f === 'VERIFICATION.md' || f.endsWith('-VERIFICATION.md'));
+    if (verificationFile) {
+      const content = fs.readFileSync(path.join(phaseDir, verificationFile), 'utf-8');
+      if (/status:\s*passed/i.test(content)) return 'Complete';
+      if (/status:\s*human_needed/i.test(content)) return 'Needs Review';
+      if (/status:\s*gaps_found/i.test(content)) return 'Executed';
+      // Verification exists but unrecognized status — treat as executed
+      return 'Executed';
+    }
+  } catch { /* directory read failed — fall through */ }
+
+  // No verification file — executed but not verified
+  return 'Executed';
+}
+
 function cmdGenerateSlug(text, raw) {
   if (!text) {
     error('text required for slug generation');
@@ -16,7 +43,8 @@ function cmdGenerateSlug(text, raw) {
   const slug = text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 60);
 
   const result = { slug };
   output(result, raw, slug);
@@ -254,7 +282,7 @@ function cmdCommit(cwd, message, files, raw, amend, noVerify) {
     let branchName = null;
     if (config.branching_strategy === 'phase') {
       // Determine which phase we're committing for from the file paths
-      const phaseMatch = (files || []).join(' ').match(/(\d+)-/);
+      const phaseMatch = (files || []).join(' ').match(/(\d+(?:\.\d+)*)-/);
       if (phaseMatch) {
         const phaseNum = phaseMatch[1];
         const phaseInfo = findPhaseInternal(cwd, phaseNum);
@@ -528,11 +556,7 @@ function cmdProgressRender(cwd, format, raw) {
       totalPlans += plans;
       totalSummaries += summaries;
 
-      let status;
-      if (plans === 0) status = 'Pending';
-      else if (summaries >= plans) status = 'Complete';
-      else if (summaries > 0) status = 'In Progress';
-      else status = 'Planned';
+      const status = determinePhaseStatus(plans, summaries, path.join(phasesDir, dir), 'Pending');
 
       phases.push({ number: phaseNum, name: phaseName, plans, summaries, status });
     }
@@ -828,18 +852,14 @@ function cmdStats(cwd, format, raw) {
       totalPlans += plans;
       totalSummaries += summaries;
 
-      let status;
-      if (plans === 0) status = 'Not Started';
-      else if (summaries >= plans) status = 'Complete';
-      else if (summaries > 0) status = 'In Progress';
-      else status = 'Planned';
+      const status = determinePhaseStatus(plans, summaries, path.join(phasesDir, dir), 'Not Started');
 
       const existing = phasesByNumber.get(phaseNum);
       phasesByNumber.set(phaseNum, {
         number: phaseNum,
         name: existing?.name || phaseName,
-        plans,
-        summaries,
+        plans: (existing?.plans || 0) + plans,
+        summaries: (existing?.summaries || 0) + summaries,
         status,
       });
     }
@@ -940,6 +960,39 @@ function cmdStats(cwd, format, raw) {
   }
 }
 
+/**
+ * Check whether a commit should be allowed based on commit_docs config.
+ * When commit_docs is false, rejects commits that stage .planning/ files.
+ * Intended for use as a pre-commit hook guard.
+ */
+function cmdCheckCommit(cwd, raw) {
+  const config = loadConfig(cwd);
+
+  // If commit_docs is true (or not set), allow all commits
+  if (config.commit_docs !== false) {
+    output({ allowed: true, reason: 'commit_docs_enabled' }, raw, 'allowed');
+    return;
+  }
+
+  // commit_docs is false — check if any .planning/ files are staged
+  try {
+    const staged = execSync('git diff --cached --name-only', { cwd, encoding: 'utf-8' }).trim();
+    const planningFiles = staged.split('\n').filter(f => f.startsWith('.planning/') || f.startsWith('.planning\\'));
+
+    if (planningFiles.length > 0) {
+      error(
+        `commit_docs is false but ${planningFiles.length} .planning/ file(s) are staged:\n` +
+        planningFiles.map(f => `  ${f}`).join('\n') +
+        `\n\nTo unstage: git reset HEAD ${planningFiles.join(' ')}`
+      );
+    }
+  } catch {
+    // git diff --cached failed (no staged files or not a git repo) — allow
+  }
+
+  output({ allowed: true, reason: 'no_planning_files_staged' }, raw, 'allowed');
+}
+
 module.exports = {
   cmdGenerateSlug,
   cmdCurrentTimestamp,
@@ -956,4 +1009,5 @@ module.exports = {
   cmdTodoMatchPhase,
   cmdScaffold,
   cmdStats,
+  cmdCheckCommit,
 };

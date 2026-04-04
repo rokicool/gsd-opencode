@@ -140,12 +140,7 @@ write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
 ```
 
 ```
-task(
-  prompt=filled_prompt,
-  subagent_type="gsd-phase-researcher",
-  model="{researcher_model}",
-  description="Research Phase {phase}"
-)
+@gsd-phase-researcher filled_prompt
 ```
 
 ## 5. Handle Agent Return
@@ -176,12 +171,7 @@ Continue research for Phase {phase_number}: {phase_name}
 ```
 
 ```
-task(
-  prompt=continuation_prompt,
-  subagent_type="gsd-phase-researcher",
-  model="{researcher_model}",
-  description="Continue research Phase {phase}"
-)
+@gsd-phase-researcher continuation_prompt
 ```
 
 </process>

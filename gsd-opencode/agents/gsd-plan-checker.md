@@ -87,13 +87,13 @@ Same methodology (goal-backward), different timing, different subject matter.
 
 ## Dimension 1: Requirement Coverage
 
-**question:** Does every phase requirement have task(s) addressing it?
+**question:** Does every phase requirement have action items addressing it?
 
 **Process:**
 1. Extract phase goal from ROADMAP.md
 2. Extract requirement IDs from ROADMAP.md `**Requirements:**` line for this phase (strip brackets if present)
 3. Verify each requirement ID appears in at least one plan's `requirements` frontmatter field
-4. For each requirement, find covering task(s) in the plan that claims it
+4. For each requirement, find covering action item(s) in the plan that claims it
 5. Flag requirements with no coverage or missing from all plans' `requirements` fields
 
 **FAIL the verification** if any requirement ID from the roadmap is absent from all plans' `requirements` fields. This is a blocking issue, not a warning.
@@ -283,7 +283,7 @@ issue:
 **Process:**
 1. Parse CONTEXT.md sections: Decisions, OpenCode's Discretion, Deferred Ideas
 2. Extract all numbered decisions (D-01, D-02, etc.) from the `<decisions>` section
-3. For each locked Decision, find implementing task(s) — check task actions for D-XX references
+3. For each locked Decision, find implementing action item(s) — check plan actions for D-XX references
 4. Verify 100% decision coverage: every D-XX must appear in at least one task's action or rationale
 5. Verify no tasks implement Deferred Ideas (scope creep)
 6. Verify Discretion areas are handled (planner's choice is valid)
@@ -317,6 +317,49 @@ issue:
   task: 1
   deferred_idea: "Search/filtering (Deferred Ideas section)"
   fix_hint: "Remove search task - belongs in future phase per user decision"
+```
+
+## Dimension 7b: Scope Reduction Detection
+
+**question:** Did the planner silently simplify user decisions instead of delivering them fully?
+
+**This is the most insidious failure mode:** Plans reference D-XX but deliver only a fraction of what the user decided. The plan "looks compliant" because it mentions the decision, but the implementation is a shadow of the requirement.
+
+**Process:**
+1. For each task action in all plans, scan for scope reduction language:
+   - `"v1"`, `"v2"`, `"simplified"`, `"static for now"`, `"hardcoded"`
+   - `"future enhancement"`, `"placeholder"`, `"basic version"`, `"minimal"`
+   - `"will be wired later"`, `"dynamic in future"`, `"skip for now"`
+   - `"not wired to"`, `"not connected to"`, `"stub"`
+2. For each match, cross-reference with the CONTEXT.md decision it claims to implement
+3. Compare: does the task deliver what D-XX actually says, or a reduced version?
+4. If reduced: BLOCKER — the planner must either deliver fully or propose phase split
+
+**Red flags (from real incident):**
+- CONTEXT.md D-26: "Config exibe referências de custo calculados em impulsos a partir da tabela de preços"
+- Plan says: "D-26 cost references (v1 — static labels). NOT wired to billingPrecosOriginaisModel — dynamic pricing display is a future enhancement"
+- This is a BLOCKER: the planner invented "v1/v2" versioning that doesn't exist in the user's decision
+
+**Severity:** ALWAYS BLOCKER. Scope reduction is never a warning — it means the user's decision will not be delivered.
+
+**Example:**
+```yaml
+issue:
+  dimension: scope_reduction
+  severity: blocker
+  description: "Plan reduces D-26 from 'calculated costs in impulses' to 'static hardcoded labels'"
+  plan: "03"
+  task: 1
+  decision: "D-26: Config exibe referências de custo calculados em impulsos"
+  plan_action: "static labels v1 — NOT wired to billing"
+  fix_hint: "Either implement D-26 fully (fetch from billingPrecosOriginaisModel) or return PHASE SPLIT RECOMMENDED"
+```
+
+**Fix path:** When scope reduction is detected, the checker returns ISSUES FOUND with recommendation:
+```
+Plans reduce {N} user decisions. Options:
+1. Revise plans to deliver decisions fully (may increase plan count)
+2. Split phase: [suggested grouping of D-XX into sub-phases]
 ```
 
 ## Dimension 8: Nyquist Compliance
@@ -440,6 +483,45 @@ issue:
   fix_hint: "Add eslint verification step to each task's <verify> block"
 ```
 
+## Dimension 11: Research Resolution (#1602)
+
+**question:** Are all research questions resolved before planning proceeds?
+
+**Skip if:** No RESEARCH.md exists for this phase.
+
+**Process:**
+1. read the phase's RESEARCH.md file
+2. Search for a `## Open Questions` section
+3. If section heading has `(RESOLVED)` suffix → PASS
+4. If section exists: check each listed question for inline `RESOLVED` marker
+5. FAIL if any question lacks a resolution
+
+**Red flags:**
+- RESEARCH.md has `## Open Questions` section without `(RESOLVED)` suffix
+- Individual questions listed without resolution status
+- Prose-style open questions that haven't been addressed
+
+**Example — unresolved questions:**
+```yaml
+issue:
+  dimension: research_resolution
+  severity: blocker
+  description: "RESEARCH.md has unresolved open questions"
+  file: "01-RESEARCH.md"
+  unresolved_questions:
+    - "Hash prefix — keep or change?"
+    - "Cache TTL — what duration?"
+  fix_hint: "Resolve questions and mark section as '## Open Questions (RESOLVED)'"
+```
+
+**Example — resolved (PASS):**
+```markdown
+## Open Questions (RESOLVED)
+
+1. **Hash prefix** — RESOLVED: Use "guest_contract:"
+2. **Cache TTL** — RESOLVED: 5 minutes with Redis
+```
+
 </verification_dimensions>
 
 <verification_process>
@@ -527,7 +609,7 @@ User can log out     | -     | -     | MISSING
 Session persists     | 01    | 3     | COVERED
 ```
 
-For each requirement: find covering task(s), verify action is specific, flag gaps.
+For each requirement: find covering action items, verify action is specific, flag gaps.
 
 **Exhaustive cross-check:** Also read PROJECT.md requirements (not just phase goal). Verify no PROJECT.md requirement relevant to this phase is silently dropped. A requirement is "relevant" if the ROADMAP.md explicitly maps it to this phase or if the phase goal directly implies it — do NOT flag requirements that belong to other phases or future work. Any unmapped relevant requirement is an automatic blocker — list it explicitly in issues.
 

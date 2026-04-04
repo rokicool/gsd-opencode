@@ -2,7 +2,7 @@
 
 # GET SHIT DONE
 
-**一个轻量级且强大的元提示、上下文工程和规格驱动开发系统，支持 OpenCode、OpenCode、Gemini CLI 和 Codex。**
+**一个轻量级且强大的元提示、上下文工程和规格驱动开发系统，支持 OpenCode、OpenCode、Gemini CLI、Kilo、Codex、Copilot、Cursor、Windsurf、Antigravity 和 Augment。**
 
 **解决上下文衰减 —— 即 OpenCode 填充上下文窗口时发生的质量退化问题。**
 
@@ -71,6 +71,8 @@ GSD 解决了这个问题。它是让 OpenCode 变得可靠的上下文工程层
 
 想要描述需求然后正确构建出来的人 —— 不用假装自己在运营一个 50 人的工程组织。
 
+内置的质量门禁能捕获真正的问题：模式漂移检测会标记缺少迁移的 ORM 变更，安全强制将验证锚定到威胁模型，范围缩减检测防止规划器默默丢弃你的需求。
+
 ---
 
 ## 快速开始
@@ -80,12 +82,13 @@ npx gsd-opencode@latest
 ```
 
 安装程序会提示你选择：
-1. **运行时** —— OpenCode、OpenCode、Gemini、Codex 或全部
+1. **运行时** —— OpenCode、OpenCode、Gemini、Kilo、Codex 或全部
 2. **位置** —— 全局（所有项目）或本地（仅当前项目）
 
 验证安装：
 - OpenCode / Gemini: `/gsd-help`
 - OpenCode: `/gsd-help`
+- Kilo: `/gsd-help`
 - Codex: `$gsd-help`
 
 > [!NOTE]
@@ -113,6 +116,10 @@ npx gsd-opencode --opencode --global # 安装到 ~/.config/opencode/
 # Gemini CLI
 npx gsd-opencode --gemini --global   # 安装到 ~/.gemini/
 
+# Kilo（OpenCode 分支）
+npx gsd-opencode --kilo --global     # 安装到 ~/.config/kilo/
+npx gsd-opencode --kilo --local      # 安装到 ./.kilo/
+
 # Codex（技能优先）
 npx gsd-opencode --codex --global    # 安装到 ~/.codex/
 npx gsd-opencode --codex --local     # 安装到 ./.codex/
@@ -122,7 +129,7 @@ npx gsd-opencode --all --global      # 安装到所有目录
 ```
 
 使用 `--global`（`-g`）或 `--local`（`-l`）跳过位置提示。
-使用 `--OpenCode`、`--opencode`、`--gemini`、`--codex` 或 `--all` 跳过运行时提示。
+使用 `--OpenCode`、`--opencode`、`--gemini`、`--kilo`、`--codex` 或 `--all` 跳过运行时提示。
 
 </details>
 
@@ -344,7 +351,7 @@ OpenCode --dangerously-skip-permissions
 
 循环 **讨论 → 规划 → 执行 → 验证** 直到里程碑完成。
 
-如果你想在讨论期间更快速地输入，使用 `/gsd-discuss-phase <n> --batch` 一次回答一组小问题，而不是一个一个来。
+如果你想在讨论期间更快速地输入，使用 `/gsd-discuss-phase <n> --batch` 一次回答一组小问题，而不是一个一个来。使用 `--chain` 可以自动链式执行从讨论到规划+执行，中间不停顿。
 
 每个阶段都会获得你的输入（讨论）、适当的研究（规划）、干净的执行（执行）和人工验证（验证）。上下文保持新鲜。质量保持高水平。
 
@@ -365,10 +372,18 @@ OpenCode --dangerously-skip-permissions
 快速模式给你 GSD 保证（原子提交、状态跟踪）和更快的路径：
 
 - **相同代理** —— 规划者 + 执行者，相同质量
-- **跳过可选步骤** —— 无研究、无计划检查器、无验证器
+- **跳过可选步骤** —— 默认无研究、无计划检查器、无验证器
 - **独立跟踪** —— 存放在 `.planning/quick/`，不是阶段
 
-用于：bug 修复、小功能、配置更改、一次性任务。
+**`--discuss` 标志：** 规划前的轻量讨论，发现灰色地带。
+
+**`--research` 标志：** 规划前启动聚焦研究员。调查实现方法、库选项和陷阱。当你不确定如何处理任务时使用。
+
+**`--full` 标志：** 启用所有阶段 —— 讨论 + 研究 + 计划检查 + 验证。快速任务形式的完整 GSD 管道。
+
+**`--validate` 标志：** 仅启用计划检查 + 执行后验证（之前 `--full` 的行为）。
+
+标志可组合：`--discuss --research --validate` 提供讨论 + 研究 + 计划检查 + 验证。
 
 ```
 /gsd-quick
@@ -469,7 +484,7 @@ lmn012o feat(08-02): 创建注册端点
 | 命令 | 作用 |
 |---------|--------------|
 | `/gsd-new-project [--auto]` | 完整初始化：提问 → 研究 → 需求 → 路线图 |
-| `/gsd-discuss-phase [N] [--auto]` | 在规划前捕获实现决策 |
+| `/gsd-discuss-phase [N] [--auto] [--chain]` | 在规划前捕获实现决策（`--chain` 自动链式执行规划+执行） |
 | `/gsd-plan-phase [N] [--auto]` | 阶段的研究 + 规划 + 验证 |
 | `/gsd-execute-phase <N>` | 在并行波次中执行所有计划，完成后验证 |
 | `/gsd-verify-work [N]` | 手动用户验收测试 ¹ |
@@ -518,7 +533,7 @@ lmn012o feat(08-02): 创建注册端点
 | `/gsd-add-todo [desc]` | 捕获想法留待后用 |
 | `/gsd-check-todos` | 列出待处理事项 |
 | `/gsd-debug [desc]` | 带持久状态的系统化调试 |
-| `/gsd-quick [--full] [--discuss]` | 用 GSD 保证执行临时任务（`--full` 添加计划检查和验证，`--discuss` 先收集上下文） |
+| `/gsd-quick [--full] [--discuss] [--research]` | 用 GSD 保证执行临时任务（`--full` 启用全部阶段，`--discuss` 先收集上下文，`--research` 规划前调查方法） |
 | `/gsd-health [--repair]` | 验证 `.planning/` 目录完整性，用 `--repair` 自动修复 |
 
 <sup>¹ 由 Reddit 用户 OracleGreyBeard 贡献</sup>
@@ -657,11 +672,13 @@ CLAUDE_CONFIG_DIR=/home/youruser/.OpenCode npx gsd-opencode --global
 # 全局安装
 npx gsd-opencode --OpenCode --global --uninstall
 npx gsd-opencode --opencode --global --uninstall
+npx gsd-opencode --kilo --global --uninstall
 npx gsd-opencode --codex --global --uninstall
 
 # 本地安装（当前项目）
 npx gsd-opencode --OpenCode --local --uninstall
 npx gsd-opencode --opencode --local --uninstall
+npx gsd-opencode --kilo --local --uninstall
 npx gsd-opencode --codex --local --uninstall
 ```
 
@@ -671,7 +688,7 @@ npx gsd-opencode --codex --local --uninstall
 
 ## 社区移植
 
-OpenCode、Gemini CLI 和 Codex 现在通过 `npx gsd-opencode` 原生支持。
+OpenCode、Gemini CLI、Kilo 和 Codex 现在通过 `npx gsd-opencode` 原生支持。
 
 这些社区移植开创了多运行时支持：
 

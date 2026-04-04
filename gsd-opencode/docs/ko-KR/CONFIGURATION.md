@@ -275,7 +275,7 @@ quick 태스크 브랜칭 예시:
 
 유효한 재정의 값: `opus`, `sonnet`, `haiku`, `inherit`, 또는 완전히 정규화된 모델 ID (예: `"openai/o3"`, `"google/gemini-2.5-pro"`).
 
-### 비 OpenCode 런타임 (Codex, OpenCode, Gemini CLI)
+### 비 OpenCode 런타임 (Codex, OpenCode, Gemini CLI, Kilo)
 
 비 OpenCode 런타임에 GSD를 설치하면 인스톨러가 자동으로 `~/.gsd/defaults.json`에 `resolve_model_ids: "omit"`을 설정합니다. 이로 인해 GSD는 모든 에이전트에 빈 model 파라미터를 반환하며 각 에이전트는 런타임에 설정된 모델을 사용합니다. 기본 사용 시 추가 설정은 필요하지 않습니다.
 
@@ -310,7 +310,7 @@ quick 태스크 브랜칭 예시:
 |----|------|----------|
 | `false` (기본값) | OpenCode 별칭 반환 (`opus`, `sonnet`, `haiku`) | 네이티브 Anthropic API를 사용하는 OpenCode |
 | `true` | 별칭을 전체 OpenCode 모델 ID로 매핑 (`OpenCode-opus-4-0`) | 전체 ID가 필요한 API를 사용하는 OpenCode |
-| `"omit"` | 빈 문자열 반환 (런타임이 기본값 선택) | 비 OpenCode 런타임 (Codex, OpenCode, Gemini CLI) |
+| `"omit"` | 빈 문자열 반환 (런타임이 기본값 선택) | 비 OpenCode 런타임 (Codex, OpenCode, Gemini CLI, Kilo) |
 
 ### 프로필 철학
 

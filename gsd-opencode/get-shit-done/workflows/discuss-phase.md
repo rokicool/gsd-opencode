@@ -137,7 +137,9 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 AGENT_SKILLS_ADVISOR=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-advisor 2>/dev/null)
 ```
 
-Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `has_verification`, `plan_count`, `roadmap_exists`, `planning_exists`.
+Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_plans`, `has_verification`, `plan_count`, `roadmap_exists`, `planning_exists`, `response_language`.
+
+**If `response_language` is set:** All user-facing questions, prompts, and explanations in this workflow MUST be presented in `{response_language}`. This includes question labels, option text, gray area descriptions, and discussion summaries. Technical terms, code, and file paths remain in English. Subagent prompts stay in English — only user-facing output is translated.
 
 **If `phase_found` is false:**
 ```
@@ -149,12 +151,46 @@ Exit workflow.
 
 **If `phase_found` is true:** Continue to check_existing.
 
+**Power mode** — If `--power` is present in ARGUMENTS:
+- Skip interactive questioning entirely
+- read and execute @$HOME/.config/opencode/get-shit-done/workflows/discuss-phase-power.md end-to-end
+- Do not continue with the steps below
+
 **Auto mode** — If `--auto` is present in ARGUMENTS:
 - In `check_existing`: auto-select "Skip" (if context exists) or continue without prompting (if no context/plans)
 - In `present_gray_areas`: auto-select ALL gray areas without asking the user
 - In `discuss_areas`: for each discussion question, choose the recommended option (first option, or the one marked "recommended") without using question
 - Log each auto-selected choice inline so the user can review decisions in the context file
 - After discussion completes, auto-advance to plan-phase (existing behavior)
+
+**Chain mode** — If `--chain` is present in ARGUMENTS:
+- Discussion is fully interactive (questions, gray area selection — same as default mode)
+- After discussion completes, auto-advance to plan-phase → execute-phase (same as `--auto`)
+- This is the middle ground: user controls the discuss decisions, then plan+execute run autonomously
+</step>
+
+<step name="check_blocking_antipatterns" priority="first">
+**MANDATORY — Check for blocking anti-patterns before any other work.**
+
+Look for a `.continue-here.md` in the current phase directory:
+
+```bash
+ls ${phase_dir}/.continue-here.md 2>/dev/null || true
+```
+
+If `.continue-here.md` exists, parse its "Critical Anti-Patterns" table for rows with `severity` = `blocking`.
+
+**If one or more `blocking` anti-patterns are found:**
+
+This step cannot be skipped. Before proceeding to `check_existing` or any other step, the agent must demonstrate understanding of each blocking anti-pattern by answering all three questions for each one:
+
+1. **What is this anti-pattern?** — Describe it in your own words, not by quoting the handoff.
+2. **How did it manifest?** — Explain the specific failure that caused it to be recorded.
+3. **What structural mechanism (not acknowledgment) prevents it?** — Name the concrete step, checklist item, or enforcement mechanism that stops recurrence.
+
+write these answers inline before continuing. If a blocking anti-pattern cannot be answered from the context in `.continue-here.md`, stop and ask the user for clarification.
+
+**If no `.continue-here.md` exists, or no `blocking` rows are found:** Proceed directly to `check_existing`.
 </step>
 
 <step name="check_existing">
@@ -181,6 +217,26 @@ If "View": Display CONTEXT.md, then offer update/skip
 If "Skip": Exit workflow
 
 **If doesn't exist:**
+
+**Check for interrupted discussion checkpoint:**
+
+```bash
+ls ${phase_dir}/*-DISCUSS-CHECKPOINT.json 2>/dev/null || true
+```
+
+If a checkpoint file exists (previous session was interrupted before CONTEXT.md was written):
+
+**If `--auto`:** Auto-select "Resume" — load checkpoint and continue from last completed area.
+
+**Otherwise:** Use question:
+- header: "Resume"
+- question: "Found interrupted discussion checkpoint ({N} areas completed out of {M}). Resume from where you left off?"
+- options:
+  - "Resume" — Load checkpoint, skip completed areas, continue discussion
+  - "Start fresh" — Delete checkpoint, start discussion from scratch
+
+If "Resume": Parse the checkpoint JSON. Load `decisions` into the internal accumulator. Set `areas_completed` to skip those areas. Continue to `present_gray_areas` with only the remaining areas.
+If "Start fresh": Delete the checkpoint file. Continue as if no checkpoint existed.
 
 Check `has_plans` and `plan_count` from init. **If `has_plans` is true:**
 
@@ -489,10 +545,9 @@ After user selects gray areas in present_gray_areas, spawn parallel research age
 
 1. Display brief status: "Researching {N} areas..."
 
-2. For EACH user-selected gray area, spawn a task() in parallel:
+2. For EACH user-selected gray area, spawn a @general subagent in parallel:
 
-   task(
-     prompt="First, read @$HOME/.config/opencode/agents/gsd-advisor-researcher.md for your role and instructions.
+   @general "First, read @$HOME/.config/opencode/agents/gsd-advisor-researcher.md for your role and instructions.
 
      <gray_area>{area_name}: {area_description from gray area identification}</gray_area>
      <phase_context>{phase_goal and description from ROADMAP.md}</phase_context>
@@ -500,13 +555,9 @@ After user selects gray areas in present_gray_areas, spawn parallel research age
      <calibration_tier>{resolved calibration tier: full_maturity | standard | minimal_decisive}</calibration_tier>
 
      Research this gray area and return a structured comparison table with rationale.
-     ${AGENT_SKILLS_ADVISOR}",
-     subagent_type="general",
-     model="{ADVISOR_MODEL}",
-     description="Research: {area_name}"
-   )
+     ${AGENT_SKILLS_ADVISOR}"
 
-   All task() calls spawn simultaneously — do NOT wait for one before starting the next.
+   All subagent calls spawn simultaneously — do NOT wait for one before starting the next.
 
 3. After ALL agents return, SYNTHESIZE results before presenting:
    For each agent's return:
@@ -640,6 +691,16 @@ Each answer (or answer set, in batch mode) should reveal the next question or ne
 ```
 After all areas are auto-resolved, skip the "Explore more gray areas" prompt and proceed directly to write_context.
 
+**CRITICAL — Auto-mode pass cap:**
+In `--auto` mode, the discuss step MUST complete in a **single pass**. After writing CONTEXT.md once, you are DONE — proceed immediately to write_context and then auto_advance. Do NOT re-read your own CONTEXT.md to find "gaps", "undefined types", or "missing decisions" and run additional passes. This creates a self-feeding loop where each pass generates references that the next pass treats as gaps, consuming unbounded time and resources.
+
+Check the pass cap from config:
+```bash
+MAX_PASSES=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.max_discuss_passes 2>/dev/null || echo "3")
+```
+
+If you have already written and committed CONTEXT.md, the discuss step is complete. Move on.
+
 **Interactive mode (no `--auto`):**
 
 **For each area:**
@@ -718,6 +779,44 @@ Back to [current area]: [return to current question]"
 ```
 
 Track deferred ideas internally.
+
+**Incremental checkpoint — save after each area completes:**
+
+After each area is resolved (user says "Next area" or area auto-resolves in `--auto` mode), immediately write a checkpoint file with all decisions captured so far. This prevents data loss if the session is interrupted mid-discussion.
+
+**Checkpoint file:** `${phase_dir}/${padded_phase}-DISCUSS-CHECKPOINT.json`
+
+write after each area:
+```json
+{
+  "phase": "{PHASE_NUM}",
+  "phase_name": "{phase_name}",
+  "timestamp": "{ISO timestamp}",
+  "areas_completed": ["Area 1", "Area 2"],
+  "areas_remaining": ["Area 3", "Area 4"],
+  "decisions": {
+    "Area 1": [
+      {"question": "...", "answer": "...", "options_presented": ["..."]},
+      {"question": "...", "answer": "...", "options_presented": ["..."]}
+    ],
+    "Area 2": [
+      {"question": "...", "answer": "...", "options_presented": ["..."]}
+    ]
+  },
+  "deferred_ideas": ["..."],
+  "canonical_refs": ["..."]
+}
+```
+
+This is a structured checkpoint, not the final CONTEXT.md — the `write_context` step still produces the canonical output. But if the session dies, the next `/gsd-discuss-phase` invocation can detect this checkpoint and offer to resume from it instead of starting from scratch.
+
+**On session resume:** In the `check_existing` step, also check for `*-DISCUSS-CHECKPOINT.json`. If found and no CONTEXT.md exists:
+- Display: "Found interrupted discussion checkpoint ({N} areas completed). Resume from checkpoint?"
+- Options: "Resume" / "Start fresh"
+- On "Resume": Load the checkpoint, skip completed areas, continue from where it left off
+- On "Start fresh": Delete the checkpoint, proceed as normal
+
+**After write_context completes successfully:** Delete the checkpoint file — the canonical CONTEXT.md now has all decisions.
 
 **Track discussion log data internally:**
 For each question asked, accumulate:
@@ -873,13 +972,14 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 **Phase ${PHASE}: [Name]** — [Goal from ROADMAP.md]
 
-`/gsd-plan-phase ${PHASE} ${GSD_WS}`
+`/new` then:
 
-*`/new` first → fresh context window*
+`/gsd-plan-phase ${PHASE} ${GSD_WS}`
 
 ---
 
 **Also available:**
+- `/gsd-discuss-phase ${PHASE} --chain ${GSD_WS}` — re-run with auto plan+execute after
 - `/gsd-plan-phase ${PHASE} --skip-research ${GSD_WS}` — plan without research
 - `/gsd-ui-phase ${PHASE} ${GSD_WS}` — generate UI design contract before planning (if phase has frontend work)
 - Review/edit CONTEXT.md before continuing
@@ -933,6 +1033,12 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 write file.
 
+**Clean up checkpoint file** — CONTEXT.md is now the canonical record:
+
+```bash
+rm -f "${phase_dir}/${padded_phase}-DISCUSS-CHECKPOINT.json"
+```
+
 Commit phase context and discussion log:
 
 ```bash
@@ -961,10 +1067,10 @@ node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(state
 <step name="auto_advance">
 Check for auto-advance trigger:
 
-1. Parse `--auto` flag from $ARGUMENTS
-2. **Sync chain flag with intent** — if user invoked manually (no `--auto`), clear the ephemeral chain flag from any previous interrupted `--auto` chain. This does NOT touch `workflow.auto_advance` (the user's persistent settings preference):
+1. Parse `--auto` and `--chain` flags from $ARGUMENTS
+2. **Sync chain flag with intent** — if user invoked manually (no `--auto` and no `--chain`), clear the ephemeral chain flag from any previous interrupted `--auto` chain. This does NOT touch `workflow.auto_advance` (the user's persistent settings preference):
    ```bash
-   if [[ ! "$ARGUMENTS" =~ --auto ]]; then
+   if [[ ! "$ARGUMENTS" =~ --auto ]] && [[ ! "$ARGUMENTS" =~ --chain ]]; then
      node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false 2>/dev/null
    fi
    ```
@@ -974,12 +1080,12 @@ Check for auto-advance trigger:
    AUTO_CFG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
 
-**If `--auto` flag present AND `AUTO_CHAIN` is not true:** Persist chain flag to config (handles direct `--auto` usage without new-project):
+**If `--auto` or `--chain` flag present AND `AUTO_CHAIN` is not true:** Persist chain flag to config (handles direct usage without new-project):
 ```bash
 node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active true
 ```
 
-**If `--auto` flag present OR `AUTO_CHAIN` is true OR `AUTO_CFG` is true:**
+**If `--auto` flag present OR `--chain` flag present OR `AUTO_CHAIN` is true OR `AUTO_CFG` is true:**
 
 Display banner:
 ```
@@ -1006,8 +1112,9 @@ This keeps the auto-advance chain flat — discuss, plan, and execute all run at
 
   Auto-advance pipeline finished: discuss → plan → execute
 
-  Next: /gsd-discuss-phase ${NEXT_PHASE} --auto ${GSD_WS}
-  */new first → fresh context window*
+  /new then:
+
+  Next: /gsd-discuss-phase ${NEXT_PHASE} ${WAS_CHAIN ? "--chain" : "--auto"} ${GSD_WS}
   ```
 - **PLANNING COMPLETE** → Planning done, execution didn't complete:
   ```
@@ -1025,11 +1132,26 @@ This keeps the auto-advance chain flat — discuss, plan, and execute all run at
   Continue: /gsd-plan-phase ${PHASE} --gaps ${GSD_WS}
   ```
 
-**If neither `--auto` nor config enabled:**
+**If none of `--auto`, `--chain`, nor config enabled:**
 Route to `confirm_creation` step (existing behavior — show manual next steps).
 </step>
 
 </process>
+
+<power_user_mode>
+When `--power` flag is present in ARGUMENTS, skip interactive questioning and execute the power user workflow.
+
+The power user mode generates ALL questions upfront into machine-readable and human-friendly files, then waits for the user to answer at their own pace before processing all answers in a single pass.
+
+**Full step-by-step instructions:** @$HOME/.config/opencode/get-shit-done/workflows/discuss-phase-power.md
+
+**Summary of flow:**
+1. Run the same phase analysis (gray area identification) as standard mode
+2. write all questions to `{phase_dir}/{padded_phase}-QUESTIONS.json` and `{phase_dir}/{padded_phase}-QUESTIONS.html`
+3. Notify user with file paths and wait for a "refresh" or "finalize" command
+4. On "refresh": read the JSON, process answered questions, update stats and HTML
+5. On "finalize": read all answers from JSON, generate CONTEXT.md in the standard format
+</power_user_mode>
 
 <success_criteria>
 - Phase validated against roadmap
@@ -1046,4 +1168,9 @@ Route to `confirm_creation` step (existing behavior — show manual next steps).
 - Deferred ideas preserved for future phases
 - STATE.md updated with session info
 - User knows next steps
+- Checkpoint file written after each area completes (incremental save)
+- Interrupted sessions can be resumed from checkpoint (no re-answering completed areas)
+- Checkpoint file cleaned up after successful CONTEXT.md write
+- `--chain` triggers interactive discuss followed by auto plan+execute (no auto-answering)
+- `--chain` and `--auto` both persist chain flag and auto-advance to plan-phase
 </success_criteria>
