@@ -41,8 +41,10 @@ Cada agente tem responsabilidade clara, entradas/saídas definidas e contexto de
 
 ### Diagnóstico
 
-- **Debugger**: identifica causa-raiz quando há falhas
+- **Debugger**: identifica causa-raiz quando há falhas (`--diagnose` para modo somente diagnóstico, v1.32)
 - **Forensics**: investiga inconsistências de estado/artefatos/histórico
+- **Security auditor**: verificação de segurança por threat model (v1.31)
+- **Doc writer / Doc verifier**: geração e validação de documentação (v1.31)
 
 ## Padrões operacionais
 
