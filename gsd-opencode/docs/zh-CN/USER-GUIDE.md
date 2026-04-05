@@ -182,7 +182,7 @@
 |---------|---------|-------------|
 | `/gsd-new-project` | 完整项目初始化：提问、研究、需求、路线图 | 新项目开始时 |
 | `/gsd-new-project --auto @idea.md` | 从文档自动初始化 | 有现成的 PRD 或想法文档 |
-| `/gsd-discuss-phase [N]` | 捕获实现决策 | 规划前，塑造构建方式 |
+| `/gsd-discuss-phase [N] [--chain] [--power]` | 捕获实现决策（`--chain` 自动链式，`--power` 文件批量输入） | 规划前，塑造构建方式 |
 | `/gsd-plan-phase [N]` | 研究 + 规划 + 验证 | 执行阶段前 |
 | `/gsd-execute-phase <N>` | 在并行波次中执行所有计划 | 规划完成后 |
 | `/gsd-verify-work [N]` | 带自动诊断的手动 UAT | 执行完成后 |
@@ -211,6 +211,17 @@
 | `/gsd-list-phase-assumptions [N]` | 预览 OpenCode 的预期方法 | 规划前，验证方向 |
 | `/gsd-plan-milestone-gaps` | 为审计缺口创建阶段 | 审计发现缺失项后 |
 | `/gsd-research-phase [N]` | 仅深度生态研究 | 复杂或不熟悉的领域 |
+| `/gsd-autonomous [--from N] [--to N] [--only N]` | 自主执行剩余阶段（`--to N` 到阶段 N 停止） | 批量自动处理 |
+| `/gsd-analyze-dependencies` | 检测阶段间依赖关系 | `/gsd-manager` 前分析 |
+
+### 状态管理
+
+| 命令 | 用途 | 何时使用 |
+|---------|---------|-------------|
+| `state validate` | 检测 STATE.md 与文件系统之间的偏差 | STATE.md 看起来不对时 |
+| `state sync` | 从磁盘上的实际项目状态重建 STATE.md | 验证发现偏差后 |
+| `state sync --verify` | 干运行：显示提议的更改但不写入 | sync 前预览 |
+| `state planned-phase --phase N --plans N` | 记录 plan-phase 完成后的状态转换 | plan-phase 后 |
 
 ### 现有代码库和工具
 
@@ -218,7 +229,7 @@
 |---------|---------|-------------|
 | `/gsd-map-codebase` | 分析现有代码库 | 在现有代码上运行 `/gsd-new-project` 之前 |
 | `/gsd-quick` | 带 GSD 保证的临时任务 | Bug 修复、小功能、配置更改 |
-| `/gsd-debug [desc]` | 带持久状态的系统化调试 | 出问题时 |
+| `/gsd-debug [desc] [--diagnose]` | 带持久状态的系统化调试（`--diagnose` 仅诊断） | 出问题时 |
 | `/gsd-add-todo [desc]` | 捕获想法留待后用 | 会话期间想到什么 |
 | `/gsd-check-todos` | 列出待处理事项 | 查看捕获的想法 |
 | `/gsd-settings` | 配置工作流开关和模型配置 | 更改模型、切换代理 |
@@ -429,6 +440,22 @@ OpenCode --dangerously-skip-permissions
 
 不要重新运行 `/gsd-execute-phase`。使用 `/gsd-quick` 进行针对性修复，或用 `/gsd-verify-work` 通过 UAT 系统识别和修复问题。
 
+### STATE.md 不同步
+
+如果 STATE.md 显示不正确的阶段状态或位置，使用状态一致性命令：
+
+```bash
+node gsd-tools.cjs state validate          # 检测 STATE.md 与文件系统之间的偏差
+node gsd-tools.cjs state sync --verify     # 预览 sync 将更改的内容
+node gsd-tools.cjs state sync              # 从磁盘重建 STATE.md
+```
+
+这些命令是 v1.32 新增的，替代了手动编辑 STATE.md。
+
+### 研究门控（Research Gate）
+
+`/gsd-plan-phase` 在规划开始前会检查 RESEARCH.md 是否存在未解决的开放问题。如果存在未解决的问题，规划将被阻止，系统会显示需要解决的具体问题。这防止了基于不完整信息构建计划。
+
 ### 模型成本太高
 
 切换到 budget 配置：`/gsd-set-profile budget`。如果领域对你（或 OpenCode）熟悉，通过 `/gsd-settings` 禁用研究和计划检查代理。
@@ -456,6 +483,7 @@ OpenCode --dangerously-skip-permissions
 | 需要更改范围 | `/gsd-add-phase`、`/gsd-insert-phase` 或 `/gsd-remove-phase` |
 | 里程碑审计发现缺口 | `/gsd-plan-milestone-gaps` |
 | 出问题了 | `/gsd-debug "描述"` |
+| STATE.md 不同步 | `state validate` 然后 `state sync` |
 | 快速针对性修复 | `/gsd-quick` |
 | 计划与你的愿景不符 | `/gsd-discuss-phase [N]` 然后重新规划 |
 | 成本过高 | `/gsd-set-profile budget` 和 `/gsd-settings` 关闭代理 |

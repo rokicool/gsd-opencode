@@ -18,6 +18,10 @@ Documentação abrangente do framework Get Shit Done (GSD) — um sistema de met
 | [Referências](references/) | Todos os usuários | Guias complementares de decisão, verificação e padrões |
 | [Superpowers](superpowers/) | Contribuidores | Planos e specs avançadas do projeto |
 
+## Novidades v1.32
+
+STATE.md consistency gates, `--to N` para execução autônoma parcial, research gate, verifier milestone scope filtering, read-before-edit guard, context reduction, novos runtimes (Trae, Cline, Augment Code), `response_language`, `--power`/`--diagnose` flags, `/gsd-analyze-dependencies`.
+
 ## Links rápidos
 
 - **Começar rápido:** [README principal](../../README.pt-BR.md) -> instalação -> `/gsd-new-project`

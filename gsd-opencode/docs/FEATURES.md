@@ -86,6 +86,27 @@
   - [Worktree Toggle](#66-worktree-toggle)
   - [Project Code Prefixing](#67-project-code-prefixing)
   - [OpenCode Skills Migration](#68-OpenCode-code-skills-migration)
+- [v1.32 Features](#v132-features)
+  - [STATE.md Consistency Gates](#69-statemd-consistency-gates)
+  - [Autonomous `--to N` Flag](#70-autonomous---to-n-flag)
+  - [Research Gate](#71-research-gate)
+  - [Verifier Milestone Scope Filtering](#72-verifier-milestone-scope-filtering)
+  - [read-Before-edit Guard Hook](#73-read-before-edit-guard-hook)
+  - [Context Reduction](#74-context-reduction)
+  - [Discuss-Phase `--power` Flag](#75-discuss-phase---power-flag)
+  - [Debug `--diagnose` Flag](#76-debug---diagnose-flag)
+  - [Phase Dependency Analysis](#77-phase-dependency-analysis)
+  - [Anti-Pattern Severity Levels](#78-anti-pattern-severity-levels)
+  - [Methodology Artifact Type](#79-methodology-artifact-type)
+  - [Planner Reachability Check](#80-planner-reachability-check)
+  - [Playwright-MCP UI Verification](#81-playwright-mcp-ui-verification)
+  - [Pause-Work Expansion](#82-pause-work-expansion)
+  - [Response Language Config](#83-response-language-config)
+  - [Manual Update Procedure](#84-manual-update-procedure)
+  - [New Runtime Support (Trae, Cline, Augment Code)](#85-new-runtime-support-trae-cline-augment-code)
+  - [Autonomous `--interactive` Flag](#86-autonomous---interactive-flag)
+  - [Commit-Docs Guard Hook](#87-commit-docs-guard-hook)
+  - [Community Hooks Opt-In](#88-community-hooks-opt-in)
 
 ---
 
@@ -880,7 +901,7 @@ fix(03-01): correct auth token expiry
 **Purpose:** Run GSD across multiple AI coding agent runtimes.
 
 **Requirements:**
-- REQ-RUNTIME-01: System MUST support OpenCode, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Antigravity
+- REQ-RUNTIME-01: System MUST support OpenCode, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Antigravity, Trae, Cline, Augment Code
 - REQ-RUNTIME-02: Installer MUST transform content per runtime (tool names, paths, frontmatter)
 - REQ-RUNTIME-03: Installer MUST support interactive and non-interactive (`--OpenCode --global`) modes
 - REQ-RUNTIME-04: Installer MUST support both global and local installation
@@ -889,12 +910,12 @@ fix(03-01): correct auth token expiry
 
 **Runtime Transformations:**
 
-| Aspect | OpenCode | OpenCode | Gemini | Kilo | Codex | Copilot | Antigravity |
-|--------|------------|----------|--------|-------|-------|---------|-------------|
-| Commands | Slash commands | Slash commands | Slash commands | Slash commands | Skills (TOML) | Slash commands | Skills |
-| Agent format | OpenCode native | `mode: subagent` | OpenCode native | `mode: subagent` | Skills | Tool mapping | Skills |
-| Hook events | `PostToolUse` | N/A | `AfterTool` | N/A | N/A | N/A | N/A |
-| Config | `settings.json` | `opencode.json(c)` | `settings.json` | `kilo.json(c)` | TOML | Instructions | Config |
+| Aspect | OpenCode | OpenCode | Gemini | Kilo | Codex | Copilot | Antigravity | Trae | Cline | Augment |
+|--------|------------|----------|--------|-------|-------|---------|-------------|------|-------|---------|
+| Commands | Slash commands | Slash commands | Slash commands | Slash commands | Skills (TOML) | Slash commands | Skills | Skills | Rules | Skills |
+| Agent format | OpenCode native | `mode: subagent` | OpenCode native | `mode: subagent` | Skills | Tool mapping | Skills | Skills | Rules | Skills |
+| Hook events | `PostToolUse` | N/A | `AfterTool` | N/A | N/A | N/A | N/A | N/A | N/A | N/A |
+| Config | `settings.json` | `opencode.json(c)` | `settings.json` | `kilo.json(c)` | TOML | Instructions | Config | Config | Config | Config |
 
 ---
 
@@ -1565,3 +1586,311 @@ Test suite that scans all agent, workflow, and command files for embedded inject
 2. **Migrate** — write `skills/gsd-*/SKILL.md` files for each GSD command
 3. **Clean** — Remove legacy `commands/gsd/` directory if skills are installed
 4. **Fallback** — Maintain Gemini path compatibility for older OpenCode versions
+
+---
+
+## v1.32 Features
+
+### 69. STATE.md Consistency Gates
+
+**Commands:** `state validate`, `state sync [--verify]`, `state planned-phase --phase N --plans N`
+
+**Purpose:** Detect and repair drift between STATE.md and the actual filesystem, preventing cascading errors from stale state.
+
+**Requirements:**
+- REQ-STATE-01: `state validate` MUST detect drift between STATE.md fields and filesystem reality
+- REQ-STATE-02: `state sync` MUST reconstruct STATE.md from actual project state on disk
+- REQ-STATE-03: `state sync --verify` MUST perform a dry-run showing proposed changes without writing
+- REQ-STATE-04: `state planned-phase` MUST record the state transition after plan-phase completes (Planned/Ready to execute)
+
+**Produces:**
+| Artifact | Description |
+|----------|-------------|
+| Updated `STATE.md` | Corrected state reflecting filesystem reality |
+
+**Process:**
+1. **Validate** — Compare STATE.md fields against filesystem (phase directories, plan files, summaries)
+2. **Sync** — Reconstruct STATE.md from disk when drift is detected
+3. **Transition** — Record post-planning state with plan count for execute-phase readiness
+
+---
+
+### 70. Autonomous `--to N` Flag
+
+**Flag:** `/gsd-autonomous --to N`
+
+**Purpose:** Stop autonomous execution after completing a specific phase, allowing partial autonomous runs.
+
+**Requirements:**
+- REQ-TO-01: System MUST stop execution after the specified phase number completes
+- REQ-TO-02: System MUST follow the same discuss -> plan -> execute flow for each phase up to N
+- REQ-TO-03: `--to N` MUST be combinable with `--from N` for bounded autonomous ranges
+
+**Process:**
+1. **Bound** — Set the upper phase limit from `--to N` argument
+2. **Execute** — Run autonomous flow for each phase up to and including phase N
+3. **Stop** — Halt after phase N completes
+
+---
+
+### 71. Research Gate
+
+**Part of:** `/gsd-plan-phase`
+
+**Purpose:** Block planning when RESEARCH.md has unresolved open questions, preventing plans built on incomplete information.
+
+**Requirements:**
+- REQ-RESGATE-01: System MUST scan RESEARCH.md for unresolved open questions before planning begins
+- REQ-RESGATE-02: System MUST block plan-phase entry when open questions exist
+- REQ-RESGATE-03: System MUST surface the specific unresolved questions to the user
+
+**Process:**
+1. **Scan** — Check RESEARCH.md for open questions section with unresolved items
+2. **Gate** — Block planning if unresolved questions are found
+3. **Surface** — Display the specific open questions requiring resolution
+
+---
+
+### 72. Verifier Milestone Scope Filtering
+
+**Part of:** `/gsd-execute-phase` (verifier step)
+
+**Purpose:** Distinguish between genuine gaps and items deferred to later phases, reducing false negatives in verification.
+
+**Requirements:**
+- REQ-VSCOPE-01: Verifier MUST check whether a gap is addressed in a later milestone phase
+- REQ-VSCOPE-02: Gaps addressed in later phases MUST be marked as "deferred", not "gap"
+- REQ-VSCOPE-03: Only genuine gaps (not covered by any future phase) MUST be reported as failures
+
+**Process:**
+1. **Verify** — Run standard goal-backward verification
+2. **Filter** — Cross-reference detected gaps against later milestone phases
+3. **Classify** — Mark deferred items separately from genuine gaps
+
+---
+
+### 73. read-Before-edit Guard Hook
+
+**Part of:** Hooks (`PreToolUse`)
+
+**Purpose:** Prevent infinite retry loops in non-OpenCode runtimes by ensuring files are read before editing.
+
+**Requirements:**
+- REQ-RBE-01: Hook MUST detect edit/write tool calls that target files not previously read in the session
+- REQ-RBE-02: Hook MUST advise reading the file first (advisory, non-blocking)
+- REQ-RBE-03: Hook MUST prevent infinite retry loops common in runtimes without built-in read-before-edit enforcement
+
+---
+
+### 74. Context Reduction
+
+**Part of:** GSD SDK prompt assembly
+
+**Purpose:** Reduce context prompt sizes through markdown truncation and cache-friendly prompt ordering.
+
+**Requirements:**
+- REQ-CTXRED-01: System MUST truncate oversized markdown artifacts to fit within context budgets
+- REQ-CTXRED-02: System MUST order prompts for cache-friendly assembly (stable prefixes first)
+- REQ-CTXRED-03: Reduction MUST preserve essential information (headings, requirements, task structure)
+
+**Process:**
+1. **Measure** — Calculate total prompt size for the workflow
+2. **Truncate** — Apply markdown-aware truncation to oversized artifacts
+3. **Order** — Arrange prompt sections for optimal KV-cache reuse
+
+---
+
+### 75. Discuss-Phase `--power` Flag
+
+**Flag:** `/gsd-discuss-phase --power`
+
+**Purpose:** File-based bulk question answering for discuss-phase, enabling batch input from a prepared answers file.
+
+**Requirements:**
+- REQ-POWER-01: System MUST accept a file containing pre-written answers to discussion questions
+- REQ-POWER-02: System MUST map answers to the corresponding gray area questions
+- REQ-POWER-03: System MUST produce CONTEXT.md identical to interactive discuss-phase
+
+---
+
+### 76. Debug `--diagnose` Flag
+
+**Flag:** `/gsd-debug --diagnose`
+
+**Purpose:** Diagnosis-only mode that investigates without attempting fixes.
+
+**Requirements:**
+- REQ-DIAG-01: System MUST perform full debug investigation (hypotheses, evidence, root cause)
+- REQ-DIAG-02: System MUST NOT attempt any code modifications
+- REQ-DIAG-03: System MUST produce a diagnostic report with findings and recommended fixes
+
+---
+
+### 77. Phase Dependency Analysis
+
+**Command:** `/gsd-analyze-dependencies`
+
+**Purpose:** Detect phase dependencies and suggest `Depends on` entries for ROADMAP.md before running `/gsd-manager`.
+
+**Requirements:**
+- REQ-DEP-01: System MUST detect file overlap between phases
+- REQ-DEP-02: System MUST detect semantic dependencies (API/schema producers and consumers)
+- REQ-DEP-03: System MUST detect data flow dependencies (output producers and readers)
+- REQ-DEP-04: System MUST suggest dependency entries with user confirmation before writing
+
+**Produces:** Dependency suggestion table; optionally updates ROADMAP.md `Depends on` fields
+
+---
+
+### 78. Anti-Pattern Severity Levels
+
+**Part of:** `/gsd-resume-work`
+
+**Purpose:** Mandatory understanding checks at resume with severity-based anti-pattern enforcement.
+
+**Requirements:**
+- REQ-ANTI-01: System MUST classify anti-patterns by severity level
+- REQ-ANTI-02: System MUST enforce mandatory understanding checks at session resume
+- REQ-ANTI-03: Higher severity anti-patterns MUST block workflow progression until acknowledged
+
+---
+
+### 79. Methodology Artifact Type
+
+**Part of:** Planning artifacts
+
+**Purpose:** Define consumption mechanisms for methodology documents, ensuring they are consumed correctly by agents.
+
+**Requirements:**
+- REQ-METHOD-01: System MUST support methodology as a distinct artifact type
+- REQ-METHOD-02: Methodology artifacts MUST have defined consumption mechanisms for agents
+
+---
+
+### 80. Planner Reachability Check
+
+**Part of:** `/gsd-plan-phase`
+
+**Purpose:** Validate that plan steps are achievable before committing to execution.
+
+**Requirements:**
+- REQ-REACH-01: Planner MUST validate that each plan step references reachable files and APIs
+- REQ-REACH-02: Unreachable steps MUST be flagged during planning, not discovered during execution
+
+---
+
+### 81. Playwright-MCP UI Verification
+
+**Part of:** `/gsd-verify-work` (optional)
+
+**Purpose:** Automated visual verification using Playwright-MCP during verify-phase.
+
+**Requirements:**
+- REQ-PLAY-01: System MUST support optional Playwright-MCP visual verification during verify-phase
+- REQ-PLAY-02: Visual verification MUST be opt-in, not mandatory
+- REQ-PLAY-03: System MUST capture and compare visual state against UI-SPEC.md expectations
+
+---
+
+### 82. Pause-Work Expansion
+
+**Part of:** `/gsd-pause-work`
+
+**Purpose:** Support non-phase contexts with richer handoff data for broader pause-work applicability.
+
+**Requirements:**
+- REQ-PAUSE-01: System MUST support pausing in non-phase contexts (quick tasks, debug sessions, threads)
+- REQ-PAUSE-02: Handoff data MUST include richer context appropriate to the current work type
+
+---
+
+### 83. Response Language Config
+
+**Config:** `response_language`
+
+**Purpose:** Cross-phase language consistency for non-English users.
+
+**Requirements:**
+- REQ-LANG-01: System MUST respect `response_language` setting across all phases and agents
+- REQ-LANG-02: Setting MUST propagate to all spawned agents for consistent language output
+
+**Config:**
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `response_language` | string | (none) | Language code for agent responses (e.g., `"pt"`, `"ko"`, `"ja"`) |
+
+---
+
+### 84. Manual Update Procedure
+
+**Part of:** `docs/manual-update.md`
+
+**Purpose:** Document a manual update path for environments where `npx` is unavailable or npm publish is experiencing outages.
+
+**Requirements:**
+- REQ-MANUAL-01: Documentation MUST describe step-by-step manual update procedure
+- REQ-MANUAL-02: Procedure MUST work without npm access
+
+---
+
+### 85. New Runtime Support (Trae, Cline, Augment Code)
+
+**Part of:** `npx gsd-opencode`
+
+**Purpose:** Extend GSD installation to Trae IDE, Cline, and Augment Code runtimes.
+
+**Requirements:**
+- REQ-TRAE-01: Installer MUST support `--trae` flag for Trae IDE installation
+- REQ-CLINE-01: Installer MUST support Cline via `.clinerules` configuration
+- REQ-AUGMENT-01: Installer MUST support Augment Code with skill conversion and config management
+
+---
+
+### 86. Autonomous `--interactive` Flag
+
+**Flag:** `/gsd-autonomous --interactive`
+
+**Purpose:** Lean-context autonomous mode that keeps discuss-phase interactive (user answers questions) while dispatching plan and execute as background agents.
+
+**Requirements:**
+- REQ-INTERACT-01: `--interactive` MUST run discuss-phase inline with interactive questions (not auto-answered)
+- REQ-INTERACT-02: `--interactive` MUST dispatch plan-phase and execute-phase as background agents for context isolation
+- REQ-INTERACT-03: `--interactive` MUST enable pipeline parallelism — discuss Phase N+1 while Phase N builds
+- REQ-INTERACT-04: Main context MUST only accumulate discuss conversations (lean context)
+
+**Process:**
+1. **Discuss inline** — Run discuss-phase in the main context with user interaction
+2. **Dispatch** — Send plan and execute to background agents with fresh context windows
+3. **Pipeline** — While background agents build Phase N, begin discussing Phase N+1
+
+---
+
+### 87. Commit-Docs Guard Hook
+
+**Hook:** `gsd-commit-docs.js`
+
+**Purpose:** PreToolUse hook that enforces the `commit_docs` configuration, preventing `.planning/` files from being committed when `planning.commit_docs` is `false`.
+
+**Requirements:**
+- REQ-COMMITDOCS-01: Hook MUST intercept git commit commands that stage `.planning/` files
+- REQ-COMMITDOCS-02: Hook MUST block commits containing `.planning/` files when `commit_docs` is `false`
+- REQ-COMMITDOCS-03: Hook MUST be advisory — does not block when `commit_docs` is `true` or absent
+
+---
+
+### 88. Community Hooks Opt-In
+
+**Hooks:** `gsd-validate-commit.sh`, `gsd-session-state.sh`, `gsd-phase-boundary.sh`
+
+**Purpose:** Optional git and session hooks for GSD projects, gated behind `hooks.community: true` in config.
+
+**Requirements:**
+- REQ-COMMUNITY-01: All community hooks MUST be no-ops unless `hooks.community` is `true` in `.planning/config.json`
+- REQ-COMMUNITY-02: `gsd-validate-commit.sh` MUST enforce Conventional Commits format on git commit messages
+- REQ-COMMUNITY-03: `gsd-session-state.sh` MUST track session state transitions
+- REQ-COMMUNITY-04: `gsd-phase-boundary.sh` MUST enforce phase boundary checks
+
+**Config:**
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `hooks.community` | boolean | `false` | Enable optional community hooks for commit validation, session state, and phase boundaries |

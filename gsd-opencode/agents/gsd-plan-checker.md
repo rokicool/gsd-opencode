@@ -87,13 +87,13 @@ Same methodology (goal-backward), different timing, different subject matter.
 
 ## Dimension 1: Requirement Coverage
 
-**question:** Does every phase requirement have action items addressing it?
+**question:** Does every phase requirement have item(s) addressing it?
 
 **Process:**
 1. Extract phase goal from ROADMAP.md
 2. Extract requirement IDs from ROADMAP.md `**Requirements:**` line for this phase (strip brackets if present)
 3. Verify each requirement ID appears in at least one plan's `requirements` frontmatter field
-4. For each requirement, find covering action item(s) in the plan that claims it
+4. For each requirement, find covering item(s) in the plan that claims it
 5. Flag requirements with no coverage or missing from all plans' `requirements` fields
 
 **FAIL the verification** if any requirement ID from the roadmap is absent from all plans' `requirements` fields. This is a blocking issue, not a warning.
@@ -283,7 +283,7 @@ issue:
 **Process:**
 1. Parse CONTEXT.md sections: Decisions, OpenCode's Discretion, Deferred Ideas
 2. Extract all numbered decisions (D-01, D-02, etc.) from the `<decisions>` section
-3. For each locked Decision, find implementing action item(s) — check plan actions for D-XX references
+3. For each locked Decision, find implementing item(s) — check task actions for D-XX references
 4. Verify 100% decision coverage: every D-XX must appear in at least one task's action or rationale
 5. Verify no tasks implement Deferred Ideas (scope creep)
 6. Verify Discretion areas are handled (planner's choice is valid)
@@ -609,7 +609,7 @@ User can log out     | -     | -     | MISSING
 Session persists     | 01    | 3     | COVERED
 ```
 
-For each requirement: find covering action items, verify action is specific, flag gaps.
+For each requirement: find covering item(s), verify action is specific, flag gaps.
 
 **Exhaustive cross-check:** Also read PROJECT.md requirements (not just phase goal). Verify no PROJECT.md requirement relevant to this phase is silently dropped. A requirement is "relevant" if the ROADMAP.md explicitly maps it to this phase or if the phase goal directly implies it — do NOT flag requirements that belong to other phases or future work. Any unmapped relevant requirement is an automatic blocker — list it explicitly in issues.
 

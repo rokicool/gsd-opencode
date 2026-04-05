@@ -214,32 +214,37 @@ function safeReadFile(filePath) {
   }
 }
 
+/**
+ * Canonical config defaults. Single source of truth — imported by config.cjs and verify.cjs.
+ */
+const CONFIG_DEFAULTS = {
+  model_profile: 'balanced',
+  commit_docs: true,
+  search_gitignored: false,
+  branching_strategy: 'none',
+  phase_branch_template: 'gsd/phase-{phase}-{slug}',
+  milestone_branch_template: 'gsd/{milestone}-{slug}',
+  quick_branch_template: null,
+  research: true,
+  plan_checker: true,
+  verifier: true,
+  nyquist_validation: true,
+  parallelization: true,
+  brave_search: false,
+  firecrawl: false,
+  exa_search: false,
+  text_mode: false, // when true, use plain-text numbered lists instead of question menus
+  sub_repos: [],
+  resolve_model_ids: false, // false: return alias as-is | true: map to full OpenCode model ID | "omit": return '' (runtime uses its default)
+  context_window: 200000, // default 200k; set to 1000000 for Opus/Sonnet 4.6 1M models
+  phase_naming: 'sequential', // 'sequential' (default, auto-increment) or 'custom' (arbitrary string IDs)
+  project_code: null, // optional short prefix for phase dirs (e.g., 'CK' → 'CK-01-foundation')
+  subagent_timeout: 300000, // 5 min default; increase for large codebases or slower models (ms)
+};
+
 function loadConfig(cwd) {
   const configPath = path.join(planningDir(cwd), 'config.json');
-  const defaults = {
-    model_profile: 'balanced',
-    commit_docs: true,
-    search_gitignored: false,
-    branching_strategy: 'none',
-    phase_branch_template: 'gsd/phase-{phase}-{slug}',
-    milestone_branch_template: 'gsd/{milestone}-{slug}',
-    quick_branch_template: null,
-    research: true,
-    plan_checker: true,
-    verifier: true,
-    nyquist_validation: true,
-    parallelization: true,
-    brave_search: false,
-    firecrawl: false,
-    exa_search: false,
-    text_mode: false, // when true, use plain-text numbered lists instead of question menus
-    sub_repos: [],
-    resolve_model_ids: false, // false: return alias as-is | true: map to full OpenCode model ID | "omit": return '' (runtime uses its default)
-    context_window: 200000, // default 200k; set to 1000000 for Opus/Sonnet 4.6 1M models
-    phase_naming: 'sequential', // 'sequential' (default, auto-increment) or 'custom' (arbitrary string IDs)
-    project_code: null, // optional short prefix for phase dirs (e.g., 'CK' → 'CK-01-foundation')
-    subagent_timeout: 300000, // 5 min default; increase for large codebases or slower models (ms)
-  };
+  const defaults = CONFIG_DEFAULTS;
 
   try {
     const raw = fs.readFileSync(configPath, 'utf-8');
@@ -360,7 +365,36 @@ function loadConfig(cwd) {
       response_language: get('response_language') || null,
     };
   } catch {
-    return defaults;
+    // Fall back to ~/.gsd/defaults.json only for truly pre-project contexts (#1683)
+    // If .planning/ exists, the project is initialized — just missing config.json
+    if (fs.existsSync(planningDir(cwd))) {
+      return defaults;
+    }
+    try {
+      const home = process.env.GSD_HOME || os.homedir();
+      const globalDefaultsPath = path.join(home, '.gsd', 'defaults.json');
+      const raw = fs.readFileSync(globalDefaultsPath, 'utf-8');
+      const globalDefaults = JSON.parse(raw);
+      return {
+        ...defaults,
+        model_profile: globalDefaults.model_profile ?? defaults.model_profile,
+        commit_docs: globalDefaults.commit_docs ?? defaults.commit_docs,
+        research: globalDefaults.research ?? defaults.research,
+        plan_checker: globalDefaults.plan_checker ?? defaults.plan_checker,
+        verifier: globalDefaults.verifier ?? defaults.verifier,
+        nyquist_validation: globalDefaults.nyquist_validation ?? defaults.nyquist_validation,
+        parallelization: globalDefaults.parallelization ?? defaults.parallelization,
+        text_mode: globalDefaults.text_mode ?? defaults.text_mode,
+        resolve_model_ids: globalDefaults.resolve_model_ids ?? defaults.resolve_model_ids,
+        context_window: globalDefaults.context_window ?? defaults.context_window,
+        subagent_timeout: globalDefaults.subagent_timeout ?? defaults.subagent_timeout,
+        model_overrides: globalDefaults.model_overrides || null,
+        agent_skills: globalDefaults.agent_skills || {},
+        response_language: globalDefaults.response_language || null,
+      };
+    } catch {
+      return defaults;
+    }
   }
 }
 
@@ -581,8 +615,8 @@ function withPlanningLock(cwd, fn) {
           }
         } catch { continue; }
 
-        // Wait and retry
-        spawnSync('sleep', ['0.1'], { stdio: 'ignore' });
+        // Wait and retry (cross-platform, no shell dependency)
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
         continue;
       }
       throw err;
@@ -1258,9 +1292,9 @@ function checkAgentsInstalled() {
  * Users can override with model_overrides in config.json for custom/latest models.
  */
 const MODEL_ALIAS_MAP = {
-  'opus': 'OpenCode-opus-4-0',
-  'sonnet': 'OpenCode-sonnet-4-5',
-  'haiku': 'OpenCode-haiku-3-5',
+  'opus': 'OpenCode-opus-4-6',
+  'sonnet': 'OpenCode-sonnet-4-6',
+  'haiku': 'OpenCode-haiku-4-5',
 };
 
 function resolveModelInternal(cwd, agentType) {
@@ -1484,6 +1518,7 @@ module.exports = {
   detectSubRepos,
   reapStaleTempFiles,
   MODEL_ALIAS_MAP,
+  CONFIG_DEFAULTS,
   planningDir,
   planningRoot,
   planningPaths,

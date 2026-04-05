@@ -31,8 +31,8 @@ Group by plan, dimension, severity.
 
 | Dimension | Strategy |
 |-----------|----------|
-| requirement_coverage | Add action item(s) for missing requirement |
-| item_completeness | Add missing elements to existing item |
+| requirement_coverage | Add item(s) for missing requirement |
+| task_completeness | Add missing elements to existing task |
 | dependency_correctness | Fix depends_on, recompute waves |
 | key_links_planned | Add wiring task or update action |
 | scope_sanity | Split into multiple plans |

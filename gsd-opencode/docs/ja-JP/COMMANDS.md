@@ -101,6 +101,8 @@
 | `--auto` | すべての質問で推奨デフォルトを自動選択 |
 | `--batch` | 質問を一つずつではなくバッチ取り込みでグループ化 |
 | `--analyze` | ディスカッション中にトレードオフ分析を追加 |
+| `--chain` | discuss → plan → execute を1つのフローで自動チェーン (v1.31) |
+| `--power` | 準備済み回答ファイルから一括入力で質問に回答 (v1.32) |
 
 **前提条件:** `.planning/ROADMAP.md` が存在すること
 **生成物:** `{phase}-CONTEXT.md`、`{phase}-DISCUSSION-LOG.md`（監査証跡）
@@ -482,7 +484,21 @@
 - 1つのターミナルから複数フェーズの作業を並列化するパワーユーザー向け
 
 ```bash
-/gsd-manager                        # コマンドセンターダッシュボードを開く
+/gsd-manager                        # コ��ンドセンターダッシュボードを開く
+```
+
+---
+
+### `/gsd-analyze-dependencies`
+
+フェーズ依存関係を検出し、ROADMAP.md に `Depends on` エントリを提案します。(v1.32)
+
+**前提���件:** `.planning/ROADMAP.md` が存在すること
+**検出方法:** ファイルオーバーラップ、セマンティック依存関係（API/スキーマのプロデューサーとコンシューマー）、データフロー依存関係
+**動作:** 依存関係提案テーブルを表示し、ユーザー確認後に ROADMAP.md の `Depends on` フィールドを更新します。
+
+```bash
+/gsd-analyze-dependencies            # 依存関係の分析と提案
 ```
 
 ---
@@ -525,10 +541,16 @@ GSDの保証付きでアドホックタスクを実行します。
 | フラグ | 説明 |
 |------|-------------|
 | `--from N` | 特定のフェーズ番号から開始 |
+| `--to N` | フェーズ N 完了後に自律実行を停止 (v1.32) |
+| `--only N` | 指定された単一フェーズのみを自律的に実行 (v1.31) |
+| `--interactive` | 各フェーズのディスカスステップでユーザー確認を要求 |
 
 ```bash
 /gsd-autonomous                     # 残りの全フェーズを実行
 /gsd-autonomous --from 3            # フェーズ3から開始
+/gsd-autonomous --to 5              # フェーズ5まで実行
+/gsd-autonomous --from 3 --to 5     # フェーズ3〜5の範囲を実行
+/gsd-autonomous --only 4            # フェーズ4のみを自律実行
 ```
 
 ### `/gsd-do`
@@ -567,8 +589,13 @@ GSDの保証付きでアドホックタスクを実行します。
 |----------|----------|-------------|
 | `description` | いいえ | バグの説明 |
 
+| フラグ | 説明 |
+|------|-------------|
+| `--diagnose` | 修正を試みず調査のみを行う診断専用モード (v1.32) |
+
 ```bash
 /gsd-debug "Login button not responding on mobile Safari"
+/gsd-debug --diagnose "API returning 500 on /users endpoint"
 ```
 
 ### `/gsd-add-todo`

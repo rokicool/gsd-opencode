@@ -25,6 +25,9 @@ via filesystem and git state.
 
 <required_reading>
 read STATE.md before any operation to load project context.
+
+@$HOME/.config/opencode/get-shit-done/references/agent-contracts.md
+@$HOME/.config/opencode/get-shit-done/references/context-budget.md
 </required_reading>
 
 <available_agent_types>
@@ -97,7 +100,7 @@ When `parallelization` is false, plans within a wave execute sequentially.
 
 **Runtime detection for Copilot:**
 Check if the current runtime is Copilot by testing for the `@gsd-executor` agent pattern
-or absence of the `@subagent` API. If running under Copilot, force sequential inline
+or absence of the `@subagent_type )` subagent API. If running under Copilot, force sequential inline
 execution regardless of the `parallelization` setting — Copilot's subagent completion
 signals are unreliable (see `<runtime_compatibility>`). Set `COPILOT_SEQUENTIAL=true`
 internally and skip the `execute_waves` step in favor of `check_interactive_mode`'s
@@ -310,98 +313,98 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    ```
 
    **Sequential dispatch for parallel execution (waves with 2+ agents):**
-   When spawning multiple agents in a wave, dispatch each subagent call **one at a time
-    with `run_in_background: true`** — do NOT send all subagent calls in a single message.
-    `git worktree add` acquires an exclusive lock on `.git/config.lock`, so simultaneous
-    calls race for this lock and fail. Sequential dispatch ensures each worktree finishes
-    creation before the next begins (the round-trip latency of each tool call provides
-    natural spacing), while all agents still **run in parallel** once created.
+   When spawning multiple agents in a wave, dispatch each `@subagent_type )` call **one at a time
+   with `run_in_background: true`** — do NOT send all task calls in a single message.
+   `git worktree add` acquires an exclusive lock on `.git/config.lock`, so simultaneous
+   calls race for this lock and fail. Sequential dispatch ensures each worktree finishes
+   creation before the next begins (the round-trip latency of each tool call provides
+   natural spacing), while all agents still **run in parallel** once created.
 
-    ```
-    # CORRECT: dispatch one @gsd-executor per message, each with run_in_background: true
-    # → worktrees created sequentially, agents execute in parallel
-    #
-    # WRONG: multiple subagent calls in a single message
+   ```
+   # CORRECT: dispatch one @subagent_type per message, each with run_in_background: true
+   # → worktrees created sequentially, agents execute in parallel
+   #
+   # WRONG: multiple @subagent_type calls in a single message
    # → simultaneous git worktree add → .git/config.lock contention → failures
    ```
 
-    ```
-    @gsd-executor "
-        <objective>
-        Execute plan {plan_number} of phase {phase_number}-{phase_name}.
-        Commit each task atomically. Create SUMMARY.md.
-        Do NOT update STATE.md or ROADMAP.md — the orchestrator owns those writes after all worktree agents in the wave complete.
-        </objective>
+   ```
+   @gsd-executor "
+       <objective>
+       Execute plan {plan_number} of phase {phase_number}-{phase_name}.
+       Commit each task atomically. Create SUMMARY.md.
+       Do NOT update STATE.md or ROADMAP.md — the orchestrator owns those writes after all worktree agents in the wave complete.
+       </objective>
 
-        <worktree_branch_check>
-        FIRST ACTION before any other work: verify this worktree's branch is based on the correct commit.
+       <worktree_branch_check>
+       FIRST ACTION before any other work: verify this worktree's branch is based on the correct commit.
 
-        Run:
-        ```bash
-        ACTUAL_BASE=$(git merge-base HEAD {EXPECTED_BASE})
-        CURRENT_HEAD=$(git rev-parse HEAD)
-        ```
+       Run:
+       ```bash
+       ACTUAL_BASE=$(git merge-base HEAD {EXPECTED_BASE})
+       CURRENT_HEAD=$(git rev-parse HEAD)
+       ```
 
-        If `ACTUAL_BASE` != `{EXPECTED_BASE}` (i.e. the worktree branch was created from an older
-        base such as `main` instead of the feature branch HEAD), rebase onto the correct base:
-        ```bash
-        git rebase --onto {EXPECTED_BASE} $(git rev-parse --abbrev-ref HEAD~1 2>/dev/null || git rev-parse HEAD^) HEAD 2>/dev/null || true
-        # If rebase fails or is a no-op, reset the branch to start from the correct base:
-        git reset --soft {EXPECTED_BASE}
-        ```
+       If `ACTUAL_BASE` != `{EXPECTED_BASE}` (i.e. the worktree branch was created from an older
+       base such as `main` instead of the feature branch HEAD), rebase onto the correct base:
+       ```bash
+       git rebase --onto {EXPECTED_BASE} $(git rev-parse --abbrev-ref HEAD~1 2>/dev/null || git rev-parse HEAD^) HEAD 2>/dev/null || true
+       # If rebase fails or is a no-op, reset the branch to start from the correct base:
+       git reset --soft {EXPECTED_BASE}
+       ```
 
-        If `ACTUAL_BASE` == `{EXPECTED_BASE}`: the branch base is correct, proceed immediately.
+       If `ACTUAL_BASE` == `{EXPECTED_BASE}`: the branch base is correct, proceed immediately.
 
-        This check fixes a known issue on Windows where `EnterWorktree` creates branches from
-        `main` instead of the current feature branch HEAD.
-        </worktree_branch_check>
+       This check fixes a known issue on Windows where `EnterWorktree` creates branches from
+       `main` instead of the current feature branch HEAD.
+       </worktree_branch_check>
 
-        <parallel_execution>
-        You are running as a PARALLEL executor agent. Use --no-verify on all git
-        commits to avoid pre-commit hook contention with other agents. The
-        orchestrator validates hooks once after all agents complete.
-        For gsd-tools commits: add --no-verify flag.
-        For direct git commits: use git commit --no-verify -m "..."
-        </parallel_execution>
+       <parallel_execution>
+       You are running as a PARALLEL executor agent. Use --no-verify on all git
+       commits to avoid pre-commit hook contention with other agents. The
+       orchestrator validates hooks once after all agents complete.
+       For gsd-tools commits: add --no-verify flag.
+       For direct git commits: use git commit --no-verify -m "..."
+       </parallel_execution>
 
-        <execution_context>
-        @$HOME/.config/opencode/get-shit-done/workflows/execute-plan.md
-        @$HOME/.config/opencode/get-shit-done/templates/summary.md
-        @$HOME/.config/opencode/get-shit-done/references/checkpoints.md
-        @$HOME/.config/opencode/get-shit-done/references/tdd.md
-        </execution_context>
+       <execution_context>
+       @$HOME/.config/opencode/get-shit-done/workflows/execute-plan.md
+       @$HOME/.config/opencode/get-shit-done/templates/summary.md
+       @$HOME/.config/opencode/get-shit-done/references/checkpoints.md
+       @$HOME/.config/opencode/get-shit-done/references/tdd.md
+       </execution_context>
 
-        <files_to_read>
-        read these files at execution start using the read tool:
-        - {phase_dir}/{plan_file} (Plan)
-        - .planning/PROJECT.md (Project context — core value, requirements, evolution rules)
-        - .planning/STATE.md (State)
-        - .planning/config.json (Config, if exists)
-        ${CONTEXT_WINDOW >= 500000 ? `
-        - ${phase_dir}/*-CONTEXT.md (User decisions from discuss-phase — honors locked choices)
-        - ${phase_dir}/*-RESEARCH.md (Technical research — pitfalls and patterns to follow)
-        - ${prior_wave_summaries} (SUMMARY.md files from earlier waves in this phase — what was already built)
-        ` : ''}
-        - ./AGENTS.md (Project instructions, if exists — follow project-specific guidelines and coding conventions)
-        - .OpenCode/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
-        </files_to_read>
+       <files_to_read>
+       read these files at execution start using the read tool:
+       - {phase_dir}/{plan_file} (Plan)
+       - .planning/PROJECT.md (Project context — core value, requirements, evolution rules)
+       - .planning/STATE.md (State)
+       - .planning/config.json (Config, if exists)
+       ${CONTEXT_WINDOW >= 500000 ? `
+       - ${phase_dir}/*-CONTEXT.md (User decisions from discuss-phase — honors locked choices)
+       - ${phase_dir}/*-RESEARCH.md (Technical research — pitfalls and patterns to follow)
+       - ${prior_wave_summaries} (SUMMARY.md files from earlier waves in this phase — what was already built)
+       ` : ''}
+       - ./AGENTS.md (Project instructions, if exists — follow project-specific guidelines and coding conventions)
+       - .OpenCode/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
+       </files_to_read>
 
-        ${AGENT_SKILLS}
+       ${AGENT_SKILLS}
 
-        <mcp_tools>
-        If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch, context7,
-        or other MCP servers), prefer those tools over grep/glob for code navigation when available.
-        MCP tools often save significant tokens by providing structured code indexes.
-        Check tool availability first — if MCP tools are not accessible, fall back to grep/glob.
-        </mcp_tools>
+       <mcp_tools>
+       If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch, context7,
+       or other MCP servers), prefer those tools over grep/glob for code navigation when available.
+       MCP tools often save significant tokens by providing structured code indexes.
+       Check tool availability first — if MCP tools are not accessible, fall back to grep/glob.
+       </mcp_tools>
 
-        <success_criteria>
-        - [ ] All tasks executed
-        - [ ] Each task committed individually
-        - [ ] SUMMARY.md created in plan directory
-        </success_criteria>
-    "
-    ```
+       <success_criteria>
+       - [ ] All tasks executed
+       - [ ] Each task committed individually
+       - [ ] SUMMARY.md created in plan directory
+       </success_criteria>
+     "
+   ```
 
    **Sequential mode** (`USE_WORKTREES` is `false`):
 
@@ -430,7 +433,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 4. **Wait for all agents in wave to complete.**
 
-   **Completion signal fallback (Copilot and runtimes where @subagent may not return):**
+   **Completion signal fallback (Copilot and runtimes where @subagent_type may not return):**
 
    If a spawned agent does not return a completion signal but appears to have finished
    its work, do NOT block indefinitely. Instead, verify completion via spot-checks:
@@ -449,7 +452,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    activity. If commits are still appearing, wait longer. If no activity, report
    the plan as failed and route to the failure handler in step 6.
 
-   **This fallback applies automatically to all runtimes.** OpenCode's @subagent normally
+   **This fallback applies automatically to all runtimes.** OpenCode's @subagent_type normally
    returns synchronously, but the fallback ensures resilience if it doesn't.
 
 5. **Post-wave hook validation (parallel mode only):**

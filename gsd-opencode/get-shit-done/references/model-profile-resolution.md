@@ -17,7 +17,11 @@ Default: `simple` if not set or config missing.
 Look up the agent in the table for the resolved profile. Pass the model parameter to task calls:
 
 ```
-@gsd-planner "..."
+@subagent_type 
+  prompt="...",
+  subagent_type="gsd-planner",
+  model="{resolved_model}"  # "inherit", "sonnet", or "haiku"
+)
 ```
 
 **Note:** Opus-tier agents resolve to `"inherit"` (not `"opus"`). This causes the agent to use the parent session's model, avoiding conflicts with organization policies that may block specific opus versions.

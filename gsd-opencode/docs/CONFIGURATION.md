@@ -72,7 +72,8 @@ GSD stores project settings in `.planning/config.json`. Created during `/gsd-new
   "security_enforcement": true,
   "security_asvs_level": 1,
   "security_block_on": "high",
-  "agent_skills": {}
+  "agent_skills": {},
+  "response_language": null
 }
 ```
 
@@ -86,6 +87,7 @@ GSD stores project settings in `.planning/config.json`. Created during `/gsd-new
 | `granularity` | enum | `coarse`, `standard`, `fine` | `standard` | Controls phase count: `coarse` (3-5), `standard` (5-8), `fine` (8-12) |
 | `model_profile` | enum | `quality`, `balanced`, `budget`, `inherit` | `balanced` | Model tier for each agent (see [Model Profiles](#model-profiles)) |
 | `project_code` | string | any short string | (none) | Prefix for phase directory names (e.g., `"ABC"` produces `ABC-01-setup/`). Added in v1.31 |
+| `response_language` | string | language code | (none) | Language for agent responses (e.g., `"pt"`, `"ko"`, `"ja"`). Propagates to all spawned agents for cross-phase language consistency. Added in v1.32 |
 
 > **Note:** `granularity` was renamed from `depth` in v1.22.3. Existing configs are auto-migrated.
 
@@ -198,7 +200,7 @@ Any GSD agent type can receive skills. Common types:
 
 ### How It Works
 
-At spawn time, workflows call `node gsd-tools.cjs agent-skills <type>` to load configured skills. If skills exist for the agent type, they are injected as an `<agent_skills>` block in the @subagent prompt:
+At spawn time, workflows call `node gsd-tools.cjs agent-skills <type>` to load configured skills. If skills exist for the agent type, they are injected as an `<agent_skills>` block in the @subagent_type prompt:
 
 ```xml
 <agent_skills>
@@ -326,6 +328,34 @@ Settings for the security enforcement feature (v1.31). All follow the **absent =
 
 ---
 
+## Manager Passthrough Flags
+
+Configure per-step flags that `/gsd-manager` appends to each dispatched command. This allows customizing how the manager runs discuss, plan, and execute steps without manual flag entry.
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `manager.flags.discuss` | string | (none) | Flags appended to discuss-phase commands (e.g., `"--auto"`) |
+| `manager.flags.plan` | string | (none) | Flags appended to plan-phase commands (e.g., `"--skip-research"`) |
+| `manager.flags.execute` | string | (none) | Flags appended to execute-phase commands (e.g., `"--validate"`) |
+
+**Example:**
+
+```json
+{
+  "manager": {
+    "flags": {
+      "discuss": "--auto",
+      "plan": "--skip-research",
+      "execute": "--validate"
+    }
+  }
+}
+```
+
+Invalid flag tokens are sanitized and logged as warnings. Only recognized GSD flags are passed through.
+
+---
+
 ## Model Profiles
 
 ### Profile Definitions
@@ -395,7 +425,7 @@ The intent is the same as the OpenCode profile tiers -- use a stronger model for
 | Value | Behavior | Use When |
 |-------|----------|----------|
 | `false` (default) | Returns OpenCode aliases (`opus`, `sonnet`, `haiku`) | OpenCode with native Anthropic API |
-| `true` | Maps aliases to full OpenCode model IDs (`OpenCode-opus-4-0`) | OpenCode with API that requires full IDs |
+| `true` | Maps aliases to full OpenCode model IDs (`OpenCode-opus-4-6`) | OpenCode with API that requires full IDs |
 | `"omit"` | Returns empty string (runtime picks its default) | Non-OpenCode runtimes (Codex, OpenCode, Gemini CLI, Kilo) |
 
 ### Profile Philosophy
@@ -417,6 +447,7 @@ The intent is the same as the OpenCode profile tiers -- use a stronger model for
 | `GEMINI_API_KEY` | Detected by context monitor to switch hook event name |
 | `WSL_DISTRO_NAME` | Detected by installer for WSL path handling |
 | `GSD_SKIP_SCHEMA_CHECK` | Skip schema drift detection during execute-phase (v1.31) |
+| `GSD_PROJECT` | Override project root for multi-project workspace support (v1.32) |
 
 ---
 

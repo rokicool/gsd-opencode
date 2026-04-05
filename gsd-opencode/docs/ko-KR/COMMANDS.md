@@ -101,6 +101,8 @@
 | `--auto` | 모든 질문에 추천 기본값을 자동으로 선택합니다 |
 | `--batch` | 질문을 하나씩 처리하는 대신 일괄 입력 방식으로 그룹화합니다 |
 | `--analyze` | 토론 중 트레이드오프 분석을 추가합니다 |
+| `--chain` | discuss → plan → execute를 하나의 플로우로 자동 체인합니다 (v1.31) |
+| `--power` | 준비된 답변 파일에서 일괄 입력으로 질문에 답변합니다 (v1.32) |
 
 **사전 조건:** `.planning/ROADMAP.md`가 존재해야 합니다.
 **생성 파일:** `{phase}-CONTEXT.md`, `{phase}-DISCUSSION-LOG.md` (감사 추적)
@@ -487,6 +489,20 @@ Nyquist 검증 갭을 소급하여 감사하고 보완합니다.
 
 ---
 
+### `/gsd-analyze-dependencies`
+
+페이즈 의존성을 감지하고 ROADMAP.md에 `Depends on` 항목을 제안합니다. (v1.32)
+
+**사전 조건:** `.planning/ROADMAP.md`가 존재해야 합니다.
+**감지 방법:** 파일 겹침, 의미적 의존성(API/스키마 생산자-소비자), 데이터 흐름 의존성
+**동작 방식:** 의존성 제안 테이블을 표시하고 사용자 확인 후 ROADMAP.md의 `Depends on` 필드를 업데이트합니다.
+
+```bash
+/gsd-analyze-dependencies            # 의존성 분석 및 제안
+```
+
+---
+
 ### `/gsd-help`
 
 모든 명령어와 사용 가이드를 표시합니다.
@@ -525,10 +541,16 @@ GSD 보증을 갖춘 임시 작업을 실행합니다.
 | 플래그 | 설명 |
 |--------|------|
 | `--from N` | 특정 페이즈 번호부터 시작합니다 |
+| `--to N` | 페이즈 N 완료 후 자율 실행을 중단합니다 (v1.32) |
+| `--only N` | 지정된 단일 페이즈만 자율적으로 실행합니다 (v1.31) |
+| `--interactive` | 각 페이즈의 discuss 단계에서 사용자 확인을 요청합니다 |
 
 ```bash
 /gsd-autonomous                     # 남은 모든 페이즈 실행
 /gsd-autonomous --from 3            # 페이즈 3부터 시작
+/gsd-autonomous --to 5              # 페이즈 5까지만 실행
+/gsd-autonomous --from 3 --to 5     # 페이즈 3~5 범위 실행
+/gsd-autonomous --only 4            # 페이즈 4만 자율 실행
 ```
 
 ### `/gsd-do`
@@ -567,8 +589,13 @@ GSD 보증을 갖춘 임시 작업을 실행합니다.
 |------|----------|------|
 | `description` | 아니오 | 버그 설명 |
 
+| 플래그 | 설명 |
+|--------|------|
+| `--diagnose` | 수정 없이 조사만 수행하는 진단 전용 모드 (v1.32) |
+
 ```bash
 /gsd-debug "Login button not responding on mobile Safari"
+/gsd-debug --diagnose "API returning 500 on /users endpoint"
 ```
 
 ### `/gsd-add-todo`

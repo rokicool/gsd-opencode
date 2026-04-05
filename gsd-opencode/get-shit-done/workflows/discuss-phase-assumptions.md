@@ -310,7 +310,8 @@ Parse the subagent's response. Extract:
 If research topics were flagged, spawn a general research agent:
 
 ```
-@general "Research the following topics for Phase {PHASE}: {phase_name}.
+@general """
+Research the following topics for Phase {PHASE}: {phase_name}.
 
 Topics needing research:
 {needs_research_content}
@@ -321,7 +322,8 @@ For each topic, return:
 - **Confidence impact:** [Which assumption this resolves and to what confidence level]
 
 Use Context7 (resolve-library-id then query-docs) for library-specific questions.
-Use websearch for ecosystem/best-practice questions."
+Use websearch for ecosystem/best-practice questions.
+"""
 ```
 
 Merge findings back into assumptions:

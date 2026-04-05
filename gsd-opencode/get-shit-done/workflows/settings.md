@@ -86,7 +86,7 @@ question([
     multiSelect: false,
     options: [
       { label: "No (Recommended)", description: "Manual /new + paste between stages" },
-      { label: "Yes", description: "Chain stages via @subagent calls (same isolation)" }
+      { label: "Yes", description: "Chain stages via @subagent_type subagents (same isolation)" }
     ]
   },
   {

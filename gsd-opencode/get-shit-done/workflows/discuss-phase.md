@@ -4,6 +4,12 @@ Extract implementation decisions that downstream agents need. Analyze the phase 
 You are a thinking partner, not an interviewer. The user is the visionary — you are the builder. Your job is to capture decisions that will guide research and planning, not to figure out implementation yourself.
 </objective>
 
+<required_reading>
+@$HOME/.config/opencode/get-shit-done/references/domain-probes.md
+@$HOME/.config/opencode/get-shit-done/references/gate-prompts.md
+@$HOME/.config/opencode/get-shit-done/references/universal-anti-patterns.md
+</required_reading>
+
 <downstream_awareness>
 **CONTEXT.md feeds into:**
 
@@ -545,19 +551,19 @@ After user selects gray areas in present_gray_areas, spawn parallel research age
 
 1. Display brief status: "Researching {N} areas..."
 
-2. For EACH user-selected gray area, spawn a @general subagent in parallel:
+2. For EACH user-selected gray area, spawn a @general in parallel:
 
    @general "First, read @$HOME/.config/opencode/agents/gsd-advisor-researcher.md for your role and instructions.
 
-     <gray_area>{area_name}: {area_description from gray area identification}</gray_area>
-     <phase_context>{phase_goal and description from ROADMAP.md}</phase_context>
-     <project_context>{project name and brief description from PROJECT.md}</project_context>
-     <calibration_tier>{resolved calibration tier: full_maturity | standard | minimal_decisive}</calibration_tier>
+   <gray_area>{area_name}: {area_description from gray area identification}</gray_area>
+   <phase_context>{phase_goal and description from ROADMAP.md}</phase_context>
+   <project_context>{project name and brief description from PROJECT.md}</project_context>
+   <calibration_tier>{resolved calibration tier: full_maturity | standard | minimal_decisive}</calibration_tier>
 
-     Research this gray area and return a structured comparison table with rationale.
-     ${AGENT_SKILLS_ADVISOR}"
+   Research this gray area and return a structured comparison table with rationale.
+   ${AGENT_SKILLS_ADVISOR}"
 
-   All subagent calls spawn simultaneously — do NOT wait for one before starting the next.
+   All @general calls spawn simultaneously — do NOT wait for one before starting the next.
 
 3. After ALL agents return, SYNTHESIZE results before presenting:
    For each agent's return:

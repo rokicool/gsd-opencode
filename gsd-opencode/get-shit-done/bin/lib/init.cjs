@@ -33,7 +33,7 @@ function withProjectRoot(cwd, result) {
   result.project_root = cwd;
   // Inject agent installation status into all init outputs (#1371).
   // Workflows that spawn named subagents use this to detect when agents
-  // are missing and would silently fall back to general-purpose.
+  // are missing and would silently fall back to general.
   const agentStatus = checkAgentsInstalled();
   result.agents_installed = agentStatus.agents_installed;
   result.missing_agents = agentStatus.missing_agents;
@@ -1429,7 +1429,7 @@ function cmdInitRemoveWorkspace(cwd, name, raw) {
 }
 
 /**
- * Build a formatted agent skills block for injection into task() prompts.
+ * Build a formatted agent skills block for injection into @subagent_type ) prompts.
  *
  * Reads `config.agent_skills[agentType]` and validates each skill path exists
  * within the project root. Returns a formatted `<agent_skills>` block or empty

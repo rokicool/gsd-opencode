@@ -538,7 +538,8 @@ EXPECTED_BASE=$(git rev-parse HEAD)
 Spawn gsd-executor with plan reference:
 
 ```
-@gsd-executor "Execute quick task ${quick_id}.
+@gsd-executor "
+Execute quick task ${quick_id}.
 
 ${USE_WORKTREES !== "false" ? `
 <worktree_branch_check>
@@ -564,7 +565,8 @@ ${AGENT_SKILLS_EXECUTOR}
 - Create summary at: ${QUICK_DIR}/${quick_id}-SUMMARY.md
 - Do NOT commit docs artifacts (SUMMARY.md, STATE.md, PLAN.md) — the orchestrator handles the docs commit in Step 8
 - Do NOT update ROADMAP.md (quick tasks are separate from planned phases)
-</constraints>"
+</constraints>
+"
 ```
 
 After executor returns:

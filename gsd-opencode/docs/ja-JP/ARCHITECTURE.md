@@ -21,7 +21,7 @@
 
 ## システム概要
 
-GSDは、ユーザーとAIコーディングエージェント（OpenCode、Gemini CLI、OpenCode、Kilo、Codex、Copilot、Antigravity）の間に位置する**メタプロンプティングフレームワーク**です。以下の機能を提供します：
+GSDは、ユーザーとAIコーディングエージェント（OpenCode、Gemini CLI、OpenCode、Kilo、Codex、Copilot、Antigravity、Trae、Cline、Augment Code）の間に位置する**メタプロンプティングフレームワーク**です。以下の機能を提供します：
 
 1. **コンテキストエンジニアリング** — タスクごとにAIが必要とするすべてを提供する構造化アーティファクト
 2. **マルチエージェントオーケストレーション** — 専門エージェントをフレッシュなコンテキストウィンドウで起動する軽量オーケストレーター

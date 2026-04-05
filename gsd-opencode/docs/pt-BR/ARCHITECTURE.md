@@ -62,6 +62,10 @@ Entrada (/gsd-comando)
 - hooks de guarda para escrita/edição sensível
 - scanner CI para padrões de risco
 
+## Runtimes suportados (v1.32)
+
+OpenCode, Gemini CLI, OpenCode, Kilo, Codex, Copilot, Antigravity, Trae, Cline, Augment Code.
+
 ## Extensibilidade
 
 GSD suporta evolução por:

@@ -1,0 +1,83 @@
+{
+  "_description": "Supplemental translation rules for v1.33.0 -- fixes remaining forbidden strings (task() prose references, general-purpose agent name)",
+  "include": ["gsd-opencode/**"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "**/oc-*",
+    "**/*-oc-*"
+  ],
+  "rules": [
+    {
+      "pattern": "spawn task(subagent_type=",
+      "replacement": "spawn @subagent_type ",
+      "description": "Fix: prose reference to task() spawning in execute-plan"
+    },
+    {
+      "pattern": "`task(subagent_type=\"gsd-executor\", ...)`",
+      "replacement": "`@gsd-executor ...`",
+      "description": "Fix: runtime compatibility note referencing Task() syntax"
+    },
+    {
+      "pattern": "task() subagent API",
+      "replacement": "@subagent_type subagent API",
+      "description": "Fix: prose reference to task() API"
+    },
+    {
+      "pattern": "task() subagents",
+      "replacement": "@subagent_type subagents",
+      "description": "Fix: prose reference in settings.md"
+    },
+    {
+      "pattern": "task() prompt",
+      "replacement": "@subagent_type prompt",
+      "description": "Fix: prose reference in CONFIGURATION.md"
+    },
+    {
+      "pattern": "task() call",
+      "replacement": "@subagent_type call",
+      "description": "Fix: prose reference to task() call"
+    },
+    {
+      "pattern": "task() calls",
+      "replacement": "@subagent_type calls",
+      "description": "Fix: prose reference to task() calls"
+    },
+    {
+      "pattern": "task() per message",
+      "replacement": "@subagent_type per message",
+      "description": "Fix: prose reference to task() per message"
+    },
+    {
+      "pattern": "task() may not return",
+      "replacement": "@subagent_type may not return",
+      "description": "Fix: prose reference to task() fallback"
+    },
+    {
+      "pattern": "task() normally",
+      "replacement": "@subagent_type normally",
+      "description": "Fix: prose reference to task() normally"
+    },
+    {
+      "pattern": "via `task()`",
+      "replacement": "via `@subagent_type`",
+      "description": "Fix: backtick-wrapped task() in agent descriptions"
+    },
+    {
+      "pattern": "task(s)",
+      "replacement": "item(s)",
+      "description": "Fix: English word task(s) matches forbidden task( pattern"
+    },
+    {
+      "pattern": "general-purpose",
+      "replacement": "general",
+      "description": "Fix: general-purpose is a forbidden agent type name"
+    },
+    {
+      "pattern": "task(",
+      "replacement": "@subagent_type ",
+      "description": "Fix: catch-all remaining task( references"
+    }
+  ]
+}

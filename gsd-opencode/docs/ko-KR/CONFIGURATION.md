@@ -33,7 +33,8 @@ GSD는 프로젝트 설정을 `.planning/config.json`에 저장합니다. `/gsd-
     "research_before_questions": false,
     "discuss_mode": "discuss",
     "skip_discuss": false,
-    "text_mode": false
+    "text_mode": false,
+    "use_worktrees": true
   },
   "hooks": {
     "context_warnings": true,
@@ -100,6 +101,7 @@ GSD는 프로젝트 설정을 `.planning/config.json`에 저장합니다. `/gsd-
 | `workflow.node_repair` | boolean | `true` | 검증 실패 시 자율적 태스크 복구 |
 | `workflow.node_repair_budget` | number | `2` | 실패한 태스크당 최대 복구 시도 횟수 |
 | `workflow.research_before_questions` | boolean | `false` | 토론 질문 후가 아닌 전에 리서치 실행 |
+| `workflow.use_worktrees` | boolean | `true` | `false`이면 git worktree 격리 비활성화 (v1.31) |
 | `workflow.discuss_mode` | string | `'discuss'` | `/gsd-discuss-phase`의 컨텍스트 수집 방식을 제어합니다. `'discuss'` (기본값)는 질문을 하나씩 합니다. `'assumptions'`는 코드베이스를 먼저 읽고 신뢰도 수준이 있는 구조화된 가정을 생성하여 틀린 부분만 수정하도록 요청합니다. v1.28에서 추가 |
 | `workflow.skip_discuss` | boolean | `false` | `true`로 설정하면 `/gsd-autonomous`가 discuss 단계를 완전히 건너뛰고 ROADMAP 단계 목표로부터 최소한의 CONTEXT.md를 작성합니다. 개발자 선호사항이 PROJECT.md/REQUIREMENTS.md에 모두 캡처된 프로젝트에 유용합니다. v1.28에서 추가 |
 | `workflow.text_mode` | boolean | `false` | question TUI 메뉴를 일반 텍스트 번호 목록으로 대체합니다. TUI 메뉴가 렌더링되지 않는 OpenCode 원격 세션 (`/rc` 모드)에 필요합니다. discuss 단계에서 `--text` 플래그로 세션별 설정도 가능합니다. v1.28에서 추가 |
@@ -232,6 +234,26 @@ quick 태스크 브랜칭 예시:
 
 ---
 
+## 보안 설정 (v1.31)
+
+| 설정 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `security_enforcement` | boolean | `true` | 위협 모델 보안 검증 활성화 |
+| `security_asvs_level` | number (1-3) | `1` | OWASP ASVS 검증 레벨 |
+| `security_block_on` | string | `"high"` | 페이즈 진행을 차단하는 최소 심각도 |
+
+---
+
+## 응답 언어 설정 (v1.32)
+
+| 설정 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `response_language` | string | (없음) | 에이전트 응답의 언어 코드 (예: `"pt"`, `"ko"`, `"ja"`) |
+
+`response_language`가 설정되면 모든 페이즈와 스폰된 에이전트에서 일관된 언어 출력을 보장합니다.
+
+---
+
 ## 훅 설정
 
 | 설정 | 타입 | 기본값 | 설명 |
@@ -309,7 +331,7 @@ quick 태스크 브랜칭 예시:
 | 값 | 동작 | 사용 시점 |
 |----|------|----------|
 | `false` (기본값) | OpenCode 별칭 반환 (`opus`, `sonnet`, `haiku`) | 네이티브 Anthropic API를 사용하는 OpenCode |
-| `true` | 별칭을 전체 OpenCode 모델 ID로 매핑 (`OpenCode-opus-4-0`) | 전체 ID가 필요한 API를 사용하는 OpenCode |
+| `true` | 별칭을 전체 OpenCode 모델 ID로 매핑 (`OpenCode-opus-4-6`) | 전체 ID가 필요한 API를 사용하는 OpenCode |
 | `"omit"` | 빈 문자열 반환 (런타임이 기본값 선택) | 비 OpenCode 런타임 (Codex, OpenCode, Gemini CLI, Kilo) |
 
 ### 프로필 철학
@@ -330,6 +352,7 @@ quick 태스크 브랜칭 예시:
 | `CLAUDE_CONFIG_DIR` | 기본 설정 디렉토리 재정의 (`$HOME/.config/opencode/`) |
 | `GEMINI_API_KEY` | context monitor가 훅 이벤트 이름을 전환하기 위해 감지 |
 | `WSL_DISTRO_NAME` | 인스톨러가 WSL 경로 처리를 위해 감지 |
+| `GSD_SKIP_SCHEMA_CHECK` | 스키마 드리프트 감지 바이패스 (v1.31) |
 
 ---
 

@@ -8,7 +8,9 @@ permissions:
 
 # /gsd-workstreams
 
-Manage parallel workstreams for concurrent milestone work.
+<objective>
+      Manage parallel workstreams for concurrent milestone work.
+</objective>
 
 ## Usage
 

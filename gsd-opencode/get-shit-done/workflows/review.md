@@ -43,8 +43,28 @@ Then run /gsd-review again.
 ```
 Exit.
 
-If only one CLI is the current runtime (e.g. running inside OpenCode), skip it for the review
-to ensure independence. At least one DIFFERENT CLI must be available.
+Determine which CLI to skip based on the current runtime environment:
+
+```bash
+# Environment-based runtime detection (priority order)
+if [ "$ANTIGRAVITY_AGENT" = "1" ]; then
+  # Antigravity is a separate client — all CLIs are external, skip none
+  SELF_CLI="none"
+elif [ -n "$CLAUDE_CODE_ENTRYPOINT" ]; then
+  # Running inside OpenCode CLI — skip OpenCode for independence
+  SELF_CLI="OpenCode"
+else
+  # Other environments (Gemini CLI, Codex CLI, etc.)
+  # Fall back to AI self-identification to decide which CLI to skip
+  SELF_CLI="auto"
+fi
+```
+
+Rules:
+- If `SELF_CLI="none"` → invoke ALL available CLIs (no skip)
+- If `SELF_CLI="OpenCode"` → skip OpenCode, use gemini/codex
+- If `SELF_CLI="auto"` → the executing AI identifies itself and skips its own CLI
+- At least one DIFFERENT CLI must be available for the review to proceed.
 </step>
 
 <step name="gather_context">

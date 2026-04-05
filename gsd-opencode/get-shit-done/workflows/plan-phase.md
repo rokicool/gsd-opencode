@@ -6,6 +6,9 @@ Create executable phase prompts (PLAN.md files) for a roadmap phase with integra
 read all files referenced by the invoking prompt's execution_context before starting.
 
 @$HOME/.config/opencode/get-shit-done/references/ui-brand.md
+@$HOME/.config/opencode/get-shit-done/references/revision-loop.md
+@$HOME/.config/opencode/get-shit-done/references/gate-prompts.md
+@$HOME/.config/opencode/get-shit-done/references/agent-contracts.md
 </required_reading>
 
 <available_agent_types>

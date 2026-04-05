@@ -21,7 +21,7 @@
 
 ## 시스템 개요
 
-GSD는 사용자와 AI 코딩 에이전트(OpenCode, Gemini CLI, OpenCode, Kilo, Codex, Copilot, Antigravity) 사이에 위치하는 **메타 프롬프팅 프레임워크**입니다. 다음을 제공합니다.
+GSD는 사용자와 AI 코딩 에이전트(OpenCode, Gemini CLI, OpenCode, Kilo, Codex, Copilot, Antigravity, Trae, Cline, Augment Code) 사이에 위치하는 **메타 프롬프팅 프레임워크**입니다. 다음을 제공합니다.
 
 1. **컨텍스트 엔지니어링** — 작업별로 AI에게 필요한 모든 것을 제공하는 구조화된 아티팩트
 2. **멀티 에이전트 오케스트레이션** — 새로운 컨텍스트 윈도우로 전문화된 에이전트를 생성하는 가벼운 오케스트레이터

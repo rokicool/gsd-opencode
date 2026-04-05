@@ -322,7 +322,7 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 Agent(
   description="Plan phase ${PHASE_NUM}: ${PHASE_NAME}",
   run_in_background=true,
-   prompt="Run plan-phase for phase ${PHASE_NUM}: skill(skill=\"/gsd-plan-phase\", args=\"${PHASE_NUM}\")"
+  prompt="Run plan-phase for phase ${PHASE_NUM}: skill(skill=\"gsd:plan-phase\", args=\"${PHASE_NUM}\")"
 )
 ```
 
@@ -344,7 +344,7 @@ Verify plan produced output — re-run `init phase-op` and check `has_plans`. If
 Agent(
   description="Execute phase ${PHASE_NUM}: ${PHASE_NAME}",
   run_in_background=true,
-   prompt="Run execute-phase for phase ${PHASE_NUM}: /gsd-execute-phase ${PHASE_NUM} --no-transition"
+  prompt="Run execute-phase for phase ${PHASE_NUM}: skill(skill=\"gsd:execute-phase\", args=\"${PHASE_NUM} --no-transition\")"
 )
 ```
 
