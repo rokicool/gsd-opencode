@@ -96,39 +96,7 @@ Produce a brief report with:
 The primary config is `assets/configs/config.json`. It contains all translation rules (URLs, paths, commands, tool names, profile names, colors, HTML tags, etc.).
 
 ---
-
-## Step 2B: Add Agents Mode
-
-Add `mode: subagent` declaration to all agent definition files. See [M-ADD-AGENTS-MODE.md](./M-ADD-AGENTS-MODE.md) for details.
-
-### 2Ba. Preview
-
-```bash
-node assets/bin/gsd-translate-in-place.js assets/configs/add-agent-mode.json --show-diff
-```
-
-**What to check:**
-- All agent files in `gsd-opencode/agents/` are listed
-- Each file shows exactly one replacement: `mode: subagent` added after `description:`
-- No duplicate `mode:` lines are created (files with existing `mode:` are skipped)
-
-### 2Bb. Apply
-
-```bash
-node assets/bin/gsd-translate-in-place.js assets/configs/add-agent-mode.json --apply
-```
-
-### 2Bc. Verify
-
-```bash
-node assets/bin/gsd-translate-in-place.js assets/configs/add-agent-mode.json
-```
-
-**Expected output**: 0 changes remaining (all agent files have `mode: subagent`).
-
----
-
-## Step 2C: Modify Agent Calls
+## Step 2A: Modify Agent Calls
 
 Replace `task()` function calls with the OpenCode `@subagent_type` shorthand syntax. The config `assets/configs/remove-task.json` contains regex rules that match the most common `task()` call patterns found in commands, workflows, references, and templates.
 
@@ -172,7 +140,7 @@ task(
 
 **What does NOT get replaced**: Prose references to `subagent_type=` inside inline code spans (e.g., `` `subagent_type="gsd-executor"` ``) are left untouched -- they are documentation, not function calls.
 
-### 2Ca. Preview
+### 2Aa. Preview
 
 ```bash
 node assets/bin/gsd-translate-in-place.js assets/configs/remove-task.json --show-diff
@@ -190,13 +158,13 @@ node assets/bin/gsd-translate-in-place.js assets/configs/remove-task.json --show
 - **Expression prompts**: Prompts using string concatenation (`+`) may only capture the first segment -- verify these replacements look correct.
 - **Unmatched calls**: Not every `task()` variant is covered by regex. Complex patterns (deeply indented, extra args in unusual positions) may need manual conversion.
 
-### 2Cb. Apply
+### 2Ab. Apply
 
 ```bash
 node assets/bin/gsd-translate-in-place.js assets/configs/remove-task.json --apply
 ```
 
-### 2Cc. Verify
+### 2Ac. Verify
 
 ```bash
 node assets/bin/gsd-translate-in-place.js assets/configs/remove-task.json
@@ -204,7 +172,7 @@ node assets/bin/gsd-translate-in-place.js assets/configs/remove-task.json
 
 **Expected output**: 0 changes remaining (all matching `task()` calls already replaced).
 
-### 2Cd. Manual review of unmatched calls
+### 2Ad. Manual review of unmatched calls
 
 After apply, search for any remaining `task(` calls with `gsd-` subagent types that were not auto-replaced:
 
@@ -215,6 +183,38 @@ grep -rn 'subagent_type="gsd-' gsd-opencode/commands/gsd/ gsd-opencode/get-shit-
 If results are found:
 - Check if each is a prose reference (inside backticks or plain text) -- these are correct to leave as-is
 - If any are actual `task()` calls that the regex missed, convert them manually following the pattern: `@subagent_type prompt_value`
+
+
+---
+
+## Step 2B: Add Agents Mode
+
+Add `mode: subagent` declaration to all agent definition files. See [M-ADD-AGENTS-MODE.md](./M-ADD-AGENTS-MODE.md) for details.
+
+### 2Ba. Preview
+
+```bash
+node assets/bin/gsd-translate-in-place.js assets/configs/add-agent-mode.json --show-diff
+```
+
+**What to check:**
+- All agent files in `gsd-opencode/agents/` are listed
+- Each file shows exactly one replacement: `mode: subagent` added after `description:`
+- No duplicate `mode:` lines are created (files with existing `mode:` are skipped)
+
+### 2Bb. Apply
+
+```bash
+node assets/bin/gsd-translate-in-place.js assets/configs/add-agent-mode.json --apply
+```
+
+### 2Bc. Verify
+
+```bash
+node assets/bin/gsd-translate-in-place.js assets/configs/add-agent-mode.json
+```
+
+**Expected output**: 0 changes remaining (all agent files have `mode: subagent`).
 
 ---
 

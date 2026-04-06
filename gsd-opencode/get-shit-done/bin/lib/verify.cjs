@@ -700,18 +700,18 @@ function cmdValidateHealth(cwd, options, raw) {
   } catch { /* intentionally empty */ }
 
   // ─── Check 7c: Agent installation (#1371) ──────────────────────────────────
-  // Verify GSD agents are installed. Missing agents cause @subagent_type subagent_type=...)
-  // to silently fall back to general, losing specialized instructions.
+  // Verify GSD agents are installed. Missing agents cause task(subagent_type=...)
+  // to silently fall back to general-purpose, losing specialized instructions.
   try {
     const agentStatus = checkAgentsInstalled();
     if (!agentStatus.agents_installed) {
       if (agentStatus.installed_agents.length === 0) {
         addIssue('warning', 'W010',
-          `No GSD agents found in ${agentStatus.agents_dir} — @subagent_type subagent_type="gsd-*") will fall back to general`,
+          `No GSD agents found in ${agentStatus.agents_dir} — task(subagent_type="gsd-*") will fall back to general-purpose`,
           'Run the GSD installer: npx gsd-opencode@latest');
       } else {
         addIssue('warning', 'W010',
-          `Missing ${agentStatus.missing_agents.length} GSD agents: ${agentStatus.missing_agents.join(', ')} — affected workflows will fall back to general`,
+          `Missing ${agentStatus.missing_agents.length} GSD agents: ${agentStatus.missing_agents.join(', ')} — affected workflows will fall back to general-purpose`,
           'Run the GSD installer: npx gsd-opencode@latest');
       }
     }

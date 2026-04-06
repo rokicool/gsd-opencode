@@ -310,7 +310,7 @@ Parse the subagent's response. Extract:
 If research topics were flagged, spawn a general research agent:
 
 ```
-@general """
+task(subagent_type="general", prompt="""
 Research the following topics for Phase {PHASE}: {phase_name}.
 
 Topics needing research:
@@ -323,7 +323,7 @@ For each topic, return:
 
 Use Context7 (resolve-library-id then query-docs) for library-specific questions.
 Use websearch for ecosystem/best-practice questions.
-"""
+""")
 ```
 
 Merge findings back into assumptions:

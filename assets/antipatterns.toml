@@ -34,5 +34,4 @@ forbidden_strings = [
         "workflows/set-profile.md",
         "quality/balanced/budget",
         'gsd:update\\|GSD update\\|gsd-install',
-        'task('
         ]

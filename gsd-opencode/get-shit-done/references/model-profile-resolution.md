@@ -17,7 +17,7 @@ Default: `simple` if not set or config missing.
 Look up the agent in the table for the resolved profile. Pass the model parameter to task calls:
 
 ```
-@subagent_type 
+task(
   prompt="...",
   subagent_type="gsd-planner",
   model="{resolved_model}"  # "inherit", "sonnet", or "haiku"

@@ -17,7 +17,7 @@ MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"
 在表中查找已解析配置对应的代理。将 model 参数传递给 task 调用：
 
 ```
-@subagent_type 
+task(
   prompt="...",
   subagent_type="gsd-planner",
   model="{resolved_model}"  # "inherit"、"sonnet" 或 "haiku"

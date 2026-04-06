@@ -176,6 +176,38 @@
       "isRegex": true,
       "caseSensitive": false,
       "description": "Replace multiline task() with multi-line expression prompt to @subagent shorthand"
+    },
+    {
+      "_comment": "17. Prose: 'spawn a task() in parallel' → @subagent reference",
+      "pattern": "spawn a task\\(\\) in parallel",
+      "replacement": "spawn a relevant subagent using `@subagent prompt` syntax in parallel",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace prose 'spawn a task() in parallel' with @subagent reference"
+    },
+    {
+      "_comment": "18. task() with subagent_type=\"general\" referencing gsd-advisor-researcher → @gsd-advisor-researcher",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=\"(First, read @[\\s\\S]*?\\$\\{AGENT_SKILLS_ADVISOR\\})\",\\s*\\r?\\n\\s*subagent_type=\"general\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@gsd-advisor-researcher \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace task(subagent_type=general) with gsd-advisor-researcher prompt to @gsd-advisor-researcher shorthand"
+    },
+    {
+      "_comment": "19. Prose: 'All task() calls spawn simultaneously' → subagent reference",
+      "pattern": "All task\\(\\) calls spawn simultaneously",
+      "replacement": "All subagents spawn simultaneously",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace prose 'All task() calls spawn simultaneously' with subagent reference"
+    },
+    {
+      "_comment": "20. task(subagent_type=\"general\", prompt=\"\"\"...\"\"\") with triple-quoted prompt → @general",
+      "pattern": "task\\(subagent_type=\"general\",\\s*prompt=\"\"\"([\\s\\S]*?)\"\"\"\\s*\\)",
+      "replacement": "@general \"\"\"$1\"\"\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace task(subagent_type=general, prompt=triple-quoted) with @general shorthand"
     }
   ]
 }
