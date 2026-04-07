@@ -5,6 +5,62 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.33.0] - 2026-04-06
+
+Overview: Major upstream sync from GSD v1.33.0 introducing security auditing pipeline, automated documentation generation with codebase verification, dependency analysis, and discuss-phase power mode. Enhanced planner with scope reduction prohibition and decision coverage matrices. Added response language support, worktree isolation control, Kilo runtime support, and schema drift detection across 150 files.
+
+### Added
+
+- `/gsd-secure-phase` command and `secure-phase` workflow for retroactive threat mitigation verification of completed phases in `gsd-opencode/commands/gsd/gsd-secure-phase.md` and `gsd-opencode/get-shit-done/workflows/secure-phase.md`
+- `gsd-security-auditor` agent for verifying PLAN.md threat model mitigations against implemented code and producing SECURITY.md in `gsd-opencode/agents/gsd-security-auditor.md`
+- `/gsd-docs-update` command and `docs-update` workflow for generating, updating, and verifying up to 9 documentation types with codebase-verified accuracy in `gsd-opencode/commands/gsd/gsd-docs-update.md` and `gsd-opencode/get-shit-done/workflows/docs-update.md`
+- `gsd-doc-writer` agent for writing and updating project documentation with codebase exploration in `gsd-opencode/agents/gsd-doc-writer.md`
+- `gsd-doc-verifier` agent for verifying factual claims in generated docs against the live codebase in `gsd-opencode/agents/gsd-doc-verifier.md`
+- `/gsd-analyze-dependencies` command and `analyze-dependencies` workflow for phase dependency graph analysis and ROADMAP.md Depends-on suggestions in `gsd-opencode/commands/gsd/gsd-analyze-dependencies.md` and `gsd-opencode/get-shit-done/workflows/analyze-dependencies.md`
+- `discuss-phase-power.md` workflow for power user mode generating all questions upfront into JSON state file with HTML companion UI in `gsd-opencode/get-shit-done/workflows/discuss-phase-power.md`
+- `docs.cjs` library for docs-update workflow providing project signal detection, doc inventory with GSD marker detection, and doc tooling detection in `gsd-opencode/get-shit-done/bin/lib/docs.cjs`
+- `schema-detect.cjs` library for detecting schema-relevant file changes and verifying database push commands were executed during phases in `gsd-opencode/get-shit-done/bin/lib/schema-detect.cjs`
+- `SECURITY.md` template for security audit reports in `gsd-opencode/get-shit-done/templates/SECURITY.md`
+- 10 new reference documents: `agent-contracts.md`, `artifact-types.md`, `context-budget.md`, `domain-probes.md`, `gate-prompts.md`, `planner-gap-closure.md`, `planner-reviews.md`, `planner-revision.md`, `revision-loop.md`, and `universal-anti-patterns.md` in `gsd-opencode/get-shit-done/references/`
+- `remove-task.json` configuration for task removal patterns during installation in `assets/configs/remove-task.json`
+- `v1.33.0.json` supplemental configuration for upstream sync in `assets/configs/v1.33.0.json`
+- `manual-update.md` documentation for manual update procedures in `gsd-opencode/docs/manual-update.md`
+- `.bg-shell/manifest.json` for background shell configuration
+
+### Changed
+
+- Enhanced `gsd-planner` agent with scope reduction prohibition, mandatory decision coverage matrices, threat model generation in PLAN.md, and MCP tool usage guidance in `gsd-opencode/agents/gsd-planner.md`
+- Enhanced `gsd-plan-checker` agent with Dimension 7b scope reduction detection, Dimension 11 research resolution check, and improved verification checks in `gsd-opencode/agents/gsd-plan-checker.md`
+- Enhanced `gsd-verifier` agent with ROADMAP success criteria merging, improved status determination decision tree, and human_needed status priority in `gsd-opencode/agents/gsd-verifier.md`
+- Enhanced `gsd-executor` agent with threat model awareness, threat surface scan in summaries, and MCP tool usage guidance in `gsd-opencode/agents/gsd-executor.md`
+- Enhanced `gsd-phase-researcher` agent with claim provenance tagging, assumptions log, and security domain research section in `gsd-opencode/agents/gsd-phase-researcher.md`
+- Enhanced `execute-phase` workflow with blocking anti-pattern checks, intra-wave file overlap detection, worktree isolation control, adaptive context window enrichment, and response language propagation in `gsd-opencode/get-shit-done/workflows/execute-phase.md`
+- Enhanced `plan-phase` workflow with security threat model gate, auto-chain UI-SPEC generation, response language support, and enriched context for 1M-class models in `gsd-opencode/get-shit-done/workflows/plan-phase.md`
+- Enhanced `discuss-phase` workflow with `--power` mode, `--chain` mode, blocking anti-pattern checks, interrupted discussion checkpoint recovery, and response language support in `gsd-opencode/get-shit-done/workflows/discuss-phase.md`
+- Enhanced `quick` workflow with `--full` and `--validate` flags replacing `--full` semantics, composable granular flags in `gsd-opencode/get-shit-done/workflows/quick.md`
+- Enhanced `autonomous` workflow with `--to N`, `--only N`, and `--interactive` flags for phase range and single-phase execution in `gsd-opencode/get-shit-done/workflows/autonomous.md`
+- Enhanced `verify-phase` workflow with test quality audit step covering disabled tests, circular test detection, and expected value provenance in `gsd-opencode/get-shit-done/workflows/verify-phase.md`
+- Enhanced `verify-work` workflow with automated UI verification via Playwright-MCP integration in `gsd-opencode/get-shit-done/workflows/verify-work.md`
+- Enhanced `reapply-patches` command with three-way comparison, Kilo runtime support, and expanded environment variable detection in `gsd-opencode/commands/gsd/gsd-reapply-patches.md`
+- Enhanced `update` workflow with Kilo runtime support, PREFERRED_CONFIG_DIR detection, and expanded runtime candidate list in `gsd-opencode/get-shit-done/workflows/update.md`
+- Enhanced `debug` command with `--diagnose` flag for root-cause-only investigation in `gsd-opencode/commands/gsd/gsd-debug.md`
+- Enhanced `manager` workflow with configurable per-step passthrough flags from config in `gsd-opencode/get-shit-done/workflows/manager.md`
+- Enhanced `review` workflow with CodeRabbit and OpenCode CLI support, environment-based runtime detection, and Antigravity agent compatibility in `gsd-opencode/get-shit-done/workflows/review.md`
+- Enhanced `progress` workflow with corrected command ordering (`/new` then command) in `gsd-opencode/get-shit-done/workflows/progress.md`
+- Updated `gsd-tools.cjs` with `docs-init`, `check-commit`, `verify schema-drift`, `state planned-phase`, `state validate`, and `state sync` commands in `gsd-opencode/get-shit-done/bin/gsd-tools.cjs`
+- Updated `core.cjs` with extracted CONFIG_DEFAULTS constants, workstream session environment keys, planning lock support, and `phaseTokenMatches` helper in `gsd-opencode/get-shit-done/bin/lib/core.cjs`
+- Updated `state.cjs` with atomic read-modify-write for concurrent agent safety, progress derivation from disk counts, and diagnostic warnings for field mismatches in `gsd-opencode/get-shit-done/bin/lib/state.cjs`
+- Updated `phase.cjs` with project-code-prefixed phase support, custom phase ID handling, and improved phase matching in `gsd-opencode/get-shit-done/bin/lib/phase.cjs`
+- Updated `roadmap.cjs` with structured phase search, success criteria extraction, and malformed roadmap detection in `gsd-opencode/get-shit-done/bin/lib/roadmap.cjs`
+- Updated `verify.cjs` with STATE.md/ROADMAP.md cross-validation and config field validation checks in `gsd-opencode/get-shit-done/bin/lib/verify.cjs`
+- Updated `commands.cjs` with `determinePhaseStatus` introducing "Executed" status, slug length limit, and decimal phase matching in `gsd-opencode/get-shit-done/bin/lib/commands.cjs`
+- Updated `frontmatter.cjs` with quote-aware inline array splitting and empty must_haves diagnostic warning in `gsd-opencode/get-shit-done/bin/lib/frontmatter.cjs`
+- Updated `config.cjs` with new valid config keys for worktrees, subagent timeout, manager flags, response language, and project code in `gsd-opencode/get-shit-done/bin/lib/config.cjs`
+- Updated `profile-output.cjs` with project skills discovery from standard directories and skills section generation for AGENTS.md in `gsd-opencode/get-shit-done/bin/lib/profile-output.cjs`
+- Updated `config.json` template with security enforcement, ASVS level, security block-on, and project code fields in `gsd-opencode/get-shit-done/templates/config.json`
+- Updated 12 additional workflow files with minor improvements across `gsd-opencode/get-shit-done/workflows/`
+- Updated all documentation across 4 locales (en, ja-JP, ko-KR, pt-BR, zh-CN) reflecting new commands and features in `gsd-opencode/docs/`
+
 ## [1.22.2] - 2026-03-30
 
 Overview: Major upstream sync from GSD v1.30.0 adding autonomous execution, fast mode, UI design pipeline, multi-project workspaces, user profiling, forensics, and 25 new slash commands. Full documentation now available in four additional locales (ja-JP, ko-KR, pt-BR, zh-CN). Added `mode: subagent` declarations to all agent definition files.
