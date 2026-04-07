@@ -21,7 +21,7 @@
 
 ## システム概要
 
-GSDは、ユーザーとAIコーディングエージェント（OpenCode、Gemini CLI、OpenCode、Codex、Copilot、Antigravity）の間に位置する**メタプロンプティングフレームワーク**です。以下の機能を提供します：
+GSDは、ユーザーとAIコーディングエージェント（OpenCode、Gemini CLI、OpenCode、Kilo、Codex、Copilot、Antigravity、Trae、Cline、Augment Code）の間に位置する**メタプロンプティングフレームワーク**です。以下の機能を提供します：
 
 1. **コンテキストエンジニアリング** — タスクごとにAIが必要とするすべてを提供する構造化アーティファクト
 2. **マルチエージェントオーケストレーション** — 専門エージェントをフレッシュなコンテキストウィンドウで起動する軽量オーケストレーター
@@ -108,7 +108,7 @@ GSDは、ユーザーとAIコーディングエージェント（OpenCode、Gemi
 
 ユーザー向けのエントリーポイントです。各ファイルにはYAMLフロントマター（name、description、allowed-tools）とワークフローをブートストラップするプロンプト本文が含まれています。コマンドは以下の形式でインストールされます：
 - **OpenCode:** カスタムスラッシュコマンド（`/gsd-command-name`）
-- **OpenCode:** スラッシュコマンド（`/gsd-command-name`）
+- **OpenCode / Kilo:** スラッシュコマンド（`/gsd-command-name`）
 - **Codex:** スキル（`$gsd-command-name`）
 - **Copilot:** スラッシュコマンド（`/gsd-command-name`）
 - **Antigravity:** スキル
@@ -362,6 +362,7 @@ $HOME/.config/opencode/                          # OpenCode (global install)
 
 他のランタイムでの同等パス：
 - **OpenCode:** `~/.config/opencode/` または `~/.opencode/`
+- **Kilo:** `~/.config/kilo/` または `~/.kilo/`
 - **Gemini CLI:** `~/.gemini/`
 - **Codex:** `~/.codex/`（コマンドの代わりにスキルを使用）
 - **Copilot:** `~/.github/`
@@ -425,12 +426,13 @@ $HOME/.config/opencode/                          # OpenCode (global install)
 
 インストーラー（`bin/install.js`、約3,000行）は以下を処理します：
 
-1. **ランタイム検出** — インタラクティブプロンプトまたはCLIフラグ（`--OpenCode`、`--opencode`、`--gemini`、`--codex`、`--copilot`、`--antigravity`、`--all`）
+1. **ランタイム検出** — インタラクティブプロンプトまたはCLIフラグ（`--OpenCode`、`--opencode`、`--gemini`、`--kilo`、`--codex`、`--copilot`、`--antigravity`、`--all`）
 2. **インストール先の選択** — グローバル（`--global`）またはローカル（`--local`）
 3. **ファイルデプロイ** — コマンド、ワークフロー、リファレンス、テンプレート、エージェント、フックをコピー
 4. **ランタイム適応** — ランタイムごとにファイル内容を変換：
    - OpenCode: そのまま使用
-   - OpenCode: エージェントフロントマターを `name:`、`model: inherit`、`mode: subagent` に変換
+   - OpenCode: コマンド/エージェントをOpenCode互換のフラットコマンド + サブエージェント形式に変換
+   - Kilo: OpenCode変換パイプラインをKiloの設定パスで再利用
    - Codex: コマンドからTOML設定 + スキルを生成
    - Copilot: ツール名をマッピング（read→read、bash→executeなど）
    - Gemini: フックイベント名を調整（`PostToolUse` の代わりに `AfterTool`）
@@ -505,12 +507,13 @@ Runtime Engine (OpenCode / Gemini CLI)
 
 ## ランタイム抽象化
 
-GSDは統一されたコマンド/ワークフローアーキテクチャを通じて6つのAIコーディングランタイムをサポートしています：
+GSDは統一されたコマンド/ワークフローアーキテクチャを通じて複数のAIコーディングランタイムをサポートしています：
 
 | ランタイム | コマンド形式 | エージェントシステム | 設定場所 |
 |---------|---------------|--------------|-----------------|
 | OpenCode | `/gsd-command` | task起動 | `$HOME/.config/opencode/` |
 | OpenCode | `/gsd-command` | サブエージェントモード | `~/.config/opencode/` |
+| Kilo | `/gsd-command` | サブエージェントモード | `~/.config/kilo/` |
 | Gemini CLI | `/gsd-command` | task起動 | `~/.gemini/` |
 | Codex | `$gsd-command` | スキル | `~/.codex/` |
 | Copilot | `/gsd-command` | エージェント委譲 | `~/.github/` |

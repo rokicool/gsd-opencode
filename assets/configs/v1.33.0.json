@@ -1,0 +1,18 @@
+{
+  "_description": "Supplemental translation rules for v1.33.0 -- fixes remaining forbidden strings",
+  "include": ["gsd-opencode/**"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "**/oc-*",
+    "**/*-oc-*"
+  ],
+  "rules": [
+    {
+      "pattern": "`general-purpose`",
+      "replacement": "`general`",
+      "description": "Fix: backtick-quoted general-purpose agent type name to general"
+    }
+  ]
+}

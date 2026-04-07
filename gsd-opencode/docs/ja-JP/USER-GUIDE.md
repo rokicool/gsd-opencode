@@ -580,7 +580,7 @@ quick タスクのブランチ設定例：
 - **quality** -- すべての意思決定エージェントに Opus、読み取り専用の検証に Sonnet。クォータに余裕があり、重要な作業に使用。
 - **balanced** -- プランニング（アーキテクチャの決定が行われる場所）にのみ Opus、それ以外は Sonnet。正当な理由があるデフォルト。
 - **budget** -- コードを書くものには Sonnet、リサーチと検証には Haiku。大量作業や重要度の低いフェーズに使用。
-- **inherit** -- すべてのエージェントが現在のセッションモデルを使用。モデルを動的に切り替える場合（例：OpenCode の `/model`）や、OpenCode を非 Anthropic プロバイダー（OpenRouter、ローカルモデル）で使用する場合に最適で、予期しない API コストを回避できます。非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI）では、インストーラーが自動的に `resolve_model_ids: "omit"` を設定します -- [非 OpenCode ランタイムの使用](#非-OpenCode-ランタイムの使用codexopencodegemini-cli)を参照。
+- **inherit** -- すべてのエージェントが現在のセッションモデルを使用。モデルを動的に切り替える場合（例：OpenCode または Kilo の `/model`）や、OpenCode を非 Anthropic プロバイダー（OpenRouter、ローカルモデル）で使用する場合に最適で、予期しない API コストを回避できます。非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI、Kilo）では、インストーラーが自動的に `resolve_model_ids: "omit"` を設定します -- [非 OpenCode ランタイムの使用](#非-OpenCode-ランタイムの使用codexopencodegemini-clikilo)を参照。
 
 ---
 
@@ -723,7 +723,7 @@ cd ~/gsd-workspaces/feature-b
 
 budget プロファイルに切り替えてください：`/gsd-set-profile budget`。ドメインに慣れている場合（またはOpenCode が慣れている場合）は、`/gsd-settings` でリサーチエージェントと plan-check エージェントを無効にしてください。
 
-### 非 OpenCode ランタイムの使用（Codex、OpenCode、Gemini CLI）
+### 非 OpenCode ランタイムの使用（Codex、OpenCode、Gemini CLI、Kilo）
 
 非 OpenCode ランタイム用に GSD をインストールした場合、インストーラーがモデル解決を設定済みのため、すべてのエージェントがランタイムのデフォルトモデルを使用します。手動設定は不要です。具体的には、インストーラーが設定に `resolve_model_ids: "omit"` を設定し、GSD に Anthropic モデル ID の解決をスキップしてランタイム独自のデフォルトモデルを使用するよう指示します。
 
@@ -740,9 +740,9 @@ budget プロファイルに切り替えてください：`/gsd-set-profile budg
 }
 ```
 
-インストーラーは Gemini CLI、OpenCode、Codex 用に `resolve_model_ids: "omit"` を自動設定します。非 OpenCode ランタイムを手動で設定する場合は、`.planning/config.json` に自分で追加してください。
+インストーラーは Gemini CLI、OpenCode、Kilo、Codex 用に `resolve_model_ids: "omit"` を自動設定します。非 OpenCode ランタイムを手動で設定する場合は、`.planning/config.json` に自分で追加してください。
 
-完全な説明は[設定リファレンス](../CONFIGURATION.md#non-OpenCode-runtimes-codex-opencode-gemini-cli)をご覧ください。
+完全な説明は[設定リファレンス](../CONFIGURATION.md#non-OpenCode-runtimes-codex-opencode-gemini-cli-kilo)をご覧ください。
 
 ### 非 Anthropic プロバイダーでの OpenCode の使用（OpenRouter、ローカル）
 

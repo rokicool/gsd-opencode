@@ -137,6 +137,12 @@ Keep Accumulated Context section from previous milestone.
 
 Delete MILESTONE-CONTEXT.md if exists (consumed).
 
+Clear leftover phase directories from the previous milestone:
+
+```bash
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" phases clear
+```
+
 ```bash
 node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: start milestone v[X.Y] [Name]" --files .planning/PROJECT.md .planning/STATE.md
 ```
@@ -210,7 +216,7 @@ Spawn 4 parallel gsd-project-researcher agents. Each uses this template with dim
 
 **Common structure for all 4 researchers:**
 ```
-task(prompt="
+@gsd-project-researcher "
 <research_type>Project Research — {DIMENSION} for [new features].</research_type>
 
 <milestone_context>
@@ -235,7 +241,7 @@ ${AGENT_SKILLS_RESEARCHER}
 write to: .planning/research/{FILE}
 Use template: $HOME/.config/opencode/get-shit-done/templates/research-project/{FILE}
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="{DIMENSION} research")
+"
 ```
 
 **Dimension-specific fields:**
@@ -251,7 +257,7 @@ Use template: $HOME/.config/opencode/get-shit-done/templates/research-project/{F
 After all 4 complete, spawn synthesizer:
 
 ```
-task(prompt="
+@gsd-research-synthesizer "
 Synthesize research outputs into SUMMARY.md.
 
 <files_to_read>
@@ -266,7 +272,7 @@ ${AGENT_SKILLS_SYNTHESIZER}
 write to: .planning/research/SUMMARY.md
 Use template: $HOME/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
-", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
+"
 ```
 
 Display key findings from SUMMARY.md:
@@ -368,7 +374,7 @@ node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: defi
 - Otherwise, continue from the previous milestone's last phase number (v1.0 ended at phase 5 → v1.1 starts at phase 6)
 
 ```
-task(prompt="
+@gsd-roadmapper "
 <planning_context>
 <files_to_read>
 - .planning/PROJECT.md
@@ -396,7 +402,7 @@ Create roadmap for milestone v[X.Y]:
 
 write files first, then return.
 </instructions>
-", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
+"
 ```
 
 **Handle return:**
@@ -459,9 +465,9 @@ node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: crea
 
 **Phase [N]: [Phase Name]** — [Goal]
 
-`/gsd-discuss-phase [N] ${GSD_WS}` — gather context and clarify approach
+`/new` then:
 
-*`/new` first → fresh context window*
+`/gsd-discuss-phase [N] ${GSD_WS}` — gather context and clarify approach
 
 Also: `/gsd-plan-phase [N] ${GSD_WS}` — skip discussion, plan directly
 ```

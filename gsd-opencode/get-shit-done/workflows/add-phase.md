@@ -87,9 +87,9 @@ Roadmap updated: .planning/ROADMAP.md
 
 **Phase {N}: {description}**
 
-`/gsd-plan-phase {N}`
+`/new` then:
 
-*`/new` first → fresh context window*
+`/gsd-plan-phase {N}`
 
 ---
 

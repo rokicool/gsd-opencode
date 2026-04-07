@@ -321,7 +321,7 @@ Workstreams let you work on multiple milestone areas concurrently without state 
 
 ### How It Works
 
-Each workstream maintains its own `.planning/` directory subtree. When you switch workstreams, GSD swaps the active planning context so that `/gsd-progress`, `/gsd-discuss-phase`, `/gsd-plan-phase`, and other commands operate on that workstream's state.
+Each workstream maintains its own `.planning/` directory subtree. When you switch workstreams, GSD swaps the active planning context so that `/gsd-progress`, `/gsd-discuss-phase`, `/gsd-plan-phase`, and other commands operate on that workstream's state. Active context is session-scoped when the runtime exposes a stable session identifier, which prevents one terminal or AI instance from repointing another instance's `STATE.md`.
 
 This is lighter weight than `/gsd-new-workspace` (which creates separate repo worktrees). Workstreams share the same codebase and git history but isolate planning artifacts.
 
@@ -363,10 +363,11 @@ The `security.cjs` module scans for known injection patterns (role overrides, in
          │     └── Executor C (fresh 200K context) -> commit
          │
          └── Verifier
-               └── Check codebase against phase goals
-                     │
-                     ├── PASS -> VERIFICATION.md (success)
-                     └── FAIL -> Issues logged for /gsd-verify-work
+               ├── Check codebase against phase goals
+               ├── Test quality audit (disabled tests, circular patterns, assertion strength)
+               │
+               ├── PASS -> VERIFICATION.md (success)
+               └── FAIL -> Issues logged for /gsd-verify-work
 ```
 
 ### Brownfield Workflow (Existing Codebase)
@@ -427,6 +428,7 @@ The `security.cjs` module scans for known injection patterns (role overrides, in
 | `/gsd-insert-phase [N]` | Insert urgent work (decimal numbering) | Urgent fix mid-milestone |
 | `/gsd-remove-phase [N]` | Remove future phase and renumber | Descoping a feature |
 | `/gsd-list-phase-assumptions [N]` | Preview OpenCode's intended approach | Before planning, to validate direction |
+| `/gsd-analyze-dependencies` | Detect phase dependencies for ROADMAP.md | Before `/gsd-manager` when phases have empty `Depends on` |
 | `/gsd-plan-milestone-gaps` | Create phases for audit gaps | After audit finds missing items |
 | `/gsd-research-phase [N]` | Deep ecosystem research only | Complex or unfamiliar domain |
 
@@ -436,7 +438,8 @@ The `security.cjs` module scans for known injection patterns (role overrides, in
 |---------|---------|-------------|
 | `/gsd-map-codebase` | Analyze existing codebase | Before `/gsd-new-project` on existing code |
 | `/gsd-quick` | Ad-hoc task with GSD guarantees | Bug fixes, small features, config changes |
-| `/gsd-debug [desc]` | Systematic debugging with persistent state | When something breaks |
+| `/gsd-autonomous` | Run remaining phases autonomously (`--from N`, `--to N`) | Hands-free multi-phase execution |
+| `/gsd-debug [desc]` | Systematic debugging with persistent state (`--diagnose` for no-fix mode) | When something breaks |
 | `/gsd-forensics` | Diagnostic report for workflow failures | When state, artifacts, or git history seem corrupted |
 | `/gsd-add-todo [desc]` | Capture an idea for later | Think of something during a session |
 | `/gsd-check-todos` | List pending todos | Review captured ideas |
@@ -533,6 +536,7 @@ GSD stores project settings in `.planning/config.json`. Configure during `/gsd-n
 | `workflow.research_before_questions` | `true`, `false` | `false` | Run research before discussion questions instead of after |
 | `workflow.discuss_mode` | `standard`, `assumptions` | `standard` | Discussion style: open-ended questions vs. codebase-driven assumptions |
 | `workflow.skip_discuss` | `true`, `false` | `false` | Skip discuss-phase entirely in autonomous mode; writes minimal CONTEXT.md from ROADMAP phase goal |
+| `response_language` | language code | (none) | Agent response language for cross-phase consistency (e.g., `"pt"`, `"ko"`, `"ja"`) |
 
 ### Hook Settings
 
@@ -590,7 +594,7 @@ Example quick-task branching:
 - **quality** -- Opus for all decision-making agents, Sonnet for read-only verification. Use when quota is available and the work is critical.
 - **balanced** -- Opus only for planning (where architecture decisions happen), Sonnet for everything else. The default for good reason.
 - **budget** -- Sonnet for anything that writes code, Haiku for research and verification. Use for high-volume work or less critical phases.
-- **inherit** -- All agents use the current session model. Best when switching models dynamically (e.g. OpenCode `/model`), or when using OpenCode with non-Anthropic providers (OpenRouter, local models) to avoid unexpected API costs. For non-OpenCode runtimes (Codex, OpenCode, Gemini CLI), the installer sets `resolve_model_ids: "omit"` automatically -- see [Non-OpenCode Runtimes](#using-non-OpenCode-runtimes-codex-opencode-gemini-cli).
+- **inherit** -- All agents use the current session model. Best when switching models dynamically (e.g. OpenCode or Kilo `/model`), or when using OpenCode with non-Anthropic providers (OpenRouter, local models) to avoid unexpected API costs. For non-OpenCode runtimes (Codex, OpenCode, Gemini CLI, Kilo), the installer sets `resolve_model_ids: "omit"` automatically -- see [Non-OpenCode Runtimes](#using-non-OpenCode-runtimes-codex-opencode-gemini-cli-kilo).
 
 ---
 
@@ -705,6 +709,27 @@ Each workspace gets:
 
 ## Troubleshooting
 
+### STATE.md Out of Sync
+
+If STATE.md shows incorrect phase status or position, use the state consistency commands:
+
+```bash
+node gsd-tools.cjs state validate          # Detect drift between STATE.md and filesystem
+node gsd-tools.cjs state sync --verify     # Preview what sync would change
+node gsd-tools.cjs state sync              # Reconstruct STATE.md from disk
+```
+
+These commands are new in v1.32 and replace manual STATE.md editing.
+
+### read-Before-edit Infinite Retry Loop
+
+Some non-OpenCode runtimes (Cline, Augment Code) may enter an infinite retry loop when an agent attempts to edit a file it hasn't read. The `gsd-read-before-edit.js` hook (v1.32) detects this pattern and advises reading the file first. If your runtime doesn't support PreToolUse hooks, add this to your project's `AGENTS.md`:
+
+```markdown
+## edit Safety Rule
+Always read a file before editing it. Never call edit or write on a file you haven't read in this session.
+```
+
 ### "Project already initialized"
 
 You ran `/gsd-new-project` but `.planning/PROJECT.md` already exists. This is a safety check. If you want to start over, delete the `.planning/` directory first.
@@ -733,7 +758,7 @@ Do not re-run `/gsd-execute-phase`. Use `/gsd-quick` for targeted fixes, or `/gs
 
 Switch to budget profile: `/gsd-set-profile budget`. Disable research and plan-check agents via `/gsd-settings` if the domain is familiar to you (or to OpenCode).
 
-### Using Non-OpenCode Runtimes (Codex, OpenCode, Gemini CLI)
+### Using Non-OpenCode Runtimes (Codex, OpenCode, Gemini CLI, Kilo)
 
 If you installed GSD for a non-OpenCode runtime, the installer already configured model resolution so all agents use the runtime's default model. No manual setup is needed. Specifically, the installer sets `resolve_model_ids: "omit"` in your config, which tells GSD to skip Anthropic model ID resolution and let the runtime choose its own default model.
 
@@ -750,9 +775,9 @@ To assign different models to different agents on a non-OpenCode runtime, add `m
 }
 ```
 
-The installer auto-configures `resolve_model_ids: "omit"` for Gemini CLI, OpenCode, and Codex. If you're manually setting up a non-OpenCode runtime, add it to `.planning/config.json` yourself.
+The installer auto-configures `resolve_model_ids: "omit"` for Gemini CLI, OpenCode, Kilo, and Codex. If you're manually setting up a non-OpenCode runtime, add it to `.planning/config.json` yourself.
 
-See the [Configuration Reference](CONFIGURATION.md#non-OpenCode-runtimes-codex-opencode-gemini-cli) for the full explanation.
+See the [Configuration Reference](CONFIGURATION.md#non-OpenCode-runtimes-codex-opencode-gemini-cli-kilo) for the full explanation.
 
 ### Using OpenCode with Non-Anthropic Providers (OpenRouter, Local)
 
@@ -765,6 +790,10 @@ Set `commit_docs: false` during `/gsd-new-project` or via `/gsd-settings`. Add `
 ### GSD Update Overwrote My Local Changes
 
 Since v1.17, the installer backs up locally modified files to `gsd-local-patches/`. Run `/gsd-reapply-patches` to merge your changes back.
+
+### Cannot Update via npm
+
+If `npx gsd-opencode` fails due to npm outages or network restrictions, see [docs/manual-update.md](manual-update.md) for a step-by-step manual update procedure that works without npm access.
 
 ### Workflow Diagnostics (`/gsd-forensics`)
 
@@ -806,7 +835,8 @@ If the installer crashes with `EPERM: operation not permitted, scandir` on Windo
 | Phase went wrong | `git revert` the phase commits, then re-plan |
 | Need to change scope | `/gsd-add-phase`, `/gsd-insert-phase`, or `/gsd-remove-phase` |
 | Milestone audit found gaps | `/gsd-plan-milestone-gaps` |
-| Something broke | `/gsd-debug "description"` |
+| Something broke | `/gsd-debug "description"` (add `--diagnose` for analysis without fixes) |
+| STATE.md out of sync | `state validate` then `state sync` |
 | Workflow state seems corrupted | `/gsd-forensics` |
 | Quick targeted fix | `/gsd-quick` |
 | Plan doesn't match your vision | `/gsd-discuss-phase [N]` then re-plan |

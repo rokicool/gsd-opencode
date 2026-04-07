@@ -33,7 +33,8 @@ GSD はプロジェクト設定を `.planning/config.json` に保存します。
     "research_before_questions": false,
     "discuss_mode": "discuss",
     "skip_discuss": false,
-    "text_mode": false
+    "text_mode": false,
+    "use_worktrees": true
   },
   "hooks": {
     "context_warnings": true,
@@ -100,6 +101,7 @@ GSD はプロジェクト設定を `.planning/config.json` に保存します。
 | `workflow.node_repair` | boolean | `true` | 検証失敗時にタスクを自律的に修復 |
 | `workflow.node_repair_budget` | number | `2` | 失敗タスクあたりの最大修復試行回数 |
 | `workflow.research_before_questions` | boolean | `false` | ディスカッション質問の後ではなく前にリサーチを実行 |
+| `workflow.use_worktrees` | boolean | `true` | `false` の場合、git worktree 分離を無効化 (v1.31) |
 | `workflow.discuss_mode` | string | `'discuss'` | `/gsd-discuss-phase` のコンテキスト収集方法を制御。`'discuss'`（デフォルト）は質問を1つずつ行います。`'assumptions'` はまずコードベースを読み取り、信頼度レベル付きの構造化された仮説を生成し、誤っている点のみ修正を求めます。v1.28 で追加 |
 | `workflow.skip_discuss` | boolean | `false` | `true` の場合、`/gsd-autonomous` は discuss-phase を完全にスキップし、ROADMAP のフェーズ目標から最小限の CONTEXT.md を作成します。開発者の要望が PROJECT.md/REQUIREMENTS.md に十分に記載されているプロジェクトに適しています。v1.28 で追加 |
 | `workflow.text_mode` | boolean | `false` | question の TUI メニューをプレーンテキストの番号付きリストに置き換えます。TUI メニューが表示されない OpenCode リモートセッション（`/rc` モード）で必要です。discuss-phase で `--text` フラグを使用してセッションごとに設定することもできます。v1.28 で追加 |
@@ -228,7 +230,27 @@ quick タスクのブランチ設定例：
 | 設定 | 型 | デフォルト | 説明 |
 |------|-----|-----------|------|
 | `safety.always_confirm_destructive` | boolean | `true` | 破壊的操作（削除、上書き）の確認 |
-| `safety.always_confirm_external_services` | boolean | `true` | 外部サービスとのやり取りの確認 |
+| `safety.always_confirm_external_services` | boolean | `true` | 外部サービ��とのやり取りの確認 |
+
+---
+
+## セキュリティ設定 (v1.31)
+
+| 設定 | 型 | ��フォルト | 説明 |
+|------|-----|-----------|------|
+| `security_enforcement` | boolean | `true` | 脅威モデルセキュリティ検証を有効化 |
+| `security_asvs_level` | number (1-3) | `1` | OWASP ASVS 検証レベル |
+| `security_block_on` | string | `"high"` | フェーズ進行をブロックする最小重大度 |
+
+---
+
+## レスポンス言語設定 (v1.32)
+
+| 設定 | 型 | デフォルト | 説明 |
+|------|-----|-----------|------|
+| `response_language` | string | (なし) | エージェントレスポンスの言語コード（例: `"pt"`、`"ko"`、`"ja"`） |
+
+`response_language` が設定されると、すべてのフェーズおよびスポーンされたエージェントで一貫した言語出力が保証されます。
 
 ---
 
@@ -275,7 +297,7 @@ quick タスクのブランチ設定例：
 
 有効なオーバーライド値: `opus`、`sonnet`、`haiku`、`inherit`、または完全修飾モデル ID（例: `"openai/o3"`、`"google/gemini-2.5-pro"`）。
 
-### 非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI）
+### 非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI、Kilo）
 
 GSD が非 OpenCode ランタイム向けにインストールされると、インストーラーは自動的に `~/.gsd/defaults.json` に `resolve_model_ids: "omit"` を設定します。これにより GSD はすべてのエージェントに対して空のモデルパラメータを返し、各エージェントはランタイムで設定されたモデルを使用します。デフォルトの場合、追加のセットアップは不要です。
 
@@ -309,8 +331,8 @@ GSD が非 OpenCode ランタイム向けにインストールされると、イ
 | 値 | 動作 | 使用場面 |
 |----|------|---------|
 | `false`（デフォルト） | OpenCode エイリアス（`opus`、`sonnet`、`haiku`）を返す | OpenCode + ネイティブ Anthropic API |
-| `true` | エイリアスを完全な OpenCode モデル ID（`OpenCode-opus-4-0`）にマッピング | 完全な ID が必要な API を使用する OpenCode |
-| `"omit"` | 空文字列を返す（ランタイムがデフォルトを選択） | 非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI） |
+| `true` | エイリアスを完全な OpenCode モデル ID（`OpenCode-opus-4-6`）にマッピング | 完全な ID が必要な API を使用する OpenCode |
+| `"omit"` | 空文字列を返す（ランタイムがデフォルトを選択） | 非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI、Kilo） |
 
 ### プロファイルの設計思想
 
@@ -330,6 +352,7 @@ GSD が非 OpenCode ランタイム向けにインストールされると、イ
 | `CLAUDE_CONFIG_DIR` | デフォルトの設定ディレクトリ（`$HOME/.config/opencode/`）をオーバーライド |
 | `GEMINI_API_KEY` | コンテキストモニターがフックイベント名を切り替えるために検出 |
 | `WSL_DISTRO_NAME` | インストーラーが WSL のパス処理のために検出 |
+| `GSD_SKIP_SCHEMA_CHECK` | スキーマドリフト検出をバイパス (v1.31) |
 
 ---
 

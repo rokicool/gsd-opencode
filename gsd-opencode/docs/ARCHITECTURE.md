@@ -21,7 +21,7 @@
 
 ## System Overview
 
-GSD is a **meta-prompting framework** that sits between the user and AI coding agents (OpenCode, Gemini CLI, OpenCode, Codex, Copilot, Antigravity). It provides:
+GSD is a **meta-prompting framework** that sits between the user and AI coding agents (OpenCode, Gemini CLI, OpenCode, Kilo, Codex, Copilot, Antigravity, Trae, Cline, Augment Code). It provides:
 
 1. **Context engineering** — Structured artifacts that give the AI everything it needs per task
 2. **Multi-agent orchestration** — Thin orchestrators that spawn specialized agents with fresh context windows
@@ -108,12 +108,12 @@ Multiple layers prevent common failure modes:
 
 User-facing entry points. Each file contains YAML frontmatter (name, description, allowed-tools) and a prompt body that bootstraps the workflow. Commands are installed as:
 - **OpenCode:** Custom slash commands (`/gsd-command-name`)
-- **OpenCode:** Slash commands (`/gsd-command-name`)
+- **OpenCode / Kilo:** Slash commands (`/gsd-command-name`)
 - **Codex:** Skills (`$gsd-command-name`)
 - **Copilot:** Slash commands (`/gsd-command-name`)
 - **Antigravity:** Skills
 
-**Total commands:** 44
+**Total commands:** 60
 
 ### Workflows (`get-shit-done/workflows/*.md`)
 
@@ -124,7 +124,7 @@ Orchestration logic that commands reference. Contains the step-by-step process i
 - State update patterns
 - Error handling and recovery
 
-**Total workflows:** 46
+**Total workflows:** 60
 
 ### Agents (`agents/*.md`)
 
@@ -134,19 +134,45 @@ Specialized agent definitions with frontmatter specifying:
 - `tools` — Allowed tool access (read, write, edit, bash, grep, glob, websearch, etc.)
 - `color` — Terminal output color for visual distinction
 
-**Total agents:** 16
+**Total agents:** 21
 
 ### References (`get-shit-done/references/*.md`)
 
-Shared knowledge documents that workflows and agents `@-reference`:
+Shared knowledge documents that workflows and agents `@-reference` (25 total):
+
+**Core references:**
 - `checkpoints.md` — Checkpoint type definitions and interaction patterns
 - `model-profiles.md` — Per-agent model tier assignments
+- `model-profile-resolution.md` — Model resolution algorithm documentation
 - `verification-patterns.md` — How to verify different artifact types
 - `planning-config.md` — Full config schema and behavior
 - `git-integration.md` — Git commit, branching, and history patterns
+- `git-planning-commit.md` — Planning directory commit conventions
 - `questioning.md` — Dream extraction philosophy for project initialization
 - `tdd.md` — Test-driven development integration patterns
 - `ui-brand.md` — Visual output formatting patterns
+
+**Workflow references:**
+- `agent-contracts.md` — Formal interface between orchestrators and agents
+- `context-budget.md` — Context window budget allocation rules
+- `continuation-format.md` — Session continuation/resume format
+- `domain-probes.md` — Domain-specific probing questions for discuss-phase
+- `gate-prompts.md` — Gate/checkpoint prompt templates
+- `revision-loop.md` — Plan revision iteration patterns
+- `universal-anti-patterns.md` — Common anti-patterns to detect and avoid
+- `artifact-types.md` — Planning artifact type definitions
+- `phase-argument-parsing.md` — Phase argument parsing conventions
+- `decimal-phase-calculation.md` — Decimal sub-phase numbering rules
+- `workstream-flag.md` — Workstream active pointer conventions
+- `user-profiling.md` — User behavioral profiling methodology
+
+**Modular planner decomposition:**
+
+The planner agent (`agents/gsd-planner.md`) was decomposed from a single monolithic file into a core agent plus reference modules to stay under the 50K character limit imposed by some runtimes:
+
+- `planner-gap-closure.md` — Gap closure mode behavior (reads VERIFICATION.md, targeted replanning)
+- `planner-reviews.md` — Cross-AI review integration (reads REVIEWS.md from `/gsd-review`)
+- `planner-revision.md` — Plan revision patterns for iterative refinement
 
 ### Templates (`get-shit-done/templates/`)
 
@@ -171,10 +197,14 @@ Runtime hooks that integrate with the host AI agent:
 | `gsd-check-update.js` | `SessionStart` | Background check for new GSD versions |
 | `gsd-prompt-guard.js` | `PreToolUse` | Scans `.planning/` writes for prompt injection patterns (advisory) |
 | `gsd-workflow-guard.js` | `PreToolUse` | Detects file edits outside GSD workflow context (advisory, opt-in via `hooks.workflow_guard`) |
+| `gsd-read-guard.js` | `PreToolUse` | Advisory guard preventing edit/write on files not yet read in the session |
+| `gsd-session-state.sh` | `PostToolUse` | Session state tracking for shell-based runtimes |
+| `gsd-validate-commit.sh` | `PostToolUse` | Commit validation for conventional commit enforcement |
+| `gsd-phase-boundary.sh` | `PostToolUse` | Phase boundary detection for workflow transitions |
 
 ### CLI Tools (`get-shit-done/bin/`)
 
-Node.js CLI utility (`gsd-tools.cjs`) with 17 domain modules:
+Node.js CLI utility (`gsd-tools.cjs`) with 19 domain modules:
 
 | Module | Responsibility |
 |--------|---------------|
@@ -192,6 +222,11 @@ Node.js CLI utility (`gsd-tools.cjs`) with 17 domain modules:
 | `model-profiles.cjs` | Model profile resolution table |
 | `security.cjs` | Path traversal prevention, prompt injection detection, safe JSON parsing, shell argument validation |
 | `uat.cjs` | UAT file parsing, verification debt tracking, audit-uat support |
+| `docs.cjs` | Docs-update workflow init, Markdown scanning, monorepo detection |
+| `workstream.cjs` | Workstream CRUD, migration, session-scoped active pointer |
+| `schema-detect.cjs` | Schema-drift detection for ORM patterns (Prisma, Drizzle, etc.) |
+| `profile-pipeline.cjs` | User behavioral profiling data pipeline, session file scanning |
+| `profile-output.cjs` | Profile rendering, USER-PROFILE.md and dev-preferences.md generation |
 
 ---
 
@@ -231,7 +266,10 @@ Orchestrator (workflow .md)
 | **Verifiers** | gsd-verifier | Sequential (after all executors complete) |
 | **Mappers** | gsd-codebase-mapper | 4 parallel (tech, arch, quality, concerns) |
 | **Debuggers** | gsd-debugger | Sequential (interactive) |
-| **Auditors** | gsd-ui-auditor | Sequential |
+| **Auditors** | gsd-ui-auditor, gsd-security-auditor | Sequential |
+| **Doc Writers** | gsd-doc-writer, gsd-doc-verifier | Sequential (writer then verifier) |
+| **Profilers** | gsd-user-profiler | Sequential |
+| **Analyzers** | gsd-assumptions-analyzer | Sequential (during discuss-phase) |
 
 ### Wave Execution Model
 
@@ -247,10 +285,19 @@ Wave Analysis:
 ```
 
 Each executor gets:
-- Fresh 200K context window
+- Fresh 200K context window (or up to 1M for models that support it)
 - The specific PLAN.md to execute
 - Project context (PROJECT.md, STATE.md)
 - Phase context (CONTEXT.md, RESEARCH.md if available)
+
+### Adaptive Context Enrichment (1M Models)
+
+When the context window is 500K+ tokens (1M-class models like Opus 4.6, Sonnet 4.6), subagent prompts are automatically enriched with additional context that would not fit in standard 200K windows:
+
+- **Executor agents** receive prior wave SUMMARY.md files and the phase CONTEXT.md/RESEARCH.md, enabling cross-plan awareness within a phase
+- **Verifier agents** receive all PLAN.md, SUMMARY.md, CONTEXT.md files plus REQUIREMENTS.md, enabling history-aware verification
+
+The orchestrator reads `context_window` from config (`gsd-tools.cjs config-get context_window`) and conditionally includes richer context when the value is >= 500,000. For standard 200K windows, prompts use truncated versions with cache-friendly ordering to maximize context efficiency.
 
 #### Parallel Commit Safety
 
@@ -302,12 +349,16 @@ ui-phase → UI-SPEC.md (design contract, optional)
     │
     ▼
 plan-phase
+    ├── Research gate (blocks if RESEARCH.md has unresolved open questions)
     ├── Phase Researcher → RESEARCH.md
-    ├── Planner → PLAN.md files
+    ├── Planner (with reachability check) → PLAN.md files
     └── Plan Checker → Verify loop (max 3x)
     │
     ▼
-execute-phase
+state planned-phase → STATE.md (Planned/Ready to execute)
+    │
+    ▼
+execute-phase (context reduction: truncated prompts, cache-friendly ordering)
     ├── Wave analysis (dependency grouping)
     ├── Executor per plan → code + atomic commits
     ├── SUMMARY.md per plan
@@ -344,14 +395,14 @@ UI-SPEC.md (per phase) ───────────────────
 
 ```
 $HOME/.config/opencode/                          # OpenCode (global install)
-├── commands/gsd/*.md               # 37 slash commands
+├── commands/gsd/*.md               # 60 slash commands
 ├── get-shit-done/
 │   ├── bin/gsd-tools.cjs           # CLI utility
-│   ├── bin/lib/*.cjs               # 15 domain modules
-│   ├── workflows/*.md              # 42 workflow definitions
-│   ├── references/*.md             # 13 shared reference docs
+│   ├── bin/lib/*.cjs               # 19 domain modules
+│   ├── workflows/*.md              # 60 workflow definitions
+│   ├── references/*.md             # 25 shared reference docs
 │   └── templates/                  # Planning artifact templates
-├── agents/*.md                     # 15 agent definitions
+├── agents/*.md                     # 21 agent definitions
 ├── hooks/
 │   ├── gsd-statusline.js           # Statusline hook
 │   ├── gsd-context-monitor.js      # Context warning hook
@@ -362,6 +413,7 @@ $HOME/.config/opencode/                          # OpenCode (global install)
 
 Equivalent paths for other runtimes:
 - **OpenCode:** `~/.config/opencode/` or `~/.opencode/`
+- **Kilo:** `~/.config/kilo/` or `~/.kilo/`
 - **Gemini CLI:** `~/.gemini/`
 - **Codex:** `~/.codex/` (uses skills instead of commands)
 - **Copilot:** `~/.github/`
@@ -425,16 +477,20 @@ Equivalent paths for other runtimes:
 
 The installer (`bin/install.js`, ~3,000 lines) handles:
 
-1. **Runtime detection** — Interactive prompt or CLI flags (`--OpenCode`, `--opencode`, `--gemini`, `--codex`, `--copilot`, `--antigravity`, `--all`)
+1. **Runtime detection** — Interactive prompt or CLI flags (`--OpenCode`, `--opencode`, `--gemini`, `--kilo`, `--codex`, `--copilot`, `--antigravity`, `--cursor`, `--windsurf`, `--trae`, `--cline`, `--augment`, `--all`)
 2. **Location selection** — Global (`--global`) or local (`--local`)
 3. **File deployment** — Copies commands, workflows, references, templates, agents, hooks
 4. **Runtime adaptation** — Transforms file content per runtime:
    - OpenCode: Uses as-is
-   - OpenCode: Converts agent frontmatter to `name:`, `model: inherit`, `mode: subagent`
+   - OpenCode: Converts commands/agents to OpenCode-compatible flat command + subagent format
+   - Kilo: Reuses the OpenCode conversion pipeline with Kilo config paths
    - Codex: Generates TOML config + skills from commands
    - Copilot: Maps tool names (read→read, bash→execute, etc.)
    - Gemini: Adjusts hook event names (`AfterTool` instead of `PostToolUse`)
    - Antigravity: Skills-first with Google model equivalents
+   - Trae: Skills-first install to `~/.trae` / `./.trae` with no `settings.json` or hook integration
+   - Cline: Writes `.clinerules` for rule-based integration
+   - Augment Code: Skills-first with full skill conversion and config management
 5. **Path normalization** — Replaces `$HOME/.config/opencode/` paths with runtime-specific paths
 6. **Settings integration** — Registers hooks in runtime's `settings.json`
 7. **patch backup** — Since v1.17, backs up locally modified files to `gsd-local-patches/` for `/gsd-reapply-patches`
@@ -505,16 +561,20 @@ Debounce: 5 tool uses between repeated warnings. Severity escalation (WARNING→
 
 ## Runtime Abstraction
 
-GSD supports 6 AI coding runtimes through a unified command/workflow architecture:
+GSD supports multiple AI coding runtimes through a unified command/workflow architecture:
 
 | Runtime | Command Format | Agent System | Config Location |
 |---------|---------------|--------------|-----------------|
 | OpenCode | `/gsd-command` | task spawning | `$HOME/.config/opencode/` |
 | OpenCode | `/gsd-command` | Subagent mode | `~/.config/opencode/` |
+| Kilo | `/gsd-command` | Subagent mode | `~/.config/kilo/` |
 | Gemini CLI | `/gsd-command` | task spawning | `~/.gemini/` |
 | Codex | `$gsd-command` | Skills | `~/.codex/` |
 | Copilot | `/gsd-command` | Agent delegation | `~/.github/` |
 | Antigravity | Skills | Skills | `~/.gemini/antigravity/` |
+| Trae | Skills | Skills | `~/.trae/` |
+| Cline | Rules | Rules | `.clinerules` |
+| Augment Code | Skills | Skills | Augment config |
 
 ### Abstraction Points
 

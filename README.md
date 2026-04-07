@@ -1,6 +1,6 @@
 <div align="left">
 
-# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.30.0 - 2026-03-30)
+# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.33.0 - 2026-04-04)
 
 **A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (Adapted for OpenCode by rokicool and enthusiasts)**
 
@@ -86,6 +86,12 @@ That's what this is. No enterprise roleplay bullshit. Just an incredibly effecti
 I just love both GSD and OpenCode. I felt like having GSD available only for Claude Code is not fair. 
 
 — **Roman**
+
+## Version 1.33.0
+
+Again we keep up with the original GSDv1 [v1.33.0](https://github.com/gsd-build/get-shit-done/releases/tag/v1.33.0) (2026-04-04).
+
+And locally there are lots of changes. And the most important one - I removed `task()` calls, since they are not supported by OpenCode and replaced them with the direct call to an agent.
 
 ## Version 1.30.0
 

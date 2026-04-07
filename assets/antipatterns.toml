@@ -33,5 +33,5 @@ forbidden_strings = [
         "websearch, webfetch, mcp__context7__*",
         "workflows/set-profile.md",
         "quality/balanced/budget",
-        "gsd:"
+        'gsd:update\\|GSD update\\|gsd-install',
         ]

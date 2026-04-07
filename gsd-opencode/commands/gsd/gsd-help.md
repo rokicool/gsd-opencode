@@ -1,6 +1,8 @@
 ---
 name: gsd-help
 description: Show available GSD commands and usage guide
+permissions:
+   read: true
 ---
 <objective>
 Display the complete GSD command reference.

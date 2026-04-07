@@ -163,9 +163,9 @@ node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(roadm
 
 **Plan first gap closure phase**
 
-`/gsd-plan-phase {N}`
+`/new` then:
 
-*`/new` first → fresh context window*
+`/gsd-plan-phase {N}`
 
 ---
 

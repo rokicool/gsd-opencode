@@ -35,6 +35,10 @@ Context budget: ~15% orchestrator, 100% fresh per subagent.
 @$HOME/.config/opencode/get-shit-done/references/ui-brand.md
 </execution_context>
 
+<runtime_note>
+**Copilot (VS Code):** Use `vscode_askquestions` wherever this workflow calls `question`. They are equivalent — `vscode_askquestions` is the VS Code Copilot implementation of the same interactive question API.
+</runtime_note>
+
 <context>
 Phase: $ARGUMENTS
 

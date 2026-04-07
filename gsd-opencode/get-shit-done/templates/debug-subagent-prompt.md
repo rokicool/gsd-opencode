@@ -53,16 +53,12 @@ Create: .planning/debug/{slug}.md
 
 **From /gsd-debug:**
 ```python
-task(
-  prompt=filled_template,
-  subagent_type="gsd-debugger",
-  description="Debug {slug}"
-)
+@gsd-debugger filled_template
 ```
 
 **From diagnose-issues (UAT):**
 ```python
-task(prompt=template, subagent_type="gsd-debugger", description="Debug UAT-001")
+@gsd-debugger template
 ```
 
 ---

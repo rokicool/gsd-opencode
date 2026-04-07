@@ -580,7 +580,7 @@ GSD는 프로젝트 설정을 `.planning/config.json`에 저장합니다. `/gsd-
 - **quality** -- 모든 의사결정 에이전트에 Opus를 사용하고 읽기 전용 검증에 Sonnet을 사용합니다. 할당량이 충분하고 작업이 중요할 때 사용합니다.
 - **balanced** -- 아키텍처 결정이 이루어지는 계획에만 Opus를 사용하고 나머지는 Sonnet을 사용합니다. 합당한 이유로 기본값입니다.
 - **budget** -- 코드를 작성하는 모든 것에 Sonnet을 사용하고 조사 및 검증에 Haiku를 사용합니다. 대량 작업이나 덜 중요한 페이즈에 사용합니다.
-- **inherit** -- 모든 에이전트가 현재 세션 모델을 사용합니다. 동적으로 모델을 전환할 때 (예: OpenCode `/model`) 또는 예상치 못한 API 비용을 방지하기 위해 비Anthropic 공급자 (OpenRouter, 로컬 모델)와 함께 OpenCode를 사용할 때 적합합니다. 비OpenCode 런타임 (Codex, OpenCode, Gemini CLI)의 경우 설치 프로그램이 자동으로 `resolve_model_ids: "omit"`을 설정합니다 — [비OpenCode 런타임](#비OpenCode-런타임-codex-opencode-gemini-cli-사용)을 참고하세요.
+- **inherit** -- 모든 에이전트가 현재 세션 모델을 사용합니다. 동적으로 모델을 전환할 때 (예: OpenCode 또는 Kilo `/model`) 또는 예상치 못한 API 비용을 방지하기 위해 비Anthropic 공급자 (OpenRouter, 로컬 모델)와 함께 OpenCode를 사용할 때 적합합니다. 비OpenCode 런타임 (Codex, OpenCode, Gemini CLI, Kilo)의 경우 설치 프로그램이 자동으로 `resolve_model_ids: "omit"`을 설정합니다 — [비OpenCode 런타임](#비OpenCode-런타임-codex-opencode-gemini-cli-kilo-사용)을 참고하세요.
 
 ---
 
@@ -723,7 +723,7 @@ cd ~/gsd-workspaces/feature-b
 
 예산 프로필로 전환하세요: `/gsd-set-profile budget`. 도메인이 익숙하다면 (또는 OpenCode에게 익숙하다면) `/gsd-settings`에서 조사 및 plan-check 에이전트를 비활성화하세요.
 
-### 비OpenCode 런타임 사용 (Codex, OpenCode, Gemini CLI)
+### 비OpenCode 런타임 사용 (Codex, OpenCode, Gemini CLI, Kilo)
 
 비OpenCode 런타임용으로 GSD를 설치했다면 설치 프로그램이 이미 모든 에이전트가 런타임의 기본 모델을 사용하도록 모델 해석을 구성했습니다. 수동 설정이 필요하지 않습니다. 구체적으로 설치 프로그램은 config에 `resolve_model_ids: "omit"`을 설정하여 GSD가 Anthropic 모델 ID 해석을 건너뛰고 런타임이 자체 기본 모델을 선택하도록 합니다.
 
@@ -740,9 +740,9 @@ cd ~/gsd-workspaces/feature-b
 }
 ```
 
-설치 프로그램은 Gemini CLI, OpenCode, Codex에 대해 `resolve_model_ids: "omit"`을 자동으로 구성합니다. 비OpenCode 런타임을 수동으로 설정하는 경우 직접 `.planning/config.json`에 추가하세요.
+설치 프로그램은 Gemini CLI, OpenCode, Kilo, Codex에 대해 `resolve_model_ids: "omit"`을 자동으로 구성합니다. 비OpenCode 런타임을 수동으로 설정하는 경우 직접 `.planning/config.json`에 추가하세요.
 
-전체 설명은 [Configuration Reference](CONFIGURATION.md#non-OpenCode-runtimes-codex-opencode-gemini-cli)를 참고하세요.
+전체 설명은 [Configuration Reference](CONFIGURATION.md#non-OpenCode-runtimes-codex-opencode-gemini-cli-kilo)를 참고하세요.
 
 ### 비Anthropic 공급자와 함께 OpenCode 사용 (OpenRouter, 로컬)
 

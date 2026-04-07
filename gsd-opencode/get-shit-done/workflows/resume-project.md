@@ -235,9 +235,9 @@ Based on user selection, route to appropriate workflow:
 
   **{phase}-{plan}: [Plan Name]** — [objective from PLAN.md]
 
-  `/gsd-execute-phase {phase} ${GSD_WS}`
+  `/new` then:
 
-  *`/new` first → fresh context window*
+  `/gsd-execute-phase {phase} ${GSD_WS}`
 
   ---
   ```
@@ -249,9 +249,9 @@ Based on user selection, route to appropriate workflow:
 
   **Phase [N]: [Name]** — [Goal from ROADMAP.md]
 
-  `/gsd-plan-phase [phase-number] ${GSD_WS}`
+  `/new` then:
 
-  *`/new` first → fresh context window*
+  `/gsd-plan-phase [phase-number] ${GSD_WS}`
 
   ---
 

@@ -66,6 +66,29 @@ AGENT_SKILLS_ROADMAPPER=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-too
 
 Parse JSON for: `researcher_model`, `synthesizer_model`, `roadmapper_model`, `commit_docs`, `project_exists`, `has_codebase_map`, `planning_exists`, `has_existing_code`, `has_package_file`, `is_brownfield`, `needs_codebase_map`, `has_git`, `project_path`.
 
+**Detect runtime and set instruction file name:**
+
+Derive `RUNTIME` from the invoking prompt's `execution_context` path:
+- Path contains `/.codex/` → `RUNTIME=codex`
+- Path contains `/.gemini/` → `RUNTIME=gemini`
+- Path contains `/.config/opencode/` or `/.opencode/` → `RUNTIME=opencode`
+- Otherwise → `RUNTIME=OpenCode`
+
+If `execution_context` path is not available, fall back to env vars:
+```bash
+if [ -n "$CODEX_HOME" ]; then RUNTIME="codex"
+elif [ -n "$GEMINI_CONFIG_DIR" ]; then RUNTIME="gemini"
+elif [ -n "$OPENCODE_CONFIG_DIR" ] || [ -n "$OPENCODE_CONFIG" ]; then RUNTIME="opencode"
+else RUNTIME="OpenCode"; fi
+```
+
+Set the instruction file variable:
+```bash
+if [ "$RUNTIME" = "codex" ]; then INSTRUCTION_FILE="AGENTS.md"; else INSTRUCTION_FILE="AGENTS.md"; fi
+```
+
+All subsequent references to the project instruction file use `$INSTRUCTION_FILE`.
+
 **If `project_exists` is true:** Error — project already initialized. Use `/gsd-progress`.
 
 **If `has_git` is false:** Initialize git:
@@ -614,7 +637,7 @@ Display spawning indicator:
 Spawn 4 parallel gsd-project-researcher agents with path references:
 
 ```
-task(prompt="<research_type>
+@gsd-project-researcher "<research_type>
 Project Research — Stack dimension for [domain].
 </research_type>
 
@@ -652,9 +675,9 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 write to: .planning/research/STACK.md
 Use template: $HOME/.config/opencode/get-shit-done/templates/research-project/STACK.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Stack research")
+"
 
-task(prompt="<research_type>
+@gsd-project-researcher "<research_type>
 Project Research — Features dimension for [domain].
 </research_type>
 
@@ -692,9 +715,9 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 write to: .planning/research/FEATURES.md
 Use template: $HOME/.config/opencode/get-shit-done/templates/research-project/FEATURES.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Features research")
+"
 
-task(prompt="<research_type>
+@gsd-project-researcher "<research_type>
 Project Research — Architecture dimension for [domain].
 </research_type>
 
@@ -732,9 +755,9 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 write to: .planning/research/ARCHITECTURE.md
 Use template: $HOME/.config/opencode/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Architecture research")
+"
 
-task(prompt="<research_type>
+@gsd-project-researcher "<research_type>
 Project Research — Pitfalls dimension for [domain].
 </research_type>
 
@@ -772,13 +795,13 @@ Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
 write to: .planning/research/PITFALLS.md
 Use template: $HOME/.config/opencode/get-shit-done/templates/research-project/PITFALLS.md
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Pitfalls research")
+"
 ```
 
 After all 4 agents complete, spawn synthesizer to create SUMMARY.md:
 
 ```
-task(prompt="
+@gsd-research-synthesizer "
 <task>
 Synthesize research outputs into SUMMARY.md.
 </task>
@@ -797,7 +820,7 @@ write to: .planning/research/SUMMARY.md
 Use template: $HOME/.config/opencode/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 </output>
-", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
+"
 ```
 
 Display research complete banner and key findings:
@@ -987,7 +1010,7 @@ Display stage banner:
 Spawn gsd-roadmapper agent with path references:
 
 ```
-task(prompt="
+@gsd-roadmapper "
 <planning_context>
 
 <files_to_read>
@@ -1012,7 +1035,7 @@ Create roadmap:
 
 write files first, then return. This ensures artifacts persist even if context is lost.
 </instructions>
-", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
+"
 ```
 
 **Handle roadmapper return:**
@@ -1084,7 +1107,7 @@ Use question:
 - Re-spawn roadmapper with revision context:
 
   ```
-  task(prompt="
+  @gsd-roadmapper "
   <revision>
   User feedback on roadmap:
   [user's notes]
@@ -1098,7 +1121,7 @@ Use question:
   Update the roadmap based on feedback. edit files in place.
   Return ROADMAP REVISED with changes made.
   </revision>
-  ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Revise roadmap")
+  "
   ```
 
 - Present revised roadmap
@@ -1106,18 +1129,18 @@ Use question:
 
 **If "Review full file":** Display raw `cat .planning/ROADMAP.md`, then re-ask.
 
-**Generate or refresh project AGENTS.md before final commit:**
+**Generate or refresh project instruction file before final commit:**
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" generate-OpenCode-md
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" generate-OpenCode-md --output "$INSTRUCTION_FILE"
 ```
 
-This ensures new projects get the default GSD workflow-enforcement guidance and current project context in `AGENTS.md`.
+This ensures new projects get the default GSD workflow-enforcement guidance and current project context in `$INSTRUCTION_FILE`.
 
 **Commit roadmap (after approval or auto mode):**
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: create roadmap ([N] phases)" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md AGENTS.md
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: create roadmap ([N] phases)" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md "$INSTRUCTION_FILE"
 ```
 
 ## 9. Done
@@ -1138,7 +1161,7 @@ Present completion summary:
 | Research       | `.planning/research/`       |
 | Requirements   | `.planning/REQUIREMENTS.md` |
 | Roadmap        | `.planning/ROADMAP.md`      |
-| Project guide  | `AGENTS.md`                 |
+| Project guide  | `$INSTRUCTION_FILE`         |
 
 **[N] phases** | **[X] requirements** | Ready to build ✓
 ```
@@ -1171,9 +1194,9 @@ PHASE1_HAS_UI=$(echo "$PHASE1_SECTION" | grep -qi "UI hint.*yes" && echo "true" 
 
 **Phase 1: [Phase Name]** — [Goal from ROADMAP.md]
 
-/gsd-discuss-phase 1 — gather context and clarify approach
+/new then:
 
-*/new first → fresh context window*
+/gsd-discuss-phase 1 — gather context and clarify approach
 
 ---
 
@@ -1193,9 +1216,9 @@ PHASE1_HAS_UI=$(echo "$PHASE1_SECTION" | grep -qi "UI hint.*yes" && echo "true" 
 
 **Phase 1: [Phase Name]** — [Goal from ROADMAP.md]
 
-/gsd-discuss-phase 1 — gather context and clarify approach
+/new then:
 
-*/new first → fresh context window*
+/gsd-discuss-phase 1 — gather context and clarify approach
 
 ---
 
@@ -1220,7 +1243,7 @@ PHASE1_HAS_UI=$(echo "$PHASE1_SECTION" | grep -qi "UI hint.*yes" && echo "true" 
 - `.planning/REQUIREMENTS.md`
 - `.planning/ROADMAP.md`
 - `.planning/STATE.md`
-- `AGENTS.md`
+- `$INSTRUCTION_FILE` (`AGENTS.md` for Codex, `AGENTS.md` for all other runtimes)
 
 </output>
 
@@ -1242,7 +1265,7 @@ PHASE1_HAS_UI=$(echo "$PHASE1_SECTION" | grep -qi "UI hint.*yes" && echo "true" 
 - [ ] ROADMAP.md created with phases, requirement mappings, success criteria
 - [ ] STATE.md initialized
 - [ ] REQUIREMENTS.md traceability updated
-- [ ] AGENTS.md generated with GSD workflow guidance
+- [ ] `$INSTRUCTION_FILE` generated with GSD workflow guidance (AGENTS.md for Codex, AGENTS.md otherwise)
 - [ ] User knows next step is `/gsd-discuss-phase 1`
 
 **Atomic commits:** Each phase commits its artifacts immediately. If context is lost, artifacts persist.

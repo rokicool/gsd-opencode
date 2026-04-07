@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { output, error, planningRoot } = require('./core.cjs');
+const { output, error, planningRoot, CONFIG_DEFAULTS } = require('./core.cjs');
 const {
   VALID_PROFILES,
   getAgentToModelMapForProfile,
@@ -22,9 +22,14 @@ const VALID_CONFIG_KEYS = new Set([
   'workflow.discuss_mode',
   'workflow.skip_discuss',
   'workflow._auto_chain_active',
-  'git.branching_strategy', 'git.phase_branch_template', 'git.milestone_branch_template', 'git.quick_branch_template',
+  'workflow.use_worktrees',
+  'git.branching_strategy', 'git.base_branch', 'git.phase_branch_template', 'git.milestone_branch_template', 'git.quick_branch_template',
   'planning.commit_docs', 'planning.search_gitignored',
+  'workflow.subagent_timeout',
   'hooks.context_warnings',
+  'project_code', 'phase_naming',
+  'manager.flags.discuss', 'manager.flags.plan', 'manager.flags.execute',
+  'response_language',
 ]);
 
 /**
@@ -101,18 +106,18 @@ function buildNewProjectConfig(userChoices) {
   }
 
   const hardcoded = {
-    model_profile: 'balanced',
-    commit_docs: true,
-    parallelization: true,
-    search_gitignored: false,
+    model_profile: CONFIG_DEFAULTS.model_profile,
+    commit_docs: CONFIG_DEFAULTS.commit_docs,
+    parallelization: CONFIG_DEFAULTS.parallelization,
+    search_gitignored: CONFIG_DEFAULTS.search_gitignored,
     brave_search: hasBraveSearch,
     firecrawl: hasFirecrawl,
     exa_search: hasExaSearch,
     git: {
-      branching_strategy: 'none',
-      phase_branch_template: 'gsd/phase-{phase}-{slug}',
-      milestone_branch_template: 'gsd/{milestone}-{slug}',
-      quick_branch_template: null,
+      branching_strategy: CONFIG_DEFAULTS.branching_strategy,
+      phase_branch_template: CONFIG_DEFAULTS.phase_branch_template,
+      milestone_branch_template: CONFIG_DEFAULTS.milestone_branch_template,
+      quick_branch_template: CONFIG_DEFAULTS.quick_branch_template,
     },
     workflow: {
       research: true,
@@ -132,6 +137,8 @@ function buildNewProjectConfig(userChoices) {
     hooks: {
       context_warnings: true,
     },
+    project_code: null,
+    phase_naming: 'sequential',
     agent_skills: {},
   };
 
@@ -434,6 +441,7 @@ function getCmdConfigSetModelProfileResultMessage(
 }
 
 module.exports = {
+  VALID_CONFIG_KEYS,
   cmdConfigEnsureSection,
   cmdConfigSet,
   cmdConfigGet,

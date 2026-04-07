@@ -449,8 +449,8 @@
       "description": "gsd-reapply-patches.md"
     },
     {
-      "pattern": "Manage parallel workstreams for concurrent milestone work.",
-      "replacement": "<objective>\nManage parallel workstreams for concurrent milestone work.\n</objective>",
+      "pattern": "/gsd-workstreams\n\nManage parallel workstreams for concurrent milestone work.",
+      "replacement": "/gsd-workstreams\n\n<objective>\n      Manage parallel workstreams for concurrent milestone work.\n</objective>",
       "description": "gsd-reapply-patches.md"
     },
     {
@@ -493,6 +493,18 @@
       "replacement": "description: \"Two models: one for reseach and planing, other for execution and verification\"",
       "description": "Use - two models: advanced and less advanced - profile"
     },
+    {
+      "pattern": "1. **Never** read agent definition files (`agents/*.md`) -- `subagent_type` auto-loads them.",
+      "replacement": "1. **Never** read agent definition files (`agents/*.md`) -- `@<custom_agent>` call auto-loads them.",
+      "description": "gsd-opencode/get-shit-done/references/universal-anti-patterns.md"
+    },
+
+    {
+      "pattern": "ALWAYS use `subagent_type: \"gsd-{agent}\"` (e.g., `gsd-phase-researcher`, `gsd-executor`, `gsd-planner`)",
+      "replacement": "ALWAYS use `@gsd-{agent}` call (e.g., `@gsd-phase-researcher`, `@gsd-executor`, `@gsd-planner`)",
+      "description": "gsd-opencode/get-shit-done/references/universal-anti-patterns.md"
+    },
+
     {
       "pattern": "label: \"Budget\"",
       "replacement": "label: \"Genius (most flexible)\"",

@@ -8,6 +8,38 @@ const { safeReadFile, normalizeMd, output, error } = require('./core.cjs');
 
 // ─── Parsing engine ───────────────────────────────────────────────────────────
 
+/**
+ * Split a YAML inline array body on commas, respecting quoted strings.
+ * e.g. '"a, b", c' → ['a, b', 'c']
+ */
+function splitInlineArray(body) {
+  const items = [];
+  let current = '';
+  let inQuote = null; // null | '"' | "'"
+
+  for (let i = 0; i < body.length; i++) {
+    const ch = body[i];
+    if (inQuote) {
+      if (ch === inQuote) {
+        inQuote = null;
+      } else {
+        current += ch;
+      }
+    } else if (ch === '"' || ch === "'") {
+      inQuote = ch;
+    } else if (ch === ',') {
+      const trimmed = current.trim();
+      if (trimmed) items.push(trimmed);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  const trimmed = current.trim();
+  if (trimmed) items.push(trimmed);
+  return items;
+}
+
 function extractFrontmatter(content) {
   const frontmatter = {};
   // Find ALL frontmatter blocks at the start of the file.
@@ -53,8 +85,8 @@ function extractFrontmatter(content) {
         // Push new context for potential nested content
         stack.push({ obj: current.obj[key], key: null, indent });
       } else if (value.startsWith('[') && value.endsWith(']')) {
-        // Inline array: key: [a, b, c]
-        current.obj[key] = value.slice(1, -1).split(',').map(s => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+        // Inline array: key: [a, b, c] — quote-aware split (REG-04 fix)
+        current.obj[key] = splitInlineArray(value.slice(1, -1));
         current.key = null;
       } else {
         // Simple key: value
@@ -251,6 +283,19 @@ function parseMustHavesBlock(content, blockName) {
     }
   }
   if (current) items.push(current);
+
+  // Warn when must_haves block exists but parsed as empty -- likely YAML formatting issue.
+  // This is a critical diagnostic: empty must_haves causes verification to silently degrade
+  // to Option C (LLM-derived truths) instead of checking documented contracts.
+  if (items.length === 0 && blockLines.length > 0) {
+    const nonEmptyLines = blockLines.filter(l => l.trim() !== '').length;
+    if (nonEmptyLines > 0) {
+      process.stderr.write(
+        `[gsd-tools] WARNING: must_haves.${blockName} block has ${nonEmptyLines} content lines but parsed 0 items. ` +
+        `Possible YAML formatting issue — verification will fall back to LLM-derived truths.\n`
+      );
+    }
+  }
 
   return items;
 }

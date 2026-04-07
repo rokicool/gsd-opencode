@@ -9,14 +9,28 @@ read all files referenced by the invoking prompt's execution_context before star
 <process>
 
 <step name="detect">
-Find current phase directory from most recently modified files:
+## Context Detection
+
+Determine what kind of work is being paused and set the handoff destination accordingly:
 
 ```bash
-# Find most recent phase directory with work
-(ls -lt .planning/phases/*/PLAN.md 2>/dev/null || true) | head -1 | grep -oP 'phases/\K[^/]+' || true
+# Check for active phase
+phase=$(( ls -lt .planning/phases/*/PLAN.md 2>/dev/null || true ) | head -1 | grep -oP 'phases/\K[^/]+' || true)
+
+# Check for active spike
+spike=$(( ls -lt .planning/spikes/*/SPIKE.md .planning/spikes/*/DESIGN.md 2>/dev/null || true ) | head -1 | grep -oP 'spikes/\K[^/]+' || true)
+
+# Check for active deliberation
+deliberation=$(ls .planning/deliberations/*.md 2>/dev/null | head -1 || true)
 ```
 
-If no active phase detected, ask user which phase they're pausing work on.
+- **Phase work**: active phase directory → handoff to `.planning/phases/XX-name/.continue-here.md`
+- **Spike work**: active spike directory or spike-related files (no active phase) → handoff to `.planning/spikes/SPIKE-NNN/.continue-here.md` (create directory if needed)
+- **Deliberation work**: active deliberation file (no phase/spike) → handoff to `.planning/deliberations/.continue-here.md`
+- **Research work**: research notes exist but no phase/spike/deliberation → handoff to `.planning/.continue-here.md`
+- **Default**: no detectable context → handoff to `.planning/.continue-here.md`, note the ambiguity in `<current_state>`
+
+If phase is detected, proceed with phase handoff path. Otherwise use the first matching non-phase path above.
 </step>
 
 <step name="gather">
@@ -30,6 +44,9 @@ If no active phase detected, ask user which phase they're pausing work on.
 6. **Human actions pending**: Things that need manual intervention (MCP setup, API keys, approvals, manual testing)
 7. **Background processes**: Any running servers/watchers that were part of the workflow
 8. **Files modified**: What's changed but not committed
+9. **Blocking constraints**: Anti-patterns or methodological failures encountered during this session that a resuming agent MUST be aware of before proceeding. Only include items discovered through actual failure — not warnings or predictions. Assign each constraint a `severity`:
+   - `blocking` — The resuming agent MUST demonstrate understanding before proceeding. The discuss-phase and execute-phase workflows will enforce a mandatory understanding check.
+   - `advisory` — Important context but does not gate resumption.
 
 Ask user for clarifications if needed via conversational questions.
 
@@ -85,10 +102,11 @@ timestamp=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" curren
 </step>
 
 <step name="write">
-**write handoff to `.planning/phases/XX-name/.continue-here.md`:**
+**write handoff to the path determined in the detect step** (e.g. `.planning/phases/XX-name/.continue-here.md`, `.planning/spikes/SPIKE-NNN/.continue-here.md`, or `.planning/.continue-here.md`):
 
 ```markdown
 ---
+context: [phase|spike|deliberation|research|default]
 phase: XX-name
 task: 3
 total_tasks: 7
@@ -96,12 +114,35 @@ status: in_progress
 last_updated: [timestamp from current-timestamp]
 ---
 
+# BLOCKING CONSTRAINTS — read Before Anything Else
+
+> These are not suggestions. Each constraint below was discovered through failure.
+> Acknowledge each one explicitly before proceeding.
+
+- [ ] CONSTRAINT: [name] — [what it is] — [structural mitigation required]
+
+**Do not proceed until all boxes are checked.**
+
+_If no constraints have been identified yet, remove this section._
+
+## Critical Anti-Patterns
+
+| Pattern | Description | Severity | Prevention Mechanism |
+|---------|-------------|----------|---------------------|
+| [pattern name] | [what it is and how it manifested] | blocking | [structural step that prevents recurrence — not acknowledgment] |
+| [pattern name] | [what it is and how it manifested] | advisory | [guidance for avoiding it] |
+
+**Severity values:** `blocking` — resuming agent must pass understanding check before proceeding. `advisory` — important context, does not gate resumption.
+
+_Remove rows that do not apply. The discuss-phase and execute-phase workflows parse this table and enforce a mandatory understanding check for any `blocking` rows._
+
 <current_state>
 [Where exactly are we? Immediate context]
 </current_state>
 
 <completed_work>
 
+Completed Tasks:
 - task 1: [name] - Done
 - task 2: [name] - Done
 - task 3: [name] - In progress, [what's done]
@@ -124,6 +165,25 @@ last_updated: [timestamp from current-timestamp]
 - [Blocker 1]: [status/workaround]
 </blockers>
 
+## Required Reading (in order)
+<!-- List documents the resuming agent must read before acting -->
+1. [document] — [why it matters]
+1. `.planning/METHODOLOGY.md` (if it exists) — project analytical lenses; apply before any assumption analysis
+
+## Critical Anti-Patterns (do NOT repeat these)
+<!-- Mistakes discovered this session that must be structurally avoided -->
+- [ANTI-PATTERN]: [what it is] → [structural mitigation]
+
+## Infrastructure State
+<!-- Running services, external state, environment specifics -->
+- [service/env]: [current state]
+
+## Pre-Execution Critique Required
+<!-- Fill in ONLY if pausing between design and execution (e.g. spike design done, not yet run) -->
+- Design artifact: [path]
+- Critique focus: [key questions the critic should probe]
+- Gate: Do NOT begin execution until critique is complete and design is revised
+
 <context>
 [Mental state, what were you thinking, the plan]
 </context>
@@ -143,7 +203,7 @@ timestamp=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" curren
 
 <step name="commit">
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/phases/*/.continue-here.md .planning/HANDOFF.json
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "wip: [context-name] paused at [X]/[Y]" --files [handoff-path] .planning/HANDOFF.json
 ```
 </step>
 
@@ -151,11 +211,12 @@ node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "wip: [phas
 ```
 ✓ Handoff created:
   - .planning/HANDOFF.json (structured, machine-readable)
-  - .planning/phases/[XX-name]/.continue-here.md (human-readable)
+  - [handoff-path] (human-readable)
 
 Current state:
 
-- Phase: [XX-name]
+- Context: [phase|spike|deliberation|research]
+- Location: [XX-name or SPIKE-NNN]
 - task: [X] of [Y]
 - Status: [in_progress/blocked]
 - Blockers: [count] ({human_actions_pending count} need human action)
@@ -169,8 +230,10 @@ To resume: /gsd-resume-work
 </process>
 
 <success_criteria>
-- [ ] .continue-here.md created in correct phase directory
-- [ ] All sections filled with specific content
+- [ ] Context detected (phase/spike/deliberation/research/default)
+- [ ] .continue-here.md created at correct path for detected context
+- [ ] Required Reading, Anti-Patterns, and Infrastructure State sections filled
+- [ ] Pre-Execution Critique section filled if pausing between design and execution
 - [ ] Committed as WIP
 - [ ] User knows location and how to resume
 </success_criteria>

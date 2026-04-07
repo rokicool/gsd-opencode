@@ -19,29 +19,31 @@
  *   2  Runtime error (file I/O, permissions)
  */
 
-import { readFile, writeFile, access, mkdir } from 'node:fs/promises';
-import { resolve, dirname, basename } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFile, writeFile, access, mkdir } from "node:fs/promises";
+import { resolve, dirname, basename } from "node:path";
+import { fileURLToPath } from "node:url";
 
 // Use dynamic import for tinyglobby
 let glob;
 try {
-  const tinyglobby = await import('tinyglobby');
+  const tinyglobby = await import("tinyglobby");
   glob = tinyglobby.glob;
 } catch (e) {
   // Fallback if tinyglobby isn't available
   glob = async (patterns, options) => {
-    console.error('Warning: tinyglobby not available. Install with: npm install tinyglobby');
+    console.error(
+      "Warning: tinyglobby not available. Install with: npm install tinyglobby",
+    );
     return [];
   };
 }
 
 // Import our modules
-import { TextTranslator } from '../lib/translator.js';
-import { CliFormatter } from '../lib/cli.js';
-import { BackupManager } from '../lib/backup-manager.js';
-import { GitChecker } from '../lib/git-checker.js';
-import { Validator } from '../lib/validator.js';
+import { TextTranslator } from "../lib/translator.js";
+import { CliFormatter } from "../lib/cli.js";
+import { BackupManager } from "../lib/backup-manager.js";
+import { GitChecker } from "../lib/git-checker.js";
+import { Validator } from "../lib/validator.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -64,21 +66,21 @@ function parseArgs(args) {
     apply: false,
     showDiff: false,
     useColor: true,
-    help: false
+    help: false,
   };
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
 
-    if (arg === '--apply') {
+    if (arg === "--apply") {
       result.apply = true;
-    } else if (arg === '--show-diff') {
+    } else if (arg === "--show-diff") {
       result.showDiff = true;
-    } else if (arg === '--no-color') {
+    } else if (arg === "--no-color") {
       result.useColor = false;
-    } else if (arg === '--help' || arg === '-h') {
+    } else if (arg === "--help" || arg === "-h") {
       result.help = true;
-    } else if (!arg.startsWith('--')) {
+    } else if (!arg.startsWith("--")) {
       // Collect all non-option arguments as config file paths
       result.configFiles.push(arg);
     }
@@ -103,7 +105,7 @@ async function loadSingleConfig(configPath) {
 
   let content;
   try {
-    content = await readFile(resolvedPath, 'utf-8');
+    content = await readFile(resolvedPath, "utf-8");
   } catch (error) {
     throw new Error(`Cannot read config file: ${error.message}`);
   }
@@ -139,19 +141,25 @@ function validateConfig(config, configPath) {
     if (!rule.pattern) {
       throw new Error(`Rule ${i + 1} must have a "pattern" in ${configPath}`);
     }
-    if (typeof rule.replacement !== 'string') {
-      throw new Error(`Rule ${i + 1} must have a "replacement" string in ${configPath}`);
+    if (typeof rule.replacement !== "string") {
+      throw new Error(
+        `Rule ${i + 1} must have a "replacement" string in ${configPath}`,
+      );
     }
   }
 
   // Validate include option if present
   if (config.include && config.include.length > 0) {
     if (!Array.isArray(config.include)) {
-      throw new Error(`Config "include" must be an array of strings: ${configPath}`);
+      throw new Error(
+        `Config "include" must be an array of strings: ${configPath}`,
+      );
     }
     for (let i = 0; i < config.include.length; i++) {
-      if (typeof config.include[i] !== 'string') {
-        throw new Error(`Config "include" item ${i + 1} must be a string in ${configPath}`);
+      if (typeof config.include[i] !== "string") {
+        throw new Error(
+          `Config "include" item ${i + 1} must be a string in ${configPath}`,
+        );
       }
     }
   }
@@ -164,13 +172,18 @@ function validateConfig(config, configPath) {
  */
 function setConfigDefaults(config) {
   return {
-    patterns: config.patterns || ['**/*'],
+    patterns: config.patterns || ["**/*"],
     include: config.include || [],
-    exclude: config.exclude || ['node_modules/**', '.git/**', '.translate-backups/**'],
+    exclude: config.exclude || [
+      "node_modules/**",
+      ".git/**",
+      ".translate-backups/**",
+    ],
     maxFileSize: config.maxFileSize || 10 * 1024 * 1024,
     rules: config.rules || [],
-    _forbidden_strings_after_translation: config._forbidden_strings_after_translation || [],
-    ...config
+    _forbidden_strings_after_translation:
+      config._forbidden_strings_after_translation || [],
+    ...config,
   };
 }
 
@@ -181,7 +194,7 @@ function setConfigDefaults(config) {
  */
 function mergeConfigs(configs) {
   if (!Array.isArray(configs) || configs.length === 0) {
-    throw new Error('At least one config is required');
+    throw new Error("At least one config is required");
   }
 
   if (configs.length === 1) {
@@ -211,11 +224,16 @@ function mergeConfigs(configs) {
     }
 
     // Merge _forbidden_strings_after_translation: combine and deduplicate
-    if (config._forbidden_strings_after_translation && config._forbidden_strings_after_translation.length > 0) {
-      merged._forbidden_strings_after_translation = [...new Set([
-        ...merged._forbidden_strings_after_translation,
-        ...config._forbidden_strings_after_translation
-      ])];
+    if (
+      config._forbidden_strings_after_translation &&
+      config._forbidden_strings_after_translation.length > 0
+    ) {
+      merged._forbidden_strings_after_translation = [
+        ...new Set([
+          ...merged._forbidden_strings_after_translation,
+          ...config._forbidden_strings_after_translation,
+        ]),
+      ];
     }
 
     // patterns: use first config's patterns (they're defaults)
@@ -227,7 +245,14 @@ function mergeConfigs(configs) {
     }
 
     // Any other custom properties: last config wins
-    const knownKeys = ['patterns', 'include', 'exclude', 'maxFileSize', 'rules', '_forbidden_strings_after_translation'];
+    const knownKeys = [
+      "patterns",
+      "include",
+      "exclude",
+      "maxFileSize",
+      "rules",
+      "_forbidden_strings_after_translation",
+    ];
     for (const key of Object.keys(config)) {
       if (!knownKeys.includes(key)) {
         merged[key] = config[key];
@@ -245,7 +270,7 @@ function mergeConfigs(configs) {
  */
 async function loadConfigs(configPaths) {
   if (!Array.isArray(configPaths) || configPaths.length === 0) {
-    throw new Error('At least one config file is required');
+    throw new Error("At least one config file is required");
   }
 
   // Load all configs
@@ -270,18 +295,22 @@ async function loadConfig(configPath) {
 }
 
 async function ensureCommandNames(apply) {
-  const commandsDir = resolve(__dirname, '../../gsd-opencode/commands/gsd');
+  const commandsDir = resolve(__dirname, "../../gsd-opencode/commands/gsd");
 
   let commandFiles;
   try {
-    commandFiles = await glob(['*.md'], { cwd: commandsDir, onlyFiles: true, absolute: true });
+    commandFiles = await glob(["*.md"], {
+      cwd: commandsDir,
+      onlyFiles: true,
+      absolute: true,
+    });
   } catch {
-    console.log('No command files found to check for missing name: field.');
+    console.log("No command files found to check for missing name: field.");
     return { fixed: 0, missing: 0 };
   }
 
   if (!commandFiles || commandFiles.length === 0) {
-    console.log('No command files found to check for missing name: field.');
+    console.log("No command files found to check for missing name: field.");
     return { fixed: 0, missing: 0 };
   }
 
@@ -289,11 +318,11 @@ async function ensureCommandNames(apply) {
   let missing = 0;
 
   for (const filePath of commandFiles) {
-    const commandName = basename(filePath, '.md');
+    const commandName = basename(filePath, ".md");
     let content;
 
     try {
-      content = await readFile(filePath, 'utf-8');
+      content = await readFile(filePath, "utf-8");
     } catch {
       continue;
     }
@@ -309,22 +338,26 @@ async function ensureCommandNames(apply) {
     const newFrontmatter = `name: ${commandName}\n${frontmatter}`;
     const newContent = content.replace(
       /^---\n([\s\S]*?)\n---/,
-      `---\n${newFrontmatter}\n---`
+      `---\n${newFrontmatter}\n---`,
     );
 
     if (apply) {
-      await writeFile(filePath, newContent, 'utf-8');
+      await writeFile(filePath, newContent, "utf-8");
       console.log(`  Fixed missing name: in ${commandName}.md`);
       fixed++;
     } else {
-      console.log(`  [dry-run] Would add name: ${commandName} to ${commandName}.md`);
+      console.log(
+        `  [dry-run] Would add name: ${commandName} to ${commandName}.md`,
+      );
     }
   }
 
   if (missing > 0) {
-    console.log(`Command name check: ${missing} file(s) missing name: field${apply ? `, ${fixed} fixed` : ' (dry-run)'}`);
+    console.log(
+      `Command name check: ${missing} file(s) missing name: field${apply ? `, ${fixed} fixed` : " (dry-run)"}`,
+    );
   } else {
-    console.log('All command files have name: in frontmatter.');
+    console.log("All command files have name: in frontmatter.");
   }
 
   return { fixed, missing };
@@ -332,8 +365,8 @@ async function ensureCommandNames(apply) {
 
 async function discoverGsdSkillReferences(searchPatterns) {
   const files = await glob(searchPatterns, {
-    ignore: ['node_modules/**', '.git/**'],
-    onlyFiles: true
+    ignore: ["node_modules/**", ".git/**"],
+    onlyFiles: true,
   });
 
   if (!files || files.length === 0) {
@@ -345,7 +378,7 @@ async function discoverGsdSkillReferences(searchPatterns) {
 
   for (const file of files) {
     try {
-      const content = await readFile(file, 'utf-8');
+      const content = await readFile(file, "utf-8");
       let match;
       while ((match = pattern.exec(content)) !== null) {
         skillRefs.add(`gsd-${match[1]}`);
@@ -360,8 +393,8 @@ async function discoverGsdSkillReferences(searchPatterns) {
 }
 
 async function generateSkillWrappers(commandNames) {
-  const commandsDir = resolve(__dirname, '../../gsd-opencode/commands/gsd');
-  const skillsBaseDir = resolve(__dirname, '../../gsd-opencode/skills');
+  const commandsDir = resolve(__dirname, "../../gsd-opencode/commands/gsd");
+  const skillsBaseDir = resolve(__dirname, "../../gsd-opencode/skills");
 
   const commandSet = new Set(commandNames);
   let created = 0;
@@ -371,7 +404,7 @@ async function generateSkillWrappers(commandNames) {
   for (const commandName of commandSet) {
     const commandFile = resolve(commandsDir, `${commandName}.md`);
     const skillDir = resolve(skillsBaseDir, commandName);
-    const skillFile = resolve(skillDir, 'SKILL.md');
+    const skillFile = resolve(skillDir, "SKILL.md");
 
     try {
       await access(commandFile);
@@ -389,9 +422,11 @@ async function generateSkillWrappers(commandNames) {
       // file doesn't exist yet, proceed
     }
 
-    const content = await readFile(commandFile, 'utf-8');
+    const content = await readFile(commandFile, "utf-8");
 
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+    const frontmatterMatch = content.match(
+      /^---\n([\s\S]*?)\n---\n?([\s\S]*)$/,
+    );
     let skillContent;
 
     if (frontmatterMatch) {
@@ -404,21 +439,25 @@ async function generateSkillWrappers(commandNames) {
       const newFrontmatter = [
         `---`,
         `name: ${commandName}`,
-        `description: Implementation of ${commandDisplayName} command`,
-        `---`
-      ].join('\n');
+        `description: Implementation of one of the commands`,
+        `---`,
+      ].join("\n");
 
-      skillContent = newFrontmatter + '\n\n' + body;
+      skillContent = newFrontmatter + "\n\n" + body;
     } else {
-      skillContent = `---\nname: ${commandName}\ndescription: Implementation of ${commandName} command\n---\n\n` + content;
+      skillContent =
+        `---\nname: ${commandName}\ndescription: Implementation of one of the commands\n---\n\n` +
+        content;
     }
 
     await mkdir(skillDir, { recursive: true });
-    await writeFile(skillFile, skillContent, 'utf-8');
+    await writeFile(skillFile, skillContent, "utf-8");
     created++;
   }
 
-  console.log(`Skill wrappers: created ${created}, skipped ${skipped} (already exist), not found ${notFound}`);
+  console.log(
+    `Skill wrappers: created ${created}, skipped ${skipped} (already exist), not found ${notFound}`,
+  );
   return { created, skipped, notFound };
 }
 
@@ -431,18 +470,23 @@ async function main() {
   // Create formatter
   const formatter = new CliFormatter({
     useColor: args.useColor,
-    showDiff: args.showDiff
+    showDiff: args.showDiff,
   });
 
   // Show help
-  if (args.help || (args.configFiles.length === 0 && process.argv.length <= 2)) {
+  if (
+    args.help ||
+    (args.configFiles.length === 0 && process.argv.length <= 2)
+  ) {
     console.log(formatter.formatHelp());
     process.exit(EXIT_SUCCESS);
   }
 
   // Validate config file argument
   if (args.configFiles.length === 0) {
-    console.error(formatter.formatError('At least one config file is required'));
+    console.error(
+      formatter.formatError("At least one config file is required"),
+    );
     console.log(formatter.formatHelp());
     process.exit(EXIT_VALIDATION_ERROR);
   }
@@ -466,12 +510,12 @@ async function main() {
   if (config._forbidden_strings_after_translation) {
     for (const str of config._forbidden_strings_after_translation) {
       // Escape special regex characters for literal matching
-      const escaped = str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const escaped = str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       forbiddenPatterns.push({
-        pattern: new RegExp(escaped, 'g'),
+        pattern: new RegExp(escaped, "g"),
         message: `Found forbidden string "${str}"`,
-        suggestion: 'Check translation rules',
-        exceptions: []
+        suggestion: "Check translation rules",
+        exceptions: [],
       });
     }
   }
@@ -485,33 +529,39 @@ async function main() {
     if (config.include.length > 0) {
       // Get all files matching include patterns
       const includedFiles = await glob(config.include, {
-        onlyFiles: true
+        onlyFiles: true,
       });
       // Apply exclude patterns to the included files
-      const excludedSet = new Set(await glob(config.include, {
-        ignore: config.exclude,
-        onlyFiles: true
-      }));
-      files = includedFiles.filter(f => excludedSet.has(f));
+      const excludedSet = new Set(
+        await glob(config.include, {
+          ignore: config.exclude,
+          onlyFiles: true,
+        }),
+      );
+      files = includedFiles.filter((f) => excludedSet.has(f));
     } else {
       // Use patterns with exclude (existing behavior)
       files = await glob(config.patterns, {
         ignore: config.exclude,
-        onlyFiles: true
+        onlyFiles: true,
       });
     }
   } catch (error) {
-    console.error(formatter.formatError(`Failed to resolve patterns: ${error.message}`));
+    console.error(
+      formatter.formatError(`Failed to resolve patterns: ${error.message}`),
+    );
     process.exit(EXIT_RUNTIME_ERROR);
   }
 
   if (files.length === 0) {
-    console.log(formatter.formatWarning('No files found matching the patterns'));
+    console.log(
+      formatter.formatWarning("No files found matching the patterns"),
+    );
     process.exit(EXIT_VALIDATION_ERROR);
   }
 
   console.log(`Found ${files.length} file(s) to process`);
-  console.log('');
+  console.log("");
 
   // Check git status for uncommitted changes
   if (args.apply) {
@@ -529,20 +579,22 @@ async function main() {
     const filePath = files[i];
 
     // Show progress
-    process.stdout.write(formatter.formatProgress(i + 1, files.length, filePath));
+    process.stdout.write(
+      formatter.formatProgress(i + 1, files.length, filePath),
+    );
 
     // Translate the file
     const result = await translator.translateFile(filePath);
 
     results.push({
       filePath,
-      ...result
+      ...result,
     });
 
     if (result.wasModified && !result.error) {
       modifiedFiles.push({
         filePath,
-        result
+        result,
       });
     }
   }
@@ -552,31 +604,35 @@ async function main() {
 
   // Show diffs if requested
   if (args.showDiff) {
-    console.log('');
-    console.log(formatter.colorize('═'.repeat(70), 'gray'));
-    console.log(formatter.colorize('  Diffs', 'bright'));
-    console.log(formatter.colorize('═'.repeat(70), 'gray'));
+    console.log("");
+    console.log(formatter.colorize("═".repeat(70), "gray"));
+    console.log(formatter.colorize("  Diffs", "bright"));
+    console.log(formatter.colorize("═".repeat(70), "gray"));
 
     for (const { filePath, result } of modifiedFiles) {
-      const diff = formatter.formatDiff(filePath, result.original, result.translated);
+      const diff = formatter.formatDiff(
+        filePath,
+        result.original,
+        result.translated,
+      );
       console.log(diff);
     }
   }
 
   // Show summary
-  const summaryResults = results.map(r => ({
+  const summaryResults = results.map((r) => ({
     filePath: r.filePath,
     changeCount: r.changeCount,
     wasModified: r.wasModified,
-    error: r.error
+    error: r.error,
   }));
 
   console.log(formatter.formatSummary(summaryResults));
 
   // Apply changes if requested
   if (args.apply && modifiedFiles.length > 0) {
-    console.log(formatter.formatWarning('Applying changes...'));
-    console.log('');
+    console.log(formatter.formatWarning("Applying changes..."));
+    console.log("");
 
     let successCount = 0;
     let errorCount = 0;
@@ -585,32 +641,44 @@ async function main() {
       // Create backup first
       const backup = await backupManager.createBackup(filePath);
       if (!backup.success) {
-        console.error(formatter.formatError(`Failed to backup ${filePath}: ${backup.error}`));
+        console.error(
+          formatter.formatError(
+            `Failed to backup ${filePath}: ${backup.error}`,
+          ),
+        );
         errorCount++;
         continue;
       }
 
       // Write translated content
       try {
-        await writeFile(filePath, result.translated, 'utf-8');
+        await writeFile(filePath, result.translated, "utf-8");
         console.log(formatter.formatSuccess(`Updated ${filePath}`));
         successCount++;
       } catch (error) {
-        console.error(formatter.formatError(`Failed to write ${filePath}: ${error.message}`));
+        console.error(
+          formatter.formatError(
+            `Failed to write ${filePath}: ${error.message}`,
+          ),
+        );
         errorCount++;
       }
     }
 
-    console.log('');
+    console.log("");
     console.log(`Applied changes to ${successCount} file(s)`);
 
     if (errorCount > 0) {
-      console.error(formatter.formatError(`Failed to update ${errorCount} file(s)`));
+      console.error(
+        formatter.formatError(`Failed to update ${errorCount} file(s)`),
+      );
     }
 
     // Run post-translation validation
-    console.log('');
-    console.log(formatter.colorize('Running post-translation validation...', 'bright'));
+    console.log("");
+    console.log(
+      formatter.colorize("Running post-translation validation...", "bright"),
+    );
 
     const validationResults = [];
     for (const { filePath } of modifiedFiles) {
@@ -621,10 +689,16 @@ async function main() {
     const summaryReport = validator.formatSummaryReport(validationResults);
     console.log(summaryReport);
 
-    const hasViolations = validationResults.some(r => !r.result.valid && !r.result.error);
+    const hasViolations = validationResults.some(
+      (r) => !r.result.valid && !r.result.error,
+    );
 
     if (hasViolations) {
-      console.error(formatter.formatError('Post-translation validation failed. Review violations above.'));
+      console.error(
+        formatter.formatError(
+          "Post-translation validation failed. Review violations above.",
+        ),
+      );
       process.exit(EXIT_VALIDATION_ERROR);
     }
 
@@ -632,29 +706,35 @@ async function main() {
       process.exit(EXIT_RUNTIME_ERROR);
     }
   } else if (!args.apply && modifiedFiles.length > 0) {
-    console.log(formatter.formatWarning('This was a dry-run. Use --apply to make changes.'));
+    console.log(
+      formatter.formatWarning(
+        "This was a dry-run. Use --apply to make changes.",
+      ),
+    );
   }
 
-  console.log('');
+  console.log("");
 
-  console.log('Checking command files for missing name: in frontmatter...');
+  console.log("Checking command files for missing name: in frontmatter...");
   await ensureCommandNames(args.apply);
-  console.log('');
+  console.log("");
 
   const skillRefs = await discoverGsdSkillReferences(config.patterns);
   if (skillRefs.size > 0) {
-    console.log(`Discovered ${skillRefs.size} gsd skill reference(s): ${[...skillRefs].join(', ')}`);
+    console.log(
+      `Discovered ${skillRefs.size} gsd skill reference(s): ${[...skillRefs].join(", ")}`,
+    );
     await generateSkillWrappers([...skillRefs]);
   } else {
-    console.log('No gsd skill references found in processed files.');
+    console.log("No gsd skill references found in processed files.");
   }
 
-  console.log(formatter.formatSuccess('Done!'));
+  console.log(formatter.formatSuccess("Done!"));
   process.exit(EXIT_SUCCESS);
 }
 
 // Run main
-main().catch(error => {
+main().catch((error) => {
   console.error(`\nError: ${error.message}`);
   process.exit(EXIT_RUNTIME_ERROR);
 });

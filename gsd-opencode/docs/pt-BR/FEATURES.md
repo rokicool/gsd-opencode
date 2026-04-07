@@ -39,6 +39,27 @@ Para catálogo completo e detalhamento exaustivo, consulte [FEATURES.md em ingl�
 - **Diagnóstico forense** com `/gsd-forensics`
 - **Relatório de sessão** com `/gsd-session-report`
 
+## Novidades v1.31--v1.32
+
+- **Schema drift detection** — detecta alterações em ORM schema sem migração correspondente
+- **Security enforcement** — verificação de segurança ancorada em threat model (`/gsd-secure-phase`)
+- **Discuss chain mode** — encadeia discuss → plan → execute com `--chain`
+- **Single-phase autonomous** — executa apenas uma fase com `--only N`
+- **Scope reduction detection** — defesa em 3 camadas contra remoção silenciosa de requisitos
+- **Worktree toggle** — desativa isolamento via `workflow.use_worktrees: false`
+- **STATE.md consistency gates** — detecta/repara drift entre STATE.md e filesystem (v1.32)
+- **Autonomous `--to N`** — para execução autônoma após fase N (v1.32)
+- **Research gate** — bloqueia planejamento quando RESEARCH.md tem questões abertas (v1.32)
+- **Verifier milestone scope filtering** — distingue gaps reais de itens deferidos (v1.32)
+- **read-before-edit guard** — hook que previne loops infinitos de retry (v1.32)
+- **Context reduction** — truncamento de markdown e ordenação cache-friendly (v1.32)
+- **`--power` flag** — respostas em batch via arquivo para discuss-phase (v1.32)
+- **`--diagnose` flag** — modo diagnóstico sem modificações no `/gsd-debug` (v1.32)
+- **`/gsd-analyze-dependencies`** — detecta dependências entre fases (v1.32)
+- **Response language config** — `response_language` para saída consistente em idioma (v1.32)
+- **Novos runtimes** — Trae IDE, Cline, Augment Code (v1.32)
+- **Manual update** — procedimento de atualização sem npm (v1.32)
+
 ---
 
 ## Atalhos recomendados por cenário

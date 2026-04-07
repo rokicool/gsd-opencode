@@ -10,7 +10,7 @@ Para detalhes completos de flags avançadas e mudanças recentes, consulte tamb�
 | Comando | Finalidade | Quando usar |
 |---------|------------|-------------|
 | `/gsd-new-project` | Inicialização completa: perguntas, pesquisa, requisitos e roadmap | Início de projeto |
-| `/gsd-discuss-phase [N]` | Captura decisões de implementação | Antes do planejamento |
+| `/gsd-discuss-phase [N]` | Captura decisões de implementação (`--chain`, `--power`) | Antes do planejamento |
 | `/gsd-ui-phase [N]` | Gera contrato de UI (`UI-SPEC.md`) | Fases com frontend |
 | `/gsd-plan-phase [N]` | Pesquisa + planejamento + verificação | Antes de executar uma fase |
 | `/gsd-execute-phase <N>` | Executa planos em ondas paralelas | Após planejamento aprovado |
@@ -27,6 +27,7 @@ Para detalhes completos de flags avançadas e mudanças recentes, consulte tamb�
 | `/gsd-resume-work` | Retoma contexto da sessão anterior |
 | `/gsd-pause-work` | Salva handoff estruturado |
 | `/gsd-session-report` | Gera resumo da sessão |
+| `/gsd-autonomous` | Executa todas as fases restantes de forma autônoma (`--from N`, `--to N`, `--only N`) |
 | `/gsd-help` | Lista comandos e uso |
 | `/gsd-update` | Atualiza o GSD |
 
@@ -46,7 +47,8 @@ Para detalhes completos de flags avançadas e mudanças recentes, consulte tamb�
 |---------|------------|
 | `/gsd-map-codebase` | Mapeia base existente antes de novo projeto |
 | `/gsd-quick` | Tarefas ad-hoc com garantias do GSD |
-| `/gsd-debug [desc]` | Debug sistemático com estado persistente |
+| `/gsd-debug [desc]` | Debug sistemático com estado persistente (`--diagnose` para modo diagnóstico) |
+| `/gsd-analyze-dependencies` | Detecta dependências entre fases e sugere `Depends on` no ROADMAP.md (v1.32) |
 | `/gsd-forensics` | Diagnóstico de falhas no workflow |
 | `/gsd-settings` | Configuração de agentes, perfil e toggles |
 | `/gsd-set-profile <perfil>` | Troca rápida de perfil de modelo |
@@ -67,6 +69,21 @@ Para detalhes completos de flags avançadas e mudanças recentes, consulte tamb�
 | `/gsd-review-backlog` | Promove, mantém ou remove itens |
 | `/gsd-plant-seed <ideia>` | Registra ideia com gatilho futuro |
 | `/gsd-thread [nome]` | Gerencia threads persistentes |
+
+## Gerenciamento de Estado
+
+| Comando | Finalidade |
+|---------|------------|
+| `state validate` | Detecta drift entre STATE.md e o filesystem real |
+| `state sync` | Reconstrói STATE.md a partir do estado real no disco |
+| `state sync --verify` | Dry-run: mostra mudanças propostas sem gravar |
+| `state planned-phase --phase N --plans N` | Registra transição de estado após plan-phase |
+
+```bash
+node gsd-tools.cjs state validate          # Detectar drift
+node gsd-tools.cjs state sync --verify     # Prévia do que sync mudaria
+node gsd-tools.cjs state sync              # Reconstruir STATE.md a partir do disco
+```
 
 ---
 
