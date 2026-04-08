@@ -504,7 +504,11 @@
       "replacement": "ALWAYS use `@gsd-{agent}` call (e.g., `@gsd-phase-researcher`, `@gsd-executor`, `@gsd-planner`)",
       "description": "gsd-opencode/get-shit-done/references/universal-anti-patterns.md"
     },
-
+    {
+      "pattern": "model: haiku\n",
+      "replacement": "",
+      "description": "gsd-set-profile.md"
+    },
     {
       "pattern": "label: \"Budget\"",
       "replacement": "label: \"Genius (most flexible)\"",

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.33.1] - 2026-04-07
+
+Overview: Added M-TRANSLATE.md workflow for sync from upstream GSD, updated gsd-set-profile to remove model constraint, converted task() calls to @subagent syntax, and enhanced discovery and discuss-phase workflows.
+
+### Added
+
+- `M-TRANSLATE.md` workflow for copying and translating changes from upstream GSD repository to OpenCode equivalents in `assets/prompts/M-TRANSLATE.md`
+- `model: haiku` to forbidden strings list in `assets/antipatterns.toml` to prevent incorrect model assignments
+
+### Changed
+
+- Removed `model: haiku` constraint from `gsd-set-profile.md` command in `gsd-opencode/commands/gsd/gsd-set-profile.md` to allow dynamic model assignment
+- Converted `task()` function calls to `@subagent_type` shorthand syntax in `gsd-opencode/get-shit-done/workflows/discuss-phase-assumptions.md` and `gsd-opencode/get-shit-done/workflows/discuss-phase.md`
+- Updated agent call syntax from `task()` to `@subagent_type prompt` format in discuss-phase workflow in `gsd-opencode/get-shit-done/workflows/discuss-phase.md`
+- Enhanced discovery-phase workflow with improved formatting for library resolution in `gsd-opencode/get-shit-done/workflows/discovery-phase.md`
+
 ## [1.33.0] - 2026-04-06
 
 Overview: Major upstream sync from GSD v1.33.0 introducing security auditing pipeline, automated documentation generation with codebase verification, dependency analysis, and discuss-phase power mode. Enhanced planner with scope reduction prohibition and decision coverage matrices. Added response language support, worktree isolation control, Kilo runtime support, and schema drift detection across 150 files.
