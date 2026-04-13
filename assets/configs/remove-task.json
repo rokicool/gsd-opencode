@@ -208,6 +208,14 @@
       "isRegex": true,
       "caseSensitive": true,
       "description": "Replace task(subagent_type=general, prompt=triple-quoted) with @general shorthand"
+    },
+    {
+      "_comment": "21. Agent() with skill(skill=\"gsd:xxx\", ...) in prompt → @gsd-xxx shorthand",
+      "pattern": "Agent\\(\\s*\\r?\\n\\s*description=\"[^\"]*\",\\s*\\r?\\n\\s*run_in_background=true,\\s*\\r?\\n\\s*prompt=\"Run ([^\"]+) for phase \\$\\{PHASE_NUM\\}: skill\\(skill=\\\\\"gsd:([^\\\\\"]+)\\\\\", args=\\\\\"([^\\\\\"]+)\\\\\"\\)\"\\s*\\r?\\n\\s*\\)",
+      "replacement": "@gsd-$2 \"Run $1 for phase ${PHASE_NUM}: skill(skill=\\\"gsd-$2\\\", args=\\\"$3\\\")\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace Agent() with gsd skill reference to @gsd-xxx shorthand, extracting agent name from skill=\"gsd:xxx\" and converting to gsd-xxx"
     }
   ]
 }

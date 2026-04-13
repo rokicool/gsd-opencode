@@ -21,6 +21,19 @@ Overview: Added M-TRANSLATE.md workflow for sync from upstream GSD, updated gsd-
 - Updated agent call syntax from `task()` to `@subagent_type prompt` format in discuss-phase workflow in `gsd-opencode/get-shit-done/workflows/discuss-phase.md`
 - Enhanced discovery-phase workflow with improved formatting for library resolution in `gsd-opencode/get-shit-done/workflows/discovery-phase.md`
 
+## [1.33.2] - 2026-04-12
+
+Overview: Added regex translation rule for Agent() background task calls in autonomous workflows, converting OpenCode-incompatible Agent() syntax to @gsd-xxx shorthand with dynamic agent name extraction.
+
+### Added
+
+- Translation rule 21 in `assets/configs/remove-task.json` for converting `Agent(description=..., run_in_background=true, prompt=...)` calls to `@gsd-<agent>` shorthand syntax, extracting agent name from `skill="gsd:<agent>"` patterns
+
+### Changed
+
+- Converted `Agent()` background task dispatch calls to `@gsd-plan-phase` and `@gsd-execute-phase` shorthand in `gsd-opencode/get-shit-done/workflows/autonomous.md` for OpenCode compatibility
+- Updated skill invocation syntax from `skill="gsd:plan-phase"` to `skill="gsd-plan-phase"` (colon to dash) in autonomous workflow agent prompts
+
 ## [1.33.0] - 2026-04-06
 
 Overview: Major upstream sync from GSD v1.33.0 introducing security auditing pipeline, automated documentation generation with codebase verification, dependency analysis, and discuss-phase power mode. Enhanced planner with scope reduction prohibition and decision coverage matrices. Added response language support, worktree isolation control, Kilo runtime support, and schema drift detection across 150 files.

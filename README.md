@@ -87,6 +87,10 @@ I just love both GSD and OpenCode. I felt like having GSD available only for Cla
 
 — **Roman**
 
+## Version 1.33.2
+
+Added support for translating `Agent()` background task calls to OpenCode-compatible `@gsd-<agent>` shorthand syntax. The new translation rule 21 in `assets/configs/remove-task.json` dynamically extracts agent names from `skill="gsd-<agent>"` patterns and converts them to the OpenCode format. This update fixes two `Agent()` calls in `autonomous.md` workflow for plan and execute phase dispatch, ensuring full OpenCode compatibility.
+
 ## Version 1.33.0
 
 Again we keep up with the original GSDv1 [v1.33.0](https://github.com/gsd-build/get-shit-done/releases/tag/v1.33.0) (2026-04-04).
