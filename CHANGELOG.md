@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.33.3] - 2026-04-12
+
+Overview: Fixed YAML frontmatter parse errors across 11 command files by quoting unquoted argument-hint values, corrected malformed skill permission in gsd-manager, and updated translation config with new rules for skill permissions and argument-hint quoting.
+
+### Fixed
+
+- Quoted unquoted `argument-hint` YAML values in 11 command files (`gsd-add-backlog`, `gsd-add-phase`, `gsd-add-todo`, `gsd-check-todos`, `gsd-complete-milestone`, `gsd-debug`, `gsd-health`, `gsd-insert-phase`, `gsd-remove-phase`, `gsd-set-profile`, `gsd-thread`) to prevent YAML parse errors with bracketed values like `[--flag]`
+- Corrected malformed `  - skill` permission entry to `skill: true` in `gsd-opencode/commands/gsd/gsd-manager.md`
+
+### Changed
+
+- Added `skill` to the YAML list-item permission translation regex in `assets/configs/config.json`
+- Added `argument-hint` auto-quoting translation rule in `assets/configs/config.json` to wrap unquoted values in double quotes during sync
+
 ## [1.33.1] - 2026-04-07
 
 Overview: Added M-TRANSLATE.md workflow for sync from upstream GSD, updated gsd-set-profile to remove model constraint, converted task() calls to @subagent syntax, and enhanced discovery and discuss-phase workflows.
