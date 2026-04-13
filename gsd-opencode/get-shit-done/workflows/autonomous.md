@@ -319,11 +319,7 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 **If `INTERACTIVE` is set:** Dispatch plan as a background agent to keep the main context lean. While plan runs, the workflow can immediately start discussing the next phase (see step 4).
 
 ```
-Agent(
-  description="Plan phase ${PHASE_NUM}: ${PHASE_NAME}",
-  run_in_background=true,
-  prompt="Run plan-phase for phase ${PHASE_NUM}: skill(skill=\"gsd:plan-phase\", args=\"${PHASE_NUM}\")"
-)
+@gsd-plan-phase "Run plan-phase for phase ${PHASE_NUM}: skill(skill=\"gsd-plan-phase\", args=\"${PHASE_NUM}\")"
 ```
 
 Store the agent task_id. After discuss for the next phase completes (or if no next phase), wait for the plan agent to finish before proceeding to execute.
@@ -341,11 +337,7 @@ Verify plan produced output — re-run `init phase-op` and check `has_plans`. If
 **If `INTERACTIVE` is set:** Wait for the plan agent to complete (if not already), verify plans exist, then dispatch execute as a background agent:
 
 ```
-Agent(
-  description="Execute phase ${PHASE_NUM}: ${PHASE_NAME}",
-  run_in_background=true,
-  prompt="Run execute-phase for phase ${PHASE_NUM}: skill(skill=\"gsd:execute-phase\", args=\"${PHASE_NUM} --no-transition\")"
-)
+@gsd-execute-phase "Run execute-phase for phase ${PHASE_NUM}: skill(skill=\"gsd-execute-phase\", args=\"${PHASE_NUM} --no-transition\")"
 ```
 
 Store the agent task_id. The workflow can now start discussing the next phase while this phase executes in the background. Before starting post-execution routing for this phase, wait for the execute agent to complete.
