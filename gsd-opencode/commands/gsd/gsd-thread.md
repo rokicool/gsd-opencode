@@ -1,7 +1,7 @@
 ---
 name: gsd-thread
 description: Manage persistent context threads for cross-session work
-argument-hint: [name | description]
+argument-hint: "[name | description]"
 permissions:
    read: true
    write: true

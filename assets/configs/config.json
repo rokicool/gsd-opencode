@@ -229,7 +229,7 @@
     },
     {
       "_comment": "regex for tools",
-      "pattern": "^([\\s]*)- (read|write|edit|bash|glob|grep|question|task|webfetch|todowrite)$",
+      "pattern": "^([\\s]*)- (read|write|edit|bash|glob|grep|question|task|webfetch|todowrite|skill)$",
       "replacement": "$1 $2: true",
       "caseSensitive": true,
       "isRegex": true,
@@ -528,6 +528,14 @@
       "pattern": "\"quality\" | \"balanced\" | \"budget\"",
       "replacement": "\"simple\" | \"smart\" | \"genius\"",
       "description": "Use - three models - profile"
+    },
+    {
+      "_comment": "Quote unquoted argument-hint values to prevent YAML parse errors (e.g. [--flag] is parsed as array)",
+      "pattern": "^(argument-hint: )([^\"].*)",
+      "replacement": "$1\"$2\"",
+      "caseSensitive": true,
+      "isRegex": true,
+      "description": "Wrap unquoted argument-hint YAML values in double quotes"
     }
   ],
   "_forbidden_strings_after_translation": [

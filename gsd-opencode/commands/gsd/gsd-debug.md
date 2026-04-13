@@ -1,7 +1,7 @@
 ---
 name: gsd-debug
 description: Systematic debugging with persistent state across context resets
-argument-hint: [--diagnose] [issue description]
+argument-hint: "[--diagnose] [issue description]"
 permissions:
    read: true
    bash: true

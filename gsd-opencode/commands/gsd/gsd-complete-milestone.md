@@ -2,7 +2,7 @@
 type: prompt
 name: gsd-complete-milestone
 description: Archive completed milestone and prepare for next version
-argument-hint: <version>
+argument-hint: "<version>"
 permissions:
    read: true
    write: true
