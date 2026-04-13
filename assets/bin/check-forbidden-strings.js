@@ -202,12 +202,14 @@ function main() {
         checklist.exclude_dir.split(',').map(d => d.trim()).filter(d => d)) :
       [];
     const forbiddenStrings = checklist.forbidden_strings || [];
+    const forbiddenRegexpStrings = checklist.forbidden_regexp_strings || [];
 
     console.log('🔍 Checking forbidden strings from antipatterns.toml...');
     console.log(`📁 Scanning folder: ${folder}`);
     console.log(`📄 File pattern: ${filePattern}`);
     console.log(`🚫 Exclude dirs: ${excludeDirs.join(', ') || 'none'}`);
     console.log(`⚠️  Forbidden strings: ${forbiddenStrings.length} strings to check`);
+    console.log(`⚠️  Forbidden regexp strings: ${forbiddenRegexpStrings.length} patterns to check`);
     console.log('');
 
     const files = findFiles(folder, filePattern, excludeDirs);
@@ -233,6 +235,27 @@ function main() {
               });
               violationsFound = true;
             }
+          }
+        }
+
+        for (const regexpString of forbiddenRegexpStrings) {
+          try {
+            const regex = new RegExp(regexpString, 'g');
+            let match;
+            while ((match = regex.exec(content)) !== null) {
+              const lineNumber = content.substring(0, match.index).split('\n').length;
+              const matchedLine = lines[lineNumber - 1] || '';
+              violations.push({
+                file: file,
+                line: lineNumber,
+                string: `/${regexpString}/`,
+                content: matchedLine.trim()
+              });
+              violationsFound = true;
+              if (match[0].length === 0) regex.lastIndex++;
+            }
+          } catch (error) {
+            console.error(`⚠️  Invalid regex pattern "/${regexpString}/": ${error.message}`);
           }
         }
       } catch (error) {
