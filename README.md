@@ -1,6 +1,6 @@
 <div align="left">
 
-# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.33.0 - 2026-04-04)
+# GET SHIT DONE for OpenCode. (Based on TÂCHES v1.35.0 - 2026-04-10)
 
 **A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES. (Adapted for OpenCode by rokicool and enthusiasts)**
 
@@ -13,16 +13,17 @@
 
 ---
 
-# (Un)Breaking news
+# Explanation
 
-TACHES decided to include support for OpenCode in his own product. That is great news. 
+Original Get-Shit-Done (GSDv1) started supporting OpenCode about 2.5 months ago. That was great, but since I started working on this project earlier, I found a lot of roughnesses in the original GSD for OpenCode. So I decided to continue working on this port.
 
-However, with all due respect, his adaptation for OpenCode is not perfect. So I will continue working on this project and will try to fill the gaps.
+Despite being 'direct port' with straightforward code adaptation we added some specific features. 
 
-Thanks to [@dpearson2699](https://github.com/dpearson2699) we have much better adaptation of /gsd-settings command and (almost)dynamical switch between different LLMs for subagents.
+Thanks to [@dpearson2699](https://github.com/dpearson2699) for the initial version and idea of Profile system. I modified it later and belive our system (`/gsd-set-profile`) is much more suitable and simpler to use than the original, based on Claude Code concept of 'Three levels of models'. 
 
+I am not going to give up on this project yet, but to be honest, it makes less and less sence. 
 
--- **Roman** (2026-01-31)
+-- **Roman** (2026-04-13)
 
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/zRJ0UWHBjCY/0.jpg)](https://www.youtube.com/watch?v=zRJ0UWHBjCY)
@@ -86,6 +87,10 @@ That's what this is. No enterprise roleplay bullshit. Just an incredibly effecti
 I just love both GSD and OpenCode. I felt like having GSD available only for Claude Code is not fair. 
 
 — **Roman**
+
+## Version 1.35.0
+
+Bumping up the version to keep up with the original GSDv1 [v1.35.0](https://github.com/gsd-build/get-shit-done/releases/tag/v1.35.0)
 
 ## Version 1.33.2
 
