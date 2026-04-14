@@ -542,6 +542,57 @@ Show all commands and usage guide.
 
 ## Utility Commands
 
+### `/gsd-explore`
+
+Socratic ideation session — guide an idea through probing questions, optionally spawn research, then route output to the right GSD artifact (notes, todos, seeds, research questions, requirements, or a new phase).
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `topic` | No | Topic to explore (e.g., `/gsd-explore authentication strategy`) |
+
+```bash
+/gsd-explore                        # Open-ended ideation session
+/gsd-explore authentication strategy  # Explore a specific topic
+```
+
+---
+
+### `/gsd-undo`
+
+Safe git revert — roll back GSD phase or plan commits using the phase manifest with dependency checks and a confirmation gate.
+
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--last N` | (one of three required) | Show recent GSD commits for interactive selection |
+| `--phase NN` | (one of three required) | Revert all commits for a phase |
+| `--plan NN-MM` | (one of three required) | Revert all commits for a specific plan |
+
+**Safety:** Checks dependent phases/plans before reverting; always shows a confirmation gate.
+
+```bash
+/gsd-undo --last 5                  # Pick from the 5 most recent GSD commits
+/gsd-undo --phase 03                # Revert all commits for phase 3
+/gsd-undo --plan 03-02              # Revert commits for plan 02 of phase 3
+```
+
+---
+
+### `/gsd-import`
+
+Ingest an external plan file into the GSD planning system with conflict detection against `PROJECT.md` decisions before writing anything.
+
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--from <filepath>` | **Yes** | Path to the external plan file to import |
+
+**Process:** Detects conflicts → prompts for resolution → writes as GSD PLAN.md → validates via `gsd-plan-checker`
+
+```bash
+/gsd-import --from /tmp/team-plan.md  # Import and validate an external plan
+```
+
+---
+
 ### `/gsd-quick`
 
 Execute ad-hoc task with GSD guarantees.
@@ -809,6 +860,46 @@ Analyze existing codebase with parallel mapper agents.
 
 ---
 
+### `/gsd-scan`
+
+Rapid single-focus codebase assessment — lightweight alternative to `/gsd-map-codebase` that spawns one mapper agent instead of four parallel ones.
+
+| Flag | Description |
+|------|-------------|
+| `--focus tech\|arch\|quality\|concerns\|tech+arch` | Focus area (default: `tech+arch`) |
+
+**Produces:** Targeted document(s) in `.planning/codebase/`
+
+```bash
+/gsd-scan                           # Quick tech + arch overview
+/gsd-scan --focus quality           # Quality and code health only
+/gsd-scan --focus concerns          # Surface concerns and risk areas
+```
+
+---
+
+### `/gsd-intel`
+
+Query, inspect, or refresh queryable codebase intelligence files stored in `.planning/intel/`. Requires `intel.enabled: true` in `config.json`.
+
+| Argument | Description |
+|----------|-------------|
+| `query <term>` | Search intel files for a term |
+| `status` | Show intel file freshness (FRESH/STALE) |
+| `diff` | Show changes since last snapshot |
+| `refresh` | Rebuild all intel files from codebase analysis |
+
+**Produces:** `.planning/intel/` JSON files (stack, api-map, dependency-graph, file-roles, arch-decisions)
+
+```bash
+/gsd-intel status                   # Check freshness of intel files
+/gsd-intel query authentication     # Search intel for a term
+/gsd-intel diff                     # What changed since last snapshot
+/gsd-intel refresh                  # Rebuild intel index
+```
+
+---
+
 ## Update Commands
 
 ### `/gsd-update`
@@ -825,6 +916,75 @@ Restore local modifications after a GSD update.
 
 ```bash
 /gsd-reapply-patches                # Merge back local changes
+```
+
+---
+
+## Code Quality Commands
+
+### `/gsd-code-review`
+
+Review source files changed during a phase for bugs, security vulnerabilities, and code quality problems.
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `N` | **Yes** | Phase number whose changes to review (e.g., `2` or `02`) |
+| `--depth=quick\|standard\|deep` | No | Review depth level (overrides `workflow.code_review_depth` config). `quick`: pattern-matching only (~2 min). `standard`: per-file analysis with language-specific checks (~5–15 min, default). `deep`: cross-file analysis including import graphs and call chains (~15–30 min) |
+| `--files file1,file2,...` | No | Explicit comma-separated file list; skips SUMMARY/git scoping entirely |
+
+**Prerequisites:** Phase has been executed and has SUMMARY.md or git history
+**Produces:** `{phase}-REVIEW.md` in phase directory with severity-classified findings
+**Spawns:** `gsd-code-reviewer` agent
+
+```bash
+/gsd-code-review 3                          # Standard review for phase 3
+/gsd-code-review 2 --depth=deep             # Deep cross-file review
+/gsd-code-review 4 --files src/auth.ts,src/token.ts  # Explicit file list
+```
+
+---
+
+### `/gsd-code-review-fix`
+
+Auto-fix issues found by `/gsd-code-review`. Reads `REVIEW.md`, spawns a fixer agent, commits each fix atomically, and produces a `REVIEW-FIX.md` summary.
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `N` | **Yes** | Phase number whose REVIEW.md to fix |
+| `--all` | No | Include Info findings in fix scope (default: Critical + Warning only) |
+| `--auto` | No | Enable fix + re-review iteration loop, capped at 3 iterations |
+
+**Prerequisites:** Phase has a `{phase}-REVIEW.md` file (run `/gsd-code-review` first)
+**Produces:** `{phase}-REVIEW-FIX.md` with applied fixes summary
+**Spawns:** `gsd-code-fixer` agent
+
+```bash
+/gsd-code-review-fix 3                      # Fix Critical + Warning findings for phase 3
+/gsd-code-review-fix 3 --all               # Include Info findings
+/gsd-code-review-fix 3 --auto              # Fix and re-review until clean (max 3 iterations)
+```
+
+---
+
+### `/gsd-audit-fix`
+
+Autonomous audit-to-fix pipeline — runs an audit, classifies findings, fixes auto-fixable issues with test verification, and commits each fix atomically.
+
+| Flag | Description |
+|------|-------------|
+| `--source <audit>` | Which audit to run (default: `audit-uat`) |
+| `--severity high\|medium\|all` | Minimum severity to process (default: `medium`) |
+| `--max N` | Maximum findings to fix (default: 5) |
+| `--dry-run` | Classify findings without fixing (shows classification table) |
+
+**Prerequisites:** At least one phase has been executed with UAT or verification
+**Produces:** Fix commits with test verification; classification report
+
+```bash
+/gsd-audit-fix                              # Run audit-uat, fix medium+ issues (max 5)
+/gsd-audit-fix --severity high             # Only fix high-severity issues
+/gsd-audit-fix --dry-run                   # Preview classification without fixing
+/gsd-audit-fix --max 10 --severity all     # Fix up to 10 issues of any severity
 ```
 
 ---
@@ -848,8 +1008,6 @@ Execute a trivial task inline — no subagents, no planning overhead. For typo f
 
 ---
 
-## Code Quality Commands
-
 ### `/gsd-review`
 
 Cross-AI peer review of phase plans from external AI CLIs.
@@ -865,6 +1023,8 @@ Cross-AI peer review of phase plans from external AI CLIs.
 | `--codex` | Include Codex CLI review |
 | `--coderabbit` | Include CodeRabbit review |
 | `--opencode` | Include OpenCode review (via GitHub Copilot) |
+| `--qwen` | Include Qwen Code review (Alibaba Qwen models) |
+| `--cursor` | Include Cursor agent review |
 | `--all` | Include all available CLIs |
 
 **Produces:** `{phase}-REVIEWS.md` — consumable by `/gsd-plan-phase --reviews`

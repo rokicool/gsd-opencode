@@ -28,6 +28,7 @@ read STATE.md before any operation to load project context.
 
 @$HOME/.config/opencode/get-shit-done/references/agent-contracts.md
 @$HOME/.config/opencode/get-shit-done/references/context-budget.md
+@$HOME/.config/opencode/get-shit-done/references/gates.md
 </required_reading>
 
 <available_agent_types>
@@ -328,8 +329,8 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    # → simultaneous git worktree add → .git/config.lock contention → failures
    ```
 
-    ```
-    @gsd-executor "
+   ```
+   @gsd-executor "
         <objective>
         Execute plan {plan_number} of phase {phase_number}-{phase_name}.
         Commit each task atomically. Create SUMMARY.md.
@@ -338,33 +339,49 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
         <worktree_branch_check>
         FIRST ACTION before any other work: verify this worktree's branch is based on the correct commit.
-
         Run:
         ```bash
         ACTUAL_BASE=$(git merge-base HEAD {EXPECTED_BASE})
-        CURRENT_HEAD=$(git rev-parse HEAD)
         ```
 
         If `ACTUAL_BASE` != `{EXPECTED_BASE}` (i.e. the worktree branch was created from an older
-        base such as `main` instead of the feature branch HEAD), rebase onto the correct base:
+        base such as `main` instead of the feature branch HEAD), hard-reset to the correct base:
         ```bash
-        git rebase --onto {EXPECTED_BASE} $(git rev-parse --abbrev-ref HEAD~1 2>/dev/null || git rev-parse HEAD^) HEAD 2>/dev/null || true
-        # If rebase fails or is a no-op, reset the branch to start from the correct base:
-        git reset --soft {EXPECTED_BASE}
+        # Safe: this runs before any agent work, so no uncommitted changes to lose
+        git reset --hard {EXPECTED_BASE}
+        # Verify correction succeeded
+        if [ "$(git rev-parse HEAD)" != "{EXPECTED_BASE}" ]; then
+          echo "ERROR: Could not correct worktree base — aborting to prevent data loss"
+          exit 1
+        fi
         ```
+
+        `reset --hard` is safe here because this is a fresh worktree with no user changes. It
+        resets both the HEAD pointer AND the working tree to the correct base commit (#2015).
 
         If `ACTUAL_BASE` == `{EXPECTED_BASE}`: the branch base is correct, proceed immediately.
 
-        This check fixes a known issue on Windows where `EnterWorktree` creates branches from
-        `main` instead of the current feature branch HEAD.
+        This check fixes a known issue where `EnterWorktree` creates branches from
+        `main` instead of the current feature branch HEAD (affects all platforms).
         </worktree_branch_check>
 
         <parallel_execution>
-        You are running as a PARALLEL executor agent. Use --no-verify on all git
-        commits to avoid pre-commit hook contention with other agents. The
-        orchestrator validates hooks once after all agents complete.
+        You are running as a PARALLEL executor agent in a git worktree.
+        Use --no-verify on all git commits to avoid pre-commit hook contention
+        with other agents. The orchestrator validates hooks once after all agents complete.
         For gsd-tools commits: add --no-verify flag.
         For direct git commits: use git commit --no-verify -m "..."
+
+        IMPORTANT: Do NOT modify STATE.md or ROADMAP.md. execute-plan.md
+        auto-detects worktree mode (`.git` is a file, not a directory) and skips
+        shared file updates automatically. The orchestrator updates them centrally
+        after merge.
+
+        REQUIRED: SUMMARY.md MUST be committed before you return. In worktree mode the
+        git_commit_metadata step in execute-plan.md commits SUMMARY.md and REQUIREMENTS.md
+        only (STATE.md and ROADMAP.md are excluded automatically). Do NOT skip or defer
+        this commit — the orchestrator force-removes the worktree after you return, and
+        any uncommitted SUMMARY.md will be permanently lost (#2070).
         </parallel_execution>
 
         <execution_context>
@@ -372,39 +389,40 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
         @$HOME/.config/opencode/get-shit-done/templates/summary.md
         @$HOME/.config/opencode/get-shit-done/references/checkpoints.md
         @$HOME/.config/opencode/get-shit-done/references/tdd.md
-        </execution_context>
+       </execution_context>
 
-        <files_to_read>
-        read these files at execution start using the read tool:
-        - {phase_dir}/{plan_file} (Plan)
-        - .planning/PROJECT.md (Project context — core value, requirements, evolution rules)
-        - .planning/STATE.md (State)
-        - .planning/config.json (Config, if exists)
-        ${CONTEXT_WINDOW >= 500000 ? `
-        - ${phase_dir}/*-CONTEXT.md (User decisions from discuss-phase — honors locked choices)
-        - ${phase_dir}/*-RESEARCH.md (Technical research — pitfalls and patterns to follow)
-        - ${prior_wave_summaries} (SUMMARY.md files from earlier waves in this phase — what was already built)
-        ` : ''}
-        - ./AGENTS.md (Project instructions, if exists — follow project-specific guidelines and coding conventions)
-        - .OpenCode/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
-        </files_to_read>
+       <files_to_read>
+       read these files at execution start using the read tool:
+       - {phase_dir}/{plan_file} (Plan)
+       - .planning/PROJECT.md (Project context — core value, requirements, evolution rules)
+       - .planning/STATE.md (State)
+       - .planning/config.json (Config, if exists)
+       ${CONTEXT_WINDOW >= 500000 ? `
+       - ${phase_dir}/*-CONTEXT.md (User decisions from discuss-phase — honors locked choices)
+       - ${phase_dir}/*-RESEARCH.md (Technical research — pitfalls and patterns to follow)
+       - ${prior_wave_summaries} (SUMMARY.md files from earlier waves in this phase — what was already built)
+       ` : ''}
+       - ./AGENTS.md (Project instructions, if exists — follow project-specific guidelines and coding conventions)
+       - .OpenCode/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
+       </files_to_read>
 
-        ${AGENT_SKILLS}
+       ${AGENT_SKILLS}
 
-        <mcp_tools>
-        If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch, context7,
-        or other MCP servers), prefer those tools over grep/glob for code navigation when available.
-        MCP tools often save significant tokens by providing structured code indexes.
-        Check tool availability first — if MCP tools are not accessible, fall back to grep/glob.
-        </mcp_tools>
+       <mcp_tools>
+       If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch, context7,
+       or other MCP servers), prefer those tools over grep/glob for code navigation when available.
+       MCP tools often save significant tokens by providing structured code indexes.
+       Check tool availability first — if MCP tools are not accessible, fall back to grep/glob.
+       </mcp_tools>
 
-        <success_criteria>
-        - [ ] All tasks executed
-        - [ ] Each task committed individually
-        - [ ] SUMMARY.md created in plan directory
+       <success_criteria>
+       - [ ] All tasks executed
+       - [ ] Each task committed individually
+       - [ ] SUMMARY.md created in plan directory
+       - [ ] No modifications to shared orchestrator artifacts (the orchestrator handles all post-wave shared-file writes)
         </success_criteria>
       "
-    ```
+   ```
 
    **Sequential mode** (`USE_WORKTREES` is `false`):
 
@@ -479,11 +497,74 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
      if [ -n "$WT_BRANCH" ] && [ "$WT_BRANCH" != "HEAD" ]; then
        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
+       # --- Orchestrator file protection (#1756) ---
+       # Snapshot orchestrator-owned files BEFORE merge. If the worktree
+       # branch outlived a milestone transition, its versions of STATE.md
+       # and ROADMAP.md are stale. Main always wins for these files.
+       STATE_BACKUP=$(mktemp)
+       ROADMAP_BACKUP=$(mktemp)
+       git show HEAD:.planning/STATE.md > "$STATE_BACKUP" 2>/dev/null || true
+       git show HEAD:.planning/ROADMAP.md > "$ROADMAP_BACKUP" 2>/dev/null || true
+
+       # Snapshot list of files on main BEFORE merge to detect resurrections
+       PRE_MERGE_FILES=$(git ls-files .planning/)
+
+       # Pre-merge deletion check: warn if the worktree branch deletes tracked files
+       DELETIONS=$(git diff --diff-filter=D --name-only HEAD..."$WT_BRANCH" 2>/dev/null || true)
+       if [ -n "$DELETIONS" ]; then
+         echo "BLOCKED: Worktree branch $WT_BRANCH contains file deletions: $DELETIONS"
+         echo "Review these deletions before merging. If intentional, remove this guard and re-run."
+         rm -f "$STATE_BACKUP" "$ROADMAP_BACKUP"
+         continue
+       fi
+
        # Merge the worktree branch into the current branch
        git merge "$WT_BRANCH" --no-edit -m "chore: merge executor worktree ($WT_BRANCH)" 2>&1 || {
          echo "⚠ Merge conflict from worktree $WT_BRANCH — resolve manually"
+         rm -f "$STATE_BACKUP" "$ROADMAP_BACKUP"
          continue
        }
+
+       # Restore orchestrator-owned files (main always wins)
+       if [ -s "$STATE_BACKUP" ]; then
+         cp "$STATE_BACKUP" .planning/STATE.md
+       fi
+       if [ -s "$ROADMAP_BACKUP" ]; then
+         cp "$ROADMAP_BACKUP" .planning/ROADMAP.md
+       fi
+       rm -f "$STATE_BACKUP" "$ROADMAP_BACKUP"
+
+       # Detect files deleted on main but re-added by worktree merge
+       # (e.g., archived phase directories that were intentionally removed)
+       DELETED_FILES=$(git diff --diff-filter=A --name-only HEAD~1 -- .planning/ 2>/dev/null || true)
+       for RESURRECTED in $DELETED_FILES; do
+         # Check if this file was NOT in main's pre-merge tree
+         if ! echo "$PRE_MERGE_FILES" | grep -qxF "$RESURRECTED"; then
+           git rm -f "$RESURRECTED" 2>/dev/null || true
+         fi
+       done
+
+       # Amend merge commit with restored files if any changed
+       if ! git diff --quiet .planning/STATE.md .planning/ROADMAP.md 2>/dev/null || \
+          [ -n "$DELETED_FILES" ]; then
+         # Only amend the commit with .planning/ files if commit_docs is enabled (#1783)
+         COMMIT_DOCS=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get commit_docs 2>/dev/null || echo "true")
+         if [ "$COMMIT_DOCS" != "false" ]; then
+           git add .planning/STATE.md .planning/ROADMAP.md 2>/dev/null || true
+           git commit --amend --no-edit 2>/dev/null || true
+         fi
+       fi
+
+       # Safety net: commit any uncommitted SUMMARY.md before force-removing the worktree.
+       # This guards against executors that skipped the git_commit_metadata step (#2070).
+       UNCOMMITTED_SUMMARY=$(git -C "$WT" ls-files --modified --others --exclude-standard -- "*SUMMARY.md" 2>/dev/null || true)
+       if [ -n "$UNCOMMITTED_SUMMARY" ]; then
+         echo "⚠ SUMMARY.md was not committed by executor — committing now to prevent data loss"
+         git -C "$WT" add -- "*SUMMARY.md" 2>/dev/null || true
+         git -C "$WT" commit --no-verify -m "docs(recovery): rescue uncommitted SUMMARY.md before worktree removal (#2070)" 2>/dev/null || true
+         # Re-merge the recovery commit
+         git merge "$WT_BRANCH" --no-edit -m "chore: merge rescued SUMMARY.md from executor worktree ($WT_BRANCH)" 2>/dev/null || true
+       fi
 
        # Remove the worktree
        git worktree remove "$WT" --force 2>/dev/null || true
@@ -498,21 +579,112 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
    **If no worktrees found:** Skip silently — agents may have been spawned without worktree isolation.
 
-5.6. **Post-wave shared artifact update (worktree mode only):**
+5.6. **Post-merge test gate (parallel mode only):**
 
-   When executor agents ran with `isolation="worktree"`, they skipped STATE.md and ROADMAP.md updates to avoid last-merge-wins overwrites. The orchestrator is the single writer for these files. After worktrees are merged back, update shared artifacts once:
+   After merging all worktrees in a wave, run the project's test suite to catch
+   cross-plan integration issues that individual worktree self-checks cannot detect
+   (e.g., conflicting type definitions, removed exports, import changes).
+
+   This addresses the Generator self-evaluation blind spot identified in Anthropic's
+   harness engineering research: agents reliably report Self-Check: PASSED even when
+   merging their work creates failures.
 
    ```bash
-   # Update ROADMAP.md for each completed plan in this wave
-   for PLAN_ID in ${WAVE_PLAN_IDS}; do
-     node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap update-plan-progress "${PHASE_NUMBER}" "${PLAN_ID}" completed
-   done
+   # Detect test runner and run quick smoke test (timeout: 5 minutes)
+   TEST_EXIT=0
+   timeout 300 bash -c '
+   if [ -f "package.json" ]; then
+     npm test 2>&1
+   elif [ -f "Cargo.toml" ]; then
+     cargo test 2>&1
+   elif [ -f "go.mod" ]; then
+     go test ./... 2>&1
+   elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
+     python -m pytest -x -q --tb=short 2>&1 || uv run python -m pytest -x -q --tb=short 2>&1
+   else
+     echo "⚠ No test runner detected — skipping post-merge test gate"
+     exit 0
+   fi
+   '
+   TEST_EXIT=$?
+   if [ "${TEST_EXIT}" -eq 0 ]; then
+     echo "✓ Post-merge test gate passed — no cross-plan conflicts"
+   elif [ "${TEST_EXIT}" -eq 124 ]; then
+     echo "⚠ Post-merge test gate timed out after 5 minutes"
+   else
+     echo "✗ Post-merge test gate failed (exit code ${TEST_EXIT})"
+     WAVE_FAILURE_COUNT=$((WAVE_FAILURE_COUNT + 1))
+   fi
+   ```
 
+   **If `TEST_EXIT` is 0 (pass):** `✓ Post-merge test gate: {N} tests passed — no cross-plan conflicts` → continue to orchestrator tracking update.
+
+   **If `TEST_EXIT` is 124 (timeout):** Log warning, treat as non-blocking, continue. Tests may need a longer budget or manual run.
+
+   **If `TEST_EXIT` is non-zero (test failure):** Increment `WAVE_FAILURE_COUNT` to track
+   cumulative failures across waves. Subsequent waves should report:
+   `⚠ Note: ${WAVE_FAILURE_COUNT} prior wave(s) had test failures`
+
+5.7. **Post-wave shared artifact update (worktree mode only, skip if tests failed):**
+
+   When executor agents ran with `isolation="worktree"`, they skipped STATE.md and ROADMAP.md updates to avoid last-merge-wins overwrites. The orchestrator is the single writer for these files. After worktrees are merged back, update shared artifacts once.
+
+   **Only update tracking when tests passed (TEST_EXIT=0).**
+   If tests failed or timed out, skip the tracking update — plans should
+   not be marked as complete when integration tests are failing or inconclusive.
+
+   ```bash
+   # Guard: only update tracking if post-merge tests passed
+   # Timeout (124) is treated as inconclusive — do NOT mark plans complete
+   if [ "${TEST_EXIT}" -eq 0 ]; then
+     # Update ROADMAP plan progress for each completed plan in this wave
+     for plan_id in {completed_plan_ids}; do
+       node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap update-plan-progress "${PHASE_NUMBER}" "${plan_id}" "complete"
+     done
+
+     # Only commit tracking files if they actually changed
+     if ! git diff --quiet .planning/ROADMAP.md .planning/STATE.md 2>/dev/null; then
+       node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(phase-${PHASE_NUMBER}): update tracking after wave ${N}" --files .planning/ROADMAP.md .planning/STATE.md
+     fi
+   elif [ "${TEST_EXIT}" -eq 124 ]; then
+     echo "⚠ Skipping tracking update — test suite timed out. Plans remain in-progress. Run tests manually to confirm."
+   else
+     echo "⚠ Skipping tracking update — post-merge tests failed (exit ${TEST_EXIT}). Plans remain in-progress until tests pass."
+   fi
    ```
 
    Where `WAVE_PLAN_IDS` is the space-separated list of plan IDs that completed in this wave.
 
    **If `workflow.use_worktrees` is `false`:** Sequential agents already updated STATE.md and ROADMAP.md themselves — skip this step.
+
+5.8. **Handle test gate failures (when `WAVE_FAILURE_COUNT > 0`):**
+
+   ```
+   ## ⚠ Post-Merge Test Failure (cumulative failures: ${WAVE_FAILURE_COUNT})
+
+   Wave {N} worktrees merged successfully, but {M} tests fail after merge.
+   This typically indicates conflicting changes across parallel plans
+   (e.g., type definitions, shared imports, API contracts).
+
+   Failed tests:
+   {first 10 lines of failure output}
+
+   Options:
+   1. Fix now (recommended) — resolve conflicts before next wave
+   2. Continue — failures may compound in subsequent waves
+   ```
+
+   Note: If `WAVE_FAILURE_COUNT > 1`, strongly recommend "Fix now" — compounding
+   failures across multiple waves become exponentially harder to diagnose.
+
+   If "Fix now": diagnose failures (typically import conflicts, missing types,
+   or changed function signatures from parallel plans modifying the same module).
+   Fix, commit as `fix: resolve post-merge conflicts from wave {N}`, re-run tests.
+
+   **Why this matters:** Worktree isolation means each agent's Self-Check passes
+   in isolation. But when merged, add/add conflicts in shared files (models, registries,
+   CLI entry points) can silently drop code. The post-merge gate catches this before
+   the next wave builds on a broken foundation.
 
 6. **Report completion — spot-check claims first:**
 
@@ -691,6 +863,39 @@ Selected wave finished successfully. This phase still has incomplete plans, so p
 - this means the selected wave happened to be the last remaining work in the phase
 </step>
 
+<step name="code_review_gate" required="true">
+**This step is REQUIRED and must not be skipped.** Auto-invoke code review on the phase's source changes. Advisory only — never blocks execution flow.
+
+**Config gate:**
+```bash
+CODE_REVIEW_ENABLED=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.code_review 2>/dev/null || echo "true")
+```
+
+If `CODE_REVIEW_ENABLED` is `"false"`: display "Code review skipped (workflow.code_review=false)" and proceed to next step.
+
+**Invoke review:**
+```
+skill(skill="gsd-code-review", args="${PHASE_NUMBER}")
+```
+
+**Check results using deterministic path (not glob):**
+```bash
+PADDED=$(printf "%02d" "${PHASE_NUMBER}")
+REVIEW_FILE="${PHASE_DIR}/${PADDED}-REVIEW.md"
+REVIEW_STATUS=$(sed -n '/^---$/,/^---$/p' "$REVIEW_FILE" | grep "^status:" | head -1 | cut -d: -f2 | tr -d ' ')
+```
+
+If REVIEW_STATUS is not "clean" and not "skipped" and not empty, display:
+```
+Code review found issues. Consider running:
+/gsd-code-review-fix ${PHASE_NUMBER}
+```
+
+**Error handling:** If the skill invocation fails or throws, catch the error, display "Code review encountered an error (non-blocking): {error}" and proceed to next step. Review failures must never block execution.
+
+Regardless of review result, ALWAYS proceed to close_parent_artifacts → regression_gate → verify_phase_goal.
+</step>
+
 <step name="close_parent_artifacts">
 **For decimal/polish phases only (X.Y pattern):** Close the feedback loop by resolving parent UAT and debug artifacts.
 
@@ -766,10 +971,11 @@ Collect all unique test file paths into `REGRESSION_FILES`.
 ```bash
 # Detect test runner and run prior phase tests
 if [ -f "package.json" ]; then
-  # Node.js — use project's test runner
-  npx jest ${REGRESSION_FILES} --passWithNoTests --no-coverage -q 2>&1 || npx vitest run ${REGRESSION_FILES} 2>&1
+  npm test 2>&1
 elif [ -f "Cargo.toml" ]; then
   cargo test 2>&1
+elif [ -f "go.mod" ]; then
+  go test ./... 2>&1
 elif [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
   python -m pytest ${REGRESSION_FILES} -q --tb=short 2>&1
 fi
@@ -876,7 +1082,8 @@ VERIFIER_SKILLS=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" 
 ```
 
 ```
-@gsd-verifier "Verify phase {phase_number} goal achievement.
+@gsd-verifier "
+Verify phase {phase_number} goal achievement.
 Phase directory: {phase_dir}
 Phase goal: {goal from ROADMAP.md}
 Phase requirement IDs: {phase_req_ids}
@@ -895,7 +1102,8 @@ ${CONTEXT_WINDOW >= 500000 ? `- {phase_dir}/*-CONTEXT.md (User decisions — ver
 ` : ''}
 </files_to_read>
 
-${VERIFIER_SKILLS}"
+${VERIFIER_SKILLS}
+"
 ```
 
 read status:
@@ -1026,6 +1234,29 @@ node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(phase
 ```
 </step>
 
+<step name="auto_copy_learnings">
+**Auto-copy phase learnings to global store (when enabled).**
+
+This step runs AFTER phase completion and SUMMARY.md is written. It copies any LEARNINGS.md
+entries from the completed phase to the global learnings store at `~/.gsd/knowledge/`.
+
+**Check config gate:**
+```bash
+GL_ENABLED=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get features.global_learnings --raw 2>/dev/null || echo "false")
+```
+
+**If `GL_ENABLED` is not `true`:** Skip this step entirely (feature disabled by default).
+
+**If enabled:**
+
+1. Check if LEARNINGS.md exists in the phase directory (use the `phase_dir` value from init context)
+2. If found, copy to global store:
+```bash
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" learnings copy 2>/dev/null || echo "⚠ Learnings copy failed — continuing"
+```
+Copy failure must NOT block phase completion.
+</step>
+
 <step name="update_project_md">
 **Evolve PROJECT.md to reflect phase completion (prevents planning document drift — #956):**
 
@@ -1103,13 +1334,32 @@ read and follow `$HOME/.config/opencode/get-shit-done/workflows/transition.md`, 
 
 **IMPORTANT: There is NO `/gsd-transition` command. Never suggest it. The transition workflow is internal only.**
 
+Check whether CONTEXT.md already exists for the next phase:
+
+```bash
+ls .planning/phases/*{next}*/{next}-CONTEXT.md 2>/dev/null || echo "no-context"
+```
+
+If CONTEXT.md does **not** exist for the next phase, present:
+
 ```
 ## ✓ Phase {X}: {Name} Complete
 
 /gsd-progress ${GSD_WS} — see updated roadmap
-/gsd-discuss-phase {next} ${GSD_WS} — discuss next phase before planning
-/gsd-plan-phase {next} ${GSD_WS} — plan next phase
-/gsd-execute-phase {next} ${GSD_WS} — execute next phase
+/gsd-discuss-phase {next} ${GSD_WS} — start here: discuss next phase before planning  ← recommended
+/gsd-plan-phase {next} ${GSD_WS} — plan next phase (skip discuss)
+/gsd-execute-phase {next} ${GSD_WS} — execute next phase (skip discuss and plan)
+```
+
+If CONTEXT.md **exists** for the next phase, present:
+
+```
+## ✓ Phase {X}: {Name} Complete
+
+/gsd-progress ${GSD_WS} — see updated roadmap
+/gsd-plan-phase {next} ${GSD_WS} — start here: plan next phase (CONTEXT.md already present)  ← recommended
+/gsd-discuss-phase {next} ${GSD_WS} — re-discuss next phase
+/gsd-execute-phase {next} ${GSD_WS} — execute next phase (skip planning)
 ```
 
 Only suggest the commands listed above. Do not invent or hallucinate command names.

@@ -20,6 +20,7 @@ GSD stores project settings in `.planning/config.json`. Created during `/gsd-new
     "commit_docs": true,
     "search_gitignored": false
   },
+  "context_profile": null,
   "workflow": {
     "research": true,
     "plan_check": true,
@@ -34,7 +35,9 @@ GSD stores project settings in `.planning/config.json`. Created during `/gsd-new
     "discuss_mode": "discuss",
     "skip_discuss": false,
     "text_mode": false,
-    "use_worktrees": true
+    "use_worktrees": true,
+    "code_review": true,
+    "code_review_depth": "standard"
   },
   "hooks": {
     "context_warnings": true,
@@ -73,7 +76,17 @@ GSD stores project settings in `.planning/config.json`. Created during `/gsd-new
   "security_asvs_level": 1,
   "security_block_on": "high",
   "agent_skills": {},
-  "response_language": null
+  "response_language": null,
+  "features": {
+    "thinking_partner": false,
+    "global_learnings": false
+  },
+  "learnings": {
+    "max_inject": 10
+  },
+  "intel": {
+    "enabled": false
+  }
 }
 ```
 
@@ -88,6 +101,7 @@ GSD stores project settings in `.planning/config.json`. Created during `/gsd-new
 | `model_profile` | enum | `quality`, `balanced`, `budget`, `inherit` | `balanced` | Model tier for each agent (see [Model Profiles](#model-profiles)) |
 | `project_code` | string | any short string | (none) | Prefix for phase directory names (e.g., `"ABC"` produces `ABC-01-setup/`). Added in v1.31 |
 | `response_language` | string | language code | (none) | Language for agent responses (e.g., `"pt"`, `"ko"`, `"ja"`). Propagates to all spawned agents for cross-phase language consistency. Added in v1.32 |
+| `context_profile` | string | `dev`, `research`, `review` | (none) | Execution context preset that applies a pre-configured bundle of mode, model, and workflow settings for the current type of work. Added in v1.34 |
 
 > **Note:** `granularity` was renamed from `depth` in v1.22.3. Existing configs are auto-migrated.
 
@@ -113,6 +127,8 @@ All workflow toggles follow the **absent = enabled** pattern. If a key is missin
 | `workflow.skip_discuss` | boolean | `false` | When `true`, `/gsd-autonomous` bypasses the discuss-phase entirely, writing minimal CONTEXT.md from the ROADMAP phase goal. Useful for projects where developer preferences are fully captured in PROJECT.md/REQUIREMENTS.md. Added in v1.28 |
 | `workflow.text_mode` | boolean | `false` | Replaces question TUI menus with plain-text numbered lists. Required for OpenCode remote sessions (`/rc` mode) where TUI menus don't render. Can also be set per-session with `--text` flag on discuss-phase. Added in v1.28 |
 | `workflow.use_worktrees` | boolean | `true` | When `false`, disables git worktree isolation for parallel execution. Users who prefer sequential execution or whose environment does not support worktrees can disable this. Added in v1.31 |
+| `workflow.code_review` | boolean | `true` | Enable `/gsd-code-review` and `/gsd-code-review-fix` commands. When `false`, the commands exit with a configuration gate message. Added in v1.34 |
+| `workflow.code_review_depth` | string | `standard` | Default review depth for `/gsd-code-review`: `quick` (pattern-matching only), `standard` (per-file analysis), or `deep` (cross-file with import graphs). Can be overridden per-run with `--depth=`. Added in v1.34 |
 
 ### Recommended Presets
 
@@ -222,6 +238,30 @@ node gsd-tools.cjs config-set agent_skills.gsd-executor '["skills/my-skill"]'
 
 ---
 
+## Feature Flags
+
+Toggle optional capabilities via the `features.*` config namespace. Feature flags default to `false` (disabled) — enabling a flag opts into new behavior without affecting existing workflows.
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `features.thinking_partner` | boolean | `false` | Enable thinking partner analysis at workflow decision points |
+| `features.global_learnings` | boolean | `false` | Enable cross-project learnings pipeline (auto-copy at phase completion, planner injection) |
+| `intel.enabled` | boolean | `false` | Enable queryable codebase intelligence system. When `true`, `/gsd-intel` commands build and query a JSON index in `.planning/intel/`. Added in v1.34 |
+
+### Usage
+
+```bash
+# Enable a feature
+node gsd-tools.cjs config-set features.global_learnings true
+
+# Disable a feature
+node gsd-tools.cjs config-set features.thinking_partner false
+```
+
+The `features.*` namespace is a dynamic key pattern — new feature flags can be added without modifying `VALID_CONFIG_KEYS`. Any key matching `features.<name>` is accepted by the config system.
+
+---
+
 ## Parallelization Settings
 
 | Setting | Type | Default | Description |
@@ -317,14 +357,6 @@ Settings for the security enforcement feature (v1.31). All follow the **absent =
 | `security_enforcement` | boolean | `true` | Enable threat-model-anchored security verification via `/gsd-secure-phase`. When `false`, security checks are skipped entirely |
 | `security_asvs_level` | number (1-3) | `1` | OWASP ASVS verification level. Level 1 = opportunistic, Level 2 = standard, Level 3 = comprehensive |
 | `security_block_on` | string | `"high"` | Minimum severity that blocks phase advancement. Options: `"high"`, `"medium"`, `"low"` |
-
----
-
-## Hook Settings
-
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `hooks.context_warnings` | boolean | `true` | Show context window usage warnings during sessions |
 
 ---
 

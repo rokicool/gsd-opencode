@@ -30,6 +30,8 @@ PROFILE_PATH="$HOME/.config/opencode/get-shit-done/USER-PROFILE.md"
 
 **If profile exists AND --refresh NOT set AND --questionnaire NOT set:**
 
+
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Use question:
 - header: "Existing Profile"
 - question: "You already have a profile. What would you like to do?"
@@ -46,7 +48,7 @@ If "Cancel": Display "No changes made." and exit.
 
 Backup existing profile:
 ```bash
-cp "$HOME/.config/opencode/get-shit-done/USER-PROFILE.md" "$HOME/.config/opencode/get-shit-done/USER-PROFILE.backup.md"
+cp "$HOME/.config/opencode/get-shit-done/USER-PROFILE.md" "$HOME/.OpenCode/USER-PROFILE.backup.md"
 ```
 
 Display: "Re-analyzing your sessions to update your profile."
@@ -381,7 +383,7 @@ read both old backup and new analysis to compare dimension ratings/confidence.
 
 read the backed-up profile:
 ```bash
-BACKUP_PATH="$HOME/.config/opencode/get-shit-done/USER-PROFILE.backup.md"
+BACKUP_PATH="$HOME/.OpenCode/USER-PROFILE.backup.md"
 ```
 
 Compare each dimension's rating and confidence between old and new. Display diff table showing only changed dimensions:

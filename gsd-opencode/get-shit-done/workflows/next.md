@@ -34,6 +34,62 @@ No GSD project detected. Run `/gsd-new-project` to get started.
 Exit.
 </step>
 
+<step name="safety_gates">
+Run hard-stop checks before routing. Exit on first hit unless `--force` was passed.
+
+If `--force` flag was passed, skip all gates and the consecutive guard.
+Print a one-line warning: `⚠ --force: skipping safety gates`
+Then proceed directly to `determine_next_action`.
+
+**Gate 1: Unresolved checkpoint**
+Check if `.planning/.continue-here.md` exists:
+```bash
+[ -f .planning/.continue-here.md ]
+```
+If found:
+```
+⛔ Hard stop: Unresolved checkpoint
+
+`.planning/.continue-here.md` exists — a previous session left
+unfinished work that needs manual review before advancing.
+
+read the file, resolve the issue, then delete it to continue.
+Use `--force` to bypass this check.
+```
+Exit (do not route).
+
+**Gate 2: Error state**
+Check if STATE.md contains `status: error` or `status: failed`:
+If found:
+```
+⛔ Hard stop: Project in error state
+
+STATE.md shows status: {status}. Resolve the error before advancing.
+Run `/gsd-health` to diagnose, or manually fix STATE.md.
+Use `--force` to bypass this check.
+```
+Exit.
+
+**Gate 3: Unchecked verification**
+Check if the current phase has a VERIFICATION.md with any `FAIL` items that don't have overrides:
+If found:
+```
+⛔ Hard stop: Unchecked verification failures
+
+VERIFICATION.md for phase {N} has {count} unresolved FAIL items.
+Address the failures or add overrides before advancing to the next phase.
+Use `--force` to bypass this check.
+```
+Exit.
+
+**Consecutive-call guard:**
+After passing all gates, check a counter file `.planning/.next-call-count`:
+- If file exists and count >= 6: prompt "You've called /gsd-next {N} times consecutively. Continue? [y/N]"
+- If user says no, exit
+- Increment the counter
+- The counter file is deleted by any non-`/gsd-next` command (convention — other workflows don't need to implement this, the note here is sufficient)
+</step>
+
 <step name="determine_next_action">
 Apply routing rules based on state:
 

@@ -387,6 +387,87 @@ The `security.cjs` module scans for known injection patterns (role overrides, in
 
 ---
 
+## Code Review Workflow
+
+### Phase Code Review
+
+After executing a phase, run a structured code review before UAT:
+
+```bash
+/gsd-code-review 3               # Review all changed files in phase 3
+/gsd-code-review 3 --depth=deep  # Deep cross-file review (import graphs, call chains)
+```
+
+The reviewer scopes files automatically using SUMMARY.md (preferred) or git diff fallback. Findings are classified as Critical, Warning, or Info in `{phase}-REVIEW.md`.
+
+```bash
+/gsd-code-review-fix 3           # Fix Critical + Warning findings atomically
+/gsd-code-review-fix 3 --auto    # Fix and re-review until clean (max 3 iterations)
+```
+
+### Autonomous Audit-to-Fix
+
+To run an audit and fix all auto-fixable issues in one pass:
+
+```bash
+/gsd-audit-fix                   # Audit + classify + fix (medium+ severity, max 5)
+/gsd-audit-fix --dry-run         # Preview classification without fixing
+```
+
+### Code Review in the Full Phase Lifecycle
+
+The review step slots in after execution and before UAT:
+
+```
+/gsd-execute-phase N   ->  /gsd-code-review N  ->  /gsd-code-review-fix N  ->  /gsd-verify-work N
+```
+
+---
+
+## Exploration & Discovery
+
+### Socratic Exploration
+
+Before committing to a new phase or plan, use `/gsd-explore` to think through the idea:
+
+```bash
+/gsd-explore                           # Open-ended ideation
+/gsd-explore "caching strategy"        # Explore a specific topic
+```
+
+The exploration session guides you through probing questions, optionally spawns a research agent, and routes output to the appropriate GSD artifact: note, todo, seed, research question, requirements update, or new phase.
+
+### Codebase Intelligence
+
+For queryable codebase insights without reading the entire codebase, enable the intel system:
+
+```json
+{ "intel": { "enabled": true } }
+```
+
+Then build the index:
+
+```bash
+/gsd-intel refresh             # Analyze codebase and write .planning/intel/ files
+/gsd-intel query auth          # Search for a term across all intel files
+/gsd-intel status              # Check freshness of intel files
+/gsd-intel diff                # See what changed since last snapshot
+```
+
+Intel files cover stack, API surface, dependency graph, file roles, and architecture decisions.
+
+### Quick Scan
+
+For a focused assessment without full `/gsd-map-codebase` overhead:
+
+```bash
+/gsd-scan                      # Quick tech + arch overview
+/gsd-scan --focus quality      # Quality and code health only
+/gsd-scan --focus concerns     # Risk areas and concerns
+```
+
+---
+
 ## Command Reference
 
 ### Core Workflow
@@ -436,9 +517,14 @@ The `security.cjs` module scans for known injection patterns (role overrides, in
 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
-| `/gsd-map-codebase` | Analyze existing codebase | Before `/gsd-new-project` on existing code |
+| `/gsd-map-codebase` | Analyze existing codebase (4 parallel agents) | Before `/gsd-new-project` on existing code |
+| `/gsd-scan [--focus area]` | Rapid single-focus codebase scan (1 agent) | Quick assessment of a specific area |
+| `/gsd-intel [query\|status\|diff\|refresh]` | Query codebase intelligence index | Look up APIs, deps, or architecture decisions |
+| `/gsd-explore [topic]` | Socratic ideation — think through an idea before committing | Exploring unfamiliar solution space |
 | `/gsd-quick` | Ad-hoc task with GSD guarantees | Bug fixes, small features, config changes |
 | `/gsd-autonomous` | Run remaining phases autonomously (`--from N`, `--to N`) | Hands-free multi-phase execution |
+| `/gsd-undo --last N\|--phase NN\|--plan NN-MM` | Safe git revert using phase manifest | Roll back a bad execution |
+| `/gsd-import --from <file>` | Ingest external plan with conflict detection | Import plans from teammates or other tools |
 | `/gsd-debug [desc]` | Systematic debugging with persistent state (`--diagnose` for no-fix mode) | When something breaks |
 | `/gsd-forensics` | Diagnostic report for workflow failures | When state, artifacts, or git history seem corrupted |
 | `/gsd-add-todo [desc]` | Capture an idea for later | Think of something during a session |
@@ -452,6 +538,9 @@ The `security.cjs` module scans for known injection patterns (role overrides, in
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
 | `/gsd-review --phase N` | Cross-AI peer review from external CLIs | Before executing, to validate plans |
+| `/gsd-code-review <N>` | Review source files changed in a phase for bugs and security issues | After execution, before verification |
+| `/gsd-code-review-fix <N>` | Auto-fix issues found by `/gsd-code-review` | After code review produces REVIEW.md |
+| `/gsd-audit-fix` | Autonomous audit-to-fix pipeline with classification and atomic commits | After UAT surfaces fixable issues |
 | `/gsd-pr-branch` | Clean PR branch filtering `.planning/` commits | Before creating PR with planning-free diff |
 | `/gsd-audit-uat` | Audit verification debt across all phases | Before milestone completion |
 

@@ -23,6 +23,8 @@ Parse JSON for: `workspace_name`, `workspace_path`, `has_manifest`, `strategy`, 
 
 First run `/gsd-list-workspaces` to show available workspaces, then ask:
 
+
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Use question:
 - header: "Remove Workspace"
 - question: "Which workspace do you want to remove?"

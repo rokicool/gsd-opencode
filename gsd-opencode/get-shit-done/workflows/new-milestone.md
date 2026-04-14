@@ -40,6 +40,8 @@ If the flag is absent, keep the current behavior of continuing phase numbering f
 
 **If no context file:**
 - Present what shipped in last milestone
+
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 - Ask inline (freeform, NOT question): "What do you want to build next?"
 - Wait for their response, then use question to probe specifics
 - If user selects "Other" at any point to provide freeform input, ask follow-up as plain text — not another question
@@ -140,7 +142,7 @@ Delete MILESTONE-CONTEXT.md if exists (consumed).
 Clear leftover phase directories from the previous milestone:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" phases clear
+node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" phases clear --confirm
 ```
 
 ```bash

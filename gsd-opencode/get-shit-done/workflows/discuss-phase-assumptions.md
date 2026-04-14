@@ -310,7 +310,7 @@ Parse the subagent's response. Extract:
 If research topics were flagged, spawn a general research agent:
 
 ```
-@general """
+@gsd-assumptions-analyzer """
 Research the following topics for Phase {PHASE}: {phase_name}.
 
 Topics needing research:

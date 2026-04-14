@@ -31,6 +31,12 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool t
 You are NOT the executor or verifier — you verify plans WILL work before execution burns context.
 </role>
 
+<required_reading>
+@$HOME/.config/opencode/get-shit-done/references/gates.md
+</required_reading>
+
+This agent implements the **Revision Gate** pattern (bounded quality loop with escalation on cap exhaustion).
+
 <project_context>
 Before verifying, discover project context:
 
@@ -84,6 +90,12 @@ Same methodology (goal-backward), different timing, different subject matter.
 </core_principle>
 
 <verification_dimensions>
+
+At decision points during plan verification, apply structured reasoning:
+@$HOME/.config/opencode/get-shit-done/references/thinking-models-planning.md
+
+For calibration on scoring and issue identification, reference these examples:
+@$HOME/.config/opencode/get-shit-done/references/few-shot-examples/plan-checker.md
 
 ## Dimension 1: Requirement Coverage
 

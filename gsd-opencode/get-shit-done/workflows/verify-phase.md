@@ -183,6 +183,89 @@ grep -E "Phase ${PHASE_NUM}" .planning/REQUIREMENTS.md 2>/dev/null || true
 For each requirement: parse description → identify supporting truths/artifacts → status: ✓ SATISFIED / ✗ BLOCKED / ? NEEDS HUMAN.
 </step>
 
+<step name="behavioral_verification">
+**Run the project's test suite and CLI commands to verify behavior, not just structure.**
+
+Static checks (grep, file existence, wiring) catch structural gaps but miss runtime
+failures. This step runs actual tests and project commands to verify the phase goal
+is behaviorally achieved.
+
+This follows Anthropic's harness engineering principle: separating generation from
+evaluation, with the evaluator interacting with the running system rather than
+inspecting static artifacts.
+
+**Step 1: Run test suite**
+
+```bash
+# Detect test runner and run all tests (timeout: 5 minutes)
+TEST_EXIT=0
+timeout 300 bash -c '
+if [ -f "package.json" ]; then
+  npm test 2>&1
+elif [ -f "Cargo.toml" ]; then
+  cargo test 2>&1
+elif [ -f "go.mod" ]; then
+  go test ./... 2>&1
+elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
+  python -m pytest -q --tb=short 2>&1 || uv run python -m pytest -q --tb=short 2>&1
+else
+  echo "⚠ No test runner detected — skipping test suite"
+  exit 1
+fi
+'
+TEST_EXIT=$?
+if [ "${TEST_EXIT}" -eq 0 ]; then
+  echo "✓ Test suite passed"
+elif [ "${TEST_EXIT}" -eq 124 ]; then
+  echo "⚠ Test suite timed out after 5 minutes"
+else
+  echo "✗ Test suite failed (exit code ${TEST_EXIT})"
+fi
+```
+
+Record: total tests, passed, failed, coverage (if available).
+
+**If any tests fail:** Mark as `behavioral_failures` — these are BLOCKER severity
+regardless of whether static checks passed. A phase cannot be verified if tests fail.
+
+**Step 2: Run project CLI/commands from success criteria (if testable)**
+
+For each success criterion that describes a user command (e.g., "User can run
+`mixtiq validate`", "User can run `npm start`"):
+
+1. Check if the command exists and required inputs are available:
+   - Look for example files in `templates/`, `fixtures/`, `test/`, `examples/`, or `testdata/`
+   - Check if the CLI binary/script exists on PATH or in the project
+2. **If no suitable inputs or fixtures exist:** Mark as `? NEEDS HUMAN` with reason
+   "No test fixtures available — requires manual verification" and move on.
+   Do NOT invent example inputs.
+3. If inputs are available: run the command and verify it exits successfully.
+
+```bash
+# Only run if both command and input exist
+if command -v {project_cli} &>/dev/null && [ -f "{example_input}" ]; then
+  {project_cli} {example_input} 2>&1
+fi
+```
+
+Record: command, exit code, output summary, pass/fail (or SKIPPED if no fixtures).
+
+**Step 3: Report**
+
+```
+## Behavioral Verification
+
+| Check | Result | Detail |
+|-------|--------|--------|
+| Test suite | {N} passed, {M} failed | {first failure if any} |
+| {CLI command 1} | ✓ / ✗ | {output summary} |
+| {CLI command 2} | ✓ / ✗ | {output summary} |
+```
+
+**If all behavioral checks pass:** Continue to scan_antipatterns.
+**If any fail:** Add to verification gaps with BLOCKER severity.
+</step>
+
 <step name="scan_antipatterns">
 Extract files modified in this phase from SUMMARY.md, scan each:
 

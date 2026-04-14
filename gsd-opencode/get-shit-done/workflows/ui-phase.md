@@ -83,6 +83,8 @@ Continue (non-blocking).
 UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 ```
 
+
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 **If exists:** Use question:
 - header: "Existing UI-SPEC"
 - question: "UI-SPEC.md already exists for Phase {N}. What would you like to do?"
@@ -251,11 +253,17 @@ Dimensions: 6/6 passed
 
 ## ▶ Next Up
 
+{If CONTEXT.md exists for this phase:}
 **Plan Phase {N}** — planner will use UI-SPEC.md as design context
 
-`/new` then:
+`/new` then: `/gsd-plan-phase {N}`
 
-`/gsd-plan-phase {N}`
+{If CONTEXT.md does NOT exist:}
+**Discuss Phase {N}** — gather implementation context before planning
+
+`/new` then: `/gsd-discuss-phase {N}`
+
+(or `/gsd-plan-phase {N}` to skip discussion)
 
 ───────────────────────────────────────────────────────────────
 ```

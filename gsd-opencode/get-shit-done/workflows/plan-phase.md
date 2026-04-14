@@ -9,6 +9,7 @@ read all files referenced by the invoking prompt's execution_context before star
 @$HOME/.config/opencode/get-shit-done/references/revision-loop.md
 @$HOME/.config/opencode/get-shit-done/references/gate-prompts.md
 @$HOME/.config/opencode/get-shit-done/references/agent-contracts.md
+@$HOME/.config/opencode/get-shit-done/references/gates.md
 </required_reading>
 
 <available_agent_types>
@@ -45,7 +46,7 @@ Parse JSON for: `researcher_model`, `planner_model`, `checker_model`, `research_
 
 ## 2. Parse and Normalize Arguments
 
-Extract from $ARGUMENTS: phase number (integer or decimal like `2.1`), flags (`--research`, `--skip-research`, `--gaps`, `--skip-verify`, `--prd <filepath>`, `--reviews`, `--text`).
+Extract from $ARGUMENTS: phase number (integer or decimal like `2.1`), flags (`--research`, `--skip-research`, `--gaps`, `--skip-verify`, `--skip-ui`, `--prd <filepath>`, `--reviews`, `--text`).
 
 Set `TEXT_MODE=true` if `--text` is present in $ARGUMENTS OR `text_mode` from init JSON is `true`. When `TEXT_MODE` is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for OpenCode remote sessions (`/rc` mode) where TUI menus don't work through the OpenCode App.
 
@@ -240,6 +241,46 @@ If "Run discuss-phase first":
   ```
   **Exit the plan-phase workflow. Do not continue.**
 
+## 4.5. Check AI-SPEC
+
+**Skip if:** `ai_integration_phase_enabled` from config is false, or `--skip-ai-spec` flag provided.
+
+```bash
+AI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-AI-SPEC.md 2>/dev/null | head -1)
+AI_PHASE_CFG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ai_integration_phase 2>/dev/null || echo "true")
+```
+
+**Skip if `AI_PHASE_CFG` is `false`.**
+
+**If `AI_SPEC_FILE` is empty:** Check phase goal for AI keywords:
+```bash
+echo "${phase_goal}" | grep -qi "agent\|llm\|rag\|chatbot\|embedding\|langchain\|llamaindex\|crewai\|langgraph\|openai\|anthropic\|vector\|eval\|ai system"
+```
+
+**If AI keywords detected AND no AI-SPEC.md:**
+```
+◆ Note: This phase appears to involve AI system development.
+  Consider running /gsd-ai-integration-phase {N} before planning to:
+  - Select the right framework for your use case
+  - Research its docs and best practices
+  - Design an evaluation strategy
+
+  Continue planning without AI-SPEC? (non-blocking — /gsd-ai-integration-phase can be run after)
+```
+
+Use question with options:
+- "Continue — plan without AI-SPEC"
+- "Stop — I'll run /gsd-ai-integration-phase {N} first"
+
+If "Stop": Exit with `/gsd-ai-integration-phase {N}` reminder.
+If "Continue": Proceed. (Non-blocking — planner will note AI-SPEC is absent.)
+
+**If `AI_SPEC_FILE` is non-empty:** Extract framework for planner context:
+```bash
+FRAMEWORK_LINE=$(grep "Selected Framework:" "${AI_SPEC_FILE}" | head -1)
+```
+Pass `ai_spec_path` and `framework_line` to planner in step 7 so it can reference the AI design contract.
+
 ## 5. Handle Research
 
 **Skip if:** `--gaps` flag or `--skip-research` flag or `--reviews` flag.
@@ -417,6 +458,8 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 
 **If UI-SPEC.md found:** Set `UI_SPEC_PATH=$UI_SPEC_FILE`. Display: `Using UI design contract: ${UI_SPEC_PATH}`
 
+**If UI-SPEC.md missing AND `--skip-ui` flag is present in $ARGUMENTS:** Skip silently to step 6.
+
 **If UI-SPEC.md missing AND `UI_GATE_CFG` is `true`:**
 
 read auto-chain state:
@@ -439,24 +482,18 @@ Continue to step 6.
 
 **If `AUTO_CHAIN` is `false` (manual invocation):**
 
-If `TEXT_MODE` is true, present as a plain-text numbered list:
+Output this markdown directly (not as a code block):
+
 ```
-Phase {N} has frontend indicators but no UI-SPEC.md. Generate a design contract before planning?
-
-1. Generate UI-SPEC first — Run /gsd-ui-phase {N} then re-run /gsd-plan-phase {N}
-2. Continue without UI-SPEC
-3. Not a frontend phase
-
-Enter number:
+## ⚠ UI-SPEC.md missing for Phase {N}
+▶ Recommended next step:
+`/gsd-ui-phase {N} ${GSD_WS}` — generate UI design contract before planning
+───────────────────────────────────────────────
+Also available:
+- `/gsd-plan-phase {N} --skip-ui ${GSD_WS}` — plan without UI-SPEC (not recommended for frontend phases)
 ```
 
-Otherwise use question:
-- header: "UI Design Contract"
-- question: "Phase {N} has frontend indicators but no UI-SPEC.md. Generate a design contract before planning?"
-- options:
-  - "Generate UI-SPEC first" → Display: "Run `/gsd-ui-phase {N} ${GSD_WS}` then re-run `/gsd-plan-phase {N} ${GSD_WS}`". Exit workflow.
-  - "Continue without UI-SPEC" → Continue to step 6.
-  - "Not a frontend phase" → Continue to step 6.
+**Exit the plan-phase workflow. Do not continue.**
 
 **If `HAS_UI` is 1 (no frontend indicators):** Skip silently to step 5.7.
 
@@ -757,13 +794,56 @@ ${AGENT_SKILLS_CHECKER}
 - **`## VERIFICATION PASSED`:** Display confirmation, proceed to step 13.
 - **`## ISSUES FOUND`:** Display issues, check iteration count, proceed to step 12.
 
+**Thinking partner for architectural tradeoffs (conditional):**
+If `features.thinking_partner` is enabled, scan the checker's issues for architectural tradeoff keywords
+("architecture", "approach", "strategy", "pattern", "vs", "alternative"). If found:
+
+```
+The plan-checker flagged an architectural decision point:
+{issue description}
+
+Brief analysis:
+- Option A: {approach_from_plan} — {pros/cons}
+- Option B: {alternative_approach} — {pros/cons}
+- Recommendation: {choice} aligned with {phase_goal}
+
+Apply this to the revision? [Yes] / [No, I'll decide]
+```
+
+If yes: include the recommendation in the revision prompt. If no: proceed to revision loop as normal.
+If thinking_partner disabled: skip this block entirely.
+
 ## 12. Revision Loop (Max 3 Iterations)
 
 Track `iteration_count` (starts at 1 after initial plan + check).
+Track `prev_issue_count` (initialized to `Infinity` before the loop begins).
+Track `stall_reentry_count` (starts at 0; incremented each time "Adjust approach" re-enters step 8).
 
 **If iteration_count < 3:**
 
-Display: `Sending back to planner for revision... (iteration {N}/3)`
+Parse issue count from checker return: count BLOCKER + WARNING entries in the YAML issues block (structured output from gsd-plan-checker). If the checker's return contains no YAML issues block (i.e., the plan was approved with no issues), treat `issue_count` as 0 and skip the stall check — the plan passed. Proceed to step 13.
+
+Display: `Revision iteration {N}/3 -- {blocker_count} blockers, {warning_count} warnings`
+
+**Stall detection:** If `issue_count >= prev_issue_count`:
+  Display: `Revision loop stalled — issue count not decreasing ({issue_count} issues remain after {N} iterations)`
+
+  **If `stall_reentry_count < 2`:**
+    Ask user:
+      question: "Issues remain after {N} revision attempts with no progress. Proceed with current output?"
+      Options: "Proceed anyway" | "Adjust approach"
+    If "Proceed anyway": accept current plans and continue to step 13.
+    If "Adjust approach": increment `stall_reentry_count`, open freeform discussion, then re-enter step 8 (full replanning). Note: re-entry resets `iteration_count` and `prev_issue_count` but `stall_reentry_count` persists across re-entries and is capped at 2.
+
+  **If `stall_reentry_count >= 2`:**
+    Display: `Stall persists after 2 re-planning attempts. The following issues could not be resolved automatically:`
+    List the remaining issues from the checker.
+    Suggest: "Consider resolving these issues manually or running `/gsd-debug` to investigate root causes."
+    Options: "Proceed anyway" | "Abandon"
+    If "Proceed anyway": accept current plans and continue to step 13.
+    If "Abandon": stop workflow.
+
+Set `prev_issue_count = issue_count`.
 
 Revision prompt:
 

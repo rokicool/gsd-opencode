@@ -117,6 +117,8 @@ All {phase_count} phases done. Ready for final steps:
   → /gsd-complete-milestone — archive and wrap up
 ```
 
+
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Ask user via question:
 - **question:** "All phases complete. What next?"
 - **options:** "Verify work" / "Complete milestone" / "Exit manager"
@@ -220,10 +222,7 @@ After discuss completes, loop back to dashboard step.
 Planning runs autonomously. Spawn a background agent that delegates to the skill pipeline with any configured flags:
 
 ```
-task(
-  description="Plan phase {N}: {phase_name}",
-  run_in_background=true,
-  prompt="You are running the GSD plan-phase workflow for phase {N} of the project.
+@gsd-planner "You are running the GSD plan-phase workflow for phase {N} of the project.
 
 Working directory: {cwd}
 Phase: {N} — {phase_name}
@@ -236,7 +235,6 @@ skill(skill=\"gsd-plan-phase\", args=\"{N} --auto {manager_flags.plan}\")
 This delegates to the full plan-phase pipeline including local patches, research, plan-checker, and all quality gates.
 
 Important: You are running in the background. Do NOT use question — make autonomous decisions based on project context. If you hit a blocker, write it to STATE.md as a blocker and stop. Do NOT silently work around permission or file access errors — let them fail so the manager can surface them with resolution hints. Do NOT use --no-verify on git commits."
-)
 ```
 
 Display:
@@ -252,10 +250,7 @@ Loop back to dashboard step.
 Execution runs autonomously. Spawn a background agent that delegates to the skill pipeline with any configured flags:
 
 ```
-task(
-  description="Execute phase {N}: {phase_name}",
-  run_in_background=true,
-  prompt="You are running the GSD execute-phase workflow for phase {N} of the project.
+@gsd-executor "You are running the GSD execute-phase workflow for phase {N} of the project.
 
 Working directory: {cwd}
 Phase: {N} — {phase_name}
@@ -268,7 +263,6 @@ skill(skill=\"gsd-execute-phase\", args=\"{N} {manager_flags.execute}\")
 This delegates to the full execute-phase pipeline including local patches, branching, wave-based execution, verification, and all quality gates.
 
 Important: You are running in the background. Do NOT use question — make autonomous decisions. Do NOT use --no-verify on git commits — let pre-commit hooks run normally. If you hit a permission error, file lock, or any access issue, do NOT work around it — let it fail and write the error to STATE.md as a blocker so the manager can surface it with resolution guidance."
-)
 ```
 
 Display:

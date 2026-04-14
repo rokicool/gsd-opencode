@@ -70,6 +70,8 @@ If potential duplicate found:
 1. read the existing todo
 2. Compare scope
 
+
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 If overlapping, use question:
 - header: "Duplicate?"
 - question: "Similar todo exists: [title]. What would you like to do?"
