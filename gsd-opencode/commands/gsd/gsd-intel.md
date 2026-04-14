@@ -8,6 +8,12 @@ permissions:
    task: true
 ---
 
+<objective>
+    Query, inspect, or refresh codebase intelligence files in .planning/intel/
+</objective>
+
+<process>
+
 **STOP -- DO NOT READ THIS FILE. You are already reading it. This prompt was injected into your context by OpenCode's command system. Using the read tool on this file wastes tokens. Begin executing Step 0 immediately.**
 
 ## Step 0 -- Banner
@@ -174,3 +180,4 @@ Display a summary showing:
 2. DO NOT modify intel files directly -- the agent handles writes during refresh
 3. DO NOT skip the config gate check
 4. DO NOT use the gsd-tools config get-value CLI for the config gate -- it exits on missing keys
+</process>
