@@ -319,7 +319,11 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 **If `INTERACTIVE` is set:** Dispatch plan as a background agent to keep the main context lean. While plan runs, the workflow can immediately start discussing the next phase (see step 4).
 
 ```
-@gsd-plan-phase "Run plan-phase for phase ${PHASE_NUM}: skill(skill=\"gsd-plan-phase\", args=\"${PHASE_NUM}\")"
+Agent(
+  description="Plan phase ${PHASE_NUM}: ${PHASE_NAME}",
+  run_in_background=true,
+  prompt="Run plan-phase for phase ${PHASE_NUM}: skill(skill=\"gsd:plan-phase\", args=\"${PHASE_NUM}\")"
+)
 ```
 
 Store the agent task_id. After discuss for the next phase completes (or if no next phase), wait for the plan agent to finish before proceeding to execute.
@@ -337,7 +341,11 @@ Verify plan produced output — re-run `init phase-op` and check `has_plans`. If
 **If `INTERACTIVE` is set:** Wait for the plan agent to complete (if not already), verify plans exist, then dispatch execute as a background agent:
 
 ```
-@gsd-execute-phase "Run execute-phase for phase ${PHASE_NUM}: skill(skill=\"gsd-execute-phase\", args=\"${PHASE_NUM} --no-transition\")"
+Agent(
+  description="Execute phase ${PHASE_NUM}: ${PHASE_NAME}",
+  run_in_background=true,
+  prompt="Run execute-phase for phase ${PHASE_NUM}: skill(skill=\"gsd:execute-phase\", args=\"${PHASE_NUM} --no-transition\")"
+)
 ```
 
 Store the agent task_id. The workflow can now start discussing the next phase while this phase executes in the background. Before starting post-execution routing for this phase, wait for the execute agent to complete.
@@ -347,6 +355,27 @@ Store the agent task_id. The workflow can now start discussing the next phase wh
 ```
 skill(skill="gsd-execute-phase", args="${PHASE_NUM} --no-transition")
 ```
+
+**3c.5. Code Review and Fix**
+
+Auto-invoke code review and fix chain. Autonomous mode chains both review and fix (unlike execute-phase/quick which only suggest fix).
+
+**Config gate:**
+```bash
+CODE_REVIEW_ENABLED=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.code_review 2>/dev/null || echo "true")
+```
+If `"false"`: display "Code review skipped (workflow.code_review=false)" and proceed to 3d.
+
+```
+skill(skill="gsd-code-review", args="${PHASE_NUM}")
+```
+
+Parse status from REVIEW.md frontmatter. If "clean" or "skipped": proceed to 3d. If findings found: auto-invoke:
+```
+skill(skill="gsd-code-review-fix", args="${PHASE_NUM} --auto")
+```
+
+**Error handling:** If either skill fails, catch the error, display as non-blocking, and proceed to 3d.
 
 **3d. Post-Execution Routing**
 
@@ -383,6 +412,8 @@ Proceed to iterate step.
 
 read the human_verification section from VERIFICATION.md to get the count and items requiring manual testing.
 
+
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Display the items, then ask user via question:
 - **question:** "Phase ${PHASE_NUM} has items needing manual verification. Validate now or continue to next phase?"
 - **options:** "Validate now" / "Continue without validation"

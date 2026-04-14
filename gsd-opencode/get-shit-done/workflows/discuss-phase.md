@@ -551,17 +551,17 @@ After user selects gray areas in present_gray_areas, spawn parallel research age
 
 1. Display brief status: "Researching {N} areas..."
 
-2. For EACH user-selected gray area, spawn a relevant subagent using `@subagent prompt` syntax in parallel:
+2. For EACH user-selected gray area, spawn a task() in parallel:
 
    @gsd-advisor-researcher "First, read @$HOME/.config/opencode/agents/gsd-advisor-researcher.md for your role and instructions.
 
-     <gray_area>{area_name}: {area_description from gray area identification}</gray_area>
-     <phase_context>{phase_goal and description from ROADMAP.md}</phase_context>
-     <project_context>{project name and brief description from PROJECT.md}</project_context>
-     <calibration_tier>{resolved calibration tier: full_maturity | standard | minimal_decisive}</calibration_tier>
+      <gray_area>{area_name}: {area_description from gray area identification}</gray_area>
+      <phase_context>{phase_goal and description from ROADMAP.md}</phase_context>
+      <project_context>{project name and brief description from PROJECT.md}</project_context>
+      <calibration_tier>{resolved calibration tier: full_maturity | standard | minimal_decisive}</calibration_tier>
 
-     Research this gray area and return a structured comparison table with rationale.
-     ${AGENT_SKILLS_ADVISOR}"
+      Research this gray area and return a structured comparison table with rationale.
+      ${AGENT_SKILLS_ADVISOR}"
 
    All subagents spawn simultaneously — do NOT wait for one before starting the next.
 
@@ -601,6 +601,20 @@ Table-first discussion flow — present research-backed comparison tables, then 
 3. **Record the user's selection:**
    - If user picks from table options → record as locked decision for that area
    - If user picks "Other" → receive their input, reflect it back for confirmation, record
+
+   **Thinking partner (conditional):**
+   If `features.thinking_partner` is enabled in config, check the user's answer for tradeoff signals
+   (see `references/thinking-partner.md` for signal list). If tradeoff detected:
+
+   ```
+   I notice competing priorities here — {option_A} optimizes for {goal_A} while {option_B} optimizes for {goal_B}.
+
+   Want me to think through the tradeoffs before we lock this in?
+   [Yes, analyze] / [No, decision made]
+   ```
+
+   If yes: provide 3-5 bullet analysis (what each optimizes/sacrifices, alignment with PROJECT.md goals, recommendation). Then return to normal flow.
+   If no or thinking_partner disabled: continue to next area.
 
 4. **After recording pick, OpenCode decides whether follow-up questions are needed:**
    - If the pick has ambiguity that would affect downstream planning → ask 1-2 targeted follow-up questions using question

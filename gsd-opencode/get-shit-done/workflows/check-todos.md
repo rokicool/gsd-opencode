@@ -102,6 +102,8 @@ If `.planning/ROADMAP.md` exists:
 <step name="offer_actions">
 **If todo maps to a roadmap phase:**
 
+
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Use question:
 - header: "Action"
 - question: "This todo relates to Phase [N]: [name]. What would you like to do?"

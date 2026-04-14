@@ -23,6 +23,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-plan-checker — Reviews plan quality before execution
 - gsd-executor — Executes plan tasks, commits, creates SUMMARY.md
 - gsd-verifier — Verifies phase completion, checks quality gates
+- gsd-code-reviewer — Reviews source files for bugs, security issues, and code quality
 </available_agent_types>
 
 <process>
@@ -36,6 +37,9 @@ Parse `$ARGUMENTS` for:
 - Remaining text → use as `$DESCRIPTION` if non-empty
 
 If `$DESCRIPTION` is empty after parsing, prompt user interactively:
+
+
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 
 ```
 question(
@@ -545,8 +549,10 @@ ${USE_WORKTREES !== "false" ? `
 <worktree_branch_check>
 FIRST ACTION before any other work: verify this worktree branch is based on the correct commit.
 Run: git merge-base HEAD ${EXPECTED_BASE}
-If the result differs from ${EXPECTED_BASE}, run: git reset --soft ${EXPECTED_BASE}
-This corrects a known issue on Windows where EnterWorktree creates branches from main instead of the feature branch HEAD.
+If the result differs from ${EXPECTED_BASE}, hard-reset to the correct base (safe — runs before any agent work):
+  git reset --hard ${EXPECTED_BASE}
+Then verify: if [ "$(git rev-parse HEAD)" != "${EXPECTED_BASE}" ]; then echo "ERROR: Could not correct worktree base"; exit 1; fi
+This corrects a known issue where EnterWorktree creates branches from main instead of the feature branch HEAD (affects all platforms).
 </worktree_branch_check>
 ` : ''}
 
@@ -577,7 +583,44 @@ After executor returns:
    for WT in $WORKTREES; do
      WT_BRANCH=$(git -C "$WT" rev-parse --abbrev-ref HEAD 2>/dev/null)
      if [ -n "$WT_BRANCH" ] && [ "$WT_BRANCH" != "HEAD" ]; then
-       git merge "$WT_BRANCH" --no-edit -m "chore: merge quick task worktree ($WT_BRANCH)" 2>&1 || echo "⚠ Merge conflict — resolve manually"
+       # --- Orchestrator file protection (#1756) ---
+       # Backup STATE.md and ROADMAP.md before merge (main always wins)
+       STATE_BACKUP=$(mktemp)
+       ROADMAP_BACKUP=$(mktemp)
+       git show HEAD:.planning/STATE.md > "$STATE_BACKUP" 2>/dev/null || true
+       git show HEAD:.planning/ROADMAP.md > "$ROADMAP_BACKUP" 2>/dev/null || true
+
+       # Snapshot files on main to detect resurrections
+       PRE_MERGE_FILES=$(git ls-files .planning/)
+
+       git merge "$WT_BRANCH" --no-edit -m "chore: merge quick task worktree ($WT_BRANCH)" 2>&1 || {
+         echo "⚠ Merge conflict — resolve manually"
+         rm -f "$STATE_BACKUP" "$ROADMAP_BACKUP"
+         continue
+       }
+
+       # Restore orchestrator-owned files
+       if [ -s "$STATE_BACKUP" ]; then cp "$STATE_BACKUP" .planning/STATE.md; fi
+       if [ -s "$ROADMAP_BACKUP" ]; then cp "$ROADMAP_BACKUP" .planning/ROADMAP.md; fi
+       rm -f "$STATE_BACKUP" "$ROADMAP_BACKUP"
+
+       # Remove files deleted on main but re-added by worktree
+       DELETED_FILES=$(git diff --diff-filter=A --name-only HEAD~1 -- .planning/ 2>/dev/null || true)
+       for RESURRECTED in $DELETED_FILES; do
+         if ! echo "$PRE_MERGE_FILES" | grep -qxF "$RESURRECTED"; then
+           git rm -f "$RESURRECTED" 2>/dev/null || true
+         fi
+       done
+
+       if ! git diff --quiet .planning/STATE.md .planning/ROADMAP.md 2>/dev/null || \
+          [ -n "$DELETED_FILES" ]; then
+         COMMIT_DOCS=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get commit_docs 2>/dev/null || echo "true")
+         if [ "$COMMIT_DOCS" != "false" ]; then
+           git add .planning/STATE.md .planning/ROADMAP.md 2>/dev/null || true
+           git commit --amend --no-edit 2>/dev/null || true
+         fi
+       fi
+
        git worktree remove "$WT" --force 2>/dev/null || true
        git branch -D "$WT_BRANCH" 2>/dev/null || true
      fi
@@ -593,6 +636,51 @@ After executor returns:
 If summary not found, error: "Executor failed to create ${quick_id}-SUMMARY.md"
 
 Note: For quick tasks producing multiple plans (rare), spawn executors in parallel waves per execute-phase patterns.
+
+---
+
+**Step 6.25: Code review (auto)**
+
+Skip this step entirely if `$FULL_MODE` is false.
+
+**Config gate:**
+```bash
+CODE_REVIEW_ENABLED=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.code_review 2>/dev/null || echo "true")
+```
+If `"false"`, skip with message "Code review skipped (workflow.code_review=false)".
+
+**Scope files from executor's commits:**
+```bash
+# Find the diff base: last commit before quick task started
+# Use git log to find commits referencing the quick task id, then take the parent of the oldest
+QUICK_COMMITS=$(git log --oneline --format="%H" --grep="${quick_id}" 2>/dev/null)
+if [ -n "$QUICK_COMMITS" ]; then
+  DIFF_BASE=$(echo "$QUICK_COMMITS" | tail -1)^
+  # Verify parent exists (guard against first commit in repo)
+  git rev-parse "${DIFF_BASE}" >/dev/null 2>&1 || DIFF_BASE=$(echo "$QUICK_COMMITS" | tail -1)
+else
+  # No commits found for this quick task — skip review
+  DIFF_BASE=""
+fi
+
+if [ -n "$DIFF_BASE" ]; then
+  CHANGED_FILES=$(git diff --name-only "${DIFF_BASE}..HEAD" -- . ':!.planning' 2>/dev/null | tr '\n' ' ')
+else
+  CHANGED_FILES=""
+fi
+```
+
+If `CHANGED_FILES` is empty, skip with "No source files changed — skipping code review."
+
+**Invoke review:**
+```
+@gsd-code-reviewer "Review these files for bugs, security issues, and code quality.
+  Files: ${CHANGED_FILES}
+  Output: ${QUICK_DIR}/${quick_id}-REVIEW.md
+  Depth: quick"
+```
+
+If review produces findings, display advisory message. **Error handling:** Failures are non-blocking — catch and proceed.
 
 ---
 
@@ -708,7 +796,14 @@ Build file list:
 ```bash
 # Explicitly stage all artifacts before commit — PLAN.md may be untracked
 # if the executor ran without worktree isolation and committed docs early
-git add ${file_list} 2>/dev/null
+# Filter .planning/ files from staging if commit_docs is disabled (#1783)
+COMMIT_DOCS=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get commit_docs 2>/dev/null || echo "true")
+if [ "$COMMIT_DOCS" = "false" ]; then
+  file_list_filtered=$(echo "${file_list}" | tr ' ' '\n' | grep -v '^\.planning/' | tr '\n' ' ')
+  git add ${file_list_filtered} 2>/dev/null
+else
+  git add ${file_list} 2>/dev/null
+fi
 node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(quick-${quick_id}): ${DESCRIPTION}" --files ${file_list}
 ```
 

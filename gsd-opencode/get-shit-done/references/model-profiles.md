@@ -4,20 +4,20 @@ Model profiles control which OpenCode model each GSD agent uses. This allows bal
 
 ## Profile Definitions
 
-| Agent | `quality` | `balanced` | `budget` | `inherit` |
-|-------|-----------|------------|----------|-----------|
-| gsd-planner | opus | opus | sonnet | inherit |
-| gsd-roadmapper | opus | sonnet | sonnet | inherit |
-| gsd-executor | opus | sonnet | sonnet | inherit |
-| gsd-phase-researcher | opus | sonnet | haiku | inherit |
-| gsd-project-researcher | opus | sonnet | haiku | inherit |
-| gsd-research-synthesizer | sonnet | sonnet | haiku | inherit |
-| gsd-debugger | opus | sonnet | sonnet | inherit |
-| gsd-codebase-mapper | sonnet | haiku | haiku | inherit |
-| gsd-verifier | sonnet | sonnet | haiku | inherit |
-| gsd-plan-checker | sonnet | sonnet | haiku | inherit |
-| gsd-integration-checker | sonnet | sonnet | haiku | inherit |
-| gsd-nyquist-auditor | sonnet | sonnet | haiku | inherit |
+| Agent | `quality` | `balanced` | `budget` | `adaptive` | `inherit` |
+|-------|-----------|------------|----------|------------|-----------|
+| gsd-planner | opus | opus | sonnet | opus | inherit |
+| gsd-roadmapper | opus | sonnet | sonnet | sonnet | inherit |
+| gsd-executor | opus | sonnet | sonnet | sonnet | inherit |
+| gsd-phase-researcher | opus | sonnet | haiku | sonnet | inherit |
+| gsd-project-researcher | opus | sonnet | haiku | sonnet | inherit |
+| gsd-research-synthesizer | sonnet | sonnet | haiku | haiku | inherit |
+| gsd-debugger | opus | sonnet | sonnet | opus | inherit |
+| gsd-codebase-mapper | sonnet | haiku | haiku | haiku | inherit |
+| gsd-verifier | sonnet | sonnet | haiku | sonnet | inherit |
+| gsd-plan-checker | sonnet | sonnet | haiku | haiku | inherit |
+| gsd-integration-checker | sonnet | sonnet | haiku | haiku | inherit |
+| gsd-nyquist-auditor | sonnet | sonnet | haiku | haiku | inherit |
 
 ## Profile Philosophy
 
@@ -36,6 +36,12 @@ Model profiles control which OpenCode model each GSD agent uses. This allows bal
 - Sonnet for anything that writes code
 - Haiku for research and verification
 - Use when: conserving quota, high-volume work, less critical phases
+
+**adaptive** — Role-based cost optimization
+- Opus for planning and debugging (where reasoning quality has highest impact)
+- Sonnet for execution, research, and verification (follows explicit instructions)
+- Haiku for mapping, checking, and auditing (high volume, structured output)
+- Use when: optimizing cost without sacrificing plan quality, solo development on paid API tiers
 
 **inherit** - Follow the current session model
 - All agents resolve to `inherit`

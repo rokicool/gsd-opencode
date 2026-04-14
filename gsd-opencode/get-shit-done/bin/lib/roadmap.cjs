@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { escapeRegex, normalizePhaseName, planningPaths, withPlanningLock, output, error, findPhaseInternal, stripShippedMilestones, extractCurrentMilestone, replaceInCurrentMilestone, phaseTokenMatches } = require('./core.cjs');
+const { escapeRegex, normalizePhaseName, planningPaths, withPlanningLock, output, error, findPhaseInternal, stripShippedMilestones, extractCurrentMilestone, replaceInCurrentMilestone, phaseTokenMatches, atomicWriteFileSync } = require('./core.cjs');
 
 /**
  * Search for a phase header (and its section) within the given content string.
@@ -129,6 +129,15 @@ function cmdRoadmapAnalyze(cwd, raw) {
   const phases = [];
   let match;
 
+  // Build phase directory lookup once (O(1) readdir instead of O(N) per phase)
+  const _phaseDirNames = (() => {
+    try {
+      return fs.readdirSync(phasesDir, { withFileTypes: true })
+        .filter(e => e.isDirectory())
+        .map(e => e.name);
+    } catch { return []; }
+  })();
+
   while ((match = phasePattern.exec(content)) !== null) {
     const phaseNum = match[1];
     const phaseName = match[2].replace(/\(INSERTED\)/i, '').trim();
@@ -155,9 +164,7 @@ function cmdRoadmapAnalyze(cwd, raw) {
     let hasResearch = false;
 
     try {
-      const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-      const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
-      const dirMatch = dirs.find(d => phaseTokenMatches(d, normalized));
+      const dirMatch = _phaseDirNames.find(d => phaseTokenMatches(d, normalized));
 
       if (dirMatch) {
         const phaseFiles = fs.readdirSync(path.join(phasesDir, dirMatch));
@@ -334,7 +341,7 @@ function cmdRoadmapUpdatePlanProgress(cwd, phaseNum, raw) {
       roadmapContent = roadmapContent.replace(planCheckboxPattern, '$1x$2');
     }
 
-    fs.writeFileSync(roadmapPath, roadmapContent, 'utf-8');
+    atomicWriteFileSync(roadmapPath, roadmapContent, 'utf-8');
   });
   output({
     updated: true,

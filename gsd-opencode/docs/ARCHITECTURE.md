@@ -113,7 +113,7 @@ User-facing entry points. Each file contains YAML frontmatter (name, description
 - **Copilot:** Slash commands (`/gsd-command-name`)
 - **Antigravity:** Skills
 
-**Total commands:** 60
+**Total commands:** 69
 
 ### Workflows (`get-shit-done/workflows/*.md`)
 
@@ -124,7 +124,7 @@ Orchestration logic that commands reference. Contains the step-by-step process i
 - State update patterns
 - Error handling and recovery
 
-**Total workflows:** 60
+**Total workflows:** 68
 
 ### Agents (`agents/*.md`)
 
@@ -134,23 +134,26 @@ Specialized agent definitions with frontmatter specifying:
 - `tools` — Allowed tool access (read, write, edit, bash, grep, glob, websearch, etc.)
 - `color` — Terminal output color for visual distinction
 
-**Total agents:** 21
+**Total agents:** 24
 
 ### References (`get-shit-done/references/*.md`)
 
-Shared knowledge documents that workflows and agents `@-reference` (25 total):
+Shared knowledge documents that workflows and agents `@-reference` (35 total):
 
 **Core references:**
 - `checkpoints.md` — Checkpoint type definitions and interaction patterns
+- `gates.md` — 4 canonical gate types (Confirm, Quality, Safety, Transition) wired into plan-checker and verifier
 - `model-profiles.md` — Per-agent model tier assignments
 - `model-profile-resolution.md` — Model resolution algorithm documentation
 - `verification-patterns.md` — How to verify different artifact types
+- `verification-overrides.md` — Per-artifact verification override rules
 - `planning-config.md` — Full config schema and behavior
 - `git-integration.md` — Git commit, branching, and history patterns
 - `git-planning-commit.md` — Planning directory commit conventions
 - `questioning.md` — Dream extraction philosophy for project initialization
 - `tdd.md` — Test-driven development integration patterns
 - `ui-brand.md` — Visual output formatting patterns
+- `common-bug-patterns.md` — Common bug patterns for code review and verification
 
 **Workflow references:**
 - `agent-contracts.md` — Formal interface between orchestrators and agents
@@ -165,6 +168,17 @@ Shared knowledge documents that workflows and agents `@-reference` (25 total):
 - `decimal-phase-calculation.md` — Decimal sub-phase numbering rules
 - `workstream-flag.md` — Workstream active pointer conventions
 - `user-profiling.md` — User behavioral profiling methodology
+- `thinking-partner.md` — Conditional thinking partner activation at decision points
+
+**Thinking model references:**
+
+References for integrating thinking-class models (o3, o4-mini, Gemini 2.5 Pro) into GSD workflows:
+
+- `thinking-models-debug.md` — Thinking model patterns for debugging workflows
+- `thinking-models-execution.md` — Thinking model patterns for execution agents
+- `thinking-models-planning.md` — Thinking model patterns for planning agents
+- `thinking-models-research.md` — Thinking model patterns for research agents
+- `thinking-models-verification.md` — Thinking model patterns for verification agents
 
 **Modular planner decomposition:**
 
@@ -395,14 +409,14 @@ UI-SPEC.md (per phase) ───────────────────
 
 ```
 $HOME/.config/opencode/                          # OpenCode (global install)
-├── commands/gsd/*.md               # 60 slash commands
+├── commands/gsd/*.md               # 69 slash commands
 ├── get-shit-done/
 │   ├── bin/gsd-tools.cjs           # CLI utility
 │   ├── bin/lib/*.cjs               # 19 domain modules
-│   ├── workflows/*.md              # 60 workflow definitions
-│   ├── references/*.md             # 25 shared reference docs
+│   ├── workflows/*.md              # 68 workflow definitions
+│   ├── references/*.md             # 35 shared reference docs
 │   └── templates/                  # Planning artifact templates
-├── agents/*.md                     # 21 agent definitions
+├── agents/*.md                     # 24 agent definitions
 ├── hooks/
 │   ├── gsd-statusline.js           # Statusline hook
 │   ├── gsd-context-monitor.js      # Context warning hook

@@ -96,7 +96,7 @@ EXPECTED_BASE=$(git rev-parse HEAD)
 For each gap, fill the debug-subagent-prompt template and spawn:
 
 ```
-@gsd-debugger filled_debug_subagent_prompt + "\n\n<worktree_branch_check>\nFIRST ACTION: run git merge-base HEAD {EXPECTED_BASE} — if result differs from {EXPECTED_BASE}, run git reset --soft {EXPECTED_BASE} to correct the branch base (fixes Windows EnterWorktree creating branches from main).\n</worktree_branch_check>\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>\n${AGENT_SKILLS_DEBUGGER}"
+@gsd-debugger filled_debug_subagent_prompt + "\n\n<worktree_branch_check>\nFIRST ACTION: run git merge-base HEAD {EXPECTED_BASE} — if result differs from {EXPECTED_BASE}, run git reset --hard {EXPECTED_BASE} to correct the branch base (safe — runs before any agent work). Then verify: if [ \"$(git rev-parse HEAD)\" != \"{EXPECTED_BASE}\" ]; then echo \"ERROR: Could not correct worktree base\"; exit 1; fi. Fixes EnterWorktree creating branches from main on all platforms.\n</worktree_branch_check>\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>\n${AGENT_SKILLS_DEBUGGER}"
 ```
 
 **All agents spawn in single message** (parallel execution).

@@ -5,6 +5,59 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.35.0] - 2026-04-13
+
+Overview: Major upstream sync from GSD v1.35.0 introducing code review pipeline with auto-fix loop, codebase intelligence system, explore/scan/explore workflows, AI integration phase, import workflow, eval review, undo, and inbox management. Added 8 new agents, 9 new commands, and 14 new reference documents. Converted all Task() calls to @subagent_type shorthand and added mode: subagent to all agent definitions.
+
+### Added
+
+- `gsd-code-reviewer` agent for deep code review with configurable depth and finding categorization in `gsd-opencode/agents/gsd-code-reviewer.md`
+- `gsd-code-fixer` agent for automated fix application from review findings with iterative review-fix loop in `gsd-opencode/agents/gsd-code-fixer.md`
+- `gsd-ai-researcher` agent for AI-specific research tasks in `gsd-opencode/agents/gsd-ai-researcher.md`
+- `gsd-domain-researcher` agent for domain-specific research in `gsd-opencode/agents/gsd-domain-researcher.md`
+- `gsd-eval-auditor` agent for evaluation auditing in `gsd-opencode/agents/gsd-eval-auditor.md`
+- `gsd-eval-planner` agent for evaluation planning in `gsd-opencode/agents/gsd-eval-planner.md`
+- `gsd-framework-selector` agent for framework selection guidance in `gsd-opencode/agents/gsd-framework-selector.md`
+- `gsd-intel-updater` agent for codebase intelligence file refresh in `gsd-opencode/agents/gsd-intel-updater.md`
+- `/gsd-code-review` command and `code-review` workflow for automated code review at configurable depth in `gsd-opencode/commands/gsd/gsd-code-review.md` and `gsd-opencode/get-shit-done/workflows/code-review.md`
+- `/gsd-code-review-fix` command and `code-review-fix` workflow for iterative auto-fix of review findings with convergence detection in `gsd-opencode/commands/gsd/gsd-code-review-fix.md` and `gsd-opencode/get-shit-done/workflows/code-review-fix.md`
+- `/gsd-intel` command for querying, inspecting, and refreshing codebase intelligence files in `gsd-opencode/commands/gsd/gsd-intel.md`
+- `/gsd-explore` command and `explore` workflow for interactive codebase exploration with optional research agent spawning in `gsd-opencode/commands/gsd/gsd-explore.md` and `gsd-opencode/get-shit-done/workflows/explore.md`
+- `/gsd-scan` command and `scan` workflow for focused codebase scanning with parallel mapper agents in `gsd-opencode/commands/gsd/gsd-scan.md` and `gsd-opencode/get-shit-done/workflows/scan.md`
+- `/gsd-import` command and `import` workflow for importing existing projects into GSD structure with plan validation in `gsd-opencode/commands/gsd/gsd-import.md` and `gsd-opencode/get-shit-done/workflows/import.md`
+- `/gsd-audit-fix` command and `audit-fix` workflow for auto-fixing audit findings with test verification in `gsd-opencode/commands/gsd/gsd-audit-fix.md` and `gsd-opencode/get-shit-done/workflows/audit-fix.md`
+- `/gsd-ai-integration-phase` command and `ai-integration-phase` workflow for AI integration phases in `gsd-opencode/commands/gsd/gsd-ai-integration-phase.md` and `gsd-opencode/get-shit-done/workflows/ai-integration-phase.md`
+- `/gsd-eval-review` command and `eval-review` workflow for evaluation review in `gsd-opencode/commands/gsd/gsd-eval-review.md` and `gsd-opencode/get-shit-done/workflows/eval-review.md`
+- `/gsd-undo` command and `undo` workflow for undoing recent GSD operations with git-based rollback in `gsd-opencode/commands/gsd/gsd-undo.md` and `gsd-opencode/get-shit-done/workflows/undo.md`
+- `/gsd-from-gsd2` command for migrating from GSD v2 format in `gsd-opencode/commands/gsd/gsd-from-gsd2.md`
+- `inbox` workflow for managing development inbox in `gsd-opencode/get-shit-done/workflows/inbox.md`
+- `intel.cjs` library for codebase intelligence management (extract-exports, patch-meta, validate, status) in `gsd-opencode/get-shit-done/bin/lib/intel.cjs`
+- `learnings.cjs` library for learning capture and retrieval in `gsd-opencode/get-shit-done/bin/lib/learnings.cjs`
+- `gsd2-import.cjs` library for GSD v2 project migration in `gsd-opencode/get-shit-done/bin/lib/gsd2-import.cjs`
+- `AI-SPEC.md` template for AI integration specifications in `gsd-opencode/get-shit-done/templates/AI-SPEC.md`
+- `gsd-code-review` and `gsd-code-review-fix` skills for OpenCode integration in `gsd-opencode/skills/`
+- 14 new reference documents: `ai-evals.md`, `ai-frameworks.md`, `common-bug-patterns.md`, `gates.md`, `ios-scaffold.md`, `thinking-models-debug.md`, `thinking-models-execution.md`, `thinking-models-planning.md`, `thinking-models-research.md`, `thinking-models-verification.md`, `thinking-partner.md`, `verification-overrides.md`, and few-shot examples for `plan-checker.md` and `verifier.md` in `gsd-opencode/get-shit-done/references/`
+- Regex-based forbidden string matching to antipatterns checker in `assets/bin/check-forbidden-strings.js`
+- `task(\n` regexp pattern to antipatterns list in `assets/antipatterns.toml` for detecting unconverted Task() calls
+
+### Changed
+
+- Synced 289 files from upstream GSD submodule at v1.35.0
+- Converted all 66 Task() function calls to @subagent_type shorthand syntax across workflows, commands, templates, and references
+- Added `mode: subagent` declaration to all 29 agent definition files in `gsd-opencode/agents/`
+- Applied 5,144 Claude Code to OpenCode translations across 287 files (paths, tool names, commands, URLs, HTML tags)
+- Enhanced `execute-phase` workflow with expanded executor agent prompts, worktree branch check improvements, and verifier agent integration in `gsd-opencode/get-shit-done/workflows/execute-phase.md`
+- Enhanced `plan-phase` workflow with additional planner and plan-checker context in `gsd-opencode/get-shit-done/workflows/plan-phase.md`
+- Enhanced `quick` workflow with executor worktree support, code review, and verification integration in `gsd-opencode/get-shit-done/workflows/quick.md`
+- Enhanced `manager` workflow with plan-phase and execute-phase background agent delegation in `gsd-opencode/get-shit-done/workflows/manager.md`
+- Enhanced `autonomous` workflow with agent tracking and dispatch patterns in `gsd-opencode/get-shit-done/workflows/autonomous.md`
+- Updated `gsd-tools.cjs` with new commands and enhanced CLI tooling in `gsd-opencode/get-shit-done/bin/gsd-tools.cjs`
+- Refactored `state.cjs` with improved state management in `gsd-opencode/get-shit-done/bin/lib/state.cjs`
+- Enhanced `phase.cjs` with expanded phase management capabilities in `gsd-opencode/get-shit-done/bin/lib/phase.cjs`
+- Updated `model-profiles.md` and `model-profile-resolution.md` references to use @subagent syntax in `gsd-opencode/get-shit-done/references/`
+- Expanded `planning-config.md` reference with detailed configuration documentation in `gsd-opencode/get-shit-done/references/planning-config.md`
+- Updated documentation (ARCHITECTURE, COMMANDS, CONFIGURATION, FEATURES, USER-GUIDE) to reflect new commands, agents, and workflows in `gsd-opencode/docs/`
+
 ## [1.33.3] - 2026-04-12
 
 Overview: Fixed YAML frontmatter parse errors across 11 command files by quoting unquoted argument-hint values, corrected malformed skill permission in gsd-manager, and updated translation config with new rules for skill permissions and argument-hint quoting.

@@ -7,7 +7,8 @@
     "gsd-opencode/commands/gsd/**",
     "gsd-opencode/get-shit-done/references/**",
     "gsd-opencode/get-shit-done/templates/**",
-    "gsd-opencode/get-shit-done/workflows/**"
+    "gsd-opencode/get-shit-done/workflows/**",
+    "gsd-opencode/docs/**"
   ],
   "exclude": [
     "node_modules/**",
@@ -186,12 +187,12 @@
       "description": "Replace prose 'spawn a task() in parallel' with @subagent reference"
     },
     {
-      "_comment": "18. task() with subagent_type=\"general\" referencing gsd-advisor-researcher → @gsd-advisor-researcher",
-      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=\"(First, read @[\\s\\S]*?\\$\\{AGENT_SKILLS_ADVISOR\\})\",\\s*\\r?\\n\\s*subagent_type=\"general\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
+      "_comment": "18. task() with subagent_type=\"general\" referencing gsd-advisor-researcher → @gsd-advisor-researcher (strip preamble, keep body from <gray_area>)",
+      "pattern": "task\\(\\s*\\r?\\n\\s*prompt=\"First, read @[^\\n]*gsd-advisor-researcher\\.md[^\\n]*\\.\\s*\\n\\s*\\n(\\s*<gray_area>[\\s\\S]*?\\$\\{AGENT_SKILLS_ADVISOR\\})\",\\s*\\r?\\n\\s*subagent_type=\"general\",\\s*\\r?\\n\\s*model=\"[^\"]*\",\\s*\\r?\\n\\s*description=\"[^\"]*\"\\s*\\r?\\n\\s*\\)",
       "replacement": "@gsd-advisor-researcher \"$1\"",
       "isRegex": true,
       "caseSensitive": true,
-      "description": "Replace task(subagent_type=general) with gsd-advisor-researcher prompt to @gsd-advisor-researcher shorthand"
+      "description": "Replace task(subagent_type=general) advisor-researcher: strip preamble, keep body from <gray_area> onward"
     },
     {
       "_comment": "19. Prose: 'All task() calls spawn simultaneously' → subagent reference",
@@ -216,6 +217,38 @@
       "isRegex": true,
       "caseSensitive": true,
       "description": "Replace Agent() with gsd skill reference to @gsd-xxx shorthand, extracting agent name from skill=\"gsd:xxx\" and converting to gsd-xxx"
+    },
+    {
+      "_comment": "22. Multiline task() with description first, then multiline prompt, no subagent_type (gsd-intel pattern)",
+      "pattern": "task\\(\\s*\\n\\s*description=\"[^\"]*\",\\s*\\n\\s*prompt=\"([\\s\\S]*?)\"\\s*\\n\\s*\\)",
+      "replacement": "@general \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace task() with description + multiline prompt (no subagent_type) to @general shorthand"
+    },
+    {
+      "_comment": "23. Multiline task() with prompt, subagent_type, model with trailing comment (zh-CN example pattern)",
+      "pattern": "task\\(\\s*\\n\\s*prompt=\"([^\"]*)\",\\s*\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\n\\s*model=\"[^\"]*\"[^\\n]*\\n\\s*\\)",
+      "replacement": "@$2 \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace task() with prompt, subagent_type, model (with optional trailing comment) to @subagent shorthand"
+    },
+    {
+      "_comment": "24. Multiline task() with description, run_in_background=true, then multiline prompt (manager.md pattern)",
+      "pattern": "task\\(\\s*\\n\\s*description=\"[^\"]*\",\\s*\\n\\s*run_in_background=true,\\s*\\n\\s*prompt=\"([\\s\\S]*?)\"\\s*\\n\\s*\\)",
+      "replacement": "@general \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace task() with description + run_in_background + multiline prompt to @general shorthand"
+    },
+    {
+      "_comment": "25. simple string with task() ",
+      "pattern": "All task() calls spawn simultaneously",
+      "replacement": "All subagents spawn simultaneously",
+      "isRegex": false,
+      "caseSensitive": false,
+      "description": "Replace string with task()"
     }
   ]
 }

@@ -110,17 +110,17 @@ npx gsd-opencode@latest
 npx gsd-opencode --OpenCode --global   # 安装到 $HOME/.config/opencode/
 npx gsd-opencode --OpenCode --local    # 安装到 ./.OpenCode/
 
-# OpenCode（开源，免费模型）
+# OpenCode
 npx gsd-opencode --opencode --global # 安装到 ~/.config/opencode/
 
 # Gemini CLI
 npx gsd-opencode --gemini --global   # 安装到 ~/.gemini/
 
-# Kilo（OpenCode 分支）
+# Kilo
 npx gsd-opencode --kilo --global     # 安装到 ~/.config/kilo/
 npx gsd-opencode --kilo --local      # 安装到 ./.kilo/
 
-# Codex（技能优先）
+# Codex
 npx gsd-opencode --codex --global    # 安装到 ~/.codex/
 npx gsd-opencode --codex --local     # 安装到 ./.codex/
 

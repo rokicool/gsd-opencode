@@ -43,12 +43,15 @@ If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool t
 - Return structured results to orchestrator
 </role>
 
-<mcp_tool_usage>
-Use all tools available in your environment, including MCP servers. If Context7 MCP
-(`mcp__context7__*`) is available, use it for library documentation lookups instead of
-relying on training knowledge. Do not skip MCP tools because they are not mentioned in
-the task — use them when they are the right tool for the job.
-</mcp_tool_usage>
+<documentation_lookup>
+For library docs: use Context7 MCP (`mcp__context7__*`) if available. If not (upstream
+bug #13898 strips MCP from `tools:`-restricted agents), use the bash CLI fallback:
+```bash
+npx --yes ctx7@latest library <name> "<query>"   # resolve library ID
+npx --yes ctx7@latest docs <libraryId> "<query>" # fetch docs
+```
+Do not skip — the CLI fallback works via bash and produces equivalent output.
+</documentation_lookup>
 
 <project_context>
 Before planning, discover project context:
@@ -1015,6 +1018,10 @@ read the most recent milestone retrospective and cross-milestone trends. Extract
 - **Cost patterns** to inform model selection and agent strategy
 </step>
 
+<step name="inject_global_learnings">
+If `features.global_learnings` is `true`: run `gsd-tools learnings query --tag <phase_tags> --limit 5`, prefix matches with `[Prior learning from <project>]` as weak priors. Project-local decisions take precedence. Skip silently if disabled or no matches. For tags, use PLAN.md frontmatter `tags` field or keywords from the phase objective, comma-separated (e.g. `--tag auth,database,api`).
+</step>
+
 <step name="gather_phase_context">
 Use `phase_dir` from init context (already loaded in load_project_state).
 
@@ -1030,6 +1037,9 @@ cat "$phase_dir"/*-DISCOVERY.md 2>/dev/null  # From mandatory discovery
 </step>
 
 <step name="break_into_tasks">
+At decision points during plan creation, apply structured reasoning:
+@$HOME/.config/opencode/get-shit-done/references/thinking-models-planning.md
+
 Decompose phase into tasks. **Think dependencies first, not sequence.**
 
 For each task:

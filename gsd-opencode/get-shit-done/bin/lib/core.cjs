@@ -27,6 +27,16 @@ const WORKSTREAM_SESSION_ENV_KEYS = [
 let cachedControllingTtyToken = null;
 let didProbeControllingTtyToken = false;
 
+// Track all .planning/.lock files held by this process so they can be removed
+// on exit. process.on('exit') fires even on process.exit(1), unlike try/finally
+// which is skipped when error() calls process.exit(1) inside a locked region (#1916).
+const _heldPlanningLocks = new Set();
+process.on('exit', () => {
+  for (const lockPath of _heldPlanningLocks) {
+    try { fs.unlinkSync(lockPath); } catch { /* already gone */ }
+  }
+});
+
 // ─── Path helpers ────────────────────────────────────────────────────────────
 
 /** Normalize a relative path to always use forward slashes (cross-platform). */
@@ -229,6 +239,7 @@ const CONFIG_DEFAULTS = {
   plan_checker: true,
   verifier: true,
   nyquist_validation: true,
+  ai_integration_phase: true,
   parallelization: true,
   brave_search: false,
   firecrawl: false,
@@ -300,7 +311,7 @@ function loadConfig(cwd) {
       // Extract top-level key names from dot-notation paths (e.g., 'workflow.research' → 'workflow')
       ...[...VALID_CONFIG_KEYS].map(k => k.split('.')[0]),
       // Section containers that hold nested sub-keys
-      'git', 'workflow', 'planning', 'hooks',
+      'git', 'workflow', 'planning', 'hooks', 'features',
       // Internal keys loadConfig reads but config-set doesn't expose
       'model_overrides', 'agent_skills', 'context_window', 'resolve_model_ids',
       // Deprecated keys (still accepted for migration, not in config-set)
@@ -400,7 +411,11 @@ function loadConfig(cwd) {
 
 // ─── Git utilities ────────────────────────────────────────────────────────────
 
+const _gitIgnoredCache = new Map();
+
 function isGitIgnored(cwd, targetPath) {
+  const key = cwd + '::' + targetPath;
+  if (_gitIgnoredCache.has(key)) return _gitIgnoredCache.get(key);
   try {
     // --no-index checks .gitignore rules regardless of whether the file is tracked.
     // Without it, git check-ignore returns "not ignored" for tracked files even when
@@ -412,8 +427,10 @@ function isGitIgnored(cwd, targetPath) {
       cwd,
       stdio: 'pipe',
     });
+    _gitIgnoredCache.set(key, true);
     return true;
   } catch {
+    _gitIgnoredCache.set(key, false);
     return false;
   }
 }
@@ -598,10 +615,15 @@ function withPlanningLock(cwd, fn) {
         acquired: new Date().toISOString(),
       }), { flag: 'wx' });
 
+      // Register for exit-time cleanup so process.exit(1) inside a locked region
+      // cannot leave a stale lock file (#1916).
+      _heldPlanningLocks.add(lockPath);
+
       // Lock acquired — run the function
       try {
         return fn();
       } finally {
+        _heldPlanningLocks.delete(lockPath);
         try { fs.unlinkSync(lockPath); } catch { /* already released */ }
       }
     } catch (err) {
@@ -670,19 +692,23 @@ function planningRoot(cwd) {
 }
 
 /**
- * Get common .planning file paths, workstream-aware.
- * Scoped paths (state, roadmap, phases, requirements) resolve to the active workstream.
- * Shared paths (project, config) always resolve to the root .planning/.
+ * Get common .planning file paths, project-and-workstream-aware.
+ *
+ * All paths route through planningDir(cwd, ws), which honors the GSD_PROJECT
+ * env var and active workstream. This matches loadConfig() above (line 256),
+ * which has always read config.json via planningDir(cwd). Previously project
+ * and config were resolved against the unrouted .planning/ root, which broke
+ * `gsd-tools config-get` in multi-project layouts (the CRUD writers and the
+ * reader pointed at different files).
  */
 function planningPaths(cwd, ws) {
   const base = planningDir(cwd, ws);
-  const root = path.join(cwd, '.planning');
   return {
     planning: base,
     state: path.join(base, 'STATE.md'),
     roadmap: path.join(base, 'ROADMAP.md'),
-    project: path.join(root, 'PROJECT.md'),
-    config: path.join(root, 'config.json'),
+    project: path.join(base, 'PROJECT.md'),
+    config: path.join(base, 'config.json'),
     phases: path.join(base, 'phases'),
     requirements: path.join(base, 'REQUIREMENTS.md'),
   };
@@ -879,7 +905,10 @@ function normalizePhaseName(phase) {
   const match = stripped.match(/^(\d+)([A-Z])?((?:\.\d+)*)/i);
   if (match) {
     const padded = match[1].padStart(2, '0');
-    const letter = match[2] ? match[2].toUpperCase() : '';
+    // Preserve original case of letter suffix (#1962).
+    // Uppercasing causes directory/roadmap mismatches on case-sensitive filesystems
+    // (e.g., "16c" in ROADMAP.md → directory "16C-name" → progress can't match).
+    const letter = match[2] || '';
     const decimal = match[3] || '';
     return padded + letter + decimal;
   }
@@ -1485,6 +1514,38 @@ function readSubdirectories(dirPath, sort = false) {
   }
 }
 
+// ─── Atomic file writes ───────────────────────────────────────────────────────
+
+/**
+ * write a file atomically using write-to-temp-then-rename.
+ *
+ * On POSIX systems, `fs.renameSync` is atomic when the source and destination
+ * are on the same filesystem. This prevents a process killed mid-write from
+ * leaving a truncated file that is unparseable on next read.
+ *
+ * The temp file is placed alongside the target so it is guaranteed to be on
+ * the same filesystem (required for rename atomicity). The PID is embedded in
+ * the temp file name so concurrent writers use distinct paths.
+ *
+ * If `renameSync` fails (e.g. cross-device move), the function falls back to a
+ * direct `writeFileSync` so callers always get a best-effort write.
+ *
+ * @param {string} filePath  Absolute path to write.
+ * @param {string|Buffer} content  File content.
+ * @param {string} [encoding='utf-8']  Encoding passed to writeFileSync.
+ */
+function atomicWriteFileSync(filePath, content, encoding = 'utf-8') {
+  const tmpPath = filePath + '.tmp.' + process.pid;
+  try {
+    fs.writeFileSync(tmpPath, content, encoding);
+    fs.renameSync(tmpPath, filePath);
+  } catch (renameErr) {
+    // Clean up the temp file if rename failed, then fall back to direct write.
+    try { fs.unlinkSync(tmpPath); } catch { /* already gone or never created */ }
+    fs.writeFileSync(filePath, content, encoding);
+  }
+}
+
 module.exports = {
   output,
   error,
@@ -1530,4 +1591,5 @@ module.exports = {
   readSubdirectories,
   getAgentsDir,
   checkAgentsInstalled,
+  atomicWriteFileSync,
 };

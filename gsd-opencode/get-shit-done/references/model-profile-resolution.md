@@ -14,17 +14,16 @@ Default: `simple` if not set or config missing.
 
 @$HOME/.config/opencode/get-shit-done/references/model-profiles.md
 
-Look up the agent in the table for the resolved profile. Pass the model parameter to task calls:
+Look up the agent in the table for the resolved profile. Pass the model parameter to subagent calls:
 
 ```
-task(
-  prompt="...",
-  subagent_type="gsd-planner",
-  model="{resolved_model}"  # "inherit", "sonnet", or "haiku"
-)
+@gsd-planner "..."
+# model is resolved from profile lookup
 ```
 
 **Note:** Opus-tier agents resolve to `"inherit"` (not `"opus"`). This causes the agent to use the parent session's model, avoiding conflicts with organization policies that may block specific opus versions.
+
+If `model_profile` is `"adaptive"`, agents resolve to role-based assignments (opus/sonnet/haiku based on agent type).
 
 If `model_profile` is `"inherit"`, all agents resolve to `"inherit"` (useful for OpenCode `/model`).
 
@@ -33,4 +32,4 @@ If `model_profile` is `"inherit"`, all agents resolve to `"inherit"` (useful for
 1. Resolve once at orchestration start
 2. Store the profile value
 3. Look up each agent's model from the table when spawning
-4. Pass model parameter to each task call (values: `"inherit"`, `"sonnet"`, `"haiku"`)
+4. Model is resolved automatically from profile for each subagent call

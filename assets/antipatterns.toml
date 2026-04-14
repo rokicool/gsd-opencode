@@ -36,3 +36,6 @@ forbidden_strings = [
         'gsd:update\\|GSD update\\|gsd-install',
         'model: haiku'
         ]
+forbidden_regexp_strings = [
+        'task\(\n'
+        ]

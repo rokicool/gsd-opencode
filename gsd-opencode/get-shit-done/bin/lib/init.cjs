@@ -870,6 +870,23 @@ function cmdInitManager(cwd, raw) {
   const phasesDir = paths.phases;
   const isDirInMilestone = getMilestonePhaseFilter(cwd);
 
+  // Pre-compute directory listing once (avoids O(N) readdirSync per phase)
+  const _phaseDirEntries = (() => {
+    try {
+      return fs.readdirSync(phasesDir, { withFileTypes: true })
+        .filter(e => e.isDirectory())
+        .map(e => e.name);
+    } catch { return []; }
+  })();
+
+  // Pre-extract all checkbox states in a single pass (avoids O(N) regex per phase)
+  const _checkboxStates = new Map();
+  const _cbPattern = /-\s*\[(x| )\]\s*.*Phase\s+(\d+[A-Z]?(?:\.\d+)*)[:\s]/gi;
+  let _cbMatch;
+  while ((_cbMatch = _cbPattern.exec(content)) !== null) {
+    _checkboxStates.set(_cbMatch[2], _cbMatch[1].toLowerCase() === 'x');
+  }
+
   const phasePattern = /#{2,4}\s*Phase\s+(\d+[A-Z]?(?:\.\d+)*)\s*:\s*([^\n]+)/gi;
   const phases = [];
   let match;
@@ -900,8 +917,7 @@ function cmdInitManager(cwd, raw) {
     let isActive = false;
 
     try {
-      const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-      const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).filter(isDirInMilestone);
+      const dirs = _phaseDirEntries.filter(isDirInMilestone);
       const dirMatch = dirs.find(d => phaseTokenMatches(d, normalized));
 
       if (dirMatch) {
@@ -935,10 +951,8 @@ function cmdInitManager(cwd, raw) {
       }
     } catch { /* intentionally empty */ }
 
-    // Check ROADMAP checkbox status
-    const checkboxPattern = new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[:\\s]`, 'i');
-    const checkboxMatch = content.match(checkboxPattern);
-    const roadmapComplete = checkboxMatch ? checkboxMatch[1] === 'x' : false;
+    // Check ROADMAP checkbox status (pre-extracted above the loop)
+    const roadmapComplete = _checkboxStates.get(phaseNum) || false;
     if (roadmapComplete && diskStatus !== 'complete') {
       diskStatus = 'complete';
     }
