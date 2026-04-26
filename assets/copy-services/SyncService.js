@@ -43,7 +43,6 @@ const DIRECTORY_MAPPING = {
   "bin/": "gsd-opencode/bin/",
   "commands/gsd/": "gsd-opencode/commands/gsd/",
   "docs/": "gsd-opencode/docs/",
-  "get-shit-done/bin/": "gsd-opencode/get-shit-done/bin/",
   "get-shit-done/references/": "gsd-opencode/get-shit-done/references/",
   "get-shit-done/templates/": "gsd-opencode/get-shit-done/templates/",
   "get-shit-done/workflows/": "gsd-opencode/get-shit-done/workflows/",

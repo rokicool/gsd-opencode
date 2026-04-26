@@ -14,7 +14,8 @@
   },
   "bin": {
     "gsd-opencode": "bin/gsd.js",
-    "gsd-install": "bin/gsd-install.js"
+    "gsd-install": "bin/gsd-install.js",
+    "gsd-sdk": "bin/gsd-sdk.js"
   },
   "scripts": {
     "test": "vitest run",
