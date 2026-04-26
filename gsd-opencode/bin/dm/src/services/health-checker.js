@@ -267,7 +267,7 @@ export class HealthChecker {
     // These represent key files that should always exist
     const sampleFiles = [
       { dir: 'agents', file: 'gsd-executor.md' },
-      { dir: 'commands', file: 'gsd/help.md' },
+      { dir: 'commands', file: 'gsd/gsd-help.md' },
       { dir: 'get-shit-done', file: 'templates/summary.md' },
       { dir: 'rules', file: 'gsd-oc-work-hard.md' },
       { dir: 'skills', file: 'gsd-oc-select-model/SKILL.md' }
