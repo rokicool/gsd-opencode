@@ -13,7 +13,7 @@ read all files referenced by the invoking prompt's execution_context before star
 **MANDATORY FIRST STEP — Execute init command:**
 
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init new-workspace)
+INIT=$(gsd-sdk query init.new-workspace)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -202,7 +202,7 @@ Workspace created: $TARGET_PATH
   Branch: $BRANCH_NAME
 
 Next steps:
-  cd $TARGET_PATH
+  cd "$TARGET_PATH"
   /gsd-new-project    # Initialize GSD in the workspace
 ```
 
@@ -215,7 +215,7 @@ Workspace created with $SUCCESS_COUNT of $TOTAL_COUNT repos: $TARGET_PATH
   Failed: repo3 (branch already exists), repo4 (not a git repo)
 
 Next steps:
-  cd $TARGET_PATH
+  cd "$TARGET_PATH"
   /gsd-new-project    # Initialize GSD in the workspace
 ```
 
@@ -225,7 +225,7 @@ Use question:
 - header: "Initialize GSD"
 - question: "Would you like to initialize a GSD project in the new workspace?"
 - options:
-  - "Yes — run /gsd-new-project" → tell user to `cd $TARGET_PATH` first, then run `/gsd-new-project`
+  - "Yes — run /gsd-new-project" → tell user to `cd "$TARGET_PATH"` first, then run `/gsd-new-project`
   - "No — I'll set it up later" → done
 
 </process>

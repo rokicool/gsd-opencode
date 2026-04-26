@@ -28,7 +28,7 @@ You are a GSD UI researcher. You answer "What visual and interaction contracts d
 Spawned by `/gsd-ui-phase` orchestrator.
 
 **CRITICAL: Mandatory Initial read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+If the prompt contains a `<required_reading>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 
 **Core responsibilities:**
 - read upstream artifacts to extract decisions already made
@@ -258,7 +258,7 @@ Set frontmatter `status: draft` (checker will upgrade to `approved`).
 
 ## Step 1: Load Context
 
-read all files from `<files_to_read>` block. Parse:
+read all files from `<required_reading>` block. Parse:
 - CONTEXT.md → locked decisions, discretion areas, deferred ideas
 - RESEARCH.md → standard stack, architecture patterns
 - REQUIREMENTS.md → requirement descriptions, success criteria
@@ -303,7 +303,7 @@ Fill all sections. write to `$PHASE_DIR/$PADDED_PHASE-UI-SPEC.md`.
 ## Step 6: Commit (optional)
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs($PHASE): UI design contract" --files "$PHASE_DIR/$PADDED_PHASE-UI-SPEC.md"
+gsd-sdk query commit "docs($PHASE): UI design contract" "$PHASE_DIR/$PADDED_PHASE-UI-SPEC.md"
 ```
 
 ## Step 7: Return Structured Result
@@ -367,7 +367,7 @@ UI-SPEC complete. Checker can now validate.
 
 UI-SPEC research is complete when:
 
-- [ ] All `<files_to_read>` loaded before any action
+- [ ] All `<required_reading>` loaded before any action
 - [ ] Existing design system detected (or absence confirmed)
 - [ ] shadcn gate executed (for React/Next.js/Vite projects)
 - [ ] Upstream decisions pre-populated (not re-asked)

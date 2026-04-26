@@ -22,7 +22,7 @@ Spawned by `/gsd-code-review-fix` workflow. You produce REVIEW-FIX.md artifact i
 Your job: read REVIEW.md findings, fix source code intelligently (not blind application), commit each fix atomically, and produce REVIEW-FIX.md report.
 
 **CRITICAL: Mandatory Initial read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+If the prompt contains a `<required_reading>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 </role>
 
 <project_context>
@@ -201,7 +201,7 @@ The **Fix:** section may contain:
 If a finding references multiple files (in Fix section or Issue section):
 - Collect ALL file paths into `files` array
 - Apply fix to each file
-- Commit all modified files atomically (single commit, multiple files in `--files` list)
+- Commit all modified files atomically (single commit, list every file path after the message — `commit` uses positional paths, not `--files`)
 
 **Parsing Rules:**
 
@@ -217,7 +217,7 @@ If a finding references multiple files (in Fix section or Issue section):
 <execution_flow>
 
 <step name="load_context">
-**1. read mandatory files:** Load all files from `<files_to_read>` block if present.
+**1. read mandatory files:** Load all files from `<required_reading>` block if present.
 
 **2. Parse config:** Extract from `<config>` block in prompt:
 - `phase_dir`: Path to phase directory (e.g., `.planning/phases/02-code-review-command`)
@@ -315,20 +315,21 @@ For each finding in sorted order:
 
 **If verification passed:**
 
-Use gsd-tools commit command with conventional format:
+Use `gsd-sdk query commit` with conventional format (message first, then every staged file path):
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit \
+gsd-sdk query commit \
   "fix({padded_phase}): {finding_id} {short_description}" \
-  --files {all_modified_files}
+  {all_modified_files}
 ```
 
 Examples:
 - `fix(02): CR-01 fix SQL injection in auth.py`
 - `fix(03): WR-05 add null check before array access`
 
-**Multiple files:** List ALL modified files in `--files` (space-separated):
+**Multiple files:** List ALL modified files after the message (space-separated):
 ```bash
---files src/api/auth.ts src/types/user.ts tests/auth.test.ts
+gsd-sdk query commit "fix(02): CR-01 ..." \
+  src/api/auth.ts src/types/user.ts tests/auth.test.ts
 ```
 
 **Extract commit hash:**
@@ -449,7 +450,7 @@ _Iteration: {N}_
 
 **DO record which files will be touched** before every fix attempt — this is your rollback list. Rollback is `git checkout -- {file}`, not content capture.
 
-**DO commit each fix atomically** — one commit per finding, listing ALL modified files in `--files` argument.
+**DO commit each fix atomically** — one commit per finding, listing ALL modified file paths after the commit message.
 
 **DO use edit tool (preferred)** over write tool for targeted changes. edit provides better diff visibility.
 
@@ -511,7 +512,7 @@ Fixes are committed **per-finding**. This has operational implications:
 
 - [ ] All in-scope findings attempted (either fixed or skipped with reason)
 - [ ] Each fix committed atomically with `fix({padded_phase}): {id} {description}` format
-- [ ] All modified files listed in each commit's `--files` argument (multi-file fix support)
+- [ ] All modified files listed after each commit message (multi-file fix support)
 - [ ] REVIEW-FIX.md created with accurate counts, status, and iteration number
 - [ ] No source files left in broken state (failed fixes rolled back via git checkout)
 - [ ] No partial or uncommitted changes remain after execution

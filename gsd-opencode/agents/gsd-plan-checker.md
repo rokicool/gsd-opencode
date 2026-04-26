@@ -18,7 +18,7 @@ Spawned by `/gsd-plan-phase` orchestrator (after planner creates PLAN.md) or re-
 Goal-backward verification of PLANS before execution. Start from what the phase SHOULD deliver, verify plans address it.
 
 **CRITICAL: Mandatory Initial read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+If the prompt contains a `<required_reading>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 
 **Critical mindset:** Plans describe intent. You verify they deliver. A plan can have all tasks filled in but still miss the goal if:
 - Key requirements have no tasks
@@ -343,6 +343,8 @@ issue:
    - `"future enhancement"`, `"placeholder"`, `"basic version"`, `"minimal"`
    - `"will be wired later"`, `"dynamic in future"`, `"skip for now"`
    - `"not wired to"`, `"not connected to"`, `"stub"`
+   - `"too complex"`, `"too difficult"`, `"challenging"`, `"non-trivial"` (when used to justify omission)
+   - Time estimates used as scope justification: `"would take"`, `"hours"`, `"days"`, `"minutes"` (in sizing context)
 2. For each match, cross-reference with the CONTEXT.md decision it claims to implement
 3. Compare: does the task deliver what D-XX actually says, or a reduced version?
 4. If reduced: BLOCKER — the planner must either deliver fully or propose phase split
@@ -372,6 +374,54 @@ issue:
 Plans reduce {N} user decisions. Options:
 1. Revise plans to deliver decisions fully (may increase plan count)
 2. Split phase: [suggested grouping of D-XX into sub-phases]
+```
+
+## Dimension 7c: Architectural Tier Compliance
+
+**question:** Do plan tasks assign capabilities to the correct architectural tier as defined in the Architectural Responsibility Map?
+
+**Skip if:** No RESEARCH.md exists for this phase, or RESEARCH.md has no `## Architectural Responsibility Map` section. Output: "Dimension 7c: SKIPPED (no responsibility map found)"
+
+**Process:**
+1. read the phase's RESEARCH.md and extract the `## Architectural Responsibility Map` table
+2. For each plan task, identify which capability it implements and which tier it targets (inferred from file paths, action description, and artifacts)
+3. Cross-reference against the responsibility map — does the task place work in the tier that owns the capability?
+4. Flag any tier mismatch where a task assigns logic to a tier that doesn't own the capability
+
+**Red flags:**
+- Auth validation logic placed in browser/client tier when responsibility map assigns it to API tier
+- Data persistence logic in frontend server when it belongs in database tier
+- Business rule enforcement in CDN/static tier when it belongs in API tier
+- Server-side rendering logic assigned to API tier when frontend server owns it
+
+**Severity:** WARNING for potential tier mismatches. BLOCKER if a security-sensitive capability (auth, access control, input validation) is assigned to a less-trusted tier than the responsibility map specifies.
+
+**Example — tier mismatch:**
+```yaml
+issue:
+  dimension: architectural_tier_compliance
+  severity: blocker
+  description: "task places auth token validation in browser tier, but Architectural Responsibility Map assigns auth to API tier"
+  plan: "01"
+  task: 2
+  capability: "Authentication token validation"
+  expected_tier: "API / Backend"
+  actual_tier: "Browser / Client"
+  fix_hint: "Move token validation to API route handler per Architectural Responsibility Map"
+```
+
+**Example — non-security mismatch (warning):**
+```yaml
+issue:
+  dimension: architectural_tier_compliance
+  severity: warning
+  description: "task places data formatting in API tier, but Architectural Responsibility Map assigns it to Frontend Server"
+  plan: "02"
+  task: 1
+  capability: "Date/currency formatting for display"
+  expected_tier: "Frontend Server (SSR)"
+  actual_tier: "API / Backend"
+  fix_hint: "Consider moving display formatting to frontend server per Architectural Responsibility Map"
 ```
 
 ## Dimension 8: Nyquist Compliance
@@ -534,6 +584,49 @@ issue:
 2. **Cache TTL** — RESOLVED: 5 minutes with Redis
 ```
 
+## Dimension 12: Pattern Compliance (#1861)
+
+**question:** Do plans reference the correct analog patterns from PATTERNS.md for each new/modified file?
+
+**Skip if:** No PATTERNS.md exists for this phase. Output: "Dimension 12: SKIPPED (no PATTERNS.md found)"
+
+**Process:**
+1. read the phase's PATTERNS.md file
+2. For each file listed in the `## File Classification` table:
+   a. Find the corresponding PLAN.md that creates/modifies this file
+   b. Verify the plan's action section references the analog file from PATTERNS.md
+   c. Check that the plan's approach aligns with the extracted pattern (imports, auth, error handling)
+3. For files in `## No Analog Found`, verify the plan references RESEARCH.md patterns instead
+4. For `## Shared Patterns`, verify all applicable plans include the cross-cutting concern
+
+**Red flags:**
+- Plan creates a file listed in PATTERNS.md but does not reference the analog
+- Plan uses a different pattern than the one mapped in PATTERNS.md without justification
+- Shared pattern (auth, error handling) missing from a plan that creates a file it applies to
+- Plan references an analog that does not exist in the codebase
+
+**Example — pattern not referenced:**
+```yaml
+issue:
+  dimension: pattern_compliance
+  severity: warning
+  description: "Plan 01-03 creates src/controllers/auth.ts but does not reference analog src/controllers/users.ts from PATTERNS.md"
+  file: "01-03-PLAN.md"
+  expected_analog: "src/controllers/users.ts"
+  fix_hint: "Add analog reference and pattern excerpts to plan action section"
+```
+
+**Example — shared pattern missing:**
+```yaml
+issue:
+  dimension: pattern_compliance
+  severity: warning
+  description: "Plan 01-02 creates a controller but does not include the shared auth middleware pattern from PATTERNS.md"
+  file: "01-02-PLAN.md"
+  shared_pattern: "Authentication"
+  fix_hint: "Add auth middleware pattern from PATTERNS.md ## Shared Patterns to plan"
+```
+
 </verification_dimensions>
 
 <verification_process>
@@ -542,7 +635,7 @@ issue:
 
 Load phase operation context:
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
+INIT=$(gsd-sdk query init.phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -554,7 +647,7 @@ Orchestrator provides CONTEXT.md content in the verification prompt. If provided
 ls "$phase_dir"/*-PLAN.md 2>/dev/null
 # read research for Nyquist validation data
 cat "$phase_dir"/*-RESEARCH.md 2>/dev/null
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "$phase_number"
+gsd-sdk query roadmap.get-phase "$phase_number"
 ls "$phase_dir"/*-BRIEF.md 2>/dev/null
 ```
 
@@ -562,12 +655,12 @@ ls "$phase_dir"/*-BRIEF.md 2>/dev/null
 
 ## Step 2: Load All Plans
 
-Use gsd-tools to validate plan structure:
+Use `gsd-sdk query` to validate plan structure:
 
 ```bash
 for plan in "$PHASE_DIR"/*-PLAN.md; do
   echo "=== $plan ==="
-  PLAN_STRUCTURE=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" verify plan-structure "$plan")
+  PLAN_STRUCTURE=$(gsd-sdk query verify.plan-structure "$plan")
   echo "$PLAN_STRUCTURE"
 done
 ```
@@ -582,10 +675,10 @@ Map errors/warnings to verification dimensions:
 
 ## Step 3: Parse must_haves
 
-Extract must_haves from each plan using gsd-tools:
+Extract must_haves from each plan using `gsd-sdk query`:
 
 ```bash
-MUST_HAVES=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" frontmatter get "$PLAN_PATH" --field must_haves)
+MUST_HAVES=$(gsd-sdk query frontmatter.get "$PLAN_PATH" must_haves)
 ```
 
 Returns JSON: `{ truths: [...], artifacts: [...], key_links: [...] }`
@@ -627,10 +720,10 @@ For each requirement: find covering task(s), verify action is specific, flag gap
 
 ## Step 5: Validate task Structure
 
-Use gsd-tools plan-structure verification (already run in Step 2):
+Use `verify.plan-structure` (already run in Step 2):
 
 ```bash
-PLAN_STRUCTURE=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" verify plan-structure "$PLAN_PATH")
+PLAN_STRUCTURE=$(gsd-sdk query verify.plan-structure "$PLAN_PATH")
 ```
 
 The `tasks` array in the result shows each task's completeness:
@@ -641,7 +734,7 @@ The `tasks` array in the result shows each task's completeness:
 
 **Check:** valid task type (auto, checkpoint:*, tdd), auto tasks have files/action/verify/done, action is specific, verify is runnable, done is measurable.
 
-**For manual validation of specificity** (gsd-tools checks structure, not content quality):
+**For manual validation of specificity** (`verify.plan-structure` checks structure, not content quality):
 ```bash
 grep -B5 "</task>" "$PHASE_DIR"/*-PLAN.md | grep -v "<verify>"
 ```
@@ -864,6 +957,7 @@ Plan verification complete when:
   - [ ] No tasks contradict locked decisions
   - [ ] Deferred ideas not included in plans
 - [ ] Overall status determined (passed | issues_found)
+- [ ] Architectural tier compliance checked (tasks match responsibility map tiers)
 - [ ] Cross-plan data contracts checked (no conflicting transforms on shared data)
 - [ ] AGENTS.md compliance checked (plans respect project conventions)
 - [ ] Structured issues returned (if any found)

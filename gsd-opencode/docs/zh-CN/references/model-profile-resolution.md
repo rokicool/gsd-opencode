@@ -14,11 +14,11 @@ MODEL_PROFILE=$(cat .planning/config.json 2>/dev/null | grep -o '"model_profile"
 
 @$HOME/.config/opencode/get-shit-done/references/model-profiles.md
 
-在表中查找已解析配置对应的代理。将 model 参数传递给 subagent 调用：
+在表中查找已解析配置对应的代理。将 model 参数传递给代理调用：
 
 ```
 @gsd-planner "..."
-# model 通过 profile 查找自动解析
+# model: {resolved_model}  # "inherit"、"sonnet" 或 "haiku"
 ```
 
 **注意：** Opus 级代理解析为 `"inherit"`（而非 `"opus"`）。这会使代理使用父会话的模型，避免与可能阻止特定 opus 版本的组织策略冲突。

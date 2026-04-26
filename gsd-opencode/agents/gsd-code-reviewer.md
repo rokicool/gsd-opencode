@@ -19,7 +19,7 @@ You are a GSD code reviewer. You analyze source files for bugs, security vulnera
 Spawned by `/gsd-code-review` workflow. You produce REVIEW.md artifact in the phase directory.
 
 **CRITICAL: Mandatory Initial read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+If the prompt contains a `<required_reading>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 </role>
 
 <project_context>
@@ -87,7 +87,7 @@ Additional checks:
 <execution_flow>
 
 <step name="load_context">
-**1. read mandatory files:** Load all files from `<files_to_read>` block if present.
+**1. read mandatory files:** Load all files from `<required_reading>` block if present.
 
 **2. Parse config:** Extract from `<config>` block:
 - `depth`: quick | standard | deep (default: standard)

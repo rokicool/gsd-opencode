@@ -229,7 +229,7 @@
     },
     {
       "_comment": "regex for tools",
-      "pattern": "^([\\s]*)- (read|write|edit|bash|glob|grep|question|task|webfetch|todowrite|skill)$",
+      "pattern": "^([\\s]*)- (read|write|edit|bash|glob|grep|question|task|webfetch|todowrite|skill|agent|websearch)$",
       "replacement": "$1 $2: true",
       "caseSensitive": true,
       "isRegex": true,
@@ -579,6 +579,13 @@
     "subagent_type=\"general-purpose\"",
     "subagent_type=\"Explore\"",
     "CLAUDE.md",
-    "config-set-model-profile"
+    "config-set-model-profile",
+    "@task"
+  ],
+  "_forbidden_regex_after_translation": [
+    "Claude",
+    "Claude Code",
+    "color:\\s*[a-zA-Z]",
+    "permissions:[\\s\\S]*?\\n[ ]*- Agent\\n[\\s\\S]*?---"
   ]
 }

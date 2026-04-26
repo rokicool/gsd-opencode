@@ -8,27 +8,4 @@ permissions:
 
 
 
-<objective>
-      Switch the model profile used by GSD agents. Controls which OpenCode model each agent uses, balancing quality vs token spend.
-
-      Routes to the set-profile workflow which handles:
-      - Argument validation (simple/smart/genius)
-      - Config file creation if missing
-      - Profile update in config.json
-      - Confirmation with model table display
-      </objective>
-
-      <execution_context>
-      @$HOME/.config/opencode/get-shit-done/workflows/oc-set-profile.md
-      </execution_context>
-
-      <process>
-      **Follow the set-profile workflow** from `@$HOME/.config/opencode/get-shit-done/workflows/oc-set-profile.md`.
-
-      The workflow handles all logic including:
-      1. Profile argument validation
-      2. Config file ensuring
-      3. Config reading and updating
-      4. Model table generation from MODEL_PROFILES
-      5. Confirmation display
-      </process> 
+!`if ! command -v gsd-sdk >/dev/null 2>&1; then printf '⚠ gsd-sdk not found in PATH — /gsd-set-profile requires it.\n\nInstall the GSD SDK:\n  npm install -g @gsd-build/sdk\n\nOr update GSD to get the latest packages:\n  /gsd-update\n'; exit 1; fi; gsd-sdk query config-set-model-profile $ARGUMENTS --raw`

@@ -21,7 +21,7 @@ Rules that apply to ALL workflows and agents. Individual workflows may have addi
 
 ## Subagent Rules
 
-10. **NEVER** use non-GSD agent types (generic agents, `Explore`, `Plan`, `bash`, `feature-dev`, etc.) -- ALWAYS use `@gsd-{agent}` call (e.g., `@gsd-phase-researcher`, `@gsd-executor`, `@gsd-planner`). GSD agents have project-aware prompts, audit logging, and workflow context. Generic agents bypass all of this.
+10. **NEVER** use non-GSD agent types (`generic`, `Explore`, `Plan`, `bash`, `feature-dev`, etc.) -- ALWAYS use `@gsd-{agent}` call (e.g., `@gsd-phase-researcher`, `@gsd-executor`, `@gsd-planner`). GSD agents have project-aware prompts, audit logging, and workflow context. Generic agents bypass all of this.
 11. **Do not** re-litigate decisions that are already locked in CONTEXT.md (or PROJECT.md ## Context section) -- respect locked decisions unconditionally.
 
 ## Questioning Anti-Patterns

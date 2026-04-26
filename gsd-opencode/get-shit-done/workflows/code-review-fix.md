@@ -18,7 +18,7 @@ Parse arguments and load project state:
 
 ```bash
 PHASE_ARG="${1}"
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
+INIT=$(gsd-sdk query init.phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -74,7 +74,7 @@ FIX_REPORT_PATH="${PHASE_DIR}/${PADDED_PHASE}-REVIEW-FIX.md"
 Check if code review is enabled via config:
 
 ```bash
-CODE_REVIEW_ENABLED=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.code_review 2>/dev/null || echo "true")
+CODE_REVIEW_ENABLED=$(gsd-sdk query config-get workflow.code_review 2>/dev/null || echo "true")
 ```
 
 If CODE_REVIEW_ENABLED is "false":
@@ -189,8 +189,7 @@ echo "Fix scope: ${FIX_SCOPE}"
 Use task() to spawn agent:
 
 ```
-@gsd-code-fixer "
-<files_to_read>
+@gsd-code-fixer """<files_to_read>
 ${REVIEW_PATH}
 </files_to_read>
 
@@ -204,7 +203,7 @@ iteration: 1
 </config>
 
 read REVIEW.md findings, apply fixes, commit each atomically, write REVIEW-FIX.md. Do NOT commit REVIEW-FIX.md (orchestrator handles that).
-"
+"""
 ```
 
 **Agent failure handling:**
@@ -270,8 +269,7 @@ if [ "$AUTO_MODE" = "true" ]; then
     
     # Spawn gsd-code-reviewer agent to re-review
     # (This overwrites REVIEW_PATH with latest review state)
-    @gsd-code-reviewer "
-<config>
+    @gsd-code-reviewer """<config>
 depth: ${REVIEW_DEPTH}
 phase_dir: ${PHASE_DIR}
 review_path: ${REVIEW_PATH}
@@ -280,7 +278,7 @@ ${FILES_CONFIG}
 
 Re-review the phase at ${REVIEW_DEPTH} depth. write findings to ${REVIEW_PATH}.
 Do NOT commit the output — the orchestrator handles that.
-"
+"""
     
     # Check new REVIEW.md status
     NEW_STATUS=$(REVIEW_PATH="${REVIEW_PATH}" node -e "
@@ -303,8 +301,7 @@ Do NOT commit the output — the orchestrator handles that.
     # Still has issues — spawn fixer again
     echo "Issues remain. Applying fixes for iteration ${ITERATION}..."
     
-    @gsd-code-fixer "
-<files_to_read>
+    @gsd-code-fixer """<files_to_read>
 ${REVIEW_PATH}
 </files_to_read>
 
@@ -318,7 +315,7 @@ iteration: ${ITERATION}
 </config>
 
 read REVIEW.md findings, apply fixes, commit each atomically, write REVIEW-FIX.md (overwrite previous). Do NOT commit REVIEW-FIX.md.
-"
+"""
     
     # Check if fixer succeeded
     if [ ! -f "${FIX_REPORT_PATH}" ]; then
@@ -359,7 +356,7 @@ if [ -f "${FIX_REPORT_PATH}" ]; then
     echo "REVIEW-FIX.md created at ${FIX_REPORT_PATH}"
     
     if [ "$COMMIT_DOCS" = "true" ]; then
-      node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit \
+      gsd-sdk query commit \
         "docs(${PADDED_PHASE}): add code review fix report" \
         --files "${FIX_REPORT_PATH}"
     fi

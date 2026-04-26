@@ -20,7 +20,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general'):
 Load execution context (paths only to minimize orchestrator context):
 
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init execute-phase "${PHASE}")
+INIT=$(gsd-sdk query init.execute-phase "${PHASE}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -40,7 +40,7 @@ Find first PLAN without matching SUMMARY. Decimal phases supported (`01.1-hotfix
 
 ```bash
 PHASE=$(echo "$PLAN_PATH" | grep -oE '[0-9]+(\.[0-9]+)?-[0-9]+')
-# config settings can be fetched via gsd-tools config-get if needed
+# config settings can be fetched via gsd-sdk query config-get if needed
 ```
 
 <if mode="yolo">
@@ -61,10 +61,19 @@ PLAN_START_EPOCH=$(date +%s)
 
 <step name="parse_segments">
 ```bash
+# Count tasks — match <task tag at any indentation level
+TASK_COUNT=$(grep -cE '^\s*<task[[:space:]>]' .planning/phases/XX-name/{phase}-{plan}-PLAN.md 2>/dev/null || echo "0")
+INLINE_THRESHOLD=$(gsd-sdk query config-get workflow.inline_plan_threshold 2>/dev/null || echo "2")
 grep -n "type=\"checkpoint" .planning/phases/XX-name/{phase}-{plan}-PLAN.md
 ```
 
-**Routing by checkpoint type:**
+**Primary routing: task count threshold (#1979)**
+
+If `INLINE_THRESHOLD > 0` AND `TASK_COUNT <= INLINE_THRESHOLD`: Use Pattern C (inline) regardless of checkpoint type. Small plans execute faster inline — avoids ~14K token subagent spawn overhead and preserves prompt cache. Configure threshold via `workflow.inline_plan_threshold` (default: 2, set to `0` to always spawn subagents).
+
+Otherwise: Apply checkpoint-based routing below.
+
+**Checkpoint-based routing (plans with > threshold tasks):**
 
 | Checkpoints | Pattern | Execution |
 |-------------|---------|-----------|
@@ -132,7 +141,7 @@ This IS the execution instructions. Follow exactly. If plan references CONTEXT.m
 
 <step name="previous_phase_check">
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" phases list --type summaries --raw
+gsd-sdk query phases.list --type summaries --raw
 # Extract the second-to-last summary from the JSON result
 ```
 
@@ -246,13 +255,9 @@ If a commit is BLOCKED by a hook:
 <task_commit>
 ## task Commit Protocol
 
-Follow the task commit protocol from the gsd-executor agent definition (single source of truth):
-- Stage files individually (NEVER `git add .` or `git add -A`)
-- Format: `{type}({phase}-{plan}): {concise description}` with bullet points for key changes
-- Types: feat, fix, test, refactor, perf, docs, style, chore
-- Sub-repos: use `commit-to-subrepo` when `sub_repos` is configured
-- Record commit hash for SUMMARY tracking
-- Check for untracked generated files after each commit
+Canonical per-task commit rules live in **`agents/gsd-executor.md`** (`<task_commit_protocol>`). Follow that section for staging, `{type}({phase}-{plan})` messages, `commit-to-subrepo` when `sub_repos` is set, post-commit checks, and untracked-file handling — do not duplicate or paraphrase the full protocol here (single source of truth).
+
+**Orchestrator note:** After each task, the spawned executor reports commit hashes; this workflow does not re-specify commit semantics beyond pointing at the executor.
 
 </task_commit>
 
@@ -285,7 +290,7 @@ If verification fails:
 
 **Check if node repair is enabled** (default: on):
 ```bash
-NODE_REPAIR=$(node "./.OpenCode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.node_repair 2>/dev/null || echo "true")
+NODE_REPAIR=$(gsd-sdk query config-get workflow.node_repair 2>/dev/null || echo "true")
 ```
 
 If `NODE_REPAIR` is `true`: invoke `@./.OpenCode/get-shit-done/workflows/node-repair.md` with:
@@ -344,7 +349,7 @@ Next: more plans → "Ready for {next-plan}" | last → "Phase complete, ready f
 handles STATE.md/ROADMAP.md updates centrally after merging worktrees to avoid
 merge conflicts).
 
-Update STATE.md using gsd-tools:
+Update STATE.md using gsd-sdk query (or legacy gsd-tools) state mutations:
 
 ```bash
 # Auto-detect parallel mode: .git is a file in worktrees, a directory in main repo
@@ -353,13 +358,13 @@ IS_WORKTREE=$([ -f .git ] && echo "true" || echo "false")
 # Skip in parallel mode — orchestrator handles STATE.md centrally
 if [ "$IS_WORKTREE" != "true" ]; then
   # Advance plan counter (handles last-plan edge case)
-  node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state advance-plan
+  gsd-sdk query state.advance-plan
 
   # Recalculate progress bar from disk state
-  node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state update-progress
+  gsd-sdk query state.update-progress
 
   # Record execution metrics
-  node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state record-metric \
+  gsd-sdk query state.record-metric \
     --phase "${PHASE}" --plan "${PLAN}" --duration "${DURATION}" \
     --tasks "${TASK_COUNT}" --files "${FILE_COUNT}"
 fi
@@ -372,19 +377,19 @@ From SUMMARY: Extract decisions and add to STATE.md:
 ```bash
 # Add each decision from SUMMARY key-decisions
 # Prefer file inputs for shell-safe text (preserves `$`, `*`, etc. exactly)
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state add-decision \
+gsd-sdk query state.add-decision \
   --phase "${PHASE}" --summary-file "${DECISION_TEXT_FILE}" --rationale-file "${RATIONALE_FILE}"
 
 # Add blockers if any found
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state add-blocker --text-file "${BLOCKER_TEXT_FILE}"
+gsd-sdk query state.add-blocker --text-file "${BLOCKER_TEXT_FILE}"
 ```
 </step>
 
 <step name="update_session_continuity">
-Update session info using gsd-tools:
+Update session info using gsd-sdk query (or legacy gsd-tools):
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state record-session \
+gsd-sdk query state.record-session \
   --stopped-at "Completed ${PHASE}-${PLAN}-PLAN.md" \
   --resume-file "None"
 ```
@@ -406,7 +411,7 @@ IS_WORKTREE=$([ -f .git ] && echo "true" || echo "false")
 
 # Skip in parallel mode — orchestrator handles ROADMAP.md centrally
 if [ "$IS_WORKTREE" != "true" ]; then
-  node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap update-plan-progress "${PHASE}"
+  gsd-sdk query roadmap.update-plan-progress "${PHASE}"
 fi
 ```
 Counts PLAN vs SUMMARY files on disk. Updates progress table row with correct count and status (`In Progress` or `Complete` with date).
@@ -416,7 +421,7 @@ Counts PLAN vs SUMMARY files on disk. Updates progress table row with correct co
 Mark completed requirements from the PLAN.md frontmatter `requirements:` field:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" requirements mark-complete ${REQ_IDS}
+gsd-sdk query requirements.mark-complete ${REQ_IDS}
 ```
 
 Extract requirement IDs from the plan's frontmatter (e.g., `requirements: [AUTH-01, AUTH-02]`). If no requirements field, skip.
@@ -431,9 +436,9 @@ IS_WORKTREE=$([ -f .git ] && echo "true" || echo "false")
 
 # In parallel mode: exclude STATE.md and ROADMAP.md (orchestrator commits these)
 if [ "$IS_WORKTREE" = "true" ]; then
-  node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/REQUIREMENTS.md
+  gsd-sdk query commit "docs({phase}-{plan}): complete [plan-name] plan" .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/REQUIREMENTS.md
 else
-  node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md
+  gsd-sdk query commit "docs({phase}-{plan}): complete [plan-name] plan" .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md
 fi
 ```
 </step>
@@ -449,7 +454,7 @@ git diff --name-only ${FIRST_TASK}^..HEAD 2>/dev/null || true
 Update only structural changes: new src/ dir → STRUCTURE.md | deps → STACK.md | file pattern → CONVENTIONS.md | API client → INTEGRATIONS.md | config → STACK.md | renamed → update paths. Skip code-only/bugfix/content changes.
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "" --files .planning/codebase/*.md --amend
+gsd-sdk query commit "" .planning/codebase/*.md --amend
 ```
 </step>
 

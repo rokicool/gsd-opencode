@@ -12,7 +12,7 @@ read all files referenced by the invoking prompt's execution_context before star
 Load todo context:
 
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init todos)
+INIT=$(gsd-sdk query init.todos)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -86,7 +86,7 @@ Use values from init context: `timestamp` and `date` are already available.
 
 Generate slug for the title:
 ```bash
-slug=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" generate-slug "$title" --raw)
+slug=$(gsd-sdk query generate-slug "$title" --raw)
 ```
 
 write to `.planning/todos/pending/${date}-${slug}.md`:
@@ -121,7 +121,7 @@ If `.planning/STATE.md` exists:
 Commit the todo and any updated state:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: capture todo - [title]" --files .planning/todos/pending/[filename] .planning/STATE.md
+gsd-sdk query commit "docs: capture todo - [title]" .planning/todos/pending/[filename] .planning/STATE.md
 ```
 
 Tool respects `commit_docs` config and gitignore automatically.
