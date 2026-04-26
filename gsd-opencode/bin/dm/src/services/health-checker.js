@@ -3,8 +3,8 @@
  *
  * This module provides comprehensive health checking capabilities for
  * GSD-OpenCode installations. It can verify file existence, version matching,
- * and file integrity through hash comparison. Works in conjunction with
- * ScopeManager to handle both global and local installations.
+ * and file integrity through hash comparison against the installation manifest.
+ * Works in conjunction with ScopeManager to handle both global and local installations.
  *
  * @module health-checker
  */
@@ -13,8 +13,9 @@ import fs from 'fs/promises';
 import path from 'path';
 import { ScopeManager } from './scope-manager.js';
 import { hashFile } from '../utils/hash.js';
-import { DIRECTORIES_TO_COPY, VERSION_FILE } from '../../lib/constants.js';
+import { DIRECTORIES_TO_COPY, VERSION_FILE, MANIFEST_FILENAME } from '../../lib/constants.js';
 import { StructureDetector, STRUCTURE_TYPES } from './structure-detector.js';
+import { ManifestManager } from './manifest-manager.js';
 
 /**
  * Manages health verification for GSD-OpenCode installations.
@@ -240,71 +241,138 @@ export class HealthChecker {
   }
 
   /**
-   * Verifies file integrity by checking that key files are readable.
+   * Verifies file integrity by comparing ALL installed files against the manifest.
    *
-   * For v1, this performs basic integrity checks by verifying that
-   * sample files from each required directory exist and are readable.
-   * Future versions may compare against known-good hashes.
+   * Loads the installation manifest (get-shit-done/INSTALLED_FILES.json) which
+   * contains every installed file with its SHA-256 hash recorded at install time.
+   * For each manifest entry:
+   *   - Checks if the file still exists
+   *   - Computes current hash and compares against the recorded hash
+   * Also scans installed directories for extra files not in the manifest.
    *
    * @returns {Promise<Object>} Integrity verification results
    * @property {boolean} passed - True if all integrity checks pass
+   * @property {number} totalChecked - Total number of files checked
+   * @property {number} passedCount - Number of files that passed
+   * @property {number} failedCount - Number of files that failed
    * @property {Array} checks - Detailed check results for each file
    *
    * @example
    * const result = await health.verifyIntegrity();
-   * console.log(result.passed); // true/false
-   * console.log(result.checks);
-   * // [
-   * //   { file: '/.../agents/README.md', passed: true },
-   * //   { file: '/.../command/gsd/help.md', passed: true }
-   * // ]
+   * console.log(`${result.passedCount}/${result.totalChecked} files OK`);
    */
   async verifyIntegrity() {
     const checks = [];
     let allPassed = true;
 
-    // Check sample files from each required directory
-    // These represent key files that should always exist
-    const sampleFiles = [
-      { dir: 'agents', file: 'gsd-executor.md' },
-      { dir: 'commands', file: 'gsd/gsd-help.md' },
-      { dir: 'get-shit-done', file: 'templates/summary.md' },
-      { dir: 'rules', file: 'gsd-oc-work-hard.md' },
-      { dir: 'skills', file: 'gsd-oc-select-model/SKILL.md' }
-    ];
+    // Load the installation manifest
+    const manifestManager = new ManifestManager(this.targetDir);
+    const manifestEntries = await manifestManager.load();
 
-    for (const { dir, file } of sampleFiles) {
-      const filePath = path.join(this.targetDir, dir, file);
-      try {
-        // Try to read and hash the file
-        const hash = await hashFile(filePath);
-        const passed = hash !== null;
-        checks.push({
-          file: filePath,
-          hash,
-          passed,
-          relative: path.join(dir, file)
-        });
-        if (!passed) allPassed = false;
-      } catch (error) {
-        checks.push({
-          file: filePath,
-          hash: null,
-          passed: false,
-          relative: path.join(dir, file),
-          error: error.code === 'ENOENT' ? 'File not found' : error.message
-        });
-        allPassed = false;
+    if (manifestEntries && manifestEntries.length > 0) {
+      // Verify each manifest entry: check existence and hash
+      for (const entry of manifestEntries) {
+        const filePath = entry.path;
+        const recordedHash = entry.hash;
+        const relativePath = entry.relativePath;
+
+        try {
+          const currentHash = await hashFile(filePath);
+
+          if (currentHash === null) {
+            checks.push({
+              file: filePath,
+              hash: null,
+              passed: false,
+              relative: relativePath,
+              error: 'File not found or unreadable'
+            });
+            allPassed = false;
+            continue;
+          }
+
+          // Normalize hashes for comparison (handle 'sha256:' prefix)
+          const normalize = h => h.startsWith('sha256:') ? h : `sha256:${h}`;
+          const hashMatch = normalize(currentHash) === normalize(recordedHash);
+
+          checks.push({
+            file: filePath,
+            hash: currentHash,
+            recordedHash,
+            passed: hashMatch,
+            relative: relativePath,
+            error: hashMatch ? undefined : 'Hash mismatch — file content differs from installation record'
+          });
+          if (!hashMatch) allPassed = false;
+        } catch (error) {
+          checks.push({
+            file: filePath,
+            hash: null,
+            passed: false,
+            relative: relativePath,
+            error: error.code === 'ENOENT' ? 'Missing from installation' : error.message
+          });
+          allPassed = false;
+        }
+      }
+
+      // Detect extra files not in the manifest
+      const manifestRelativePaths = new Set(manifestEntries.map(e => e.relativePath));
+      const installedFiles = await this._enumerateInstalledFiles();
+      for (const relative of installedFiles) {
+        if (!manifestRelativePaths.has(relative)) {
+          const installedPath = path.join(this.targetDir, relative);
+          checks.push({
+            file: installedPath,
+            hash: null,
+            passed: true,
+            relative,
+            note: 'extra file (not tracked in manifest)'
+          });
+        }
+      }
+    } else {
+      // Fallback: no manifest available, check key sample files only
+      const sampleFiles = [
+        { dir: 'agents', file: 'gsd-executor.md' },
+        { dir: 'commands', file: 'gsd/gsd-help.md' },
+        { dir: 'get-shit-done', file: 'templates/summary.md' },
+        { dir: 'rules', file: 'gsd-oc-work-hard.md' },
+        { dir: 'skills', file: 'gsd-oc-select-model/SKILL.md' }
+      ];
+
+      for (const { dir, file } of sampleFiles) {
+        const filePath = path.join(this.targetDir, dir, file);
+        try {
+          const hash = await hashFile(filePath);
+          const passed = hash !== null;
+          checks.push({
+            file: filePath,
+            hash,
+            passed,
+            relative: path.join(dir, file)
+          });
+          if (!passed) allPassed = false;
+        } catch (error) {
+          checks.push({
+            file: filePath,
+            hash: null,
+            passed: false,
+            relative: path.join(dir, file),
+            error: error.code === 'ENOENT' ? 'File not found' : error.message
+          });
+          allPassed = false;
+        }
       }
     }
 
-    // Also verify VERSION file is readable (counts as integrity check)
+    // Also verify VERSION file is readable
     const versionPath = path.join(this.targetDir, VERSION_FILE);
     try {
-      const content = await fs.readFile(versionPath, 'utf-8');
+      await fs.readFile(versionPath, 'utf-8');
       checks.push({
         file: versionPath,
-        hash: null, // We don't hash VERSION file
+        hash: null,
         passed: true,
         relative: VERSION_FILE
       });
@@ -319,10 +387,53 @@ export class HealthChecker {
       allPassed = false;
     }
 
+    const passedCount = checks.filter(c => c.passed).length;
+
     return {
       passed: allPassed,
+      totalChecked: checks.length,
+      passedCount,
+      failedCount: checks.length - passedCount,
       checks
     };
+  }
+
+  /**
+   * Recursively enumerates all files in the installed directories.
+   *
+   * @returns {Promise<string[]>} Array of relative file paths
+   * @private
+   */
+  async _enumerateInstalledFiles() {
+    const files = [];
+
+    async function walkDir(dir, relativeBase) {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        const relative = relativeBase ? `${relativeBase}/${entry.name}` : entry.name;
+
+        if (entry.isDirectory()) {
+          if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+          await walkDir(fullPath, relative);
+        } else {
+          if (entry.name.startsWith('.')) continue;
+          files.push(relative);
+        }
+      }
+    }
+
+    for (const dirName of DIRECTORIES_TO_COPY) {
+      const dirPath = path.join(this.targetDir, dirName);
+      try {
+        await fs.stat(dirPath);
+        await walkDir(dirPath, dirName);
+      } catch {
+        // Directory doesn't exist, skip
+      }
+    }
+
+    return files;
   }
 
   /**
