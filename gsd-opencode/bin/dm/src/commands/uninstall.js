@@ -179,6 +179,17 @@ export async function uninstallCommand(options = {}) {
     logger.info("\n🗑️  Removing files...");
     const removalResult = await removeFiles(categorized.toRemove, targetDir);
 
+    // Step 10.5: Remove .env file (written during install, not in manifest)
+    try {
+      const envPath = path.join(targetDir, ".env");
+      await fs.unlink(envPath);
+      logger.debug("Removed: .env");
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        logger.debug(`Could not remove .env: ${error.message}`);
+      }
+    }
+
     // Step 11: Clean up empty directories
     const dirResult = await cleanupDirectories(categorized, targetDir);
 

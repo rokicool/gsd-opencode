@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.38.1] - 2026-04-26
+
+Overview: Rewrote health check integrity verification to use installation manifest with SHA-256 hash comparison instead of sample file checks. Added install.js and gsd-sdk.js scripts for streamlined OpenCode tooling. Fixed false negatives in check command and integrity verification.
+
+### Added
+
+- `install.js` script (7434 lines) providing comprehensive multi-runtime installation and uninstallation support for OpenCode, Codex, Gemini, Copilot, Cursor, Windsurf, Cline, Antigravity, Trae, Qwen, CodeBuddy, Augment, and Kilo in `gsd-opencode/bin/install.js`
+- `gsd-sdk.js` script as SDK entry point in `gsd-opencode/bin/gsd-sdk.js`
+- `gsd-local-patches/` directory support for preserving user modifications across updates in `gsd-opencode/bin/install.js`
+- `gsd-file-manifest.json` generation for tracking installed files with SHA-256 hashes in `gsd-opencode/bin/install.js`
+- JSONC config parsing support for OpenCode and Kilo configuration files in `gsd-opencode/bin/install.js`
+- Runtime-specific permission configuration for OpenCode and Kilo in `gsd-opencode/bin/install.js`
+- User artifact preservation during re-install for `USER-PROFILE.md` and `dev-preferences.md` in `gsd-opencode/bin/install.js`
+- Leaked path detection for unreplaced .OpenCode references in non-OpenCode runtimes in `gsd-opencode/bin/install.js`
+- Codex config.toml generation with agent roles and hooks configuration in `gsd-opencode/bin/install.js`
+- Copilot instructions merging with `copilot-instructions.md` in `gsd-opencode/bin/install.js`
+- Hook file installation with version stamping and executable permissions in `gsd-opencode/bin/install.js`
+- Context monitor hook auto-migration adding matcher and timeout in `gsd-opencode/bin/install.js`
+- Agent frontmatter conversion for all supported runtimes in `gsd-opencode/bin/install.js`
+- Command-to-skill conversion functions for Codex, Copilot, Cursor, Windsurf, Trae, Antigravity, Augment, Codebuddy, and Qwen in `gsd-opencode/bin/install.js`
+
+### Changed
+
+- Rewrote `verifyIntegrity()` in `HealthChecker` to load installation manifest and compare SHA-256 hashes for all installed files instead of checking sample files in `gsd-opencode/bin/dm/src/services/health-checker.js`
+- Added extra file detection to identify files not tracked in the installation manifest in `gsd-opencode/bin/dm/src/services/health-checker.js`
+- Updated integrity check output to show `passedCount/totalChecked files verified` summary instead of listing all files in `gsd-opencode/bin/dm/src/commands/check.js`
+- Fixed package root resolution from `../..` to `../../../..` in check command in `gsd-opencode/bin/dm/src/commands/check.js`
+- Updated health-checker imports to include `ManifestManager` and `MANIFEST_FILENAME` in `gsd-opencode/bin/dm/src/services/health-checker.js`
+- Added `gsd-sdk.js` and `install.js` to package.json bin array in `gsd-opencode/package.json`
+- Added whitespace normalization in `discovery-phase.md` in `gsd-opencode/get-shit-done/workflows/discovery-phase.md`
+
+### Fixed
+
+- Fixed integrity check false negative for `help.md` (renamed to `gsd-help.md`) in `gsd-opencode/bin/dm/src/services/health-checker.js`
+- Fixed check command false negatives for version and integrity checks by using manifest-based verification in `gsd-opencode/bin/dm/src/commands/check.js`
+- Fixed integrity check to only display failed files instead of all files in output in `gsd-opencode/bin/dm/src/commands/check.js`
+
 ## [1.38.0] - 2026-04-25
 
 Overview: Major upstream sync from GSD v1.38.5 introducing UI sketching and spiking workflows, Socratic spec refinement phase, plan convergence via external AI reviewers, ultraplan cloud integration, document ingestion pipeline, and enhanced debugging with session management. Added 4 new agents, 18 new commands, 8 new library modules, 19 new reference documents, and comprehensive workflow infrastructure for design exploration and knowledge capture.
