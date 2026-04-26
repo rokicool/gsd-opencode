@@ -31,6 +31,7 @@ import { isBinary } from '../utils/binary-check.js';
  */
 const DIRECTORY_MAPPING = {
   'agents/': 'gsd-opencode/agents/',
+  'bin/': 'gsd-opencode/bin/',
   'commands/gsd/': 'gsd-opencode/commands/gsd/',
   'docs/': 'gsd-opencode/docs/',
   'get-shit-done/bin/': 'gsd-opencode/get-shit-done/bin/',
