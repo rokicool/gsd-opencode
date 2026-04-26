@@ -5,26 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.38.5] - 2026-04-25
+## [1.38.0] - 2026-04-25
 
 Overview: Major upstream sync from GSD v1.38.5 introducing UI sketching and spiking workflows, Socratic spec refinement phase, plan convergence via external AI reviewers, ultraplan cloud integration, document ingestion pipeline, and enhanced debugging with session management. Added 4 new agents, 18 new commands, 8 new library modules, 19 new reference documents, and comprehensive workflow infrastructure for design exploration and knowledge capture.
 
 ### Added
 
-- `/gsd-sketch` command and `sketch` workflow for exploring UI/design ideas with throwaway HTML mockups and theme system in `gsd-opencode/commands/gsd/gsd-sketch.md` and `gsd-opencode/get-shit-done/workflows/sketch.md`
-- `/gsd-sketch-wrap-up` command and `sketch-wrap-up` workflow for finalizing selected sketch variants into production components in `gsd-opencode/commands/gsd/gsd-sketch-wrap-up.md` and `gsd-opencode/get-shit-done/workflows/sketch-wrap-up.md`
-- `/gsd-spike` command and `spike` workflow for experiential idea validation through targeted experiments in `gsd-opencode/commands/gsd/gsd-spike.md` and `gsd-opencode/get-shit-done/workflows/spike.md`
-- `/gsd-spike-wrap-up` command and `spike-wrap-up` workflow for consolidating spike findings into documented knowledge in `gsd-opencode/commands/gsd/gsd-spike-wrap-up.md` and `gsd-opencode/get-shit-done/workflows/spike-wrap-up.md`
-- `/gsd-spec-phase` command and `spec-phase` workflow for Socratic requirement clarification with ambiguity scoring before planning in `gsd-opencode/commands/gsd/gsd-spec-phase.md` and `gsd-opencode/get-shit-done/workflows/spec-phase.md`
-- `/gsd-ultraplan-phase` command for offloading planning to OpenCode's ultraplan cloud infrastructure with browser review in `gsd-opencode/commands/gsd/gsd-ultraplan-phase.md`
-- `/gsd-plan-review-convergence` command and workflow for cross-AI plan convergence loop using external AI CLIs (codex, gemini, OpenCode) until no HIGH concerns remain in `gsd-opencode/commands/gsd/gsd-plan-review-convergence.md` and `gsd-opencode/get-shit-done/workflows/plan-review-convergence.md`
-- `/gsd-ingest-docs` command and `ingest-docs` workflow for classifying, synthesizing, and consolidating existing planning documents with conflict detection in `gsd-opencode/commands/gsd/gsd-ingest-docs.md` and `gsd-opencode/get-shit-done/workflows/ingest-docs.md`
-- `/gsd-extract_learnings` command and `extract_learnings` workflow for capturing and retrieving project learnings in `gsd-opencode/commands/gsd/gsd-extract_learnings.md` and `gsd-opencode/get-shit-done/workflows/extract_learnings.md`
-- `/gsd-sync-skills` command and `sync-skills` workflow for synchronizing skill definitions in `gsd-opencode/commands/gsd/gsd-sync-skills.md` and `gsd-opencode/get-shit-done/workflows/sync-skills.md`
-- `/gsd-graphify` command for visualizing project structure in `gsd-opencode/commands/gsd/gsd-graphify.md`
-- `/gsd-settings-advanced` and `/gsd-settings-integrations` commands for advanced configuration and integration management in `gsd-opencode/commands/gsd/`
-- `/gsd-oc-set-profile` command for OpenCode profile configuration in `gsd-opencode/commands/gsd/gsd-oc-set-profile.md`
-- `/gsd-inbox` command for inbox management in `gsd-opencode/commands/gsd/gsd-inbox.md`
+- `gsd-sketch` command and `sketch` workflow for exploring UI/design ideas with throwaway HTML mockups and theme system in `gsd-opencode/commands/gsd/gsd-sketch.md` and `gsd-opencode/get-shit-done/workflows/sketch.md`
+- `gsd-sketch-wrap-up` command and `sketch-wrap-up` workflow for finalizing selected sketch variants into production components in `gsd-opencode/commands/gsd/gsd-sketch-wrap-up.md` and `gsd-opencode/get-shit-done/workflows/sketch-wrap-up.md`
+- `gsd-spike` command and `spike` workflow for experiential idea validation through targeted experiments in `gsd-opencode/commands/gsd/gsd-spike.md` and `gsd-opencode/get-shit-done/workflows/spike.md`
+- `gsd-spike-wrap-up` command and `spike-wrap-up` workflow for consolidating spike findings into documented knowledge in `gsd-opencode/commands/gsd/gsd-spike-wrap-up.md` and `gsd-opencode/get-shit-done/workflows/spike-wrap-up.md`
+- `gsd-spec-phase` command and `spec-phase` workflow for Socratic requirement clarification with ambiguity scoring before planning in `gsd-opencode/commands/gsd/gsd-spec-phase.md` and `gsd-opencode/get-shit-done/workflows/spec-phase.md`
+- `gsd-ultraplan-phase` command for offloading planning to OpenCode's ultraplan cloud infrastructure with browser review in `gsd-opencode/commands/gsd/gsd-ultraplan-phase.md`
+- `gsd-plan-review-convergence` command and workflow for cross-AI plan convergence loop using external AI CLIs (codex, gemini, OpenCode) until no HIGH concerns remain in `gsd-opencode/commands/gsd/gsd-plan-review-convergence.md` and `gsd-opencode/get-shit-done/workflows/plan-review-convergence.md`
+- `gsd-ingest-docs` command and `ingest-docs` workflow for classifying, synthesizing, and consolidating existing planning documents with conflict detection in `gsd-opencode/commands/gsd/gsd-ingest-docs.md` and `gsd-opencode/get-shit-done/workflows/ingest-docs.md`
+- `gsd-extract_learnings` command and `extract_learnings` workflow for capturing and retrieving project learnings in `gsd-opencode/commands/gsd/gsd-extract_learnings.md` and `gsd-opencode/get-shit-done/workflows/extract_learnings.md`
+- `gsd-sync-skills` command and `sync-skills` workflow for synchronizing skill definitions in `gsd-opencode/commands/gsd/gsd-sync-skills.md` and `gsd-opencode/get-shit-done/workflows/sync-skills.md`
+- `gsd-graphify` command for visualizing project structure in `gsd-opencode/commands/gsd/gsd-graphify.md`
+- `gsd-settings-advanced` and `gsd-settings-integrations` commands for advanced configuration and integration management in `gsd-opencode/commands/gsd/`
+- `gsd-oc-set-profile` command for OpenCode profile configuration in `gsd-opencode/commands/gsd/gsd-oc-set-profile.md`
+- `gsd-inbox` command for inbox management in `gsd-opencode/commands/gsd/gsd-inbox.md`
 - `gsd-debug-session-manager` agent for multi-cycle debug checkpoint and continuation loop in isolated context in `gsd-opencode/agents/gsd-debug-session-manager.md`
 - `gsd-doc-classifier` agent for classifying planning documents as ADR, PRD, SPEC, DOC, or UNKNOWN in `gsd-opencode/agents/gsd-doc-classifier.md`
 - `gsd-doc-synthesizer` agent for synthesizing classified docs with precedence rules and conflict detection in `gsd-opencode/agents/gsd-doc-synthesizer.md`
