@@ -19,7 +19,7 @@ read all files referenced by the invoking prompt's execution_context before star
 Bootstrap via manager init:
 
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init manager)
+INIT=$(gsd-sdk query init.manager)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -30,7 +30,7 @@ Parse JSON for: `milestone_version`, `milestone_name`, `phase_count`, `completed
 - `manager_flags.plan` — appended to plan agent init command
 - `manager_flags.execute` — appended to execute agent init command
 
-These are empty strings by default. Set via: `gsd-tools config-set manager.flags.discuss "--auto --analyze"`
+These are empty strings by default. Set via: `gsd-sdk query config-set manager.flags.discuss "--auto --analyze"`
 
 **If error:** Display the error message and exit.
 
@@ -60,7 +60,7 @@ Proceed to dashboard step.
 **Every time this step is reached**, re-read state from disk to pick up changes from background agents:
 
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init manager)
+INIT=$(gsd-sdk query init.manager)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 

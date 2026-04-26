@@ -12,17 +12,19 @@ read all files referenced by the invoking prompt's execution_context before star
 Ensure config exists and load current state:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-ensure-section
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state load)
+gsd-sdk query config-ensure-section
+GSD_CONFIG_PATH=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-path)
+INIT=$(gsd-sdk query state.load)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
-Creates `.planning/config.json` with defaults if missing and loads current config values.
+Creates config.json (at the workstream-aware path) with defaults if missing and loads current config values.
+Store `$GSD_CONFIG_PATH` — all subsequent reads and writes use this path, not the hardcoded `.planning/config.json`, so active-workstream installs write to the correct location (#2282).
 </step>
 
 <step name="read_current">
 ```bash
-cat .planning/config.json
+cat "$GSD_CONFIG_PATH"
 ```
 
 Parse current values (default to `true` if not present):
@@ -213,7 +215,7 @@ Merge new settings into existing config.json:
 }
 ```
 
-write updated config to `.planning/config.json`.
+write updated config to `$GSD_CONFIG_PATH` (the workstream-aware path resolved in `ensure_and_load_config`). Never hardcode `.planning/config.json` — workstream installs route to `.planning/workstreams/<slug>/config.json`.
 </step>
 
 <step name="save_as_defaults">

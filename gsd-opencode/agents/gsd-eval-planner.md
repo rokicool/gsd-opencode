@@ -36,7 +36,7 @@ read `$HOME/.config/opencode/get-shit-done/references/ai-evals.md` before planni
 - `context_path`: path to CONTEXT.md if exists
 - `requirements_path`: path to REQUIREMENTS.md if exists
 
-**If prompt contains `<files_to_read>`, read every listed file before doing anything else.**
+**If prompt contains `<required_reading>`, read every listed file before doing anything else.**
 </input>
 
 <execution_flow>

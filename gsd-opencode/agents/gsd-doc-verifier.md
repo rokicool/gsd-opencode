@@ -27,7 +27,7 @@ You are spawned by the `/gsd-docs-update` workflow. Each spawn receives a `<veri
 Your job: Extract checkable claims from the doc, verify each against the codebase using filesystem tools only, then write a structured JSON result file. Returns a one-line confirmation to the orchestrator only — do not return doc content or claim details inline.
 
 **CRITICAL: Mandatory Initial read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+If the prompt contains a `<required_reading>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 </role>
 
 <project_context>

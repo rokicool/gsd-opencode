@@ -160,10 +160,10 @@ If found, delete them — phase is complete, handoffs are stale.
 
 <step name="update_roadmap_and_state">
 
-**Delegate ROADMAP.md and STATE.md updates to gsd-tools:**
+**Delegate ROADMAP.md and STATE.md updates to `gsd-sdk query phase.complete`:**
 
 ```bash
-TRANSITION=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" phase complete "${current_phase}")
+TRANSITION=$(gsd-sdk query phase.complete "${current_phase}")
 ```
 
 The CLI handles:
@@ -273,12 +273,12 @@ After (Phase 2 shipped JWT auth, discovered rate limiting needed):
 
 <step name="update_current_position_after_transition">
 
-**Note:** Basic position updates (Current Phase, Status, Current Plan, Last Activity) were already handled by `gsd-tools phase complete` in the update_roadmap_and_state step.
+**Note:** Basic position updates (Current Phase, Status, Current Plan, Last Activity) were already handled by `gsd-sdk query phase.complete` in the update_roadmap_and_state step.
 
 Verify the updates are correct by reading STATE.md. If the progress bar needs updating, use:
 
 ```bash
-PROGRESS=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" progress bar --raw)
+PROGRESS=$(gsd-sdk query progress.bar --raw)
 ```
 
 Update the progress bar line in STATE.md with the result.
@@ -377,7 +377,7 @@ Resume file: None
 
 **MANDATORY: Verify milestone status before presenting next steps.**
 
-**Use the transition result from `gsd-tools phase complete`:**
+**Use the transition result from `gsd-sdk query phase.complete`:**
 
 The `is_last_phase` field from the phase complete result tells you directly:
 - `is_last_phase: false` → More phases remain → Go to **Route A**
@@ -387,7 +387,7 @@ The `next_phase` and `next_phase_name` fields give you the next phase details.
 
 If you need additional context, use:
 ```bash
-ROADMAP=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
+ROADMAP=$(gsd-sdk query roadmap.analyze)
 ```
 
 This returns all phases with goals, disk status, and completion info.
@@ -406,7 +406,7 @@ In flat mode, go directly to **Route B**.
 ```bash
 # Only check if we're in workstream mode
 if [ -n "$GSD_WORKSTREAM" ]; then
-  WS_LIST=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" workstream list --raw)
+  WS_LIST=$(gsd-sdk query workstream.list --raw)
 fi
 ```
 
@@ -471,7 +471,7 @@ Exit skill and invoke command("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 
 ---
 
-## ▶ Next Up
+## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Phase [X+1]: [Name]** — [Goal from ROADMAP.md]
 
@@ -495,7 +495,7 @@ Exit skill and invoke command("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 
 ---
 
-## ▶ Next Up
+## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Phase [X+1]: [Name]** — [Goal from ROADMAP.md]
 *✓ Context gathered, ready to plan*
@@ -526,7 +526,7 @@ to the next milestone — other workstreams are still working.
 **Clear auto-advance chain flag** — workstream boundary is the natural stopping point:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false
+gsd-sdk query config-set workflow._auto_chain_active false
 ```
 
 <if mode="yolo">
@@ -580,7 +580,7 @@ Do NOT auto-invoke any further slash commands.
 **Clear auto-advance chain flag** — milestone boundary is the natural stopping point:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false
+gsd-sdk query config-set workflow._auto_chain_active false
 ```
 
 <if mode="yolo">
@@ -606,7 +606,7 @@ Exit skill and invoke command("/gsd-complete-milestone {version} ${GSD_WS}")
 
 ---
 
-## ▶ Next Up
+## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Complete Milestone {version}** — archive and prepare for next
 

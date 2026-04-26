@@ -54,7 +54,7 @@ GSD is a **meta-prompting framework** that sits between the user and AI coding a
        │              │                 │
 ┌──────▼──────────────▼─────────────────▼──────────────┐
 │              CLI TOOLS LAYER                          │
-│   get-shit-done/bin/gsd-tools.cjs                     │
+│   gsd-sdk query (sdk/src/query) + gsd-tools.cjs       │
 │   (State, config, phase, roadmap, verify, templates)  │
 └──────────────────────┬───────────────────────────────┘
                        │
@@ -76,7 +76,7 @@ Every agent spawned by an orchestrator gets a clean context window (up to 200K t
 ### 2. Thin Orchestrators
 
 Workflow files (`get-shit-done/workflows/*.md`) never do heavy lifting. They:
-- Load context via `gsd-tools.cjs init <workflow>`
+- Load context via `gsd-sdk query init.<workflow>` (or legacy `gsd-tools.cjs init <workflow>`)
 - Spawn specialized agents with focused prompts
 - Collect results and route to the next step
 - Update state between steps
@@ -113,18 +113,18 @@ User-facing entry points. Each file contains YAML frontmatter (name, description
 - **Copilot:** Slash commands (`/gsd-command-name`)
 - **Antigravity:** Skills
 
-**Total commands:** 69
+**Total commands:** 81
 
 ### Workflows (`get-shit-done/workflows/*.md`)
 
 Orchestration logic that commands reference. Contains the step-by-step process including:
-- Context loading via `gsd-tools.cjs init`
+- Context loading via `gsd-sdk query` init handlers (or legacy `gsd-tools.cjs init`)
 - Agent spawn instructions with model resolution
 - Gate/checkpoint definitions
 - State update patterns
 - Error handling and recovery
 
-**Total workflows:** 68
+**Total workflows:** 78
 
 ### Agents (`agents/*.md`)
 
@@ -134,7 +134,7 @@ Specialized agent definitions with frontmatter specifying:
 - `tools` — Allowed tool access (read, write, edit, bash, grep, glob, websearch, etc.)
 - `color` — Terminal output color for visual distinction
 
-**Total agents:** 24
+**Total agents:** 33
 
 ### References (`get-shit-done/references/*.md`)
 
@@ -409,14 +409,14 @@ UI-SPEC.md (per phase) ───────────────────
 
 ```
 $HOME/.config/opencode/                          # OpenCode (global install)
-├── commands/gsd/*.md               # 69 slash commands
+├── commands/gsd/*.md               # 81 slash commands
 ├── get-shit-done/
 │   ├── bin/gsd-tools.cjs           # CLI utility
 │   ├── bin/lib/*.cjs               # 19 domain modules
-│   ├── workflows/*.md              # 68 workflow definitions
+│   ├── workflows/*.md              # 78 workflow definitions
 │   ├── references/*.md             # 35 shared reference docs
 │   └── templates/                  # Planning artifact templates
-├── agents/*.md                     # 24 agent definitions
+├── agents/*.md                     # 33 agent definitions
 ├── hooks/
 │   ├── gsd-statusline.js           # Statusline hook
 │   ├── gsd-context-monitor.js      # Context warning hook

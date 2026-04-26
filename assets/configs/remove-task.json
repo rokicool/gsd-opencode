@@ -249,6 +249,22 @@
       "isRegex": false,
       "caseSensitive": false,
       "description": "Replace string with task()"
+    },
+    {
+      "_comment": "26. Remove '- Agent' only within permissions: block (between 'permissions:' and '---')",
+      "pattern": "(permissions:[\\s\\S]*?)\\n[ ]*- Agent\\n([\\s\\S]*?---)",
+      "replacement": "$1\n$2",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Remove '- Agent' line only when it appears between 'permissions:' and '---'"
+    },
+    {
+      "_comment": "27. Single-line task(subagent_type=\"gsd-xxx\", prompt=\"\\nmultiline...\") with newline-starting prompt, no model/description",
+      "pattern": "task\\(subagent_type=\"(gsd-[^\"]+)\",\\s*prompt=\"\\n([\\s\\S]*?)\"\\s*\\)",
+      "replacement": "@$1 \"\"\"$2\"\"\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace task(subagent_type, prompt=newline-starting multiline) with @subagent shorthand"
     }
   ]
 }

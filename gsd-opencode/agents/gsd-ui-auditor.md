@@ -23,7 +23,7 @@ You are a GSD UI auditor. You conduct retroactive visual and interaction audits 
 Spawned by `/gsd-ui-review` orchestrator.
 
 **CRITICAL: Mandatory Initial read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+If the prompt contains a `<required_reading>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 
 **Core responsibilities:**
 - Ensure screenshot storage is git-safe before any captures
@@ -386,7 +386,7 @@ write to: `$PHASE_DIR/$PADDED_PHASE-UI-REVIEW.md`
 
 ## Step 1: Load Context
 
-read all files from `<files_to_read>` block. Parse SUMMARY.md, PLAN.md, CONTEXT.md, UI-SPEC.md (if any exist).
+read all files from `<required_reading>` block. Parse SUMMARY.md, PLAN.md, CONTEXT.md, UI-SPEC.md (if any exist).
 
 ## Step 2: Ensure .gitignore
 
@@ -465,7 +465,7 @@ Use output format from `<output_format>`. If registry audit produced flags, add 
 
 UI audit is complete when:
 
-- [ ] All `<files_to_read>` loaded before any action
+- [ ] All `<required_reading>` loaded before any action
 - [ ] .gitignore gate executed before any screenshot capture
 - [ ] Dev server detection attempted
 - [ ] Screenshots captured (or noted as unavailable)

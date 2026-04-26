@@ -56,6 +56,9 @@ Determine which CLI to skip based on the current runtime environment:
 if [ "$ANTIGRAVITY_AGENT" = "1" ]; then
   # Antigravity is a separate client — all CLIs are external, skip none
   SELF_CLI="none"
+elif [ -n "$CURSOR_SESSION_ID" ]; then
+  # Running inside Cursor agent — skip cursor for independence
+  SELF_CLI="cursor"
 elif [ -n "$CLAUDE_CODE_ENTRYPOINT" ]; then
   # Running inside OpenCode CLI — skip OpenCode for independence
   SELF_CLI="OpenCode"
@@ -77,7 +80,7 @@ Rules:
 Collect phase artifacts for the review prompt:
 
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
+INIT=$(gsd-sdk query init.phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -148,10 +151,11 @@ write to a temp file: `/tmp/gsd-review-prompt-{phase}.md`
 read model preferences from planning config. Null/missing values fall back to CLI defaults.
 
 ```bash
-GEMINI_MODEL=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get review.models.gemini --raw 2>/dev/null || true)
-CLAUDE_MODEL=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get review.models.OpenCode --raw 2>/dev/null || true)
-CODEX_MODEL=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get review.models.codex --raw 2>/dev/null || true)
-OPENCODE_MODEL=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get review.models.opencode --raw 2>/dev/null || true)
+# JSON scalars from gsd-sdk query; use jq -r to strip JSON string quotes (install jq if missing)
+GEMINI_MODEL=$(gsd-sdk query config-get review.models.gemini 2>/dev/null | jq -r '.' 2>/dev/null || true)
+CLAUDE_MODEL=$(gsd-sdk query config-get review.models.OpenCode 2>/dev/null | jq -r '.' 2>/dev/null || true)
+CODEX_MODEL=$(gsd-sdk query config-get review.models.codex 2>/dev/null | jq -r '.' 2>/dev/null || true)
+OPENCODE_MODEL=$(gsd-sdk query config-get review.models.opencode 2>/dev/null | jq -r '.' 2>/dev/null || true)
 ```
 
 For each selected CLI, invoke in sequence (not parallel — avoid rate limits):
@@ -159,27 +163,27 @@ For each selected CLI, invoke in sequence (not parallel — avoid rate limits):
 **Gemini:**
 ```bash
 if [ -n "$GEMINI_MODEL" ] && [ "$GEMINI_MODEL" != "null" ]; then
-  gemini -m "$GEMINI_MODEL" -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-gemini-{phase}.md
+  cat /tmp/gsd-review-prompt-{phase}.md | gemini -m "$GEMINI_MODEL" -p - 2>/dev/null > /tmp/gsd-review-gemini-{phase}.md
 else
-  gemini -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-gemini-{phase}.md
+  cat /tmp/gsd-review-prompt-{phase}.md | gemini -p - 2>/dev/null > /tmp/gsd-review-gemini-{phase}.md
 fi
 ```
 
 **OpenCode (separate session):**
 ```bash
 if [ -n "$CLAUDE_MODEL" ] && [ "$CLAUDE_MODEL" != "null" ]; then
-  OpenCode --model "$CLAUDE_MODEL" -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-OpenCode-{phase}.md
+  cat /tmp/gsd-review-prompt-{phase}.md | OpenCode --model "$CLAUDE_MODEL" -p - 2>/dev/null > /tmp/gsd-review-OpenCode-{phase}.md
 else
-  OpenCode -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-OpenCode-{phase}.md
+  cat /tmp/gsd-review-prompt-{phase}.md | OpenCode -p - 2>/dev/null > /tmp/gsd-review-OpenCode-{phase}.md
 fi
 ```
 
 **Codex:**
 ```bash
 if [ -n "$CODEX_MODEL" ] && [ "$CODEX_MODEL" != "null" ]; then
-  codex exec --model "$CODEX_MODEL" --skip-git-repo-check "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-codex-{phase}.md
+  cat /tmp/gsd-review-prompt-{phase}.md | codex exec --model "$CODEX_MODEL" --skip-git-repo-check - 2>/dev/null > /tmp/gsd-review-codex-{phase}.md
 else
-  codex exec --skip-git-repo-check "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-codex-{phase}.md
+  cat /tmp/gsd-review-prompt-{phase}.md | codex exec --skip-git-repo-check - 2>/dev/null > /tmp/gsd-review-codex-{phase}.md
 fi
 ```
 
@@ -205,7 +209,7 @@ fi
 
 **Qwen Code:**
 ```bash
-qwen "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-qwen-{phase}.md
+cat /tmp/gsd-review-prompt-{phase}.md | qwen - 2>/dev/null > /tmp/gsd-review-qwen-{phase}.md
 if [ ! -s /tmp/gsd-review-qwen-{phase}.md ]; then
   echo "Qwen review failed or returned empty output." > /tmp/gsd-review-qwen-{phase}.md
 fi
@@ -275,6 +279,18 @@ plans_reviewed: [{list of PLAN.md files}]
 
 ---
 
+## Qwen Review
+
+{qwen review content}
+
+---
+
+## Cursor Review
+
+{cursor review content}
+
+---
+
 ## Consensus Summary
 
 {synthesize common concerns across all reviewers}
@@ -291,7 +307,7 @@ plans_reviewed: [{list of PLAN.md files}]
 
 Commit:
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: cross-AI review for phase {N}" --files {phase_dir}/{padded_phase}-REVIEWS.md
+gsd-sdk query commit "docs: cross-AI review for phase {N}" {phase_dir}/{padded_phase}-REVIEWS.md
 ```
 </step>
 

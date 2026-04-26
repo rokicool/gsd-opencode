@@ -19,27 +19,32 @@ Valid GSD subagent types (use exact names — do not fall back to 'general'):
 ## 1. Initialize
 
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init plan-phase "$PHASE")
+INIT=$(gsd-sdk query init.plan-phase "$PHASE")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_UI=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-ui-researcher 2>/dev/null)
-AGENT_SKILLS_UI_CHECKER=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-ui-checker 2>/dev/null)
+AGENT_SKILLS_UI=$(gsd-sdk query agent-skills gsd-ui-researcher 2>/dev/null)
+AGENT_SKILLS_UI_CHECKER=$(gsd-sdk query agent-skills gsd-ui-checker 2>/dev/null)
 ```
 
 Parse JSON for: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_context`, `has_research`, `commit_docs`.
 
 **File paths:** `state_path`, `roadmap_path`, `requirements_path`, `context_path`, `research_path`.
 
+Detect sketch findings:
+```bash
+SKETCH_FINDINGS_PATH=$(ls ./.OpenCode/skills/sketch-findings-*/SKILL.md 2>/dev/null | head -1)
+```
+
 Resolve UI agent models:
 
 ```bash
-UI_RESEARCHER_MODEL=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-ui-researcher --raw)
-UI_CHECKER_MODEL=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-ui-checker --raw)
+UI_RESEARCHER_MODEL=$(gsd-sdk query resolve-model gsd-ui-researcher --raw)
+UI_CHECKER_MODEL=$(gsd-sdk query resolve-model gsd-ui-checker --raw)
 ```
 
 Check config:
 
 ```bash
-UI_ENABLED=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_phase 2>/dev/null || echo "true")
+UI_ENABLED=$(gsd-sdk query config-get workflow.ui_phase 2>/dev/null || echo "true")
 ```
 
 **If `UI_ENABLED` is `false`:**
@@ -55,7 +60,7 @@ Exit workflow.
 Extract phase number from $ARGUMENTS. If not provided, detect next unplanned phase.
 
 ```bash
-PHASE_INFO=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}")
+PHASE_INFO=$(gsd-sdk query roadmap.get-phase "${PHASE}")
 ```
 
 **If `found` is false:** Error with available phases.
@@ -76,6 +81,13 @@ No RESEARCH.md found for Phase {N}.
 Note: stack decisions (component library, styling approach) will be asked during UI research.
 ```
 Continue (non-blocking).
+
+**If `SKETCH_FINDINGS_PATH` is not empty:**
+```
+⚡ Sketch findings detected: {SKETCH_FINDINGS_PATH}
+   Validated design decisions from /gsd-sketch will be loaded into the UI researcher.
+   Pre-validated decisions (layout, palette, typography, spacing) should be treated as locked — not re-asked.
+```
 
 ## 4. Check Existing UI-SPEC
 
@@ -124,6 +136,7 @@ Answer: "What visual and interaction contracts does this phase need?"
 - {requirements_path} (Requirements)
 - {context_path} (USER DECISIONS from /gsd-discuss-phase)
 - {research_path} (Technical Research — stack decisions)
+- {SKETCH_FINDINGS_PATH} (Sketch Findings — validated design decisions, CSS patterns, visual direction from /gsd-sketch, if exists)
 </files_to_read>
 
 ${AGENT_SKILLS_UI}
@@ -251,7 +264,7 @@ Dimensions: 6/6 passed
 
 ───────────────────────────────────────────────────────────────
 
-## ▶ Next Up
+## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 {If CONTEXT.md exists for this phase:}
 **Plan Phase {N}** — planner will use UI-SPEC.md as design context
@@ -271,13 +284,13 @@ Dimensions: 6/6 passed
 ## 11. Commit (if configured)
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): UI design contract" --files "${PHASE_DIR}/${PADDED_PHASE}-UI-SPEC.md"
+gsd-sdk query commit "docs(${padded_phase}): UI design contract" "${PHASE_DIR}/${PADDED_PHASE}-UI-SPEC.md"
 ```
 
 ## 12. Update State
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state record-session \
+gsd-sdk query state.record-session \
   --stopped-at "Phase ${PHASE} UI-SPEC approved" \
   --resume-file "${PHASE_DIR}/${PADDED_PHASE}-UI-SPEC.md"
 ```

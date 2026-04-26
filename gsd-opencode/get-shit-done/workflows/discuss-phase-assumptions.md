@@ -64,9 +64,9 @@ plain-text numbered list and ask the user to type their choice number.
 Phase number from argument (required).
 
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE}")
+INIT=$(gsd-sdk query init.phase-op "${PHASE}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_ANALYZER=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-assumptions-analyzer 2>/dev/null)
+AGENT_SKILLS_ANALYZER=$(gsd-sdk query agent-skills gsd-assumptions-analyzer 2>/dev/null)
 ```
 
 Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`,
@@ -171,7 +171,7 @@ Structure the extracted information for use in assumption generation.
 Check if any pending todos are relevant to this phase's scope.
 
 ```bash
-TODO_MATCHES=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" todo match-phase "${PHASE_NUMBER}")
+TODO_MATCHES=$(gsd-sdk query todo.match-phase "${PHASE_NUMBER}")
 ```
 
 Parse JSON for: `todo_count`, `matches[]`.
@@ -310,7 +310,7 @@ Parse the subagent's response. Extract:
 If research topics were flagged, spawn a general research agent:
 
 ```
-@gsd-assumptions-analyzer """
+@general """
 Research the following topics for Phase {PHASE}: {phase_name}.
 
 Topics needing research:
@@ -548,7 +548,7 @@ write file.
 Commit phase context and discussion log:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): capture phase context (assumptions mode)" --files "${phase_dir}/${padded_phase}-CONTEXT.md" "${phase_dir}/${padded_phase}-DISCUSSION-LOG.md"
+gsd-sdk query commit "docs(${padded_phase}): capture phase context (assumptions mode)" "${phase_dir}/${padded_phase}-CONTEXT.md" "${phase_dir}/${padded_phase}-DISCUSSION-LOG.md"
 ```
 
 Confirm: "Committed: docs(${padded_phase}): capture phase context (assumptions mode)"
@@ -558,7 +558,7 @@ Confirm: "Committed: docs(${padded_phase}): capture phase context (assumptions m
 Update STATE.md with session info:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state record-session \
+gsd-sdk query state.record-session \
   --stopped-at "Phase ${PHASE} context gathered (assumptions mode)" \
   --resume-file "${phase_dir}/${padded_phase}-CONTEXT.md"
 ```
@@ -566,7 +566,7 @@ node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" state record-sessi
 Commit STATE.md:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(state): record phase ${PHASE} context session" --files .planning/STATE.md
+gsd-sdk query commit "docs(state): record phase ${PHASE} context session" .planning/STATE.md
 ```
 </step>
 
@@ -593,7 +593,7 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 ---
 
-## ▶ Next Up
+## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Phase ${PHASE}: {phase_name}** — {Goal from ROADMAP.md}
 
@@ -619,18 +619,18 @@ Check for auto-advance trigger:
 2. Sync chain flag:
    ```bash
    if [[ ! "$ARGUMENTS" =~ --auto ]]; then
-     node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false 2>/dev/null
+     gsd-sdk query config-set workflow._auto_chain_active false 2>/dev/null
    fi
    ```
 3. read chain flag and user preference:
    ```bash
-   AUTO_CHAIN=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
-   AUTO_CFG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
+   AUTO_CHAIN=$(gsd-sdk query config-get workflow._auto_chain_active 2>/dev/null || echo "false")
+   AUTO_CFG=$(gsd-sdk query config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
 
 **If `--auto` flag present AND `AUTO_CHAIN` is not true:**
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active true
+gsd-sdk query config-set workflow._auto_chain_active true
 ```
 
 **If `--auto` flag present OR `AUTO_CHAIN` is true OR `AUTO_CFG` is true:**

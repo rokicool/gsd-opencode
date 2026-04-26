@@ -8,6 +8,8 @@
 
 `gsd-tools.cjs` is a Node.js CLI utility that replaces repetitive inline bash patterns across GSD's ~50 command, workflow, and agent files. It centralizes: config parsing, model resolution, phase lookup, git commits, summary verification, state management, and template operations.
 
+**Preferred for new orchestration:** Many of the same operations are available as `gsd-sdk query <command>` (see `sdk/src/query/index.ts` and `docs/QUERY-HANDLERS.md`). Use that in workflows and examples where the handler exists; keep `node … gsd-tools.cjs` for commands not yet in the registry (for example graphify) or when you need CJS-only flags.
+
 **Location:** `get-shit-done/bin/gsd-tools.cjs`
 **Modules:** 15 domain modules in `get-shit-done/bin/lib/`
 
@@ -21,6 +23,7 @@ node gsd-tools.cjs <command> [args] [--raw] [--cwd <path>]
 |------|-------------|
 | `--raw` | Machine-readable output (JSON or plain text, no formatting) |
 | `--cwd <path>` | Override working directory (for sandboxed subagents) |
+| `--ws <name>` | Target a specific workstream context (SDK only) |
 
 ---
 
@@ -275,6 +278,10 @@ node gsd-tools.cjs init todos [area]
 node gsd-tools.cjs init milestone-op
 node gsd-tools.cjs init map-codebase
 node gsd-tools.cjs init progress
+
+# Workstream-scoped init (SDK --ws flag)
+node gsd-tools.cjs init execute-phase <phase> --ws <name>
+node gsd-tools.cjs init plan-phase <phase> --ws <name>
 ```
 
 **Large payload handling:** When output exceeds ~50KB, the CLI writes to a temp file and returns `@file:/tmp/gsd-init-XXXXX.json`. Workflows check for the `@file:` prefix and read from disk:
@@ -296,6 +303,22 @@ node gsd-tools.cjs milestone complete <version> [--name <name>] [--archive-phase
 node gsd-tools.cjs requirements mark-complete <ids>
 # Accepts: REQ-01,REQ-02 or REQ-01 REQ-02 or [REQ-01, REQ-02]
 ```
+
+---
+
+## skill Manifest
+
+Pre-compute and cache skill discovery for faster command loading.
+
+```bash
+# Generate skill manifest (writes to .OpenCode/skill-manifest.json)
+node gsd-tools.cjs skill-manifest
+
+# Generate with custom output path
+node gsd-tools.cjs skill-manifest --output <path>
+```
+
+Returns JSON mapping of all available GSD skills with their metadata (name, description, file path, argument hints). Used by the installer and session-start hooks to avoid repeated filesystem scans.
 
 ---
 

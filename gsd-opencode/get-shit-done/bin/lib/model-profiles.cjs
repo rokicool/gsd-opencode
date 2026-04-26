@@ -19,13 +19,14 @@ const MODEL_PROFILES = {
   'gsd-plan-checker': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', adaptive: 'haiku' },
   'gsd-integration-checker': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', adaptive: 'haiku' },
   'gsd-nyquist-auditor': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', adaptive: 'haiku' },
+  'gsd-pattern-mapper': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', adaptive: 'haiku' },
   'gsd-ui-researcher': { quality: 'opus', balanced: 'sonnet', budget: 'haiku', adaptive: 'sonnet' },
   'gsd-ui-checker': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', adaptive: 'haiku' },
   'gsd-ui-auditor': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', adaptive: 'haiku' },
   'gsd-doc-writer': { quality: 'opus', balanced: 'sonnet', budget: 'haiku', adaptive: 'sonnet' },
   'gsd-doc-verifier': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku', adaptive: 'haiku' },
 };
-const VALID_PROFILES = Object.keys(MODEL_PROFILES['gsd-planner']);
+const VALID_PROFILES = [...Object.keys(MODEL_PROFILES['gsd-planner']), 'inherit'];
 
 /**
  * Formats the agent-to-model mapping as a human-readable table (in string format).
@@ -57,7 +58,9 @@ function formatAgentToModelMapAsTable(agentToModelMap) {
 function getAgentToModelMapForProfile(normalizedProfile) {
   const agentToModelMap = {};
   for (const [agent, profileToModelMap] of Object.entries(MODEL_PROFILES)) {
-    agentToModelMap[agent] = profileToModelMap[normalizedProfile];
+    agentToModelMap[agent] = normalizedProfile === 'inherit'
+      ? 'inherit'
+      : profileToModelMap[normalizedProfile];
   }
   return agentToModelMap;
 }

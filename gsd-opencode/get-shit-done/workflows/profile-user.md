@@ -1,7 +1,7 @@
 <objective>
 Orchestrate the full developer profiling flow: consent, session analysis (or questionnaire fallback), profile generation, result display, and artifact creation.
 
-This workflow wires Phase 1 (session pipeline) and Phase 2 (profiling engine) into a cohesive user-facing experience. All heavy lifting is done by existing gsd-tools.cjs subcommands and the gsd-user-profiler agent -- this workflow orchestrates the sequence, handles branching, and provides the UX.
+This workflow wires Phase 1 (session pipeline) and Phase 2 (profiling engine) into a cohesive user-facing experience. All heavy lifting is done by existing `gsd-sdk query` handlers (with legacy `gsd-tools.cjs` parity where needed) and the gsd-user-profiler agent -- this workflow orchestrates the sequence, handles branching, and provides the UX.
 </objective>
 
 <required_reading>
@@ -130,7 +130,7 @@ Display: "◆ Scanning sessions..."
 
 Run session scan:
 ```bash
-SCAN_RESULT=$(node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs scan-sessions --json 2>/dev/null)
+SCAN_RESULT=$(gsd-sdk query scan-sessions --json 2>/dev/null)
 ```
 
 Parse the JSON output to get session count and project count.
@@ -150,7 +150,7 @@ Display: "◆ Sampling messages..."
 
 Run profile sampling:
 ```bash
-SAMPLE_RESULT=$(node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs profile-sample --json 2>/dev/null)
+SAMPLE_RESULT=$(gsd-sdk query profile-sample --json 2>/dev/null)
 ```
 
 Parse the JSON output to get the temp directory path and message count.
@@ -201,7 +201,7 @@ Display: "Using questionnaire to build your profile."
 
 **Get questions:**
 ```bash
-QUESTIONS=$(node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs profile-questionnaire --json 2>/dev/null)
+QUESTIONS=$(gsd-sdk query profile-questionnaire --json 2>/dev/null)
 ```
 
 Parse the questions JSON. It contains 8 questions, one per dimension.
@@ -224,7 +224,7 @@ write the answers JSON to `$ANSWERS_PATH`.
 
 **Convert answers to analysis:**
 ```bash
-ANALYSIS_RESULT=$(node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs profile-questionnaire --answers "$ANSWERS_PATH" --json 2>/dev/null)
+ANALYSIS_RESULT=$(gsd-sdk query profile-questionnaire --answers "$ANSWERS_PATH" --json 2>/dev/null)
 ```
 
 Parse the analysis JSON from the result.
@@ -271,7 +271,7 @@ write updated analysis JSON back to `$ANALYSIS_PATH`.
 Display: "◆ Writing profile..."
 
 ```bash
-node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs write-profile --input "$ANALYSIS_PATH" --json 2>/dev/null
+gsd-sdk query write-profile --input "$ANALYSIS_PATH" --json 2>/dev/null
 ```
 
 Display: "✓ Profile written to $HOME/.config/opencode/get-shit-done/USER-PROFILE.md"
@@ -350,7 +350,7 @@ Generate selected artifacts sequentially (file I/O is fast, no benefit from para
 **For /gsd-dev-preferences (if selected):**
 
 ```bash
-node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs generate-dev-preferences --analysis "$ANALYSIS_PATH" --json 2>/dev/null
+gsd-sdk query generate-dev-preferences --analysis "$ANALYSIS_PATH" --json 2>/dev/null
 ```
 
 Display: "✓ Generated /gsd-dev-preferences at $HOME/.OpenCode/commands/gsd/dev-preferences.md"
@@ -358,7 +358,7 @@ Display: "✓ Generated /gsd-dev-preferences at $HOME/.OpenCode/commands/gsd/dev
 **For AGENTS.md profile section (if selected):**
 
 ```bash
-node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs generate-OpenCode-profile --analysis "$ANALYSIS_PATH" --json 2>/dev/null
+gsd-sdk query generate-OpenCode-profile --analysis "$ANALYSIS_PATH" --json 2>/dev/null
 ```
 
 Display: "✓ Added profile section to AGENTS.md"
@@ -366,12 +366,12 @@ Display: "✓ Added profile section to AGENTS.md"
 **For Global AGENTS.md (if selected):**
 
 ```bash
-node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs generate-OpenCode-profile --analysis "$ANALYSIS_PATH" --global --json 2>/dev/null
+gsd-sdk query generate-OpenCode-profile --analysis "$ANALYSIS_PATH" --global --json 2>/dev/null
 ```
 
 Display: "✓ Added profile section to $HOME/.OpenCode/AGENTS.md"
 
-**Error handling:** If any gsd-tools.cjs call fails, display the error message and use question to offer "Retry" or "Skip this artifact". On retry, re-run the command. On skip, continue to next artifact.
+**Error handling:** If any `gsd-sdk query` or gsd-tools.cjs call fails, display the error message and use question to offer "Retry" or "Skip this artifact". On retry, re-run the command. On skip, continue to next artifact.
 
 ---
 
@@ -446,7 +446,7 @@ rm -f "$ANALYSIS_PATH" 2>/dev/null
 - [ ] Profile written to USER-PROFILE.md via write-profile subcommand
 - [ ] Result display shows report card table and highlight reel with evidence
 - [ ] Artifact selection uses multiSelect with all options pre-selected
-- [ ] Artifacts generated sequentially via gsd-tools.cjs subcommands
+- [ ] Artifacts generated sequentially via gsd-sdk query (or gsd-tools.cjs) subcommands
 - [ ] Refresh diff shows changed dimensions when --refresh was used
 - [ ] Temp files cleaned up on completion
 </success_criteria>

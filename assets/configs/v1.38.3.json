@@ -1,0 +1,34 @@
+{
+  "_description": "Supplemental translation rules for v1.38.3 -- fixes remaining task() calls not caught by remove-task.json",
+  "include": ["gsd-opencode/**"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "**/oc-*",
+    "**/*-oc-*"
+  ],
+  "rules": [
+    {
+      "pattern": "task(\n  prompt=\"([^\"]+)\",\n  subagent_type=\"([^\"]+)\"\n)",
+      "replacement": "@$2 \"$1\"",
+      "flags": "s",
+      "description": "Fix: simple task() with single-line quoted prompt"
+    },
+    {
+      "pattern": "task(\n  prompt=([^,\n]+),\n  subagent_type=\"([^\"]+)\"\n)",
+      "replacement": "@$2 $1",
+      "description": "Fix: simple task() with variable prompt"
+    },
+    {
+      "pattern": "task\(\n  prompt=\"([^\"]+)\",\n  subagent_type=\"([^\"]+)\",\n  model=\"\{([^\}]+)\}\"\n\)",
+      "replacement": "@$2 \"$1\"",
+      "description": "Fix: task() with prompt, subagent_type, model"
+    },
+    {
+      "pattern": "task\(\n  description=\"[^\"]+\",\n  prompt=\"([^\"]+)\",\n  subagent_type=\"([^\"]+)\"\n\)",
+      "replacement": "@$2 \"$1\"",
+      "description": "Fix: task() with description first, then prompt and subagent_type"
+    }
+  ]
+}

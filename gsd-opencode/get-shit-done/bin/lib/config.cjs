@@ -17,17 +17,26 @@ const VALID_CONFIG_KEYS = new Set([
   'workflow.research', 'workflow.plan_check', 'workflow.verifier',
   'workflow.nyquist_validation', 'workflow.ai_integration_phase', 'workflow.ui_phase', 'workflow.ui_safety_gate',
   'workflow.auto_advance', 'workflow.node_repair', 'workflow.node_repair_budget',
+  'workflow.tdd_mode',
   'workflow.text_mode',
   'workflow.research_before_questions',
   'workflow.discuss_mode',
   'workflow.skip_discuss',
+  'workflow.auto_prune_state',
   'workflow._auto_chain_active',
   'workflow.use_worktrees',
   'workflow.code_review',
   'workflow.code_review_depth',
+  'workflow.code_review_command',
+  'workflow.pattern_mapper',
+  'workflow.plan_bounce',
+  'workflow.plan_bounce_script',
+  'workflow.plan_bounce_passes',
   'git.branching_strategy', 'git.base_branch', 'git.phase_branch_template', 'git.milestone_branch_template', 'git.quick_branch_template',
   'planning.commit_docs', 'planning.search_gitignored',
+  'workflow.cross_ai_execution', 'workflow.cross_ai_command', 'workflow.cross_ai_timeout',
   'workflow.subagent_timeout',
+  'workflow.inline_plan_threshold',
   'hooks.context_warnings',
   'features.thinking_partner',
   'context',
@@ -37,6 +46,9 @@ const VALID_CONFIG_KEYS = new Set([
   'manager.flags.discuss', 'manager.flags.plan', 'manager.flags.execute',
   'response_language',
   'intel.enabled',
+  'graphify.enabled',
+  'graphify.build_timeout',
+  'claude_md_path',
 ]);
 
 /**
@@ -64,6 +76,7 @@ const CONFIG_KEY_SUGGESTIONS = {
   'hooks.research_questions': 'workflow.research_before_questions',
   'workflow.research_questions': 'workflow.research_before_questions',
   'workflow.codereview': 'workflow.code_review',
+  'workflow.review_command': 'workflow.code_review_command',
   'workflow.review': 'workflow.code_review',
   'workflow.code_review_level': 'workflow.code_review_depth',
   'workflow.review_depth': 'workflow.code_review_depth',
@@ -148,12 +161,19 @@ function buildNewProjectConfig(userChoices) {
       ui_phase: true,
       ui_safety_gate: true,
       ai_integration_phase: true,
+      tdd_mode: false,
       text_mode: false,
       research_before_questions: false,
       discuss_mode: 'discuss',
       skip_discuss: false,
       code_review: true,
       code_review_depth: 'standard',
+      code_review_command: null,
+      pattern_mapper: true,
+      plan_bounce: false,
+      plan_bounce_script: null,
+      plan_bounce_passes: 2,
+      auto_prune_state: false,
     },
     hooks: {
       context_warnings: true,
@@ -161,6 +181,7 @@ function buildNewProjectConfig(userChoices) {
     project_code: null,
     phase_naming: 'sequential',
     agent_skills: {},
+    claude_md_path: './AGENTS.md',
   };
 
   // Three-level deep merge: hardcoded <- userDefaults <- choices
@@ -474,6 +495,17 @@ function getCmdConfigSetModelProfileResultMessage(
   return paragraphs.join('\n\n');
 }
 
+/**
+ * Print the resolved config.json path (workstream-aware). Used by settings.md
+ * so the workflow writes/reads the correct file when a workstream is active (#2282).
+ */
+function cmdConfigPath(cwd) {
+  // Always emit as plain text — a file path is used via shell substitution,
+  // never consumed as JSON. Passing raw=true forces plain-text output.
+  const configPath = path.join(planningDir(cwd), 'config.json');
+  output(configPath, true, configPath);
+}
+
 module.exports = {
   VALID_CONFIG_KEYS,
   cmdConfigEnsureSection,
@@ -481,4 +513,5 @@ module.exports = {
   cmdConfigGet,
   cmdConfigSetModelProfile,
   cmdConfigNewProject,
+  cmdConfigPath,
 };

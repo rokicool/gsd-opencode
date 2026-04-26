@@ -32,7 +32,7 @@ Invoke the source audit command and capture output.
 
 For `audit-uat` source:
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init audit-uat 2>/dev/null || echo "{}")
+INIT=$(gsd-sdk query audit-uat 2>/dev/null || echo "{}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
