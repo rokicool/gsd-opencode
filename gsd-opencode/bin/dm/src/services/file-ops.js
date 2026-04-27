@@ -165,7 +165,7 @@ export class FileOperations {
     // Use tempDir initially, will update paths after atomic move
     const manifestManager = new ManifestManager(tempDir);
 
-    this.logger.info(`Installing to ${this.scopeManager.getPathPrefix()}...`);
+    this.logger.debug(`Installing to ${this.scopeManager.getPathPrefix()}...`);
 
     try {
       // Create temp directory

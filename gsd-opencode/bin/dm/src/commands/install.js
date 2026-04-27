@@ -315,14 +315,44 @@ async function installSdk(targetDir) {
       await fs.access(pkgPath);
     } catch {
       logger.debug("SDK package.json not found in target, skipping SDK build");
-      return false;
+      return { success: false, message: "skipped (no package.json)" };
+    }
+
+    // Check if pre-built dist exists and src is missing
+    const distPath = path.join(sdkDir, "dist");
+    const srcPath = path.join(sdkDir, "src");
+    const hasDist = await fs.access(distPath).then(() => true).catch(() => false);
+    const hasSrc = await fs.access(srcPath).then(() => true).catch(() => false);
+
+    if (hasDist && !hasSrc) {
+      logger.debug("Pre-built SDK dist found, skipping build");
+      // Ensure cli.js is executable
+      const cliPath = path.join(sdkDir, "dist", "cli.js");
+      try {
+        const stat = await fs.stat(cliPath);
+        if (!(stat.mode & 0o111)) {
+          await fs.chmod(cliPath, stat.mode | 0o111);
+        }
+      } catch {
+        logger.warning("Could not set execute bit on sdk/dist/cli.js");
+      }
+      return { success: true, message: "pre-built (dist ready)" };
+    }
+
+    if (!hasSrc) {
+      logger.debug("SDK source not found, skipping build");
+      return { success: false, message: "skipped (no source)" };
     }
 
     logger.info("Installing SDK dependencies...");
     await execAsync("npm install", { cwd: sdkDir });
 
     logger.info("Building SDK...");
-    await execAsync("npm run build", { cwd: sdkDir });
+    try {
+      await execAsync("npm run build 2>&1", { cwd: sdkDir });
+    } catch (buildError) {
+      throw new Error(`npm run build failed: ${buildError.message}\n${buildError.stdout || ''}\n${buildError.stderr || ''}`.trim());
+    }
 
     const cliPath = path.join(sdkDir, "dist", "cli.js");
     try {
@@ -335,11 +365,15 @@ async function installSdk(targetDir) {
     }
 
     logger.debug("SDK installed and built successfully");
-    return true;
+    return { success: true, message: "installed and built" };
   } catch (error) {
-    logger.warning(`SDK build failed: ${error.message}`);
+    logger.warning(`SDK build failed: ${error.message.split('\n')[0]}`);
+    const errorLines = error.message.split('\n').slice(1).filter(l => l.trim());
+    if (errorLines.length > 0) {
+      logger.debug(`Build output:\n${errorLines.join('\n')}`);
+    }
     logger.debug("Continuing installation without SDK...");
-    return false;
+    return { success: false, message: "build failed" };
   }
 }
 
@@ -660,7 +694,7 @@ export async function installCommand(options = {}) {
     const result = await fileOps.install(sourceDir, targetDir);
 
     // Step 7: Install and build SDK from bundled source
-    const sdkBuilt = await installSdk(targetDir);
+    const sdkResult = await installSdk(targetDir);
 
     // Step 8: write .env file with GSD_AGENTS_DIR for SDK integration
     await writeEnvFile(targetDir, scope);
@@ -677,7 +711,7 @@ export async function installCommand(options = {}) {
     logger.dim(`  Directories: ${result.directories}`);
     logger.dim(`  Location: ${pathPrefix}`);
     logger.dim(`  Version: ${version}`);
-    logger.dim(`  SDK: ${sdkBuilt ? "installed and built" : "skipped"}`);
+    logger.dim(`  SDK: ${sdkResult.message}`);
     logger.dim(`  GSD_AGENTS_DIR: ${pathPrefix}/agents`);
 
     if (verbose) {
