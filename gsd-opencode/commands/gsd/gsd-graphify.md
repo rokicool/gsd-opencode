@@ -8,6 +8,13 @@ permissions:
    task: true
 ---
 
+<objective>
+Build, query, and inspect the project knowledge graph stored in `.planning/graphs/`.
+
+Supports subcommands: `build` (create/update graph), `query <term>` (search graph), `status` (show graph info), `diff` (show changes since last build).
+Uses `graphify` CLI tool for SHA256 incremental caching and fast graph operations.
+</objective>
+
 **STOP -- DO NOT READ THIS FILE. You are already reading it. This prompt was injected into your context by OpenCode's command system. Using the read tool on this file wastes tokens. Begin executing Step 0 immediately.**
 
 **CJS-only (graphify):** `graphify` subcommands are not registered on `gsd-sdk query`. Use `node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs graphify …` as documented in this command and in `docs/CLI-TOOLS.md`. Other tooling may still use `gsd-sdk query` where a handler exists.
