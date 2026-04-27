@@ -85,7 +85,7 @@
   - [주장 출처 태깅](#65-주장-출처-태깅)
   - [Worktree 토글](#66-worktree-토글)
   - [프로젝트 코드 접두사](#67-프로젝트-코드-접두사)
-  - [OpenCode 스킬 마이그레이션](#68-OpenCode-code-스킬-마이그레이션)
+  - [OpenCode 스킬 마이그레이션](#68-claude-code-스킬-마이그레이션)
 - [v1.32 기능](#v132-기능)
   - [STATE.md 일관성 게이트](#69-statemd-일관성-게이트)
   - [자율 모드 `--to N` 플래그](#70-자율-모드---to-n-플래그)
@@ -618,7 +618,7 @@
 - REQ-CTX-08: 모든 훅은 자동으로 실패해야 하며 도구 실행을 차단해서는 안 됩니다.
 
 **아키텍처.** 두 부분으로 구성된 브리지 시스템.
-1. 상태표시줄이 `/tmp/OpenCode-ctx-{session}.json`에 지표를 기록합니다.
+1. 상태표시줄이 `/tmp/claude-ctx-{session}.json`에 지표를 기록합니다.
 2. 컨텍스트 모니터가 지표를 읽고 `additionalContext` 경고를 주입합니다.
 
 ---
@@ -900,7 +900,7 @@ fix(03-01): correct auth token expiry
 **요구사항.**
 - REQ-RUNTIME-01: OpenCode, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Antigravity를 지원해야 합니다.
 - REQ-RUNTIME-02: 설치 프로그램은 런타임별로 콘텐츠를 변환해야 합니다(도구 이름, 경로, 프론트매터).
-- REQ-RUNTIME-03: 설치 프로그램은 대화형 및 비대화형(`--OpenCode --global`) 모드를 모두 지원해야 합니다.
+- REQ-RUNTIME-03: 설치 프로그램은 대화형 및 비대화형(`--claude --global`) 모드를 모두 지원해야 합니다.
 - REQ-RUNTIME-04: 설치 프로그램은 전역 및 로컬 설치를 모두 지원해야 합니다.
 - REQ-RUNTIME-05: 제거는 다른 구성에 영향을 주지 않고 모든 GSD 파일을 깔끔하게 제거해야 합니다.
 - REQ-RUNTIME-06: 설치 프로그램은 플랫폼 차이를 처리해야 합니다(Windows, macOS, Linux, WSL, Docker).
@@ -1049,7 +1049,7 @@ fix(03-01): correct auth token expiry
 
 ### 42. Cross-AI Peer Review
 
-**명령어:** `/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--coderabbit] [--opencode] [--qwen] [--cursor] [--all]`
+**명령어:** `/gsd-review --phase N [--gemini] [--claude] [--codex] [--coderabbit] [--opencode] [--qwen] [--cursor] [--all]`
 
 **목적:** 외부 AI CLI(Gemini, OpenCode, Codex, CodeRabbit, OpenCode, Qwen Code, Cursor)를 호출하여 페이즈 계획을 독립적으로 검토합니다. 검토자별 피드백이 담긴 구조화된 REVIEWS.md를 생성합니다.
 

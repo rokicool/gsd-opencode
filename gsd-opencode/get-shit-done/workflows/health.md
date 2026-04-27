@@ -11,12 +11,16 @@ read all files referenced by the invoking prompt's execution_context before star
 <step name="parse_args">
 **Parse arguments:**
 
-Check if `--repair` flag is present in the command arguments.
+Check if `--repair` or `--backfill` flags are present in the command arguments.
 
 ```
 REPAIR_FLAG=""
+BACKFILL_FLAG=""
 if arguments contain "--repair"; then
   REPAIR_FLAG="--repair"
+fi
+if arguments contain "--backfill"; then
+  BACKFILL_FLAG="--backfill"
 fi
 ```
 </step>
@@ -25,7 +29,7 @@ fi
 **Run health validation:**
 
 ```bash
-gsd-sdk query validate.health $REPAIR_FLAG
+gsd-sdk query validate.health $REPAIR_FLAG $BACKFILL_FLAG
 ```
 
 Parse JSON output:
@@ -138,6 +142,8 @@ Report final status.
 | W007 | warning | Phase on disk but not in ROADMAP | No |
 | W008 | warning | config.json: workflow.nyquist_validation absent (defaults to enabled but agents may skip) | Yes |
 | W009 | warning | Phase has Validation Architecture in RESEARCH.md but no VALIDATION.md | No |
+| W018 | warning | MILESTONES.md missing entry for archived milestone snapshot | Yes (`--backfill`) |
+| W019 | warning | Unrecognized .planning/ root file — not a canonical GSD artifact | No |
 | I001 | info | Plan without SUMMARY (may be in progress) | No |
 
 </error_codes>
@@ -150,6 +156,7 @@ Report final status.
 | resetConfig | Delete + recreate config.json | Loses custom settings |
 | regenerateState | Create STATE.md from ROADMAP structure when it is missing | Loses session history |
 | addNyquistKey | Add workflow.nyquist_validation: true to config.json | None — matches existing default |
+| backfillMilestones | Synthesize missing MILESTONES.md entries from `.planning/milestones/vX.Y-ROADMAP.md` snapshots | None — additive only; triggered by `--backfill` flag |
 
 **Not repairable (too risky):**
 - PROJECT.md, ROADMAP.md content
@@ -166,7 +173,7 @@ When `--repair` is active, detect and clean up:
 
 ```bash
 # Check for stale task directories (older than 24 hours)
-TASKS_DIR="$HOME/.OpenCode/tasks"
+TASKS_DIR="$HOME/.claude/tasks"
 if [ -d "$TASKS_DIR" ]; then
   STALE_COUNT=$( (find "$TASKS_DIR" -maxdepth 1 -type d -mtime +1 2>/dev/null || true) | wc -l )
   if [ "$STALE_COUNT" -gt 0 ]; then

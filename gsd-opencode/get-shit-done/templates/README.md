@@ -21,7 +21,7 @@ These files live directly at `.planning/` — not inside phase subdirectories.
 | `LEARNINGS.md` | *(inline)* | `/gsd-extract-learnings`, `/gsd-execute-phase` | Phase retrospective learnings for future plans |
 | `THREADS.md` | *(inline)* | `/gsd-thread` | Persistent discussion threads |
 | `config.json` | `config.json` | `/gsd-new-project`, `/gsd-health --repair` | Project-specific GSD configuration |
-| `AGENTS.md` | `OpenCode-md.md` | `/gsd-profile` | Auto-assembled OpenCode context file |
+| `AGENTS.md` | `claude-md.md` | `/gsd-profile` | Auto-assembled OpenCode context file |
 
 ### Version-stamped artifacts (pattern: `vX.Y-*.md`)
 

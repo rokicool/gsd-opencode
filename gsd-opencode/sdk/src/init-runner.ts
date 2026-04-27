@@ -37,7 +37,7 @@ import { resolveAgentsDir } from './query/helpers.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const GSD_TEMPLATES_DIR = join(homedir(), '.OpenCode', 'get-shit-done', 'templates');
+const GSD_TEMPLATES_DIR = join(homedir(), '.claude', 'get-shit-done', 'templates');
 const GSD_AGENTS_DIR = resolveAgentsDir();
 
 const RESEARCH_TYPES = ['STACK', 'FEATURES', 'ARCHITECTURE', 'PITFALLS'] as const;

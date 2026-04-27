@@ -102,12 +102,12 @@ if [ -z "$PATCHES_DIR" ]; then
   elif [ -d "$HOME/.codex/gsd-local-patches" ]; then
     PATCHES_DIR="$HOME/.codex/gsd-local-patches"
   else
-    PATCHES_DIR="$HOME/.OpenCode/gsd-local-patches"
+    PATCHES_DIR="$HOME/.claude/gsd-local-patches"
   fi
 fi
 # Local install fallback — check all runtime directories
 if [ ! -d "$PATCHES_DIR" ]; then
-  for dir in .config/kilo .kilo .config/opencode .opencode .gemini .codex .OpenCode; do
+  for dir in .config/kilo .kilo .config/opencode .opencode .gemini .codex .claude; do
     if [ -d "./$dir/gsd-local-patches" ]; then
       PATCHES_DIR="./$dir/gsd-local-patches"
       break
@@ -136,7 +136,7 @@ The quality of the merge depends on having a **pristine baseline** — the origi
 
 Check for baseline sources in priority order:
 
-### Option A: Git history (most reliable)
+### Option A: Pristine hash from backup-meta.json + git history (most reliable)
 If the config directory is a git repository:
 ```bash
 CONFIG_DIR=$(dirname "$PATCHES_DIR")
@@ -144,14 +144,34 @@ if git -C "$CONFIG_DIR" rev-parse --git-dir >/dev/null 2>&1; then
   HAS_GIT=true
 fi
 ```
-When `HAS_GIT=true`, use `git log` to find the commit where GSD was originally installed (before user edits). For each file, the pristine baseline can be extracted with:
+When `HAS_GIT=true`, use the `pristine_hashes` recorded in `backup-meta.json` to locate the correct baseline commit. For each file, iterate commits that touched it and find the one whose blob SHA-256 matches the recorded pristine hash:
 ```bash
-git -C "$CONFIG_DIR" log --diff-filter=A --format="%H" -- "{file_path}"
+# Get the expected pristine SHA-256 from backup-meta.json
+PRISTINE_HASH=$(jq -r ".pristine_hashes[\"${file_path}\"] // empty" "$PATCHES_DIR/backup-meta.json")
+
+BASELINE_COMMIT=""
+if [ -n "$PRISTINE_HASH" ]; then
+  # Walk commits that touched this file, pick the one matching the pristine hash
+  while IFS= read -r commit_hash; do
+    blob_hash=$(git -C "$CONFIG_DIR" show "${commit_hash}:${file_path}" 2>/dev/null | sha256sum | cut -d' ' -f1)
+    if [ "$blob_hash" = "$PRISTINE_HASH" ]; then
+      BASELINE_COMMIT="$commit_hash"
+      break
+    fi
+  done < <(git -C "$CONFIG_DIR" log --format="%H" -- "${file_path}")
+fi
+
+# Fallback: if no pristine hash in backup-meta (older installer), use first-add commit
+if [ -z "$BASELINE_COMMIT" ]; then
+  BASELINE_COMMIT=$(git -C "$CONFIG_DIR" log --diff-filter=A --format="%H" -- "${file_path}" | tail -1)
+fi
 ```
-This gives the commit that first added the file (the install commit). Extract the pristine version:
+Extract the pristine version from the matched commit:
 ```bash
-git -C "$CONFIG_DIR" show {install_commit}:{file_path}
+git -C "$CONFIG_DIR" show "${BASELINE_COMMIT}:${file_path}"
 ```
+
+**Why this matters:** `git log --diff-filter=A` returns the commit that *first added* the file, which is the wrong baseline on repos that have been through multiple GSD update cycles. The `pristine_hashes` field in `backup-meta.json` records the SHA-256 of the file as it existed in the pre-update GSD release — matching against it finds the correct baseline regardless of how many updates have occurred.
 
 ### Option B: Pristine snapshot directory
 Check if a `gsd-pristine/` directory exists alongside `gsd-local-patches/`:
@@ -208,7 +228,7 @@ When no pristine baseline is available, use these **strengthened heuristics**:
 For each file:
 a. read both versions completely
 b. Identify ALL differences, then classify each as:
-   - **Mechanical drift** — path substitutions (e.g. `/Users/xxx/.OpenCode/` → `$HOME/.OpenCode/`), variable additions (`${GSD_WS}`, `${AGENT_SKILLS_*}`), error handling additions (`|| true`)
+   - **Mechanical drift** — path substitutions (e.g. `/Users/xxx/.claude/` → `$HOME/.claude/`), variable additions (`${GSD_WS}`, `${AGENT_SKILLS_*}`), error handling additions (`|| true`)
    - **User customization** — added steps/sections, removed sections, reordered content, changed behavior, added frontmatter fields, modified instructions
 
 c. **If ANY differences remain after filtering out mechanical drift → those are user customizations. Merge them.**

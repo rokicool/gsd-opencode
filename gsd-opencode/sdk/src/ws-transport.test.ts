@@ -70,7 +70,7 @@ describe('WSTransport', () => {
     const event: GSDEvent = {
       ...makeBase(),
       type: GSDEventType.SessionInit,
-      model: 'OpenCode-sonnet-4-20250514',
+      model: 'claude-sonnet-4-20250514',
       tools: ['read', 'write'],
       cwd: '/tmp/test',
     } as GSDEvent;
@@ -82,7 +82,7 @@ describe('WSTransport', () => {
     const parsed = JSON.parse(received);
 
     expect(parsed.type).toBe('session_init');
-    expect(parsed.model).toBe('OpenCode-sonnet-4-20250514');
+    expect(parsed.model).toBe('claude-sonnet-4-20250514');
     expect(parsed.tools).toEqual(['read', 'write']);
 
     client.close();

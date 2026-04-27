@@ -119,7 +119,7 @@ export const initNewProject: QueryHandler = async (_args, projectDir, _workstrea
     '.r', '.R', '.zig', '.ex', '.exs', '.clj',
   ]);
   const skipDirs = new Set([
-    'node_modules', '.git', '.planning', '.OpenCode', '.codex',
+    'node_modules', '.git', '.planning', '.claude', '.codex',
     '__pycache__', 'target', 'dist', 'build',
   ]);
 

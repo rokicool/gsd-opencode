@@ -42,14 +42,14 @@ describe('CLITransport', () => {
     transport.onEvent({
       ...makeBase(),
       type: GSDEventType.SessionInit,
-      model: 'OpenCode-sonnet-4-20250514',
+      model: 'claude-sonnet-4-20250514',
       tools: ['read', 'write', 'bash'],
       cwd: '/home/project',
     } as GSDEvent);
 
     const output = readOutput(stream);
     expect(output).toBe(
-      '[14:30:45] [INIT] Session started — model: OpenCode-sonnet-4-20250514, tools: 3, cwd: /home/project',
+      '[14:30:45] [INIT] Session started — model: claude-sonnet-4-20250514, tools: 3, cwd: /home/project',
     );
   });
 

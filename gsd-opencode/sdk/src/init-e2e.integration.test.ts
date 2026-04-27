@@ -2,7 +2,7 @@
  * E2E integration test — proves InitRunner.run() drives real Agent SDK
  * sessions for the gsd-sdk init workflow.
  *
- * Requires OpenCode CLI (`OpenCode`) installed and authenticated.
+ * Requires OpenCode CLI (`claude`) installed and authenticated.
  * Skips gracefully if CLI is unavailable.
  *
  * This test proves the headless init pipeline can bootstrap a real project
@@ -28,7 +28,7 @@ import type { GSDEvent } from './types.js';
 
 let cliAvailable = false;
 try {
-  execSync('which OpenCode', { stdio: 'ignore' });
+  execSync('which claude', { stdio: 'ignore' });
   cliAvailable = true;
 } catch {
   cliAvailable = false;

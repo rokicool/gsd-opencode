@@ -85,7 +85,7 @@
   - [クレーム出所タグ付け](#65-クレーム出所タグ付け)
   - [Worktree トグル](#66-worktree-トグル)
   - [プロジェクトコードプレフィックス](#67-プロジェクトコードプレフィックス)
-  - [OpenCode スキルマイグレーション](#68-OpenCode-code-スキルマイグレーション)
+  - [OpenCode スキルマイグレーション](#68-claude-code-スキルマイグレーション)
 - [v1.32 の機能](#v132-の機能)
   - [STATE.md 整合性ゲート](#69-statemd-整合性ゲート)
   - [自律モード `--to N` フラグ](#70-自律モード---to-n-フラグ)
@@ -618,7 +618,7 @@
 - REQ-CTX-08: すべてのフックはサイレントに失敗し、ツール実行をブロックしてはならない
 
 **アーキテクチャ:** 2部構成のブリッジシステム:
-1. ステータスラインがメトリクスを `/tmp/OpenCode-ctx-{session}.json` に書き込み
+1. ステータスラインがメトリクスを `/tmp/claude-ctx-{session}.json` に書き込み
 2. コンテキストモニターがメトリクスを読み取り、`additionalContext` 警告を注入
 
 ---
@@ -900,7 +900,7 @@ fix(03-01): correct auth token expiry
 **要件:**
 - REQ-RUNTIME-01: システムは OpenCode、OpenCode、Gemini CLI、Kilo、Codex、Copilot、Antigravity をサポートしなければならない
 - REQ-RUNTIME-02: インストーラーはランタイムごとにコンテンツを変換しなければならない（ツール名、パス、フロントマター）
-- REQ-RUNTIME-03: インストーラーはインタラクティブおよび非インタラクティブ（`--OpenCode --global`）モードをサポートしなければならない
+- REQ-RUNTIME-03: インストーラーはインタラクティブおよび非インタラクティブ（`--claude --global`）モードをサポートしなければならない
 - REQ-RUNTIME-04: インストーラーはグローバルとローカルの両方のインストールをサポートしなければならない
 - REQ-RUNTIME-05: アンインストールは他の設定に影響を与えることなく、すべての GSD ファイルをクリーンに削除しなければならない
 - REQ-RUNTIME-06: インストーラーはプラットフォームの違い（Windows、macOS、Linux、WSL、Docker）を処理しなければならない
@@ -1049,7 +1049,7 @@ fix(03-01): correct auth token expiry
 
 ### 42. クロス AI ピアレビュー
 
-**コマンド:** `/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--coderabbit] [--opencode] [--qwen] [--cursor] [--all]`
+**コマンド:** `/gsd-review --phase N [--gemini] [--claude] [--codex] [--coderabbit] [--opencode] [--qwen] [--cursor] [--all]`
 
 **目的:** 外部の AI CLI（Gemini、OpenCode、Codex、CodeRabbit、OpenCode、Qwen Code、Cursor）を呼び出して、フェーズプランを独立してレビューします。レビュアーごとのフィードバックを含む構造化された REVIEWS.md を生成します。
 

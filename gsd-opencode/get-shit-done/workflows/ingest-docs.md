@@ -41,6 +41,8 @@ if [ -n "{MANIFEST_PATH}" ]; then
 fi
 ```
 
+**Containment (required):** After resolving `SCAN_PATH` and `MANIFEST_PATH` relative to the repo root, canonicalize each with `realpath` (or platform equivalent) and assert the result is under `realpath("$REPO_ROOT")`. Reject absolute paths outside the repo (e.g. `/tmp`, `C:\Windows`) even when they do not contain `..`.
+
 If `PATH_NOT_FOUND` or `MANIFEST_NOT_FOUND`: display error and exit.
 
 </step>
@@ -70,7 +72,7 @@ git init
 - execution_context path `/.codex/` → `RUNTIME=codex`
 - `/.gemini/` → `RUNTIME=gemini`
 - `/.opencode/` or `/.config/opencode/` → `RUNTIME=opencode`
-- else → `RUNTIME=OpenCode`
+- else → `RUNTIME=claude`
 
 Fall back to env vars (`CODEX_HOME`, `GEMINI_CONFIG_DIR`, `OPENCODE_CONFIG_DIR`) if execution_context is unavailable.
 
@@ -175,7 +177,9 @@ Collect the one-line confirmations from each classifier. If any classifier error
 Spawn `gsd-doc-synthesizer` once:
 
 ```
-@gsd-doc-synthesizer """
+task({
+  subagent_type: "gsd-doc-synthesizer",
+  prompt: "
     CLASSIFICATIONS_DIR: .planning/intel/classifications/
     INTEL_DIR: .planning/intel/
     CONFLICTS_PATH: .planning/INGEST-CONFLICTS.md
@@ -187,7 +191,8 @@ Spawn `gsd-doc-synthesizer` once:
     - agents/gsd-doc-synthesizer.md
     - get-shit-done/references/doc-conflict-engine.md
     </required_reading>
-  """
+  "
+})
 ```
 
 The synthesizer writes:
@@ -237,7 +242,9 @@ Audit PROJECT.md field requirements that `gsd-roadmapper` expects. For fields de
 Delegate to `gsd-roadmapper`:
 
 ```
-@gsd-roadmapper """
+task({
+  subagent_type: "gsd-roadmapper",
+  prompt: "
     Mode: new-project-from-ingest
     Intel: .planning/intel/SYNTHESIS.md (entry point)
     Per-type intel: .planning/intel/{decisions,requirements,constraints,context}.md
@@ -250,7 +257,8 @@ Delegate to `gsd-roadmapper`:
     - .planning/STATE.md
 
     Treat ADR-locked decisions as locked in PROJECT.md <decisions> blocks.
-  """
+  "
+})
 ```
 
 </step>

@@ -7,7 +7,7 @@
  * without human intervention. InitRunner bootstraps the project,
  * then GSD.runPhase() drives Phase 1 through the complete lifecycle.
  *
- * Requires OpenCode CLI (`OpenCode`) installed and authenticated.
+ * Requires OpenCode CLI (`claude`) installed and authenticated.
  * Skips gracefully if CLI is unavailable.
  */
 
@@ -30,7 +30,7 @@ import type { GSDEvent, PhaseRunnerResult, RoadmapAnalysis } from './types.js';
 
 let cliAvailable = false;
 try {
-  execSync('which OpenCode', { stdio: 'ignore' });
+  execSync('which claude', { stdio: 'ignore' });
   cliAvailable = true;
 } catch {
   cliAvailable = false;

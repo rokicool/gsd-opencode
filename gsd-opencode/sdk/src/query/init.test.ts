@@ -160,7 +160,7 @@ describe('withProjectRoot', () => {
   // false-negatives agent presence on non-default installs.
   it('honors CLAUDE_CONFIG_DIR when GSD_AGENTS_DIR is unset', async () => {
     const { MODEL_PROFILES } = await import('./config-query.js');
-    const configDir = join(tmpDir, 'custom-OpenCode');
+    const configDir = join(tmpDir, 'custom-claude');
     const agentsDir = join(configDir, 'agents');
     await mkdir(agentsDir, { recursive: true });
     for (const name of Object.keys(MODEL_PROFILES)) {

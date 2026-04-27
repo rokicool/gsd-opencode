@@ -85,7 +85,28 @@
   - [Claim Provenance Tagging](#65-claim-provenance-tagging)
   - [Worktree Toggle](#66-worktree-toggle)
   - [Project Code Prefixing](#67-project-code-prefixing)
-  - [OpenCode Skills Migration](#68-OpenCode-code-skills-migration)
+  - [OpenCode Skills Migration](#68-claude-code-skills-migration)
+- [v1.32 Features](#v132-features)
+  - [STATE.md Consistency Gates](#69-statemd-consistency-gates)
+  - [Autonomous `--to N` Flag](#70-autonomous---to-n-flag)
+  - [Research Gate](#71-research-gate)
+  - [Verifier Milestone Scope Filtering](#72-verifier-milestone-scope-filtering)
+  - [read-Before-edit Guard Hook](#73-read-before-edit-guard-hook)
+  - [Context Reduction](#74-context-reduction)
+  - [Discuss-Phase `--power` Flag](#75-discuss-phase---power-flag)
+  - [Debug `--diagnose` Flag](#76-debug---diagnose-flag)
+  - [Phase Dependency Analysis](#77-phase-dependency-analysis)
+  - [Anti-Pattern Severity Levels](#78-anti-pattern-severity-levels)
+  - [Methodology Artifact Type](#79-methodology-artifact-type)
+  - [Planner Reachability Check](#80-planner-reachability-check)
+  - [Playwright-MCP UI Verification](#81-playwright-mcp-ui-verification)
+  - [Pause-Work Expansion](#82-pause-work-expansion)
+  - [Response Language Config](#83-response-language-config)
+  - [Manual Update Procedure](#84-manual-update-procedure)
+  - [New Runtime Support (Trae, Cline, Augment Code)](#85-new-runtime-support-trae-cline-augment-code)
+  - [Autonomous `--interactive` Flag](#86-autonomous---interactive-flag)
+  - [Commit-Docs Guard Hook](#87-commit-docs-guard-hook)
+  - [Community Hooks Opt-In](#88-community-hooks-opt-in)
 - [v1.34.0 Features](#v1340-features)
   - [Global Learnings Store](#89-global-learnings-store)
   - [Queryable Codebase Intelligence](#90-queryable-codebase-intelligence)
@@ -116,11 +137,13 @@
   - [SDK Workstream Support](#113-sdk-workstream-support)
   - [Context-Window-Aware Prompt Thinning](#114-context-window-aware-prompt-thinning)
   - [Configurable AGENTS.md Path](#115-configurable-claudemd-path)
+  - [TDD Pipeline Mode](#116-tdd-pipeline-mode)
 - [v1.37.0 Features](#v1370-features)
   - [Spike Command](#117-spike-command)
   - [Sketch Command](#118-sketch-command)
   - [Agent Size-Budget Enforcement](#119-agent-size-budget-enforcement)
   - [Shared Boilerplate Extraction](#120-shared-boilerplate-extraction)
+  - [Knowledge Graph Integration](#121-knowledge-graph-integration)
 - [v1.32 Features](#v132-features)
   - [STATE.md Consistency Gates](#69-statemd-consistency-gates)
   - [Autonomous `--to N` Flag](#70-autonomous---to-n-flag)
@@ -658,7 +681,7 @@
 - REQ-CTX-08: All hooks MUST fail silently and never block tool execution
 
 **Architecture:** Two-part bridge system:
-1. Statusline writes metrics to `/tmp/OpenCode-ctx-{session}.json`
+1. Statusline writes metrics to `/tmp/claude-ctx-{session}.json`
 2. Context monitor reads metrics and injects `additionalContext` warnings
 
 ---
@@ -778,6 +801,45 @@
 | `STRUCTURE.md` | Directory layout and file organization |
 | `TESTING.md` | Test infrastructure, coverage, patterns |
 | `INTEGRATIONS.md` | External services, APIs, third-party dependencies |
+
+**Incremental remap — `--paths` (#2003):** The mapper accepts an optional
+`--paths <p1,p2,...>` scope hint. When provided, it restricts exploration
+to the listed repo-relative prefixes instead of scanning the whole tree.
+This is the pathway used by the post-execute codebase-drift gate to refresh
+only the subtrees the phase actually changed. Each produced document carries
+`last_mapped_commit` in its YAML frontmatter so drift can be measured
+against the mapping point, not HEAD.
+
+### 27a. Post-Execute Codebase Drift Detection
+
+**Introduced by:** #2003
+**Trigger:** Runs automatically at the end of every `/gsd-execute-phase`
+**Configuration:**
+- `workflow.drift_threshold` (integer, default `3`) — minimum new
+  structural elements before the gate acts.
+- `workflow.drift_action` (`warn` | `auto-remap`, default `warn`) —
+  warn-only or spawn `gsd-codebase-mapper` with `--paths` scoped to
+  affected subtrees.
+
+**What counts as drift:**
+- New directory outside mapped paths
+- New barrel export at `(packages|apps)/*/src/index.*`
+- New migration file (supabase/prisma/drizzle/src/migrations/…)
+- New route module under `routes/` or `api/`
+
+**Non-blocking guarantee:** any internal failure (missing STRUCTURE.md,
+git errors, mapper spawn failure) logs a single line and the phase
+continues. Drift detection cannot fail verification.
+
+**Requirements:**
+- REQ-DRIFT-01: System MUST detect the four drift categories from `git diff
+  --name-status last_mapped_commit..HEAD`
+- REQ-DRIFT-02: Action fires only when element count ≥ `workflow.drift_threshold`
+- REQ-DRIFT-03: `warn` action MUST NOT spawn any agent
+- REQ-DRIFT-04: `auto-remap` action MUST pass sanitized `--paths` to the mapper
+- REQ-DRIFT-05: Detection/remap failure MUST be non-blocking for `/gsd-execute-phase`
+- REQ-DRIFT-06: `last_mapped_commit` round-trip through YAML frontmatter
+  on each `.planning/codebase/*.md` file
 
 ---
 
@@ -940,7 +1002,7 @@ fix(03-01): correct auth token expiry
 **Requirements:**
 - REQ-RUNTIME-01: System MUST support OpenCode, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Antigravity, Trae, Cline, Augment Code, CodeBuddy, Qwen Code
 - REQ-RUNTIME-02: Installer MUST transform content per runtime (tool names, paths, frontmatter)
-- REQ-RUNTIME-03: Installer MUST support interactive and non-interactive (`--OpenCode --global`) modes
+- REQ-RUNTIME-03: Installer MUST support interactive and non-interactive (`--claude --global`) modes
 - REQ-RUNTIME-04: Installer MUST support both global and local installation
 - REQ-RUNTIME-05: Uninstall MUST cleanly remove all GSD files without affecting other configurations
 - REQ-RUNTIME-06: Installer MUST handle platform differences (Windows, macOS, Linux, WSL, Docker)
@@ -1089,7 +1151,7 @@ When verification returns `human_needed`, items are persisted as a trackable HUM
 
 ### 42. Cross-AI Peer Review
 
-**Command:** `/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--coderabbit] [--opencode] [--qwen] [--cursor] [--all]`
+**Command:** `/gsd-review --phase N [--gemini] [--claude] [--codex] [--coderabbit] [--opencode] [--qwen] [--cursor] [--all]`
 
 **Purpose:** Invoke external AI CLIs (Gemini, OpenCode, Codex, CodeRabbit, OpenCode, Qwen Code, Cursor) to independently review phase plans. Produces structured REVIEWS.md with per-reviewer feedback.
 
@@ -2371,6 +2433,20 @@ Test suite that scans all agent, workflow, and command files for embedded inject
 
 **Produces:** `{phase}-LEARNINGS.md` with YAML frontmatter (phase, project, counts per category, missing_artifacts)
 
+**Optional integration — `capture_thought`:** `capture_thought` is a **convention, not a bundled tool**. GSD does not ship one and does not require one. The workflow checks whether any MCP server in the current session exposes a tool named `capture_thought` and, if so, calls it once per extracted learning with the signature below. If no such tool is present, the step is skipped silently and `LEARNINGS.md` remains the primary output.
+
+Expected tool signature:
+```javascript
+capture_thought({
+  category: "decision" | "lesson" | "pattern" | "surprise",
+  phase: <phase_number>,
+  content: <learning_text>,
+  source: <artifact_name>
+})
+```
+
+Users who run a memory / knowledge-base MCP server (for example, ExoCortex-style servers, `claude-mem`, or `mem0`-style servers) can implement this tool name to have learnings routed into their knowledge base automatically with `project`, `phase`, and `source` metadata. Everyone else can use `/gsd-extract-learnings` without any extra setup — the `LEARNINGS.md` artifact is the feature.
+
 ---
 
 ### 113. SDK Workstream Support
@@ -2445,14 +2521,14 @@ Test suite that scans all agent, workflow, and command files for embedded inject
 - REQ-SPIKE-03: Each experiment MUST return one of: VALIDATED, INVALIDATED, or PARTIAL verdict with evidence
 - REQ-SPIKE-04: Results MUST be stored in `.planning/spikes/NNN-experiment-name/` with a README and MANIFEST.md
 - REQ-SPIKE-05: `--quick` flag skips intake conversation and uses the argument text as the experiment direction
-- REQ-SPIKE-06: `/gsd-spike-wrap-up` MUST package findings into `.OpenCode/skills/spike-findings-[project]/`
+- REQ-SPIKE-06: `/gsd-spike-wrap-up` MUST package findings into `.claude/skills/spike-findings-[project]/`
 
 **Produces:**
 | Artifact | Description |
 |----------|-------------|
 | `.planning/spikes/NNN-name/README.md` | Hypothesis, experiment code, verdict, and evidence |
 | `.planning/spikes/MANIFEST.md` | Index of all spikes with verdicts |
-| `.OpenCode/skills/spike-findings-[project]/` | Packaged findings (via `/gsd-spike-wrap-up`) |
+| `.claude/skills/spike-findings-[project]/` | Packaged findings (via `/gsd-spike-wrap-up`) |
 
 ---
 
@@ -2470,7 +2546,7 @@ Test suite that scans all agent, workflow, and command files for embedded inject
 - REQ-SKETCH-05: A shared `themes/default.css` MUST provide CSS variables adapted to the agreed aesthetic
 - REQ-SKETCH-06: `--quick` flag skips mood intake; `--text` flag replaces `question` with numbered lists for non-OpenCode runtimes
 - REQ-SKETCH-07: The winning variant MUST be marked in the README frontmatter and with a ★ in the HTML tab
-- REQ-SKETCH-08: `/gsd-sketch-wrap-up` MUST package winning decisions into `.OpenCode/skills/sketch-findings-[project]/`
+- REQ-SKETCH-08: `/gsd-sketch-wrap-up` MUST package winning decisions into `.claude/skills/sketch-findings-[project]/`
 
 **Produces:**
 | Artifact | Description |
@@ -2479,7 +2555,7 @@ Test suite that scans all agent, workflow, and command files for embedded inject
 | `.planning/sketches/NNN-name/README.md` | Design question, variants, winner, what to look for |
 | `.planning/sketches/themes/default.css` | Shared CSS theme variables |
 | `.planning/sketches/MANIFEST.md` | Index of all sketches with winners |
-| `.OpenCode/skills/sketch-findings-[project]/` | Packaged decisions (via `/gsd-sketch-wrap-up`) |
+| `.claude/skills/sketch-findings-[project]/` | Packaged decisions (via `/gsd-sketch-wrap-up`) |
 
 ---
 
@@ -2507,3 +2583,19 @@ Test suite that scans all agent, workflow, and command files for embedded inject
 - REQ-BOILER-03: Agents that previously inlined these blocks MUST now reference them via `@` required_reading
 
 **Reference files:** `references/mandatory-initial-read.md`, `references/project-skills-discovery.md`
+
+---
+
+### 121. Knowledge Graph Integration
+
+**Purpose:** Build, query, and inspect a lightweight knowledge graph of the project in `.planning/graphs/`. Opt-in per project. Exposed as the `/gsd-graphify` user-facing command and the `gsd-tools.cjs graphify …` programmatic verb family. Complements `/gsd-intel` (snapshot-oriented) with a graph-oriented view of nodes and edges across commands, agents, workflows, and phases.
+
+**Requirements:**
+- REQ-GRAPH-01: Opt-in via `graphify.enabled: true` in `.planning/config.json`. When disabled, `/gsd-graphify` prints an activation hint and stops without writing.
+- REQ-GRAPH-02: Slash-command `/gsd-graphify` exposes subcommands `build`, `query <term>`, `status`, `diff`. The programmatic CLI `node gsd-tools.cjs graphify …` additionally exposes `snapshot`, which is also invoked automatically as the final step of `graphify build`.
+- REQ-GRAPH-03: Build runs within the configurable `graphify.build_timeout` (seconds); exceeding the timeout aborts cleanly without leaving a partial graph.
+- REQ-GRAPH-04: `graphify.cjs` falls back to `graph.links` when `graph.edges` is absent so older graph artifacts keep rendering.
+- REQ-GRAPH-05: CJS-only surface; `gsd-sdk query` does not yet register graphify handlers.
+
+**Configuration:** `graphify.enabled`, `graphify.build_timeout`
+**Reference files:** `commands/gsd/graphify.md`, `bin/lib/graphify.cjs`

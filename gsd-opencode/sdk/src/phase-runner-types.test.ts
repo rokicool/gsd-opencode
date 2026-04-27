@@ -183,7 +183,7 @@ describe('Phase lifecycle types', () => {
         callbacks: {},
         maxBudgetPerStep: 3.0,
         maxTurnsPerStep: 30,
-        model: 'OpenCode-sonnet-4-6',
+        model: 'claude-sonnet-4-6',
       };
       expect(options.maxBudgetPerStep).toBe(3.0);
     });

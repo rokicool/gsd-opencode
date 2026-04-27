@@ -80,9 +80,9 @@ function makeErrorResult(overrides: Partial<PlanResult> = {}): PlanResult {
 
 function makeProjectInfo(overrides: Partial<InitNewProjectInfo> = {}): InitNewProjectInfo {
   return {
-    researcher_model: 'OpenCode-sonnet-4-6',
-    synthesizer_model: 'OpenCode-sonnet-4-6',
-    roadmapper_model: 'OpenCode-sonnet-4-6',
+    researcher_model: 'claude-sonnet-4-6',
+    synthesizer_model: 'claude-sonnet-4-6',
+    roadmapper_model: 'claude-sonnet-4-6',
     commit_docs: false, // false for tests — no git operations
     project_exists: false,
     has_codebase_map: false,
@@ -532,7 +532,7 @@ describe('InitRunner', () => {
     }, {
       maxBudgetPerSession: 10.0,
       maxTurnsPerSession: 50,
-      orchestratorModel: 'OpenCode-opus-4-6',
+      orchestratorModel: 'claude-opus-4-6',
     });
 
     await runner.run('build a todo app');
@@ -547,7 +547,7 @@ describe('InitRunner', () => {
       return options?.model;
     });
     // When projectInfo model is undefined, ?? falls through to orchestratorModel
-    expect(modelsUsed.some(m => m === 'OpenCode-opus-4-6')).toBe(true);
+    expect(modelsUsed.some(m => m === 'claude-opus-4-6')).toBe(true);
   });
 
   // ─── Session count validation ────────────────────────────────────────────

@@ -310,7 +310,7 @@ Package spike findings into a persistent project skill.
 
 - Curates each spike one-at-a-time (include/exclude/partial/UAT)
 - Groups findings by feature area
-- Generates `./.OpenCode/skills/spike-findings-[project]/` with references and sources
+- Generates `./.claude/skills/spike-findings-[project]/` with references and sources
 - Writes summary to `.planning/spikes/WRAP-UP-SUMMARY.md`
 - Adds auto-load routing line to project AGENTS.md
 
@@ -321,7 +321,7 @@ Package sketch design findings into a persistent project skill.
 
 - Curates each sketch one-at-a-time (include/exclude/partial/revisit)
 - Groups findings by design area
-- Generates `./.OpenCode/skills/sketch-findings-[project]/` with design decisions, CSS patterns, HTML structures
+- Generates `./.claude/skills/sketch-findings-[project]/` with design decisions, CSS patterns, HTML structures
 - Writes summary to `.planning/sketches/WRAP-UP-SUMMARY.md`
 - Adds auto-load routing line to project AGENTS.md
 
@@ -396,10 +396,10 @@ Usage: `/gsd-ship 4` or `/gsd-ship 4 --draft`
 
 ---
 
-**`/gsd-review --phase N [--gemini] [--OpenCode] [--codex] [--coderabbit] [--opencode] [--qwen] [--cursor] [--all]`**
+**`/gsd-review --phase N [--gemini] [--claude] [--codex] [--coderabbit] [--opencode] [--qwen] [--cursor] [--all]`**
 Cross-AI peer review — invoke external AI CLIs to independently review phase plans.
 
-- Detects available CLIs (gemini, OpenCode, codex, coderabbit)
+- Detects available CLIs (gemini, claude, codex, coderabbit)
 - Each CLI reviews plans independently with the same structured prompt
 - CodeRabbit reviews the current git diff (not a prompt) — may take up to 5 minutes
 - Produces REVIEWS.md with per-reviewer feedback and consensus summary

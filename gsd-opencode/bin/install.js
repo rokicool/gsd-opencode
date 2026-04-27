@@ -76,7 +76,7 @@ const args = process.argv.slice(2);
 const hasGlobal = args.includes('--global') || args.includes('-g');
 const hasLocal = args.includes('--local') || args.includes('-l');
 const hasOpencode = args.includes('--opencode');
-const hasClaude = args.includes('--OpenCode');
+const hasClaude = args.includes('--claude');
 const hasGemini = args.includes('--gemini');
 const hasKilo = args.includes('--kilo');
 const hasCodex = args.includes('--codex');
@@ -105,11 +105,11 @@ if (hasSdk && hasNoSdk) {
 // Runtime selection - can be set by flags or interactive prompt
 let selectedRuntimes = [];
 if (hasAll) {
-  selectedRuntimes = ['OpenCode', 'kilo', 'opencode', 'gemini', 'codex', 'copilot', 'antigravity', 'cursor', 'windsurf', 'augment', 'trae', 'qwen', 'codebuddy', 'cline'];
+  selectedRuntimes = ['claude', 'kilo', 'opencode', 'gemini', 'codex', 'copilot', 'antigravity', 'cursor', 'windsurf', 'augment', 'trae', 'qwen', 'codebuddy', 'cline'];
 } else if (hasBoth) {
-  selectedRuntimes = ['OpenCode', 'opencode'];
+  selectedRuntimes = ['claude', 'opencode'];
 } else {
-  if (hasClaude) selectedRuntimes.push('OpenCode');
+  if (hasClaude) selectedRuntimes.push('claude');
   if (hasOpencode) selectedRuntimes.push('opencode');
   if (hasGemini) selectedRuntimes.push('gemini');
   if (hasKilo) selectedRuntimes.push('kilo');
@@ -174,13 +174,13 @@ function getDirName(runtime) {
   if (runtime === 'qwen') return '.qwen';
   if (runtime === 'codebuddy') return '.codebuddy';
   if (runtime === 'cline') return '.cline';
-  return '.OpenCode';
+  return '.claude';
 }
 
 /**
  * Get the config directory path relative to home directory for a runtime
  * Used for templating hooks that use path.join(homeDir, '<configDir>', ...)
- * @param {string} runtime - 'OpenCode', 'opencode', 'gemini', 'codex', or 'copilot'
+ * @param {string} runtime - 'claude', 'opencode', 'gemini', 'codex', or 'copilot'
  * @param {boolean} isGlobal - Whether this is a global install
  */
 function getConfigDirFromHome(runtime, isGlobal) {
@@ -209,7 +209,7 @@ function getConfigDirFromHome(runtime, isGlobal) {
   if (runtime === 'qwen') return "'.qwen'";
   if (runtime === 'codebuddy') return "'.codebuddy'";
   if (runtime === 'cline') return "'.cline'";
-  return "'.OpenCode'";
+  return "'.claude'";
 }
 
 /**
@@ -264,7 +264,7 @@ function getKiloGlobalDir() {
 
 /**
  * Get the global config directory for a runtime
- * @param {string} runtime - 'OpenCode', 'opencode', 'gemini', 'codex', or 'copilot'
+ * @param {string} runtime - 'claude', 'opencode', 'gemini', 'codex', or 'copilot'
  * @param {string|null} explicitDir - Explicit directory from --config-dir flag
  */
 function getGlobalDir(runtime, explicitDir = null) {
@@ -410,7 +410,7 @@ function getGlobalDir(runtime, explicitDir = null) {
   if (process.env.CLAUDE_CONFIG_DIR) {
     return expandTilde(process.env.CLAUDE_CONFIG_DIR);
   }
-  return path.join(os.homedir(), '.OpenCode');
+  return path.join(os.homedir(), '.claude');
 }
 
 const banner = '\n' +
@@ -461,7 +461,7 @@ if (hasUninstall) {
 
 // Show help if requested
 if (hasHelp) {
-  console.log(`  ${yellow}Usage:${reset} npx gsd-opencode [options]\n\n  ${yellow}Options:${reset}\n    ${cyan}-g, --global${reset}              Install globally (to config directory)\n    ${cyan}-l, --local${reset}               Install locally (to current directory)\n    ${cyan}--OpenCode${reset}                  Install for OpenCode only\n    ${cyan}--opencode${reset}                Install for OpenCode only\n    ${cyan}--gemini${reset}                  Install for Gemini only\n    ${cyan}--kilo${reset}                    Install for Kilo only\n    ${cyan}--codex${reset}                   Install for Codex only\n    ${cyan}--copilot${reset}                 Install for Copilot only\n    ${cyan}--antigravity${reset}             Install for Antigravity only\n    ${cyan}--cursor${reset}                  Install for Cursor only\n    ${cyan}--windsurf${reset}                Install for Windsurf only\n    ${cyan}--augment${reset}                 Install for Augment only\n    ${cyan}--trae${reset}                    Install for Trae only\n    ${cyan}--qwen${reset}                    Install for Qwen Code only\n    ${cyan}--cline${reset}                   Install for Cline only\n    ${cyan}--codebuddy${reset}              Install for CodeBuddy only\n    ${cyan}--all${reset}                     Install for all runtimes\n    ${cyan}-u, --uninstall${reset}           Uninstall GSD (remove all GSD files)\n    ${cyan}-c, --config-dir <path>${reset}   Specify custom config directory\n    ${cyan}-h, --help${reset}                Show this help message\n    ${cyan}--force-statusline${reset}        Replace existing statusline config\n    ${cyan}--portable-hooks${reset}          Emit \$HOME-relative hook paths in settings.json\n                              (for WSL/Docker bind-mount setups; also GSD_PORTABLE_HOOKS=1)\n\n  ${yellow}Examples:${reset}\n    ${dim}# Interactive install (prompts for runtime and location)${reset}\n    npx gsd-opencode\n\n    ${dim}# Install for OpenCode globally${reset}\n    npx gsd-opencode --OpenCode --global\n\n    ${dim}# Install for Gemini globally${reset}\n    npx gsd-opencode --gemini --global\n\n    ${dim}# Install for Kilo globally${reset}\n    npx gsd-opencode --kilo --global\n\n    ${dim}# Install for Codex globally${reset}\n    npx gsd-opencode --codex --global\n\n    ${dim}# Install for Copilot globally${reset}\n    npx gsd-opencode --copilot --global\n\n    ${dim}# Install for Copilot locally${reset}\n    npx gsd-opencode --copilot --local\n\n    ${dim}# Install for Antigravity globally${reset}\n    npx gsd-opencode --antigravity --global\n\n    ${dim}# Install for Antigravity locally${reset}\n    npx gsd-opencode --antigravity --local\n\n    ${dim}# Install for Cursor globally${reset}\n    npx gsd-opencode --cursor --global\n\n    ${dim}# Install for Cursor locally${reset}\n    npx gsd-opencode --cursor --local\n\n    ${dim}# Install for Windsurf globally${reset}\n    npx gsd-opencode --windsurf --global\n\n    ${dim}# Install for Windsurf locally${reset}\n    npx gsd-opencode --windsurf --local\n\n    ${dim}# Install for Augment globally${reset}\n    npx gsd-opencode --augment --global\n\n    ${dim}# Install for Augment locally${reset}\n    npx gsd-opencode --augment --local\n\n    ${dim}# Install for Trae globally${reset}\n    npx gsd-opencode --trae --global\n\n    ${dim}# Install for Trae locally${reset}\n    npx gsd-opencode --trae --local\n\n    ${dim}# Install for Cline locally${reset}\n    npx gsd-opencode --cline --local\n\n    ${dim}# Install for CodeBuddy globally${reset}\n    npx gsd-opencode --codebuddy --global\n\n    ${dim}# Install for CodeBuddy locally${reset}\n    npx gsd-opencode --codebuddy --local\n\n    ${dim}# Install for all runtimes globally${reset}\n    npx gsd-opencode --all --global\n\n    ${dim}# Install to custom config directory${reset}\n    npx gsd-opencode --kilo --global --config-dir ~/.kilo-work\n\n    ${dim}# Install to current project only${reset}\n    npx gsd-opencode --OpenCode --local\n\n    ${dim}# Uninstall GSD from Cursor globally${reset}\n    npx gsd-opencode --cursor --global --uninstall\n\n  ${yellow}Notes:${reset}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over CLAUDE_CONFIG_DIR / OPENCODE_CONFIG_DIR / GEMINI_CONFIG_DIR / KILO_CONFIG_DIR / CODEX_HOME / COPILOT_CONFIG_DIR / ANTIGRAVITY_CONFIG_DIR / CURSOR_CONFIG_DIR / WINDSURF_CONFIG_DIR / AUGMENT_CONFIG_DIR / TRAE_CONFIG_DIR / QWEN_CONFIG_DIR / CLINE_CONFIG_DIR / CODEBUDDY_CONFIG_DIR environment variables.\n`);
+  console.log(`  ${yellow}Usage:${reset} npx gsd-opencode [options]\n\n  ${yellow}Options:${reset}\n    ${cyan}-g, --global${reset}              Install globally (to config directory)\n    ${cyan}-l, --local${reset}               Install locally (to current directory)\n    ${cyan}--claude${reset}                  Install for OpenCode only\n    ${cyan}--opencode${reset}                Install for OpenCode only\n    ${cyan}--gemini${reset}                  Install for Gemini only\n    ${cyan}--kilo${reset}                    Install for Kilo only\n    ${cyan}--codex${reset}                   Install for Codex only\n    ${cyan}--copilot${reset}                 Install for Copilot only\n    ${cyan}--antigravity${reset}             Install for Antigravity only\n    ${cyan}--cursor${reset}                  Install for Cursor only\n    ${cyan}--windsurf${reset}                Install for Windsurf only\n    ${cyan}--augment${reset}                 Install for Augment only\n    ${cyan}--trae${reset}                    Install for Trae only\n    ${cyan}--qwen${reset}                    Install for Qwen Code only\n    ${cyan}--cline${reset}                   Install for Cline only\n    ${cyan}--codebuddy${reset}              Install for CodeBuddy only\n    ${cyan}--all${reset}                     Install for all runtimes\n    ${cyan}-u, --uninstall${reset}           Uninstall GSD (remove all GSD files)\n    ${cyan}-c, --config-dir <path>${reset}   Specify custom config directory\n    ${cyan}-h, --help${reset}                Show this help message\n    ${cyan}--force-statusline${reset}        Replace existing statusline config\n    ${cyan}--portable-hooks${reset}          Emit \$HOME-relative hook paths in settings.json\n                              (for WSL/Docker bind-mount setups; also GSD_PORTABLE_HOOKS=1)\n\n  ${yellow}Examples:${reset}\n    ${dim}# Interactive install (prompts for runtime and location)${reset}\n    npx gsd-opencode\n\n    ${dim}# Install for OpenCode globally${reset}\n    npx gsd-opencode --claude --global\n\n    ${dim}# Install for Gemini globally${reset}\n    npx gsd-opencode --gemini --global\n\n    ${dim}# Install for Kilo globally${reset}\n    npx gsd-opencode --kilo --global\n\n    ${dim}# Install for Codex globally${reset}\n    npx gsd-opencode --codex --global\n\n    ${dim}# Install for Copilot globally${reset}\n    npx gsd-opencode --copilot --global\n\n    ${dim}# Install for Copilot locally${reset}\n    npx gsd-opencode --copilot --local\n\n    ${dim}# Install for Antigravity globally${reset}\n    npx gsd-opencode --antigravity --global\n\n    ${dim}# Install for Antigravity locally${reset}\n    npx gsd-opencode --antigravity --local\n\n    ${dim}# Install for Cursor globally${reset}\n    npx gsd-opencode --cursor --global\n\n    ${dim}# Install for Cursor locally${reset}\n    npx gsd-opencode --cursor --local\n\n    ${dim}# Install for Windsurf globally${reset}\n    npx gsd-opencode --windsurf --global\n\n    ${dim}# Install for Windsurf locally${reset}\n    npx gsd-opencode --windsurf --local\n\n    ${dim}# Install for Augment globally${reset}\n    npx gsd-opencode --augment --global\n\n    ${dim}# Install for Augment locally${reset}\n    npx gsd-opencode --augment --local\n\n    ${dim}# Install for Trae globally${reset}\n    npx gsd-opencode --trae --global\n\n    ${dim}# Install for Trae locally${reset}\n    npx gsd-opencode --trae --local\n\n    ${dim}# Install for Cline locally${reset}\n    npx gsd-opencode --cline --local\n\n    ${dim}# Install for CodeBuddy globally${reset}\n    npx gsd-opencode --codebuddy --global\n\n    ${dim}# Install for CodeBuddy locally${reset}\n    npx gsd-opencode --codebuddy --local\n\n    ${dim}# Install for all runtimes globally${reset}\n    npx gsd-opencode --all --global\n\n    ${dim}# Install to custom config directory${reset}\n    npx gsd-opencode --kilo --global --config-dir ~/.kilo-work\n\n    ${dim}# Install to current project only${reset}\n    npx gsd-opencode --claude --local\n\n    ${dim}# Uninstall GSD from Cursor globally${reset}\n    npx gsd-opencode --cursor --global --uninstall\n\n  ${yellow}Notes:${reset}\n    The --config-dir option is useful when you have multiple configurations.\n    It takes priority over CLAUDE_CONFIG_DIR / OPENCODE_CONFIG_DIR / GEMINI_CONFIG_DIR / KILO_CONFIG_DIR / CODEX_HOME / COPILOT_CONFIG_DIR / ANTIGRAVITY_CONFIG_DIR / CURSOR_CONFIG_DIR / WINDSURF_CONFIG_DIR / AUGMENT_CONFIG_DIR / TRAE_CONFIG_DIR / QWEN_CONFIG_DIR / CLINE_CONFIG_DIR / CODEBUDDY_CONFIG_DIR environment variables.\n`);
   process.exit(0);
 }
 
@@ -805,7 +805,7 @@ const attributionCache = new Map();
 
 /**
  * Get commit attribution setting for a runtime
- * @param {string} runtime - 'OpenCode', 'opencode', 'gemini', 'codex', or 'copilot'
+ * @param {string} runtime - 'claude', 'opencode', 'gemini', 'codex', or 'copilot'
  * @returns {null|undefined|string} null = remove, undefined = keep default, string = custom
  */
 function getCommitAttribution(runtime) {
@@ -832,9 +832,9 @@ function getCommitAttribution(runtime) {
     } else {
       result = settings.attribution.commit;
     }
-  } else if (runtime === 'OpenCode') {
+  } else if (runtime === 'claude') {
     // OpenCode
-    const settings = readSettings(path.join(getGlobalDir('OpenCode', explicitConfigDir), 'settings.json'));
+    const settings = readSettings(path.join(getGlobalDir('claude', explicitConfigDir), 'settings.json'));
     if (!settings || !settings.attribution || settings.attribution.commit === undefined) {
       result = undefined;
     } else if (settings.attribution.commit === '') {
@@ -1049,8 +1049,8 @@ function convertCopilotToolName(claudeTool) {
 /**
  * Apply Copilot-specific content conversion — CONV-06 (paths) + CONV-07 (command names).
  * Path mappings depend on install mode:
- *   Global: $HOME/.config/opencode/ → ~/.copilot/, ./.OpenCode/ → ./.github/
- *   Local:  $HOME/.config/opencode/ → ./.github/, ./.OpenCode/ → ./.github/
+ *   Global: $HOME/.config/opencode/ → ~/.copilot/, ./.claude/ → ./.github/
+ *   Local:  $HOME/.config/opencode/ → ./.github/, ./.claude/ → ./.github/
  * Applied to ALL Copilot content (skills, agents, engine files).
  * @param {string} content - Source content to convert
  * @param {boolean} [isGlobal=false] - Whether this is a global install
@@ -1062,16 +1062,16 @@ function convertClaudeToCopilotContent(content, isGlobal = false) {
   // one pass via a capture group, matching the approach used by Antigravity,
   // OpenCode, Kilo, and Codex converters (issue #2545).
   if (isGlobal) {
-    c = c.replace(/\$HOME\/\.OpenCode(\/|\b)/g, '$HOME/.copilot$1');
-    c = c.replace(/~\/\.OpenCode(\/|\b)/g, '~/.copilot$1');
+    c = c.replace(/\$HOME\/\.claude(\/|\b)/g, '$HOME/.copilot$1');
+    c = c.replace(/~\/\.claude(\/|\b)/g, '~/.copilot$1');
   } else {
-    c = c.replace(/\$HOME\/\.OpenCode\//g, '.github/');
-    c = c.replace(/~\/\.OpenCode\//g, '.github/');
-    c = c.replace(/\$HOME\/\.OpenCode\b/g, '.github');
-    c = c.replace(/~\/\.OpenCode\b/g, '.github');
+    c = c.replace(/\$HOME\/\.claude\//g, '.github/');
+    c = c.replace(/~\/\.claude\//g, '.github/');
+    c = c.replace(/\$HOME\/\.claude\b/g, '.github');
+    c = c.replace(/~\/\.claude\b/g, '.github');
   }
-  c = c.replace(/\.\/\.OpenCode\//g, './.github/');
-  c = c.replace(/\.OpenCode\//g, '.github/');
+  c = c.replace(/\.\/\.claude\//g, './.github/');
+  c = c.replace(/\.claude\//g, '.github/');
   // CONV-07: Command name conversion (all gsd: references → gsd-)
   c = c.replace(/gsd-/g, 'gsd-');
   // Runtime-neutral agent name replacement (#766)
@@ -1201,8 +1201,8 @@ function convertClaudeAgentToCopilotAgent(content, isGlobal = false) {
 /**
  * Apply Antigravity-specific content conversion — path replacement + command name conversion.
  * Path mappings depend on install mode:
- *   Global: $HOME/.config/opencode/ → ~/.gemini/antigravity/, ./.OpenCode/ → ./.agent/
- *   Local:  $HOME/.config/opencode/ → .agent/, ./.OpenCode/ → ./.agent/
+ *   Global: $HOME/.config/opencode/ → ~/.gemini/antigravity/, ./.claude/ → ./.agent/
+ *   Local:  $HOME/.config/opencode/ → .agent/, ./.claude/ → ./.agent/
  * Applied to ALL Antigravity content (skills, agents, engine files).
  * @param {string} content - Source content to convert
  * @param {boolean} [isGlobal=false] - Whether this is a global install
@@ -1210,20 +1210,20 @@ function convertClaudeAgentToCopilotAgent(content, isGlobal = false) {
 function convertClaudeToAntigravityContent(content, isGlobal = false) {
   let c = content;
   if (isGlobal) {
-    c = c.replace(/\$HOME\/\.OpenCode\//g, '$HOME/.gemini/antigravity/');
-    c = c.replace(/~\/\.OpenCode\//g, '~/.gemini/antigravity/');
+    c = c.replace(/\$HOME\/\.claude\//g, '$HOME/.gemini/antigravity/');
+    c = c.replace(/~\/\.claude\//g, '~/.gemini/antigravity/');
     // Bare form (no trailing slash) — must come after slash form to avoid double-replace
-    c = c.replace(/\$HOME\/\.OpenCode\b/g, '$HOME/.gemini/antigravity');
-    c = c.replace(/~\/\.OpenCode\b/g, '~/.gemini/antigravity');
+    c = c.replace(/\$HOME\/\.claude\b/g, '$HOME/.gemini/antigravity');
+    c = c.replace(/~\/\.claude\b/g, '~/.gemini/antigravity');
   } else {
-    c = c.replace(/\$HOME\/\.OpenCode\//g, '.agent/');
-    c = c.replace(/~\/\.OpenCode\//g, '.agent/');
+    c = c.replace(/\$HOME\/\.claude\//g, '.agent/');
+    c = c.replace(/~\/\.claude\//g, '.agent/');
     // Bare form (no trailing slash) — must come after slash form to avoid double-replace
-    c = c.replace(/\$HOME\/\.OpenCode\b/g, '.agent');
-    c = c.replace(/~\/\.OpenCode\b/g, '.agent');
+    c = c.replace(/\$HOME\/\.claude\b/g, '.agent');
+    c = c.replace(/~\/\.claude\b/g, '.agent');
   }
-  c = c.replace(/\.\/\.OpenCode\//g, './.agent/');
-  c = c.replace(/\.OpenCode\//g, '.agent/');
+  c = c.replace(/\.\/\.claude\//g, './.agent/');
+  c = c.replace(/\.claude\//g, '.agent/');
   // Command name conversion (all gsd: references → gsd-)
   c = c.replace(/gsd-/g, 'gsd-');
   // Runtime-neutral agent name replacement (#766)
@@ -1352,11 +1352,11 @@ function convertClaudeToCursorMarkdown(content) {
   converted = converted.replace(/subagent_type="general"/g, 'subagent_type="generalPurpose"');
   converted = converted.replace(/\$ARGUMENTS\b/g, '{{GSD_ARGS}}');
   // Replace project-level OpenCode conventions with Cursor equivalents
-  converted = converted.replace(/`\.\/OPENCODE\.md`/g, '`.cursor/rules/`');
-  converted = converted.replace(/\.\/OPENCODE\.md/g, '.cursor/rules/');
-  converted = converted.replace(/`OPENCODE\.md`/g, '`.cursor/rules/`');
+  converted = converted.replace(/`\.\/CLAUDE\.md`/g, '`.cursor/rules/`');
+  converted = converted.replace(/\.\/CLAUDE\.md/g, '.cursor/rules/');
+  converted = converted.replace(/`CLAUDE\.md`/g, '`.cursor/rules/`');
   converted = converted.replace(/\bCLAUDE\.md\b/g, '.cursor/rules/');
-  converted = converted.replace(/\.OpenCode\/skills\//g, '.cursor/skills/');
+  converted = converted.replace(/\.claude\/skills\//g, '.cursor/skills/');
   // Remove OpenCode-specific bug workarounds before brand replacement
   converted = converted.replace(/\*\*Known OpenCode bug \(classifyHandoffIfNeeded\):\*\*[^\n]*\n/g, '');
   converted = converted.replace(/- \*\*classifyHandoffIfNeeded false failure:\*\*[^\n]*\n/g, '');
@@ -1470,11 +1470,11 @@ function convertClaudeToWindsurfMarkdown(content) {
   converted = converted.replace(/subagent_type="general"/g, 'subagent_type="generalPurpose"');
   converted = converted.replace(/\$ARGUMENTS\b/g, '{{GSD_ARGS}}');
   // Replace project-level OpenCode conventions with Windsurf equivalents
-  converted = converted.replace(/`\.\/OPENCODE\.md`/g, '`.windsurf/rules`');
-  converted = converted.replace(/\.\/OPENCODE\.md/g, '.windsurf/rules');
-  converted = converted.replace(/`OPENCODE\.md`/g, '`.windsurf/rules`');
+  converted = converted.replace(/`\.\/CLAUDE\.md`/g, '`.windsurf/rules`');
+  converted = converted.replace(/\.\/CLAUDE\.md/g, '.windsurf/rules');
+  converted = converted.replace(/`CLAUDE\.md`/g, '`.windsurf/rules`');
   converted = converted.replace(/\bCLAUDE\.md\b/g, '.windsurf/rules');
-  converted = converted.replace(/\.OpenCode\/skills\//g, '.windsurf/skills/');
+  converted = converted.replace(/\.claude\/skills\//g, '.windsurf/skills/');
   // Remove OpenCode-specific bug workarounds before brand replacement
   converted = converted.replace(/\*\*Known OpenCode bug \(classifyHandoffIfNeeded\):\*\*[^\n]*\n/g, '');
   converted = converted.replace(/- \*\*classifyHandoffIfNeeded false failure:\*\*[^\n]*\n/g, '');
@@ -1592,11 +1592,11 @@ function convertClaudeToAugmentMarkdown(content) {
   converted = converted.replace(/subagent_type="general"/g, 'subagent_type="generalPurpose"');
   converted = converted.replace(/\$ARGUMENTS\b/g, '{{GSD_ARGS}}');
   // Replace project-level OpenCode conventions with Augment equivalents
-  converted = converted.replace(/`\.\/OPENCODE\.md`/g, '`.augment/rules/`');
-  converted = converted.replace(/\.\/OPENCODE\.md/g, '.augment/rules/');
-  converted = converted.replace(/`OPENCODE\.md`/g, '`.augment/rules/`');
+  converted = converted.replace(/`\.\/CLAUDE\.md`/g, '`.augment/rules/`');
+  converted = converted.replace(/\.\/CLAUDE\.md/g, '.augment/rules/');
+  converted = converted.replace(/`CLAUDE\.md`/g, '`.augment/rules/`');
   converted = converted.replace(/\bCLAUDE\.md\b/g, '.augment/rules/');
-  converted = converted.replace(/\.OpenCode\/skills\//g, '.augment/skills/');
+  converted = converted.replace(/\.claude\/skills\//g, '.augment/skills/');
   // Remove OpenCode-specific bug workarounds before brand replacement
   converted = converted.replace(/\*\*Known OpenCode bug \(classifyHandoffIfNeeded\):\*\*[^\n]*\n/g, '');
   converted = converted.replace(/- \*\*classifyHandoffIfNeeded false failure:\*\*[^\n]*\n/g, '');
@@ -1710,9 +1710,9 @@ function copyCommandsAsAugmentSkills(srcDir, skillsDir, prefix, pathPrefix, runt
       fs.mkdirSync(skillDir, { recursive: true });
 
       let content = fs.readFileSync(srcPath, 'utf8');
-      const globalClaudeRegex = /~\/\.OpenCode\//g;
-      const globalClaudeHomeRegex = /\$HOME\/\.OpenCode\//g;
-      const localClaudeRegex = /\.\/\.OpenCode\//g;
+      const globalClaudeRegex = /~\/\.claude\//g;
+      const globalClaudeHomeRegex = /\$HOME\/\.claude\//g;
+      const localClaudeRegex = /\.\/\.claude\//g;
       const augmentDirRegex = /~\/\.augment\//g;
       content = content.replace(globalClaudeRegex, pathPrefix);
       content = content.replace(globalClaudeHomeRegex, pathPrefix);
@@ -1741,13 +1741,13 @@ function convertClaudeToTraeMarkdown(content) {
   // Replace general-purpose subagent type with Trae's equivalent "general_purpose_task"
   converted = converted.replace(/subagent_type="general"/g, 'subagent_type="general_purpose_task"');
   converted = converted.replace(/\$ARGUMENTS\b/g, '{{GSD_ARGS}}');
-  converted = converted.replace(/`\.\/OPENCODE\.md`/g, '`.trae/rules/`');
-  converted = converted.replace(/\.\/OPENCODE\.md/g, '.trae/rules/');
-  converted = converted.replace(/`OPENCODE\.md`/g, '`.trae/rules/`');
+  converted = converted.replace(/`\.\/CLAUDE\.md`/g, '`.trae/rules/`');
+  converted = converted.replace(/\.\/CLAUDE\.md/g, '.trae/rules/');
+  converted = converted.replace(/`CLAUDE\.md`/g, '`.trae/rules/`');
   converted = converted.replace(/\bCLAUDE\.md\b/g, '.trae/rules/');
-  converted = converted.replace(/\.OpenCode\/skills\//g, '.trae/skills/');
-  converted = converted.replace(/\.\/\.OpenCode\//g, './.trae/');
-  converted = converted.replace(/\.OpenCode\//g, '.trae/');
+  converted = converted.replace(/\.claude\/skills\//g, '.trae/skills/');
+  converted = converted.replace(/\.\/\.claude\//g, './.trae/');
+  converted = converted.replace(/\.claude\//g, '.trae/');
   converted = converted.replace(/\*\*Known OpenCode bug \(classifyHandoffIfNeeded\):\*\*[^\n]*\n/g, '');
   converted = converted.replace(/- \*\*classifyHandoffIfNeeded false failure:\*\*[^\n]*\n/g, '');
   converted = converted.replace(/\bClaude Code\b/g, 'Trae');
@@ -1794,13 +1794,13 @@ function convertClaudeToCodebuddyMarkdown(content) {
   // CodeBuddy uses the same tool names as OpenCode (bash, edit, read, write, etc.)
   // No tool name conversion needed
   converted = converted.replace(/\$ARGUMENTS\b/g, '{{GSD_ARGS}}');
-  converted = converted.replace(/`\.\/OPENCODE\.md`/g, '`CODEBUDDY.md`');
-  converted = converted.replace(/\.\/OPENCODE\.md/g, 'CODEBUDDY.md');
-  converted = converted.replace(/`OPENCODE\.md`/g, '`CODEBUDDY.md`');
+  converted = converted.replace(/`\.\/CLAUDE\.md`/g, '`CODEBUDDY.md`');
+  converted = converted.replace(/\.\/CLAUDE\.md/g, 'CODEBUDDY.md');
+  converted = converted.replace(/`CLAUDE\.md`/g, '`CODEBUDDY.md`');
   converted = converted.replace(/\bCLAUDE\.md\b/g, 'CODEBUDDY.md');
-  converted = converted.replace(/\.OpenCode\/skills\//g, '.codebuddy/skills/');
-  converted = converted.replace(/\.\/\.OpenCode\//g, './.codebuddy/');
-  converted = converted.replace(/\.OpenCode\//g, '.codebuddy/');
+  converted = converted.replace(/\.claude\/skills\//g, '.codebuddy/skills/');
+  converted = converted.replace(/\.\/\.claude\//g, './.codebuddy/');
+  converted = converted.replace(/\.claude\//g, '.codebuddy/');
   converted = converted.replace(/\*\*Known OpenCode bug \(classifyHandoffIfNeeded\):\*\*[^\n]*\n/g, '');
   converted = converted.replace(/- \*\*classifyHandoffIfNeeded false failure:\*\*[^\n]*\n/g, '');
   converted = converted.replace(/\bClaude Code\b/g, 'CodeBuddy');
@@ -1841,13 +1841,13 @@ function convertClaudeAgentToCodebuddyAgent(content) {
 function convertClaudeToCliineMarkdown(content) {
   let converted = content;
   // Cline uses the same tool names as OpenCode — no tool name conversion needed
-  converted = converted.replace(/`\.\/OPENCODE\.md`/g, '`.clinerules`');
-  converted = converted.replace(/\.\/OPENCODE\.md/g, '.clinerules');
-  converted = converted.replace(/`OPENCODE\.md`/g, '`.clinerules`');
+  converted = converted.replace(/`\.\/CLAUDE\.md`/g, '`.clinerules`');
+  converted = converted.replace(/\.\/CLAUDE\.md/g, '.clinerules');
+  converted = converted.replace(/`CLAUDE\.md`/g, '`.clinerules`');
   converted = converted.replace(/\bCLAUDE\.md\b/g, '.clinerules');
-  converted = converted.replace(/\.OpenCode\/skills\//g, '.cline/skills/');
-  converted = converted.replace(/\.\/\.OpenCode\//g, './.cline/');
-  converted = converted.replace(/\.OpenCode\//g, '.cline/');
+  converted = converted.replace(/\.claude\/skills\//g, '.cline/skills/');
+  converted = converted.replace(/\.\/\.claude\//g, './.cline/');
+  converted = converted.replace(/\.claude\//g, '.cline/');
   converted = converted.replace(/\*\*Known OpenCode bug \(classifyHandoffIfNeeded\):\*\*[^\n]*\n/g, '');
   converted = converted.replace(/- \*\*classifyHandoffIfNeeded false failure:\*\*[^\n]*\n/g, '');
   converted = converted.replace(/\bClaude Code\b/g, 'Cline');
@@ -1890,15 +1890,15 @@ function convertClaudeToCodexMarkdown(content) {
   converted = converted.replace(/\/new\s*,?\s*then:?\s*\n?/gi, '');
   // Handle standalone /new on its own line
   converted = converted.replace(/^\s*`?\/new`?\s*$/gm, '');
-  // Path replacement: .OpenCode → .codex (#1430)
-  converted = converted.replace(/\$HOME\/\.OpenCode\//g, '$HOME/.codex/');
-  converted = converted.replace(/~\/\.OpenCode\//g, '~/.codex/');
-  converted = converted.replace(/\.\/\.OpenCode\//g, './.codex/');
-  // Bare/project-relative .OpenCode/... references (#2639). Covers strings like
-  // "check `.OpenCode/skills/`" where there is no ~/, $HOME/, or ./ anchor.
+  // Path replacement: .claude → .codex (#1430)
+  converted = converted.replace(/\$HOME\/\.claude\//g, '$HOME/.codex/');
+  converted = converted.replace(/~\/\.claude\//g, '~/.codex/');
+  converted = converted.replace(/\.\/\.claude\//g, './.codex/');
+  // Bare/project-relative .claude/... references (#2639). Covers strings like
+  // "check `.claude/skills/`" where there is no ~/, $HOME/, or ./ anchor.
   // Negative lookbehind prevents double-replacing already-anchored forms and
   // avoids matching inside URLs or other slash-prefixed paths.
-  converted = converted.replace(/(?<![A-Za-z0-9_\-./~$])\.OpenCode\//g, '.codex/');
+  converted = converted.replace(/(?<![A-Za-z0-9_\-./~$])\.claude\//g, '.codex/');
   // `.claudeignore` → `.codexignore` (#2639). Codex honors its own ignore
   // file; leaving the OpenCode-specific name is misleading in agent prompts.
   converted = converted.replace(/\.claudeignore\b/g, '.codexignore');
@@ -3309,13 +3309,13 @@ function installCodexConfig(targetDir, agentsSrc) {
 
   for (const file of agentEntries) {
     let content = fs.readFileSync(path.join(agentsSrc, file), 'utf8');
-    // Replace full .OpenCode/get-shit-done prefix so path resolves to the Codex
-    // GSD install before generic .OpenCode → .codex conversion rewrites it.
-    content = content.replace(/~\/\.OpenCode\/get-shit-done\//g, codexGsdPath);
-    content = content.replace(/\$HOME\/\.OpenCode\/get-shit-done\//g, codexGsdPath);
+    // Replace full .claude/get-shit-done prefix so path resolves to the Codex
+    // GSD install before generic .claude → .codex conversion rewrites it.
+    content = content.replace(/~\/\.claude\/get-shit-done\//g, codexGsdPath);
+    content = content.replace(/\$HOME\/\.claude\/get-shit-done\//g, codexGsdPath);
     // Route TOML emit through the same full OpenCode→Codex conversion pipeline
     // used on the `.md` emit path (#2639). Covers: slash-command rewrites,
-    // $ARGUMENTS → {{GSD_ARGS}}, /new removal, anchored and bare .OpenCode/
+    // $ARGUMENTS → {{GSD_ARGS}}, /new removal, anchored and bare .claude/
     // paths, .claudeignore → .codexignore, and standalone "OpenCode" /
     // AGENTS.md neutralization via neutralizeAgentReferences(..., 'AGENTS.md').
     content = convertClaudeToCodexMarkdown(content);
@@ -3362,7 +3362,7 @@ function installCodexConfig(targetDir, agentsSrc) {
  * Replaces:
  * - Standalone "OpenCode" (agent name) → "the agent"
  *   Preserves: "OpenCode" (product), "OpenCode Opus/Sonnet/Haiku" (models),
- *   "OpenCode-" (prefixes), "AGENTS.md" (handled separately)
+ *   "claude-" (prefixes), "AGENTS.md" (handled separately)
  * - "AGENTS.md" → runtime-appropriate instruction file
  * - "Do NOT load full AGENTS.md" → removed (harmful for AGENTS.md runtimes)
  *
@@ -3377,7 +3377,7 @@ function neutralizeAgentReferences(content, instructionFile) {
   c = c.replace(/\bClaude(?! Code| Opus| Sonnet| Haiku| native| based|-)\b(?!\.md)/g, 'the agent');
   // Replace AGENTS.md with runtime-appropriate instruction file
   if (instructionFile) {
-    c = c.replace(/OPENCODE\.md/g, instructionFile);
+    c = c.replace(/CLAUDE\.md/g, instructionFile);
   }
   // Remove instructions that conflict with AGENTS.md-based runtimes
   c = c.replace(/Do NOT load full `AGENTS\.md` files[^\n]*/g, '');
@@ -3501,9 +3501,9 @@ function convertClaudeToOpencodeFrontmatter(content, { isAgent = false, modelOve
   convertedContent = convertedContent.replace(/\bTodoWrite\b/g, 'todowrite');
   // Replace /gsd-command colon variant with /gsd-command for opencode (flat command structure)
   convertedContent = convertedContent.replace(/\/gsd-/g, '/gsd-');
-  // Replace $HOME/.config/opencode and $HOME/.OpenCode with OpenCode's config location
-  convertedContent = convertedContent.replace(/~\/\.OpenCode\b/g, '~/.config/opencode');
-  convertedContent = convertedContent.replace(/\$HOME\/\.OpenCode\b/g, '$HOME/.config/opencode');
+  // Replace $HOME/.config/opencode and $HOME/.claude with OpenCode's config location
+  convertedContent = convertedContent.replace(/~\/\.claude\b/g, '~/.config/opencode');
+  convertedContent = convertedContent.replace(/\$HOME\/\.claude\b/g, '$HOME/.config/opencode');
   // Replace general-purpose subagent type with OpenCode's equivalent "general"
   convertedContent = convertedContent.replace(/subagent_type="general"/g, 'subagent_type="general"');
   // Runtime-neutral agent name replacement (#766)
@@ -3658,14 +3658,14 @@ function convertClaudeToKiloFrontmatter(content, { isAgent = false } = {}) {
   convertedContent = convertedContent.replace(/\bTodoWrite\b/g, 'todowrite');
   // Replace /gsd-command colon variant with /gsd-command for Kilo (flat command structure)
   convertedContent = convertedContent.replace(/\/gsd-/g, '/gsd-');
-  // Replace $HOME/.config/opencode and $HOME/.OpenCode with Kilo's config location
-  convertedContent = convertedContent.replace(/~\/\.OpenCode\b/g, '~/.config/kilo');
-  convertedContent = convertedContent.replace(/\$HOME\/\.OpenCode\b/g, '$HOME/.config/kilo');
-  convertedContent = convertedContent.replace(/\.\/\.OpenCode\//g, './.kilo/');
+  // Replace $HOME/.config/opencode and $HOME/.claude with Kilo's config location
+  convertedContent = convertedContent.replace(/~\/\.claude\b/g, '~/.config/kilo');
+  convertedContent = convertedContent.replace(/\$HOME\/\.claude\b/g, '$HOME/.config/kilo');
+  convertedContent = convertedContent.replace(/\.\/\.claude\//g, './.kilo/');
   // Normalize both OpenCode skill directory variants to Kilo's canonical skills dir.
-  convertedContent = replaceRelativePathReference(convertedContent, '.OpenCode/skills/', '.kilo/skills/');
+  convertedContent = replaceRelativePathReference(convertedContent, '.claude/skills/', '.kilo/skills/');
   convertedContent = replaceRelativePathReference(convertedContent, '.agents/skills/', '.kilo/skills/');
-  convertedContent = replaceRelativePathReference(convertedContent, '.OpenCode/agents/', '.kilo/agents/');
+  convertedContent = replaceRelativePathReference(convertedContent, '.claude/agents/', '.kilo/agents/');
   // Replace general-purpose subagent type with Kilo's equivalent "general"
   convertedContent = convertedContent.replace(/subagent_type="general"/g, 'subagent_type="general"');
   // Runtime-neutral agent name replacement (#766)
@@ -3875,7 +3875,7 @@ function convertClaudeToGeminiToml(content) {
  * @param {string} destDir - Destination directory (e.g., command/)
  * @param {string} prefix - Prefix for filenames (e.g., 'gsd')
  * @param {string} pathPrefix - Path prefix for file references
- * @param {string} runtime - Target runtime ('OpenCode', 'opencode', or 'kilo')
+ * @param {string} runtime - Target runtime ('claude', 'opencode', or 'kilo')
  */
 function copyFlattenedCommands(srcDir, destDir, prefix, pathPrefix, runtime) {
   if (!fs.existsSync(srcDir)) {
@@ -3909,9 +3909,9 @@ function copyFlattenedCommands(srcDir, destDir, prefix, pathPrefix, runtime) {
       const destPath = path.join(destDir, destName);
 
       let content = fs.readFileSync(srcPath, 'utf8');
-      const globalClaudeRegex = /~\/\.OpenCode\//g;
-      const globalClaudeHomeRegex = /\$HOME\/\.OpenCode\//g;
-      const localClaudeRegex = /\.\/\.OpenCode\//g;
+      const globalClaudeRegex = /~\/\.claude\//g;
+      const globalClaudeHomeRegex = /\$HOME\/\.claude\//g;
+      const localClaudeRegex = /\.\/\.claude\//g;
       const opencodeDirRegex = /~\/\.opencode\//g;
       const kiloDirRegex = /~\/\.kilo\//g;
       content = content.replace(globalClaudeRegex, pathPrefix);
@@ -3974,9 +3974,9 @@ function copyCommandsAsCodexSkills(srcDir, skillsDir, prefix, pathPrefix, runtim
       fs.mkdirSync(skillDir, { recursive: true });
 
       let content = fs.readFileSync(srcPath, 'utf8');
-      const globalClaudeRegex = /~\/\.OpenCode\//g;
-      const globalClaudeHomeRegex = /\$HOME\/\.OpenCode\//g;
-      const localClaudeRegex = /\.\/\.OpenCode\//g;
+      const globalClaudeRegex = /~\/\.claude\//g;
+      const globalClaudeHomeRegex = /\$HOME\/\.claude\//g;
+      const localClaudeRegex = /\.\/\.claude\//g;
       const codexDirRegex = /~\/\.codex\//g;
       content = content.replace(globalClaudeRegex, pathPrefix);
       content = content.replace(globalClaudeHomeRegex, pathPrefix);
@@ -4027,9 +4027,9 @@ function copyCommandsAsCursorSkills(srcDir, skillsDir, prefix, pathPrefix, runti
       fs.mkdirSync(skillDir, { recursive: true });
 
       let content = fs.readFileSync(srcPath, 'utf8');
-      const globalClaudeRegex = /~\/\.OpenCode\//g;
-      const globalClaudeHomeRegex = /\$HOME\/\.OpenCode\//g;
-      const localClaudeRegex = /\.\/\.OpenCode\//g;
+      const globalClaudeRegex = /~\/\.claude\//g;
+      const globalClaudeHomeRegex = /\$HOME\/\.claude\//g;
+      const localClaudeRegex = /\.\/\.claude\//g;
       const cursorDirRegex = /~\/\.cursor\//g;
       content = content.replace(globalClaudeRegex, pathPrefix);
       content = content.replace(globalClaudeHomeRegex, pathPrefix);
@@ -4084,9 +4084,9 @@ function copyCommandsAsWindsurfSkills(srcDir, skillsDir, prefix, pathPrefix, run
       fs.mkdirSync(skillDir, { recursive: true });
 
       let content = fs.readFileSync(srcPath, 'utf8');
-      const globalClaudeRegex = /~\/\.OpenCode\//g;
-      const globalClaudeHomeRegex = /\$HOME\/\.OpenCode\//g;
-      const localClaudeRegex = /\.\/\.OpenCode\//g;
+      const globalClaudeRegex = /~\/\.claude\//g;
+      const globalClaudeHomeRegex = /\$HOME\/\.claude\//g;
+      const localClaudeRegex = /\.\/\.claude\//g;
       const windsurfDirRegex = /~\/\.codeium\/windsurf\//g;
       content = content.replace(globalClaudeRegex, pathPrefix);
       content = content.replace(globalClaudeHomeRegex, pathPrefix);
@@ -4136,12 +4136,12 @@ function copyCommandsAsTraeSkills(srcDir, skillsDir, prefix, pathPrefix, runtime
       fs.mkdirSync(skillDir, { recursive: true });
 
       let content = fs.readFileSync(srcPath, 'utf8');
-      const globalClaudeRegex = /~\/\.OpenCode\//g;
-      const globalClaudeHomeRegex = /\$HOME\/\.OpenCode\//g;
-      const localClaudeRegex = /\.\/\.OpenCode\//g;
-      const bareGlobalClaudeRegex = /~\/\.OpenCode\b/g;
-      const bareGlobalClaudeHomeRegex = /\$HOME\/\.OpenCode\b/g;
-      const bareLocalClaudeRegex = /\.\/\.OpenCode\b/g;
+      const globalClaudeRegex = /~\/\.claude\//g;
+      const globalClaudeHomeRegex = /\$HOME\/\.claude\//g;
+      const localClaudeRegex = /\.\/\.claude\//g;
+      const bareGlobalClaudeRegex = /~\/\.claude\b/g;
+      const bareGlobalClaudeHomeRegex = /\$HOME\/\.claude\b/g;
+      const bareLocalClaudeRegex = /\.\/\.claude\b/g;
       const traeDirRegex = /~\/\.trae\//g;
       const normalizedPathPrefix = pathPrefix.replace(/\/$/, '');
       content = content.replace(globalClaudeRegex, pathPrefix);
@@ -4199,12 +4199,12 @@ function copyCommandsAsCodebuddySkills(srcDir, skillsDir, prefix, pathPrefix, ru
       fs.mkdirSync(skillDir, { recursive: true });
 
       let content = fs.readFileSync(srcPath, 'utf8');
-      const globalClaudeRegex = /~\/\.OpenCode\//g;
-      const globalClaudeHomeRegex = /\$HOME\/\.OpenCode\//g;
-      const localClaudeRegex = /\.\/\.OpenCode\//g;
-      const bareGlobalClaudeRegex = /~\/\.OpenCode\b/g;
-      const bareGlobalClaudeHomeRegex = /\$HOME\/\.OpenCode\b/g;
-      const bareLocalClaudeRegex = /\.\/\.OpenCode\b/g;
+      const globalClaudeRegex = /~\/\.claude\//g;
+      const globalClaudeHomeRegex = /\$HOME\/\.claude\//g;
+      const localClaudeRegex = /\.\/\.claude\//g;
+      const bareGlobalClaudeRegex = /~\/\.claude\b/g;
+      const bareGlobalClaudeHomeRegex = /\$HOME\/\.claude\b/g;
+      const bareLocalClaudeRegex = /\.\/\.claude\b/g;
       const codebuddyDirRegex = /~\/\.codebuddy\//g;
       const normalizedPathPrefix = pathPrefix.replace(/\/$/, '');
       content = content.replace(globalClaudeRegex, pathPrefix);
@@ -4320,17 +4320,17 @@ function copyCommandsAsClaudeSkills(srcDir, skillsDir, prefix, pathPrefix, runti
       fs.mkdirSync(skillDir, { recursive: true });
 
       let content = fs.readFileSync(srcPath, 'utf8');
-      content = content.replace(/~\/\.OpenCode\//g, pathPrefix);
-      content = content.replace(/\$HOME\/\.OpenCode\//g, pathPrefix);
-      content = content.replace(/\.\/\.OpenCode\//g, `./${getDirName(runtime)}/`);
+      content = content.replace(/~\/\.claude\//g, pathPrefix);
+      content = content.replace(/\$HOME\/\.claude\//g, pathPrefix);
+      content = content.replace(/\.\/\.claude\//g, `./${getDirName(runtime)}/`);
       content = content.replace(/~\/\.qwen\//g, pathPrefix);
       content = content.replace(/\$HOME\/\.qwen\//g, pathPrefix);
       content = content.replace(/\.\/\.qwen\//g, `./${getDirName(runtime)}/`);
       // Qwen reuses OpenCode skill format but needs runtime-specific content replacement
       if (runtime === 'qwen') {
-        content = content.replace(/OPENCODE\.md/g, 'QWEN.md');
+        content = content.replace(/CLAUDE\.md/g, 'QWEN.md');
         content = content.replace(/\bClaude Code\b/g, 'Qwen Code');
-        content = content.replace(/\.OpenCode\//g, '.qwen/');
+        content = content.replace(/\.claude\//g, '.qwen/');
       }
       content = processAttribution(content, getCommitAttribution(runtime));
       content = convertClaudeCommandToClaudeSkill(content, skillName);
@@ -4438,7 +4438,7 @@ function restoreUserArtifacts(destDir, saved) {
  * @param {string} srcDir - Source directory
  * @param {string} destDir - Destination directory
  * @param {string} pathPrefix - Path prefix for file references
- * @param {string} runtime - Target runtime ('OpenCode', 'opencode', 'gemini', 'codex')
+ * @param {string} runtime - Target runtime ('claude', 'opencode', 'gemini', 'codex')
  */
 function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, isCommand = false, isGlobal = false) {
   const isOpencode = runtime === 'opencode';
@@ -4469,13 +4469,13 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, isCommand
     if (entry.isDirectory()) {
       copyWithPathReplacement(srcPath, destPath, pathPrefix, runtime, isCommand, isGlobal);
     } else if (entry.name.endsWith('.md')) {
-      // Replace $HOME/.config/opencode/ and $HOME/.OpenCode/ and ./.OpenCode/ with runtime-appropriate paths
+      // Replace $HOME/.config/opencode/ and $HOME/.claude/ and ./.claude/ with runtime-appropriate paths
       // Skip generic replacement for Copilot — convertClaudeToCopilotContent handles all paths
       let content = fs.readFileSync(srcPath, 'utf8');
       if (!isCopilot && !isAntigravity) {
-        const globalClaudeRegex = /~\/\.OpenCode\//g;
-        const globalClaudeHomeRegex = /\$HOME\/\.OpenCode\//g;
-        const localClaudeRegex = /\.\/\.OpenCode\//g;
+        const globalClaudeRegex = /~\/\.claude\//g;
+        const globalClaudeHomeRegex = /\$HOME\/\.claude\//g;
+        const localClaudeRegex = /\.\/\.claude\//g;
         content = content.replace(globalClaudeRegex, pathPrefix);
         content = content.replace(globalClaudeHomeRegex, pathPrefix);
         content = content.replace(localClaudeRegex, `./${dirName}/`);
@@ -4526,9 +4526,9 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, isCommand
         content = convertClaudeToCliineMarkdown(content);
         fs.writeFileSync(destPath, content);
       } else if (isQwen) {
-        content = content.replace(/OPENCODE\.md/g, 'QWEN.md');
+        content = content.replace(/CLAUDE\.md/g, 'QWEN.md');
         content = content.replace(/\bClaude Code\b/g, 'Qwen Code');
-        content = content.replace(/\.OpenCode\//g, '.qwen/');
+        content = content.replace(/\.claude\//g, '.qwen/');
         fs.writeFileSync(destPath, content);
       } else {
         fs.writeFileSync(destPath, content);
@@ -4547,16 +4547,16 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, isCommand
       // For Cursor, also convert OpenCode references in JS/CJS utility scripts
       let jsContent = fs.readFileSync(srcPath, 'utf8');
       jsContent = jsContent.replace(/gsd-/gi, 'gsd-');
-      jsContent = jsContent.replace(/\.OpenCode\/skills\//g, '.cursor/skills/');
-      jsContent = jsContent.replace(/OPENCODE\.md/g, '.cursor/rules/');
+      jsContent = jsContent.replace(/\.claude\/skills\//g, '.cursor/skills/');
+      jsContent = jsContent.replace(/CLAUDE\.md/g, '.cursor/rules/');
       jsContent = jsContent.replace(/\bClaude Code\b/g, 'Cursor');
       fs.writeFileSync(destPath, jsContent);
     } else if (isWindsurf && (entry.name.endsWith('.cjs') || entry.name.endsWith('.js'))) {
       // For Windsurf, also convert OpenCode references in JS/CJS utility scripts
       let jsContent = fs.readFileSync(srcPath, 'utf8');
       jsContent = jsContent.replace(/gsd-/gi, 'gsd-');
-      jsContent = jsContent.replace(/\.OpenCode\/skills\//g, '.windsurf/skills/');
-      jsContent = jsContent.replace(/OPENCODE\.md/g, '.windsurf/rules');
+      jsContent = jsContent.replace(/\.claude\/skills\//g, '.windsurf/skills/');
+      jsContent = jsContent.replace(/CLAUDE\.md/g, '.windsurf/rules');
       jsContent = jsContent.replace(/\bClaude Code\b/g, 'Windsurf');
       fs.writeFileSync(destPath, jsContent);
     } else if (isTrae && (entry.name.endsWith('.cjs') || entry.name.endsWith('.js'))) {
@@ -4564,21 +4564,21 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix, runtime, isCommand
       jsContent = jsContent.replace(/\/gsd-([a-z0-9-]+)/g, (_, commandName) => {
         return `/gsd-${commandName}`;
       });
-      jsContent = jsContent.replace(/\.OpenCode\/skills\//g, '.trae/skills/');
-      jsContent = jsContent.replace(/OPENCODE\.md/g, '.trae/rules/');
+      jsContent = jsContent.replace(/\.claude\/skills\//g, '.trae/skills/');
+      jsContent = jsContent.replace(/CLAUDE\.md/g, '.trae/rules/');
       jsContent = jsContent.replace(/\bClaude Code\b/g, 'Trae');
       fs.writeFileSync(destPath, jsContent);
     } else if (isCline && (entry.name.endsWith('.cjs') || entry.name.endsWith('.js'))) {
       let jsContent = fs.readFileSync(srcPath, 'utf8');
-      jsContent = jsContent.replace(/\.OpenCode\/skills\//g, '.cline/skills/');
-      jsContent = jsContent.replace(/OPENCODE\.md/g, '.clinerules');
+      jsContent = jsContent.replace(/\.claude\/skills\//g, '.cline/skills/');
+      jsContent = jsContent.replace(/CLAUDE\.md/g, '.clinerules');
       jsContent = jsContent.replace(/\bClaude Code\b/g, 'Cline');
       fs.writeFileSync(destPath, jsContent);
     } else if (isQwen && (entry.name.endsWith('.cjs') || entry.name.endsWith('.js'))) {
       let jsContent = fs.readFileSync(srcPath, 'utf8');
-      jsContent = jsContent.replace(/\.OpenCode\/skills\//g, '.qwen/skills/');
-      jsContent = jsContent.replace(/\.OpenCode\//g, '.qwen/');
-      jsContent = jsContent.replace(/OPENCODE\.md/g, 'QWEN.md');
+      jsContent = jsContent.replace(/\.claude\/skills\//g, '.qwen/skills/');
+      jsContent = jsContent.replace(/\.claude\//g, '.qwen/');
+      jsContent = jsContent.replace(/CLAUDE\.md/g, 'QWEN.md');
       jsContent = jsContent.replace(/\bClaude Code\b/g, 'Qwen Code');
       fs.writeFileSync(destPath, jsContent);
     } else {
@@ -4745,9 +4745,9 @@ function validateHookFields(settings) {
  * Uninstall GSD from the specified directory for a specific runtime
  * Removes only GSD-specific files/directories, preserves user content
  * @param {boolean} isGlobal - Whether to uninstall from global or local
- * @param {string} runtime - Target runtime ('OpenCode', 'opencode', 'gemini', 'codex', 'copilot')
+ * @param {string} runtime - Target runtime ('claude', 'opencode', 'gemini', 'codex', 'copilot')
  */
-function uninstall(isGlobal, runtime = 'OpenCode') {
+function uninstall(isGlobal, runtime = 'claude') {
   const isOpencode = runtime === 'opencode';
   const isKilo = runtime === 'kilo';
   const isGemini = runtime === 'gemini';
@@ -5512,7 +5512,7 @@ function verifyFileInstalled(filePath, description) {
 /**
  * Install to the specified directory for a specific runtime
  * @param {boolean} isGlobal - Whether to install globally or locally
- * @param {string} runtime - Target runtime ('OpenCode', 'opencode', 'gemini', 'codex')
+ * @param {string} runtime - Target runtime ('claude', 'opencode', 'gemini', 'codex')
  */
 
 // ──────────────────────────────────────────────────────
@@ -5553,7 +5553,7 @@ function generateManifest(dir, baseDir) {
 /**
  * write file manifest after installation for future modification detection
  */
-function writeManifest(configDir, runtime = 'OpenCode') {
+function writeManifest(configDir, runtime = 'claude') {
   const isOpencode = runtime === 'opencode';
   const isKilo = runtime === 'kilo';
   const isGemini = runtime === 'gemini';
@@ -5693,7 +5693,7 @@ function saveLocalPatches(configDir) {
 /**
  * After install, report backed-up patches for user to reapply.
  */
-function reportLocalPatches(configDir, runtime = 'OpenCode') {
+function reportLocalPatches(configDir, runtime = 'claude') {
   const patchesDir = path.join(configDir, PATCHES_DIR_NAME);
   const metaPath = path.join(patchesDir, 'backup-meta.json');
   if (!fs.existsSync(metaPath)) return [];
@@ -5723,7 +5723,7 @@ function reportLocalPatches(configDir, runtime = 'OpenCode') {
   return meta.files || [];
 }
 
-function install(isGlobal, runtime = 'OpenCode') {
+function install(isGlobal, runtime = 'claude') {
   const isOpencode = runtime === 'opencode';
   const isGemini = runtime === 'gemini';
   const isKilo = runtime === 'kilo';
@@ -5754,7 +5754,7 @@ function install(isGlobal, runtime = 'OpenCode') {
     : targetDir.replace(process.cwd(), '.');
 
   // Path prefix for file references in markdown content (e.g. gsd-tools.cjs).
-  // Replaces $HOME/.OpenCode/ or $HOME/.config/opencode/ so the result is <pathPrefix>get-shit-done/bin/...
+  // Replaces $HOME/.claude/ or $HOME/.config/opencode/ so the result is <pathPrefix>get-shit-done/bin/...
   // For global installs: use $HOME/ so paths expand correctly inside double-quoted
   // shell commands (~ does NOT expand inside double quotes, causing MODULE_NOT_FOUND).
   // For local installs: use resolved absolute path (may be outside $HOME).
@@ -5964,7 +5964,7 @@ function install(isGlobal, runtime = 'OpenCode') {
     }
   } else {
     // OpenCode local: commands/gsd/ format — OpenCode reads local project
-    // commands from .OpenCode/commands/gsd/, not .OpenCode/skills/
+    // commands from .claude/commands/gsd/, not .claude/skills/
     const commandsDir = path.join(targetDir, 'commands');
     fs.mkdirSync(commandsDir, { recursive: true });
     const gsdSrc = path.join(src, 'commands', 'gsd');
@@ -6024,11 +6024,11 @@ function install(isGlobal, runtime = 'OpenCode') {
     for (const entry of agentEntries) {
       if (entry.isFile() && entry.name.endsWith('.md')) {
         let content = fs.readFileSync(path.join(agentsSrc, entry.name), 'utf8');
-        // Replace $HOME/.config/opencode/ and $HOME/.OpenCode/ as they are the source of truth in the repo
-        const dirRegex = /~\/\.OpenCode\//g;
-        const homeDirRegex = /\$HOME\/\.OpenCode\//g;
-        const bareDirRegex = /~\/\.OpenCode\b/g;
-        const bareHomeDirRegex = /\$HOME\/\.OpenCode\b/g;
+        // Replace $HOME/.config/opencode/ and $HOME/.claude/ as they are the source of truth in the repo
+        const dirRegex = /~\/\.claude\//g;
+        const homeDirRegex = /\$HOME\/\.claude\//g;
+        const bareDirRegex = /~\/\.claude\b/g;
+        const bareHomeDirRegex = /\$HOME\/\.claude\b/g;
         const normalizedPathPrefix = pathPrefix.replace(/\/$/, '');
         if (!isCopilot && !isAntigravity) {
           content = content.replace(dirRegex, pathPrefix);
@@ -6071,9 +6071,9 @@ function install(isGlobal, runtime = 'OpenCode') {
         } else if (isCline) {
           content = convertClaudeAgentToClineAgent(content);
         } else if (isQwen) {
-          content = content.replace(/OPENCODE\.md/g, 'QWEN.md');
+          content = content.replace(/CLAUDE\.md/g, 'QWEN.md');
           content = content.replace(/\bClaude Code\b/g, 'Qwen Code');
-          content = content.replace(/\.OpenCode\//g, '.qwen/');
+          content = content.replace(/\.claude\//g, '.qwen/');
         }
         const destName = isCopilot ? entry.name.replace('.md', '.agent.md') : entry.name;
         fs.writeFileSync(path.join(agentsDest, destName), content);
@@ -6116,7 +6116,7 @@ function install(isGlobal, runtime = 'OpenCode') {
     console.log(`  ${green}✓${reset} Wrote package.json (CommonJS mode)`);
 
     // Copy hooks from dist/ (bundled with dependencies)
-    // Template paths for the target runtime (replaces '.OpenCode' with correct config dir)
+    // Template paths for the target runtime (replaces '.claude' with correct config dir)
     const hooksSrc = path.join(src, 'hooks', 'dist');
     if (fs.existsSync(hooksSrc)) {
       const hooksDest = path.join(targetDir, 'hooks');
@@ -6127,15 +6127,15 @@ function install(isGlobal, runtime = 'OpenCode') {
         const srcFile = path.join(hooksSrc, entry);
         if (fs.statSync(srcFile).isFile()) {
           const destFile = path.join(hooksDest, entry);
-          // Template .js files to replace '.OpenCode' with runtime-specific config dir
+          // Template .js files to replace '.claude' with runtime-specific config dir
           // and stamp the current GSD version into the hook version header
           if (entry.endsWith('.js')) {
             let content = fs.readFileSync(srcFile, 'utf8');
-            content = content.replace(/'\.OpenCode'/g, configDirReplacement);
-            content = content.replace(/\/\.OpenCode\//g, `/${getDirName(runtime)}/`);
-            content = content.replace(/\.OpenCode\//g, `${getDirName(runtime)}/`);
+            content = content.replace(/'\.claude'/g, configDirReplacement);
+            content = content.replace(/\/\.claude\//g, `/${getDirName(runtime)}/`);
+            content = content.replace(/\.claude\//g, `${getDirName(runtime)}/`);
             if (isQwen) {
-              content = content.replace(/OPENCODE\.md/g, 'QWEN.md');
+              content = content.replace(/CLAUDE\.md/g, 'QWEN.md');
               content = content.replace(/\bClaude Code\b/g, 'Qwen Code');
             }
             content = content.replace(/\{\{GSD_VERSION\}\}/g, pkg.version);
@@ -6188,8 +6188,8 @@ function install(isGlobal, runtime = 'OpenCode') {
   // Report any backed-up local patches
   reportLocalPatches(targetDir, runtime);
 
-  // Verify no leaked .OpenCode paths in non-OpenCode runtimes
-  if (runtime !== 'OpenCode') {
+  // Verify no leaked .claude paths in non-OpenCode runtimes
+  if (runtime !== 'claude') {
     const leakedPaths = [];
     function scanForLeakedPaths(dir) {
       if (!fs.existsSync(dir)) return;
@@ -6216,7 +6216,7 @@ function install(isGlobal, runtime = 'OpenCode') {
             }
             throw err;
           }
-          const matches = content.match(/(?:~|\$HOME)\/\.OpenCode\b/g);
+          const matches = content.match(/(?:~|\$HOME)\/\.claude\b/g);
           if (matches) {
             leakedPaths.push({ file: fullPath.replace(targetDir + '/', ''), count: matches.length });
           }
@@ -6226,7 +6226,7 @@ function install(isGlobal, runtime = 'OpenCode') {
     scanForLeakedPaths(targetDir);
     if (leakedPaths.length > 0) {
       const totalLeaks = leakedPaths.reduce((sum, l) => sum + l.count, 0);
-      console.warn(`\n  ${yellow}⚠${reset}  Found ${totalLeaks} unreplaced .OpenCode path reference(s) in ${leakedPaths.length} file(s):`);
+      console.warn(`\n  ${yellow}⚠${reset}  Found ${totalLeaks} unreplaced .claude path reference(s) in ${leakedPaths.length} file(s):`);
       for (const leak of leakedPaths.slice(0, 5)) {
         console.warn(`     ${dim}${leak.file}${reset} (${leak.count})`);
       }
@@ -6257,9 +6257,9 @@ function install(isGlobal, runtime = 'OpenCode') {
         const destFile = path.join(codexHooksDest, entry);
         if (entry.endsWith('.js')) {
           let content = fs.readFileSync(srcFile, 'utf8');
-          content = content.replace(/'\.OpenCode'/g, configDirReplacement);
-          content = content.replace(/\/\.OpenCode\//g, `/${getDirName(runtime)}/`);
-          content = content.replace(/\.OpenCode\//g, `${getDirName(runtime)}/`);
+          content = content.replace(/'\.claude'/g, configDirReplacement);
+          content = content.replace(/\/\.claude\//g, `/${getDirName(runtime)}/`);
+          content = content.replace(/\.claude\//g, `${getDirName(runtime)}/`);
           content = content.replace(/\{\{GSD_VERSION\}\}/g, pkg.version);
           fs.writeFileSync(destFile, content);
           try { fs.chmodSync(destFile, 0o755); } catch (e) { /* Windows */ }
@@ -6678,7 +6678,7 @@ function install(isGlobal, runtime = 'OpenCode') {
 /**
  * Apply statusline config, then print completion message
  */
-function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline, runtime = 'OpenCode', isGlobal = true, configDir = null) {
+function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline, runtime = 'claude', isGlobal = true, configDir = null) {
   const isOpencode = runtime === 'opencode';
   const isKilo = runtime === 'kilo';
   const isCodex = runtime === 'codex';
@@ -6723,7 +6723,7 @@ function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallS
   // so resolveModelInternal() returns '' instead of OpenCode aliases (opus/sonnet/haiku)
   // that the runtime can't resolve. Users can still use model_overrides for explicit IDs.
   // See #1156.
-  if (runtime !== 'OpenCode') {
+  if (runtime !== 'claude') {
     const gsdDir = path.join(os.homedir(), '.gsd');
     const defaultsPath = path.join(gsdDir, 'defaults.json');
     try {
@@ -6844,7 +6844,7 @@ function promptRuntime(callback) {
   });
 
   const runtimeMap = {
-    '1': 'OpenCode',
+    '1': 'claude',
     '2': 'antigravity',
     '3': 'augment',
     '4': 'cline',
@@ -6859,7 +6859,7 @@ function promptRuntime(callback) {
     '13': 'trae',
     '14': 'windsurf'
   };
-  const allRuntimes = ['OpenCode', 'antigravity', 'augment', 'cline', 'codebuddy', 'codex', 'copilot', 'cursor', 'gemini', 'kilo', 'opencode', 'qwen', 'trae', 'windsurf'];
+  const allRuntimes = ['claude', 'antigravity', 'augment', 'cline', 'codebuddy', 'codex', 'copilot', 'cursor', 'gemini', 'kilo', 'opencode', 'qwen', 'trae', 'windsurf'];
 
   console.log(`  ${yellow}Which runtime(s) would you like to install for?${reset}\n\n  ${cyan}1${reset}) OpenCode  ${dim}($HOME/.config/opencode)${reset}
   ${cyan}2${reset}) Antigravity  ${dim}(~/.gemini/antigravity)${reset}
@@ -6901,7 +6901,7 @@ function promptRuntime(callback) {
       }
     }
 
-    callback(selected.length > 0 ? selected : ['OpenCode']);
+    callback(selected.length > 0 ? selected : ['claude']);
   });
 }
 
@@ -7242,24 +7242,6 @@ function installSdkIfNeeded(opts) {
     // `node sdkCliPath` invocation in bin/gsd-sdk.js.
   }
 
-  // Install runtime dependencies for the SDK if node_modules is missing.
-  // The dist files (e.g., session-runner.js) import @anthropic-ai/claude-agent-sdk
-  // which must be available at runtime even when using pre-built dist.
-  const sdkNodeModules = path.join(sdkDir, 'node_modules');
-  const sdkDepPath = path.join(sdkDir, 'node_modules', '@anthropic-ai', 'claude-agent-sdk');
-  if (!fs.existsSync(sdkDepPath)) {
-    const { execSync } = require('child_process');
-    try {
-      console.log(`  ${dim}Installing SDK runtime dependencies...${reset}`);
-      const output = execSync('npm install 2>&1', { cwd: sdkDir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-      if (!fs.existsSync(sdkDepPath)) {
-        console.warn(`  ${yellow}⚠${reset} SDK dependency @anthropic-ai/claude-agent-sdk not installed — /gsd-* commands may fail`);
-      }
-    } catch (e) {
-      console.warn(`  ${yellow}⚠${reset} SDK dependency install failed — /gsd-* commands may not work`);
-    }
-  }
-
   console.log(`  ${green}✓${reset} GSD SDK ready (sdk/dist/cli.js)`);
 
   // #2620: warn if npm's global bin is not on PATH, suppressing the
@@ -7289,7 +7271,7 @@ function installAllRuntimes(runtimes, isGlobal, isInteractive) {
     results.push(result);
   }
 
-  const statuslineRuntimes = ['OpenCode', 'gemini'];
+  const statuslineRuntimes = ['claude', 'gemini'];
   const primaryStatuslineResult = results.find(r => statuslineRuntimes.includes(r.runtime));
 
   const finalize = (shouldInstallStatusline) => {
@@ -7424,7 +7406,7 @@ if (process.env.GSD_TEST_MODE) {
       console.error(`  ${yellow}--uninstall requires --global or --local${reset}`);
       process.exit(1);
     }
-    const runtimes = selectedRuntimes.length > 0 ? selectedRuntimes : ['OpenCode'];
+    const runtimes = selectedRuntimes.length > 0 ? selectedRuntimes : ['claude'];
     for (const runtime of runtimes) {
       uninstall(hasGlobal, runtime);
     }
@@ -7436,12 +7418,12 @@ if (process.env.GSD_TEST_MODE) {
     }
   } else if (hasGlobal || hasLocal) {
     // Default to OpenCode if no runtime specified but location is
-    installAllRuntimes(['OpenCode'], hasGlobal, false);
+    installAllRuntimes(['claude'], hasGlobal, false);
   } else {
     // Interactive
     if (!process.stdin.isTTY) {
       console.log(`  ${yellow}Non-interactive terminal detected, defaulting to OpenCode global install${reset}\n`);
-      installAllRuntimes(['OpenCode'], true, false);
+      installAllRuntimes(['claude'], true, false);
     } else {
       promptRuntime((runtimes) => {
         promptLocation(runtimes);

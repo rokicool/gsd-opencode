@@ -32,7 +32,7 @@ read STATE.md before any operation to load project context.
 </required_reading>
 
 <available_agent_types>
-These are the valid GSD subagent types registered in .OpenCode/agents/ (or equivalent for your runtime).
+These are the valid GSD subagent types registered in .claude/agents/ (or equivalent for your runtime).
 Always use the exact name from this list — do not fall back to 'general' or other built-in types:
 
 - gsd-executor — Executes plan tasks, commits, creates SUMMARY.md
@@ -69,10 +69,12 @@ Load all context in one call:
 ```bash
 INIT=$(gsd-sdk query init.execute-phase "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS=$(gsd-sdk query agent-skills gsd-executor 2>/dev/null)
+AGENT_SKILLS=$(gsd-sdk query agent-skills gsd-executor)
 ```
 
 Parse JSON for: `executor_model`, `verifier_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`, `response_language`.
+
+**Model resolution:** If `executor_model` is `"inherit"`, omit the `model=` parameter from all `task()` calls — do NOT pass `model="inherit"` to task. Omitting the `model=` parameter causes OpenCode to inherit the current orchestrator model automatically. Only set `model=` when `executor_model` is an explicit model name (e.g., `"claude-sonnet-4-6"`, `"claude-opus-4-7"`).
 
 **If `response_language` is set:** Include `response_language: {value}` in all spawned subagent prompts so any user-facing output stays in the configured language.
 
@@ -128,7 +130,7 @@ inline path for each plan.
 ```bash
 # REQUIRED: prevents stale auto-chain from previous --auto runs
 if [[ ! "$ARGUMENTS" =~ --auto ]]; then
-  gsd-sdk query config-set workflow._auto_chain_active false 2>/dev/null
+  gsd-sdk query config-set workflow._auto_chain_active false || true
 fi
 ```
 </step>
@@ -334,6 +336,26 @@ CROSS_AI_TIMEOUT=$(gsd-sdk query config-get workflow.cross_ai_timeout 2>/dev/nul
 <step name="execute_waves">
 Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`, sequential if `false`.
 
+**Stream-idle-timeout prevention — checkpoint heartbeats (#2410):**
+
+Multi-plan phases can accumulate enough subagent context that the OpenCode API
+SSE layer terminates with `Stream idle timeout - partial response received`
+between a large tool_result and the next assistant turn (seen on OpenCode
++ Opus 4.7 at ~200K+ cache_read). To keep the stream warm, emit short
+assistant-text heartbeats — **no tool call, just a literal line** — at every
+wave and plan boundary. Each heartbeat MUST start with `[checkpoint]` so
+tooling and `/gsd-manager`'s background-completion handler can grep partial
+transcripts. `{P}/{Q}` is the phase-wide completed/total plans counter and
+increases monotonically across waves. `{status}` is `complete` (success),
+`failed` (executor error), or `checkpoint` (human-gate returned).
+
+```
+[checkpoint] phase {PHASE_NUMBER} wave {N}/{M} starting, {wave_plan_count} plan(s), {P}/{Q} plans done
+[checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} starting ({P}/{Q} plans done)
+[checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} {status} ({P}/{Q} plans done)
+[checkpoint] phase {PHASE_NUMBER} wave {N}/{M} complete, {P}/{Q} plans done ({wave_success}/{wave_plan_count} ok)
+```
+
 **For each wave:**
 
 1. **Intra-wave files_modified overlap check (BEFORE spawning):**
@@ -372,7 +394,15 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 2. **Describe what's being built (BEFORE spawning):**
 
-   read each plan's `<objective>`. Extract what's being built and why.
+   **First, emit the wave-start checkpoint heartbeat as a literal assistant-text
+   line — no tool call (#2410). Do NOT skip this even for single-plan waves; it
+   is required before any further reasoning or spawning:**
+
+   ```
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} starting, {wave_plan_count} plan(s), {P}/{Q} plans done
+   ```
+
+   Then read each plan's `<objective>`. Extract what's being built and why.
 
    ```
    ---
@@ -389,6 +419,13 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    - Good: "Procedural terrain generator using Perlin noise — creates height maps, biome zones, and collision meshes. Required before vehicle physics can interact with ground."
 
 3. **Spawn executor agents:**
+
+   **Emit a plan-start heartbeat (literal line, no tool call) immediately before
+   each `task()` dispatch (#2410):**
+
+   ```
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} starting ({P}/{Q} plans done)
+   ```
 
    Pass paths only — executors read files themselves with their fresh context window.
    For 200k models, this keeps orchestrator context lean (~10-15%).
@@ -409,111 +446,37 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    creation before the next begins (the round-trip latency of each tool call provides
    natural spacing), while all agents still **run in parallel** once created.
 
-    ```
-    # CORRECT: dispatch one @gsd-executor per message, each with run_in_background: true
-    # → worktrees created sequentially, agents execute in parallel
-    #
-    # WRONG: multiple @gsd-executor calls in a single message
-    # → simultaneous git worktree add → .git/config.lock contention → failures
-    ```
+   ```
+   # CORRECT: dispatch one task() per message, each with run_in_background: true
+   # → worktrees created sequentially, agents execute in parallel
+   #
+   # WRONG: multiple task() calls in a single message
+   # → simultaneous git worktree add → .git/config.lock contention → failures
+   ```
 
-    ```
-    @gsd-executor """
-      <objective>
-      Execute plan {plan_number} of phase {plan_number}-{phase_name}.
-      Commit each task atomically. Create SUMMARY.md.
-      Do NOT update STATE.md or ROADMAP.md — the orchestrator owns those writes after all worktree agents in the wave complete.
-      </objective>
+   ```
+   task(
+     subagent_type="gsd-executor",
+     description="Execute plan {plan_number} of phase {phase_number}",
+     # Only include model= when executor_model is an explicit model name.
+     # When executor_model is "inherit", omit this parameter entirely so
+     # OpenCode inherits the orchestrator model automatically.
+     model="{executor_model}",  # omit this line when executor_model == "inherit"
+     isolation="worktree",
+     prompt="
+       <objective>
+       Execute plan {plan_number} of phase {phase_number}-{phase_name}.
+       Commit each task atomically. Create SUMMARY.md.
+       Do NOT update STATE.md or ROADMAP.md — the orchestrator owns those writes after all worktree agents in the wave complete.
+       </objective>
 
-      <worktree_branch_check>
-      FIRST ACTION before any other work: verify this worktree's branch is based on the correct commit.
+       <worktree_branch_check>
+       FIRST ACTION before any other work: verify this worktree's branch is based on the correct commit.
 
-      Run:
-      ```bash
-      ACTUAL_BASE=$(git merge-base HEAD {EXPECTED_BASE})
-      ```
-
-      If `ACTUAL_BASE` != `{EXPECTED_BASE}` (i.e. the worktree branch was created from an older
-      base such as `main` instead of the feature branch HEAD), hard-reset to the correct base:
-      ```bash
-      # Safe: this runs before any agent work, so no uncommitted changes to lose
-      git reset --hard {EXPECTED_BASE}
-      # Verify correction succeeded
-      if [ "$(git rev-parse HEAD)" != "{EXPECTED_BASE}" ]; then
-        echo "ERROR: Could not correct worktree base — aborting to prevent data loss"
-        exit 1
-      fi
-      ```
-
-      `reset --hard` is safe here because this is a fresh worktree with no user changes. It
-      resets both the HEAD pointer AND the working tree to the correct base commit (#2015).
-
-      If `ACTUAL_BASE` == `{EXPECTED_BASE}`: the branch base is correct, proceed immediately.
-
-      This check fixes a known issue where `EnterWorktree` creates branches from
-      `main` instead of the current feature branch HEAD (affects all platforms).
-      </worktree_branch_check>
-
-      <parallel_execution>
-      You are running as a PARALLEL executor agent in a git worktree.
-      Use --no-verify on all git commits to avoid pre-commit hook contention
-
-      with other agents. The orchestrator validates hooks once after all agents complete.
-      For `gsd-sdk query commit` (or legacy `gsd-tools.cjs` commit): add --no-verify flag when needed.
-      For direct git commits: use git commit --no-verify -m "..."
-
-      IMPORTANT: Do NOT modify STATE.md or ROADMAP.md. execute-plan.md
-      auto-detects worktree mode (`.git` is a file, not a directory) and skips
-      shared file updates automatically. The orchestrator updates them centrally
-      after merge.
-
-      REQUIRED: SUMMARY.md MUST be committed before you return. In worktree mode the
-      git_commit_metadata step in execute-plan.md commits SUMMARY.md and REQUIREMENTS.md
-      only (STATE.md and ROADMAP.md are excluded automatically). Do NOT skip or defer
-      this commit — the orchestrator force-removes the worktree after you return, and
-      any uncommitted SUMMARY.md will be permanently lost (#2070).
-      </parallel_execution>
-
-      <execution_context>
-      @$HOME/.config/opencode/get-shit-done/workflows/execute-plan.md
-      @$HOME/.config/opencode/get-shit-done/templates/summary.md
-      @$HOME/.config/opencode/get-shit-done/references/checkpoints.md
-      @$HOME/.config/opencode/get-shit-done/references/tdd.md
-      ${CONTEXT_WINDOW < 200000 ? '' : '@$HOME/.config/opencode/get-shit-done/references/executor-examples.md'}
-      </execution_context>
-
-      <files_to_read>
-      read these files at execution start using the read tool:
-      - {phase_dir}/{plan_file} (Plan)
-      - .planning/PROJECT.md (Project context — core value, requirements, evolution rules)
-      - .planning/STATE.md (State)
-      - .planning/config.json (Config, if exists)
-      ${CONTEXT_WINDOW >= 500000 ? `
-      - ${phase_dir}/*-CONTEXT.md (User decisions from discuss-phase — honors locked choices)
-      - ${phase_dir}/*-RESEARCH.md (Technical research — pitfalls and patterns to follow)
-      - ${prior_wave_summaries} (SUMMARY.md files from earlier waves in this phase — what was already built)
-      ` : ''}
-      - ./AGENTS.md (Project instructions, if exists — follow project-specific guidelines and coding conventions)
-      - .OpenCode/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
-      </files_to_read>
-
-      ${AGENT_SKILLS}
-
-      <mcp_tools>
-      If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch, context7,
-      or other MCP servers), prefer those tools over grep/glob for code navigation when available.
-      MCP tools often save significant tokens by providing structured code indexes.
-      Check tool availability first — if MCP tools are not accessible, fall back to grep/glob.
-      </mcp_tools>
-
-      <success_criteria>
-      - [ ] All tasks executed
-      - [ ] Each task committed individually
-      - [ ] SUMMARY.md created in plan directory
-      - [ ] No modifications to shared orchestrator artifacts (the orchestrator handles all post-wave shared-file writes)
-       </success_criteria>
-    """
-    ```
+       Run:
+       ```bash
+       ACTUAL_BASE=$(git merge-base HEAD {EXPECTED_BASE})
+       ```
 
        If `ACTUAL_BASE` != `{EXPECTED_BASE}` (i.e. the worktree branch was created from an older
        base such as `main` instead of the feature branch HEAD), hard-reset to the correct base:
@@ -575,7 +538,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
        - ${prior_wave_summaries} (SUMMARY.md files from earlier waves in this phase — what was already built)
        ` : ''}
        - ./AGENTS.md (Project instructions, if exists — follow project-specific guidelines and coding conventions)
-       - .OpenCode/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
+       - .claude/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
        </files_to_read>
 
        ${AGENT_SKILLS}
@@ -592,9 +555,10 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
        - [ ] Each task committed individually
        - [ ] SUMMARY.md created in plan directory
        - [ ] No modifications to shared orchestrator artifacts (the orchestrator handles all post-wave shared-file writes)
-        </success_criteria>
-      "
-    ```
+       </success_criteria>
+     "
+   )
+   ```
 
    **Sequential mode** (`USE_WORKTREES` is `false`):
 
@@ -622,6 +586,16 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    When worktrees are disabled, execute plans **one at a time within each wave** (sequential) regardless of the `PARALLELIZATION` setting — multiple agents writing to the same working tree concurrently would cause conflicts.
 
 4. **Wait for all agents in wave to complete.**
+
+   **Plan-complete heartbeat (#2410):** as each executor returns (or is verified
+   via spot-check below), emit one line — `complete` advances `{P}`, `failed`
+   and `checkpoint` do not but still warm the stream:
+
+   ```
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} complete ({P}/{Q} plans done)
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} failed ({P}/{Q} plans done)
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} checkpoint ({P}/{Q} plans done)
+   ```
 
    **Completion signal fallback (Copilot and runtimes where task() may not return):**
 
@@ -699,6 +673,21 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
          break
        }
 
+       # Post-merge deletion audit: detect bulk file deletions in merge commit (#2384)
+       # --diff-filter=D HEAD~1 HEAD shows files deleted by the merge commit itself.
+       # Exclude .planning/ — orchestrator-owned deletions there are expected (resurrections
+       # are handled below). Require ALLOW_BULK_DELETE=1 to bypass for intentional large refactors.
+       MERGE_DEL_COUNT=$(git diff --diff-filter=D --name-only HEAD~1 HEAD 2>/dev/null | grep -vc '^\.planning/' || true)
+       if [ "$MERGE_DEL_COUNT" -gt 5 ] && [ "${ALLOW_BULK_DELETE:-0}" != "1" ]; then
+         MERGE_DELETIONS=$(git diff --diff-filter=D --name-only HEAD~1 HEAD 2>/dev/null | grep -v '^\.planning/' || true)
+         echo "⚠ BLOCKED: Merge of $WT_BRANCH deleted $MERGE_DEL_COUNT files outside .planning/ — reverting to protect repository integrity (#2384)"
+         echo "$MERGE_DELETIONS"
+         echo "  If these deletions are intentional, re-run with ALLOW_BULK_DELETE=1"
+         git reset --hard HEAD~1 2>/dev/null || true
+         rm -f "$STATE_BACKUP" "$ROADMAP_BACKUP"
+         continue
+       fi
+
        # Restore orchestrator-owned files (main always wins)
        if [ -s "$STATE_BACKUP" ]; then
          cp "$STATE_BACKUP" .planning/STATE.md
@@ -710,10 +699,15 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
        # Detect files deleted on main but re-added by worktree merge
        # (e.g., archived phase directories that were intentionally removed)
+       # A "resurrected" file must have a deletion event in main's ancestry —
+       # brand-new files (e.g. SUMMARY.md just created by the executor) have no
+       # such history and must NOT be removed (#2501).
        DELETED_FILES=$(git diff --diff-filter=A --name-only HEAD~1 -- .planning/ 2>/dev/null || true)
        for RESURRECTED in $DELETED_FILES; do
-         # Check if this file was NOT in main's pre-merge tree
-         if ! echo "$PRE_MERGE_FILES" | grep -qxF "$RESURRECTED"; then
+         # Only delete if this file was previously tracked on main and then
+         # deliberately removed (has a deletion event in git history).
+         WAS_DELETED=$(git log --follow --diff-filter=D --name-only --format="" HEAD~1 -- "$RESURRECTED" 2>/dev/null | grep -c . || true)
+         if [ "${WAS_DELETED:-0}" -gt 0 ]; then
            git rm -f "$RESURRECTED" 2>/dev/null || true
          fi
        done
@@ -741,7 +735,19 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
        fi
 
        # Remove the worktree
-       git worktree remove "$WT" --force 2>/dev/null || true
+       if ! git worktree remove "$WT" --force; then
+         WT_NAME=$(basename "$WT")
+         if [ -f ".git/worktrees/${WT_NAME}/locked" ]; then
+           echo "⚠ Worktree $WT is locked — attempting to unlock and retry"
+           git worktree unlock "$WT" 2>/dev/null || true
+           if ! git worktree remove "$WT" --force; then
+             echo "⚠ Residual worktree at $WT — manual cleanup required after session exits:"
+             echo "    git worktree unlock \"$WT\" && git worktree remove \"$WT\" --force && git branch -D \"$WT_BRANCH\""
+           fi
+         else
+           echo "⚠ Residual worktree at $WT (remove failed) — investigate manually"
+         fi
+       fi
 
        # Delete the temporary branch
        git branch -D "$WT_BRANCH" 2>/dev/null || true
@@ -764,22 +770,29 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    merging their work creates failures.
 
    ```bash
+   # Resolve test command: project config > Makefile > language sniff
+   TEST_CMD=$(gsd-sdk query config-get workflow.test_command --default "" 2>/dev/null || true)
+   if [ -z "$TEST_CMD" ]; then
+     if [ -f "Makefile" ] && grep -q "^test:" Makefile; then
+       TEST_CMD="make test"
+     elif [ -f "Justfile" ] || [ -f "justfile" ]; then
+       TEST_CMD="just test"
+     elif [ -f "package.json" ]; then
+       TEST_CMD="npm test"
+     elif [ -f "Cargo.toml" ]; then
+       TEST_CMD="cargo test"
+     elif [ -f "go.mod" ]; then
+       TEST_CMD="go test ./..."
+     elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
+       TEST_CMD="python -m pytest -x -q --tb=short 2>&1 || uv run python -m pytest -x -q --tb=short"
+     else
+       TEST_CMD="true"
+       echo "⚠ No test runner detected — skipping post-merge test gate"
+     fi
+   fi
    # Detect test runner and run quick smoke test (timeout: 5 minutes)
    TEST_EXIT=0
-   timeout 300 bash -c '
-   if [ -f "package.json" ]; then
-     npm test 2>&1
-   elif [ -f "Cargo.toml" ]; then
-     cargo test 2>&1
-   elif [ -f "go.mod" ]; then
-     go test ./... 2>&1
-   elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
-     python -m pytest -x -q --tb=short 2>&1 || uv run python -m pytest -x -q --tb=short 2>&1
-   else
-     echo "⚠ No test runner detected — skipping post-merge test gate"
-     exit 0
-   fi
-   '
+   timeout 300 bash -c "$TEST_CMD" 2>&1
    TEST_EXIT=$?
    if [ "${TEST_EXIT}" -eq 0 ]; then
      echo "✓ Post-merge test gate passed — no cross-plan conflicts"
@@ -862,6 +875,15 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 6. **Report completion — spot-check claims first:**
 
+   **Wave-close heartbeat (#2410):** after spot-checks finish (pass or fail),
+   before the `## Wave {N} Complete` summary, emit as a literal line:
+
+   ```
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} complete, {P}/{Q} plans done ({wave_success}/{wave_plan_count} ok)
+   ```
+
+
+
    For each SUMMARY.md:
    - Verify first 2 files from `key-files.created` exist on disk
    - Check `git log --oneline --all --grep="{phase}-{plan}"` returns ≥1 commit
@@ -922,13 +944,12 @@ Plans with `autonomous: false` require user interaction.
 
 **Auto-mode checkpoint handling:**
 
-read auto-advance config (chain flag + user preference):
+read auto-advance config (chain flag OR user preference — same boolean as `check.auto-mode`):
 ```bash
-AUTO_CHAIN=$(gsd-sdk query config-get workflow._auto_chain_active 2>/dev/null || echo "false")
-AUTO_CFG=$(gsd-sdk query config-get workflow.auto_advance 2>/dev/null || echo "false")
+AUTO_MODE=$(gsd-sdk query check auto-mode --pick active 2>/dev/null || echo "false")
 ```
 
-When executor returns a checkpoint AND (`AUTO_CHAIN` is `"true"` OR `AUTO_CFG` is `"true"`):
+When executor returns a checkpoint AND `AUTO_MODE` is `true`:
 - **human-verify** → Auto-spawn continuation agent with `{user_response}` = `"approved"`. Log `⚡ Auto-approved checkpoint`.
 - **decision** → Auto-spawn continuation agent with `{user_response}` = first option from checkpoint details. Log `⚡ Auto-selected: [option]`.
 - **human-action** → Present to user (existing behavior below). Auth gates cannot be automated.
@@ -1187,16 +1208,27 @@ Collect all unique test file paths into `REGRESSION_FILES`.
 **Step 3: Run regression tests (if any found)**
 
 ```bash
-# Detect test runner and run prior phase tests
-if [ -f "package.json" ]; then
-  npm test 2>&1
-elif [ -f "Cargo.toml" ]; then
-  cargo test 2>&1
-elif [ -f "go.mod" ]; then
-  go test ./... 2>&1
-elif [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
-  python -m pytest ${REGRESSION_FILES} -q --tb=short 2>&1
+# Resolve test command: project config > Makefile > language sniff
+REG_TEST_CMD=$(gsd-sdk query config-get workflow.test_command --default "" 2>/dev/null || true)
+if [ -z "$REG_TEST_CMD" ]; then
+  if [ -f "Makefile" ] && grep -q "^test:" Makefile; then
+    REG_TEST_CMD="make test"
+  elif [ -f "Justfile" ] || [ -f "justfile" ]; then
+    REG_TEST_CMD="just test"
+  elif [ -f "package.json" ]; then
+    REG_TEST_CMD="npm test"
+  elif [ -f "Cargo.toml" ]; then
+    REG_TEST_CMD="cargo test"
+  elif [ -f "go.mod" ]; then
+    REG_TEST_CMD="go test ./..."
+  elif [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+    REG_TEST_CMD="python -m pytest ${REGRESSION_FILES} -q --tb=short"
+  else
+    REG_TEST_CMD="true"
+  fi
 fi
+# Detect test runner and run prior phase tests
+eval "$REG_TEST_CMD" 2>&1
 ```
 
 **Step 4: Report results**
@@ -1292,11 +1324,22 @@ If `TEXT_MODE` is true, present as a plain-text numbered list. Otherwise use que
 **If user selects option 3:** Stop execution. Report partial completion.
 </step>
 
+<step name="codebase_drift_gate">
+Post-execution structural drift detection (#2003). Non-blocking by contract:
+any internal error here MUST fall through to `verify_phase_goal`. The phase
+is never failed by this gate.
+
+Load and follow the full step spec from
+`get-shit-done/workflows/execute-phase/steps/codebase-drift-gate.md` —
+covers the SDK call, JSON contract, `warn` vs `auto-remap` branches, mapper
+spawn template, and the two `workflow.drift_*` config keys.
+</step>
+
 <step name="verify_phase_goal">
 Verify phase achieved its GOAL, not just completed tasks.
 
 ```bash
-VERIFIER_SKILLS=$(gsd-sdk query agent-skills gsd-verifier 2>/dev/null)
+VERIFIER_SKILLS=$(gsd-sdk query agent-skills gsd-verifier)
 ```
 
 ```
@@ -1473,6 +1516,38 @@ gsd-sdk query learnings.copy 2>/dev/null || echo "⚠ Learnings copy failed — 
 Copy failure must NOT block phase completion.
 </step>
 
+<step name="close_phase_todos">
+**Auto-close pending todos tagged for this phase (#2433).**
+
+This step runs AFTER `update_roadmap` marks the phase complete. It moves any pending todos that carry `resolves_phase: <current-phase-number>` to the completed directory.
+
+```bash
+PHASE_NUM="${PHASE_NUMBER}"
+PENDING_DIR=".planning/todos/pending"
+COMPLETED_DIR=".planning/todos/completed"
+mkdir -p "$COMPLETED_DIR"
+
+CLOSED=()
+for TODO_FILE in "$PENDING_DIR"/*.md; do
+  [ -f "$TODO_FILE" ] || continue
+  # Extract resolves_phase from YAML frontmatter (first --- block only)
+  RP=$(awk '/^---/{c++;next} c==1 && /^resolves_phase:/{print $2;exit} c==2{exit}' "$TODO_FILE" 2>/dev/null || true)
+  if [ "$RP" = "$PHASE_NUM" ] || [ "$RP" = "\"$PHASE_NUM\"" ]; then
+    mv "$TODO_FILE" "$COMPLETED_DIR/"
+    CLOSED+=("$(basename "$TODO_FILE")")
+  fi
+done
+
+if [ ${#CLOSED[@]} -gt 0 ]; then
+  gsd-sdk query commit "docs(phase-${PHASE_NUMBER}): auto-close ${#CLOSED[@]} todo(s) resolved by this phase" .planning/todos/completed/ .planning/STATE.md || true
+  echo "◆ Closed ${#CLOSED[@]} todo(s) resolved by Phase ${PHASE_NUMBER}:"
+  for f in "${CLOSED[@]}"; do echo "  ✓ $f"; done
+fi
+```
+
+**If no todos have `resolves_phase: <this-phase>`:** Skip silently — this step is always additive and never blocks phase completion.
+</step>
+
 <step name="update_project_md">
 **Evolve PROJECT.md to reflect phase completion (prevents planning document drift — #956):**
 
@@ -1525,13 +1600,12 @@ STOP. Do not proceed to auto-advance or transition.
 **Auto-advance detection:**
 
 1. Parse `--auto` flag from $ARGUMENTS
-2. read both the chain flag and user preference (chain flag already synced in init step):
+2. read consolidated auto-mode (`active` = chain flag OR user preference; chain flag already synced in init step):
    ```bash
-   AUTO_CHAIN=$(gsd-sdk query config-get workflow._auto_chain_active 2>/dev/null || echo "false")
-   AUTO_CFG=$(gsd-sdk query config-get workflow.auto_advance 2>/dev/null || echo "false")
+   AUTO_MODE=$(gsd-sdk query check auto-mode --pick active 2>/dev/null || echo "false")
    ```
 
-**If `--auto` flag present OR `AUTO_CHAIN` is true OR `AUTO_CFG` is true (AND verification passed with no gaps):**
+**If `--auto` flag present OR `AUTO_MODE` is true (AND verification passed with no gaps):**
 
 ```
 ╔══════════════════════════════════════════╗
@@ -1544,7 +1618,7 @@ Execute the transition workflow inline (do NOT use task — orchestrator context
 
 read and follow `$HOME/.config/opencode/get-shit-done/workflows/transition.md`, passing through the `--auto` flag so it propagates to the next phase invocation.
 
-**If none of `--auto`, `AUTO_CHAIN`, or `AUTO_CFG` is true:**
+**If neither `--auto` nor `AUTO_MODE` is true:**
 
 **STOP. Do not auto-advance. Do not execute transition. Do not plan next phase. Present options to the user and wait.**
 

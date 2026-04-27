@@ -148,7 +148,7 @@ gsd-sdk query config-set brave_search null
 
 `review.models.<cli>` is a map that tells the code-review workflow which
 shell command to invoke for a given reviewer flavor. Supported flavors:
-`OpenCode`, `codex`, `gemini`, `opencode`.
+`claude`, `codex`, `gemini`, `opencode`.
 
 ```text
 question([
@@ -157,10 +157,10 @@ question([
     header: "CLI",
     multiSelect: false,
     options: [
-      { label: "OpenCode", description: "review.models.OpenCode — defaults to session model when unset" },
+      { label: "OpenCode", description: "review.models.claude — defaults to session model when unset" },
       { label: "Codex", description: "review.models.codex — e.g. 'codex exec --model gpt-5'" },
       { label: "Gemini", description: "review.models.gemini — e.g. 'gemini -m gemini-2.5-pro'" },
-      { label: "OpenCode", description: "review.models.opencode — e.g. 'opencode run --model OpenCode-sonnet-4'" },
+      { label: "OpenCode", description: "review.models.opencode — e.g. 'opencode run --model claude-sonnet-4'" },
       { label: "Done", description: "Skip — finish this section" }
     ]
   }
@@ -246,7 +246,7 @@ Search Integrations
 Code Review CLI Routing
 | CLI         | Command                              |
 |-------------|--------------------------------------|
-| OpenCode      | <value or (session model default)>   |
+| claude      | <value or (session model default)>   |
 | codex       | <value or (unset)>                   |
 | gemini      | <value or (unset)>                   |
 | opencode    | <value or (unset)>                   |

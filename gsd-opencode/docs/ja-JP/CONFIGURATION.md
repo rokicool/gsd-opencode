@@ -331,7 +331,7 @@ GSD が非 OpenCode ランタイム向けにインストールされると、イ
 | 値 | 動作 | 使用場面 |
 |----|------|---------|
 | `false`（デフォルト） | OpenCode エイリアス（`opus`、`sonnet`、`haiku`）を返す | OpenCode + ネイティブ Anthropic API |
-| `true` | エイリアスを完全な OpenCode モデル ID（`OpenCode-opus-4-6`）にマッピング | 完全な ID が必要な API を使用する OpenCode |
+| `true` | エイリアスを完全な OpenCode モデル ID（`claude-opus-4-6`）にマッピング | 完全な ID が必要な API を使用する OpenCode |
 | `"omit"` | 空文字列を返す（ランタイムがデフォルトを選択） | 非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI、Kilo） |
 
 ### プロファイルの設計思想

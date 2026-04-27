@@ -13,7 +13,7 @@ permissions:
 <objective>
 Curate spike experiment findings and package them into a persistent project skill that OpenCode
 auto-loads in future build conversations. Also writes a summary to `.planning/spikes/` for
-project history. Output skill goes to `./.OpenCode/skills/spike-findings-[project]/` (project-local).
+project history. Output skill goes to `./.claude/skills/spike-findings-[project]/` (project-local).
 </objective>
 
 <execution_context>
@@ -27,5 +27,5 @@ project history. Output skill goes to `./.OpenCode/skills/spike-findings-[projec
 
 <process>
 Execute the spike-wrap-up workflow from @$HOME/.config/opencode/get-shit-done/workflows/spike-wrap-up.md end-to-end.
-Preserve all curation gates (per-spike review, grouping approval, AGENTS.md routing line).
+Preserve all workflow gates (auto-include, feature-area grouping, skill synthesis, AGENTS.md routing line, intelligent next-step routing).
 </process>

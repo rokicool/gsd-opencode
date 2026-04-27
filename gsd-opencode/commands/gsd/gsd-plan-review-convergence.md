@@ -1,7 +1,7 @@
 ---
 name: gsd-plan-review-convergence
 description: "Cross-AI plan convergence loop — replan with review feedback until no HIGH concerns remain (max 3 cycles)"
-argument-hint: "<phase> [--codex] [--gemini] [--OpenCode] [--opencode] [--ollama] [--lm-studio] [--llama-cpp] [--text] [--ws <name>] [--all] [--max-cycles N]"
+argument-hint: "<phase> [--codex] [--gemini] [--claude] [--opencode] [--ollama] [--lm-studio] [--llama-cpp] [--text] [--ws <name>] [--all] [--max-cycles N]"
 permissions:
    read: true
    write: true
@@ -39,7 +39,7 @@ Phase number: extracted from $ARGUMENTS (required)
 **Flags:**
 - `--codex` — Use Codex CLI as reviewer (default if no reviewer specified)
 - `--gemini` — Use Gemini CLI as reviewer
-- `--OpenCode` — Use OpenCode CLI as reviewer (separate session)
+- `--claude` — Use OpenCode CLI as reviewer (separate session)
 - `--opencode` — Use OpenCode as reviewer
 - `--ollama` — Use local Ollama server as reviewer (OpenAI-compatible, default host `http://localhost:11434`; configure model via `review.models.ollama`)
 - `--lm-studio` — Use local LM Studio server as reviewer (OpenAI-compatible, default host `http://localhost:1234`; configure model via `review.models.lm_studio`)

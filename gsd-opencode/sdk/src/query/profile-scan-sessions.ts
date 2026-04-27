@@ -92,7 +92,7 @@ export function getProjectName(projectDirName: string, indexData: ReturnType<typ
 
 /** Same resolution as CJS `getSessionsDir` in profile-pipeline.cjs. */
 export function getScanSessionsRoot(overridePath: string | null): string | null {
-  const dir = overridePath || join(homedir(), '.OpenCode', 'projects');
+  const dir = overridePath || join(homedir(), '.claude', 'projects');
   if (!existsSync(dir)) return null;
   return dir;
 }

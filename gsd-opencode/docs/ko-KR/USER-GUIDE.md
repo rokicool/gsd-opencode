@@ -580,7 +580,7 @@ GSD는 프로젝트 설정을 `.planning/config.json`에 저장합니다. `/gsd-
 - **quality** -- 모든 의사결정 에이전트에 Opus를 사용하고 읽기 전용 검증에 Sonnet을 사용합니다. 할당량이 충분하고 작업이 중요할 때 사용합니다.
 - **balanced** -- 아키텍처 결정이 이루어지는 계획에만 Opus를 사용하고 나머지는 Sonnet을 사용합니다. 합당한 이유로 기본값입니다.
 - **budget** -- 코드를 작성하는 모든 것에 Sonnet을 사용하고 조사 및 검증에 Haiku를 사용합니다. 대량 작업이나 덜 중요한 페이즈에 사용합니다.
-- **inherit** -- 모든 에이전트가 현재 세션 모델을 사용합니다. 동적으로 모델을 전환할 때 (예: OpenCode 또는 Kilo `/model`) 또는 예상치 못한 API 비용을 방지하기 위해 비Anthropic 공급자 (OpenRouter, 로컬 모델)와 함께 OpenCode를 사용할 때 적합합니다. 비OpenCode 런타임 (Codex, OpenCode, Gemini CLI, Kilo)의 경우 설치 프로그램이 자동으로 `resolve_model_ids: "omit"`을 설정합니다 — [비OpenCode 런타임](#비OpenCode-런타임-codex-opencode-gemini-cli-kilo-사용)을 참고하세요.
+- **inherit** -- 모든 에이전트가 현재 세션 모델을 사용합니다. 동적으로 모델을 전환할 때 (예: OpenCode 또는 Kilo `/model`) 또는 예상치 못한 API 비용을 방지하기 위해 비Anthropic 공급자 (OpenRouter, 로컬 모델)와 함께 OpenCode를 사용할 때 적합합니다. 비OpenCode 런타임 (Codex, OpenCode, Gemini CLI, Kilo)의 경우 설치 프로그램이 자동으로 `resolve_model_ids: "omit"`을 설정합니다 — [비OpenCode 런타임](#비claude-런타임-codex-opencode-gemini-cli-kilo-사용)을 참고하세요.
 
 ---
 
@@ -589,7 +589,7 @@ GSD는 프로젝트 설정을 `.planning/config.json`에 저장합니다. `/gsd-
 ### 새 프로젝트 (전체 사이클)
 
 ```bash
-OpenCode --dangerously-skip-permissions
+claude --dangerously-skip-permissions
 /gsd-new-project            # Answer questions, configure, approve roadmap
 /new
 /gsd-discuss-phase 1        # Lock in your preferences
@@ -742,7 +742,7 @@ cd ~/gsd-workspaces/feature-b
 
 설치 프로그램은 Gemini CLI, OpenCode, Kilo, Codex에 대해 `resolve_model_ids: "omit"`을 자동으로 구성합니다. 비OpenCode 런타임을 수동으로 설정하는 경우 직접 `.planning/config.json`에 추가하세요.
 
-전체 설명은 [Configuration Reference](CONFIGURATION.md#non-OpenCode-runtimes-codex-opencode-gemini-cli-kilo)를 참고하세요.
+전체 설명은 [Configuration Reference](CONFIGURATION.md#non-claude-runtimes-codex-opencode-gemini-cli-kilo)를 참고하세요.
 
 ### 비Anthropic 공급자와 함께 OpenCode 사용 (OpenRouter, 로컬)
 

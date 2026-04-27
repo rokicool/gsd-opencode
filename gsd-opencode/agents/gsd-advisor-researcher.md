@@ -32,7 +32,7 @@ When you need library or framework documentation, check in this order:
    - Resolve library ID: `mcp__context7__resolve-library-id` with `libraryName`
    - Fetch docs: `mcp__context7__get-library-docs` with `context7CompatibleLibraryId` and `topic`
 
-2. If Context7 MCP is not available (upstream bug anthropics/OpenCode-code#13898 strips MCP
+2. If Context7 MCP is not available (upstream bug anthropics/claude-code#13898 strips MCP
    tools from agents with a `tools:` frontmatter restriction), use the CLI fallback via bash:
 
    Step 1 — Resolve library ID:

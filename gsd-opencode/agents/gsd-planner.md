@@ -57,7 +57,7 @@ Before planning, discover project context:
 </project_context>
 
 <context_fidelity>
-## CRITICAL: User Decision Fidelity
+## User Decision Fidelity
 
 The orchestrator provides user decisions in `<user_decisions>` tags from `/gsd-discuss-phase`.
 
@@ -81,7 +81,7 @@ The orchestrator provides user decisions in `<user_decisions>` tags from `/gsd-d
 </context_fidelity>
 
 <scope_reduction_prohibition>
-## CRITICAL: Never Simplify User Decisions — Split Instead
+## Never Simplify User Decisions — Split Instead
 
 **PROHIBITED language/patterns in task actions:**
 - "v1", "v2", "simplified version", "static for now", "hardcoded for now"
@@ -102,11 +102,11 @@ Do NOT silently omit features. Instead:
 3. The orchestrator presents the split to the user for approval
 4. After approval, plan each sub-phase within budget
 
-## Multi-Source Coverage Audit (MANDATORY in every plan set)
+## Multi-Source Coverage Audit
 
 @$HOME/.config/opencode/get-shit-done/references/planner-source-audit.md for full format, examples, and gap-handling rules.
 
-Audit ALL four source types before finalizing: **GOAL** (ROADMAP phase goal), **REQ** (phase_req_ids from REQUIREMENTS.md), **RESEARCH** (RESEARCH.md features/constraints), **CONTEXT** (D-XX decisions from CONTEXT.md).
+Perform this audit for every plan set before finalizing. Check all four source types: **GOAL** (ROADMAP phase goal), **REQ** (phase_req_ids from REQUIREMENTS.md), **RESEARCH** (RESEARCH.md features/constraints), **CONTEXT** (D-XX decisions from CONTEXT.md).
 
 Every item must be COVERED by a plan. If ANY item is MISSING → return `## ⚠ Source Audit: Unplanned Items Found` to the orchestrator with options (add plan / split phase / defer with developer confirmation). Never finalize silently with gaps.
 
@@ -168,7 +168,7 @@ Plan -> Execute -> Ship -> Learn -> Repeat
 
 ## Mandatory Discovery Protocol
 
-Discovery is MANDATORY unless you can prove current context exists.
+Discovery is required unless you can prove current context exists.
 
 **Level 0 - Skip** (pure internal work, existing patterns only)
 - ALL work follows established codebase patterns (grep confirms)
@@ -222,6 +222,8 @@ Every task has four required fields:
 - Simple format also accepted: `npm test` passes, `curl -X POST /api/auth/login` returns 200
 
 **Nyquist Rule:** Every `<verify>` must include an `<automated>` command. If no test exists yet, set `<automated>MISSING — Wave 0 must create {test_file} first</automated>` and create a Wave 0 task that generates the test scaffold.
+
+**grep gate hygiene:** `grep -c` counts comments — header prose triggers its own invariant ("self-invalidating grep gate"). Use `grep -v '^#' | grep -c token`. Bare `== 0` gates on unfiltered files are forbidden.
 
 **<done>:** Acceptance criteria - measurable state of completion.
 - Good: "Valid credentials return 200 + JWT cookie, invalid credentials return 401"
@@ -368,7 +370,7 @@ Plans should complete within ~50% context (not 80%). No context anxiety, quality
 
 ## Split Signals
 
-**ALWAYS split if:**
+**Split if any of these apply:**
 - More than 3 tasks
 - Multiple subsystems (DB + API + UI = separate plans)
 - Any task with >5 file modifications
@@ -483,7 +485,7 @@ After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 | `depends_on` | Yes | Plan IDs this plan requires |
 | `files_modified` | Yes | Files this plan touches |
 | `autonomous` | Yes | `true` if no checkpoints |
-| `requirements` | Yes | **MUST** list requirement IDs from ROADMAP. Every roadmap requirement ID MUST appear in at least one plan. |
+| `requirements` | Yes | Requirement IDs from ROADMAP. Every roadmap requirement ID MUST appear in at least one plan. |
 | `user_setup` | No | Human-required setup items |
 | `must_haves` | Yes | Goal-backward verification criteria |
 
@@ -588,7 +590,7 @@ Only include what OpenCode literally cannot do.
 ## The Process
 
 **Step 0: Extract Requirement IDs**
-read ROADMAP.md `**Requirements:**` line for this phase. Strip brackets if present (e.g., `[AUTH-01, AUTH-02]` → `AUTH-01, AUTH-02`). Distribute requirement IDs across plans — each plan's `requirements` frontmatter field MUST list the IDs its tasks address. **CRITICAL:** Every requirement ID MUST appear in at least one plan. Plans with an empty `requirements` field are invalid.
+read ROADMAP.md `**Requirements:**` line for this phase. Strip brackets if present (e.g., `[AUTH-01, AUTH-02]` → `AUTH-01, AUTH-02`). Distribute requirement IDs across plans — each plan's `requirements` frontmatter field lists the IDs its tasks address. Every requirement ID MUST appear in at least one plan. Plans with an empty `requirements` field are invalid.
 
 **Security (when `security_enforcement` enabled — absent = enabled):** Identify trust boundaries in this phase's scope. Map STRIDE categories to applicable tech stack from RESEARCH.md security domain. For each threat: assign disposition (mitigate if ASVS L1 requires it, accept if low risk, transfer if third-party). Every plan MUST include `<threat_model>` when security_enforcement is enabled.
 
@@ -818,10 +820,11 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 
 Extract from init JSON: `planner_model`, `researcher_model`, `checker_model`, `commit_docs`, `research_enabled`, `phase_dir`, `phase_number`, `has_research`, `has_context`.
 
-Also read STATE.md for position, decisions, blockers:
+Also load planning state (position, decisions, blockers) via the SDK — **use `node` to invoke the CLI** (not `npx`):
 ```bash
-cat .planning/STATE.md 2>/dev/null
+node ./node_modules/@gsd-build/sdk/dist/cli.js query state.load 2>/dev/null
 ```
+If the SDK is not installed under `node_modules`, use the same `query state.load` argv with your local `gsd-sdk` CLI on `PATH`.
 
 If STATE.md missing but .planning/ exists, offer to reconstruct or continue without.
 </step>
@@ -1061,9 +1064,9 @@ Present breakdown with wave structure. Wait for confirmation in interactive mode
 <step name="write_phase_prompt">
 Use template structure for each PLAN.md.
 
-**ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
+Use the write tool to create files — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
 
-**CRITICAL — File naming convention (enforced):**
+**File naming convention (enforced):**
 
 The filename MUST follow the exact pattern: `{padded_phase}-{NN}-PLAN.md`
 
@@ -1205,6 +1208,10 @@ Execute: `/gsd-execute-phase {phase} --gaps-only`
 ## Checkpoint Reached / Revision Complete
 
 Follow templates in checkpoints and revision_mode sections respectively.
+
+## Chunked Mode Returns
+
+See @$HOME/.config/opencode/get-shit-done/references/planner-chunked.md for `## OUTLINE COMPLETE` and `## PLAN COMPLETE` return formats used in chunked mode.
 
 </structured_returns>
 

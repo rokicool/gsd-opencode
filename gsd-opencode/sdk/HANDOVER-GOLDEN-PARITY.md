@@ -108,11 +108,11 @@ All 127 portable canonicals have subprocess or in-process parity coverage. Summa
 
 ### Profile-output + milestone subprocess batch (latest)
 
-**`write-profile`**, **`generate-OpenCode-profile`**, **`generate-dev-preferences`**, **`generate-OpenCode-md`** — implemented in **`sdk/src/query/profile-output.ts`** (templates from `get-shit-done/templates/`, same JSON as `profile-output.cjs`); re-exported from **`profile.ts`**. **`milestone.complete`** — full port of **`cmdMilestoneComplete`** in **`phase-lifecycle.ts`**; **`readModifyWriteStateMdFull`** in **`state-mutation.ts`** for STATE writes matching CJS.
+**`write-profile`**, **`generate-claude-profile`**, **`generate-dev-preferences`**, **`generate-claude-md`** — implemented in **`sdk/src/query/profile-output.ts`** (templates from `get-shit-done/templates/`, same JSON as `profile-output.cjs`); re-exported from **`profile.ts`**. **`milestone.complete`** — full port of **`cmdMilestoneComplete`** in **`phase-lifecycle.ts`**; **`readModifyWriteStateMdFull`** in **`state-mutation.ts`** for STATE writes matching CJS.
 
 ### Mutation subprocess infrastructure
 
-**`mutation-subprocess.integration.test.ts`** — tmp fixture `sdk/src/golden/fixtures/mutation-project/` + `createMutationSandbox()` (`mutation-sandbox.ts`). **`assertJsonParity`** runs CJS and SDK on **two fresh sandboxes** (factory fn) so neither run sees the other's filesystem mutations. **`GOLDEN_MUTATION_SUBPROCESS_COVERED`** lists canonicals with non-skipped subprocess assertions. Handlers covered: `config-ensure-section`, `commit`, `commitToSubrepo`, `configSetModelProfile`, `state.patch`, `frontmatter.set`/`merge`, `workstream.progress`, `workstream.set`, nine `state.*` subprocess tests, `write-profile`, `generate-OpenCode-profile`, `generate-dev-preferences`, `generate-OpenCode-md`, `milestone.complete`, `init.remove-workspace`.
+**`mutation-subprocess.integration.test.ts`** — tmp fixture `sdk/src/golden/fixtures/mutation-project/` + `createMutationSandbox()` (`mutation-sandbox.ts`). **`assertJsonParity`** runs CJS and SDK on **two fresh sandboxes** (factory fn) so neither run sees the other's filesystem mutations. **`GOLDEN_MUTATION_SUBPROCESS_COVERED`** lists canonicals with non-skipped subprocess assertions. Handlers covered: `config-ensure-section`, `commit`, `commitToSubrepo`, `configSetModelProfile`, `state.patch`, `frontmatter.set`/`merge`, `workstream.progress`, `workstream.set`, nine `state.*` subprocess tests, `write-profile`, `generate-claude-profile`, `generate-dev-preferences`, `generate-claude-md`, `milestone.complete`, `init.remove-workspace`.
 
 ### CJS mutation handler alignment
 
@@ -146,7 +146,7 @@ All 127 portable canonicals have subprocess or in-process parity coverage. Summa
 
 **Done (this line of work):** `summary-extract` + `history-digest` — strict `READ_ONLY_JSON_PARITY_ROWS`; `summary.ts` aligned with `commands.cjs`; `extractFrontmatterLeading` in `frontmatter.ts` for first-`---`-block parity with `frontmatter.cjs`.
 
-**Done (profile-output + milestone mutation batch):** `write-profile`, `generate-OpenCode-profile`, `generate-dev-preferences`, `generate-OpenCode-md` (`profile-output.ts`); `milestone.complete` (`phase-lifecycle.ts` + `readModifyWriteStateMdFull`); `GOLDEN_MUTATION_SUBPROCESS_COVERED` updated; **`MUTATION_SUBPROCESS_GAP_REASON` removed** from `golden-policy.ts`.
+**Done (profile-output + milestone mutation batch):** `write-profile`, `generate-claude-profile`, `generate-dev-preferences`, `generate-claude-md` (`profile-output.ts`); `milestone.complete` (`phase-lifecycle.ts` + `readModifyWriteStateMdFull`); `GOLDEN_MUTATION_SUBPROCESS_COVERED` updated; **`MUTATION_SUBPROCESS_GAP_REASON` removed** from `golden-policy.ts`.
 
 **Mutations** (`QUERY_MUTATION_COMMANDS`): subprocess coverage is **`mutation-subprocess.integration.test.ts`** + `GOLDEN_MUTATION_SUBPROCESS_COVERED`. Remaining mutation canonicals without a subprocess row use **`MUTATION_DEFERRED_REASON`** (see `golden-policy.ts`). For known gaps before parity, prefer **`it.skip`** with an explicit rationale in code comments or restore a dedicated gap map — do not rely on silent deferral alone.
 

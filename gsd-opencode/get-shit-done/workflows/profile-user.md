@@ -9,7 +9,7 @@ read all files referenced by the invoking prompt's execution_context before star
 
 Key references:
 - @$HOME/.config/opencode/get-shit-done/references/ui-brand.md (display patterns)
-- @$HOME/.config/opencode/get-shit-done/agents/gsd-user-profiler.md (profiler agent definition)
+- @$HOME/.claude/agents/gsd-user-profiler.md (profiler agent definition)
 - @$HOME/.config/opencode/get-shit-done/references/user-profiling.md (profiling reference doc)
 </required_reading>
 
@@ -48,7 +48,7 @@ If "Cancel": Display "No changes made." and exit.
 
 Backup existing profile:
 ```bash
-cp "$HOME/.config/opencode/get-shit-done/USER-PROFILE.md" "$HOME/.OpenCode/USER-PROFILE.backup.md"
+cp "$HOME/.config/opencode/get-shit-done/USER-PROFILE.md" "$HOME/.claude/USER-PROFILE.backup.md"
 ```
 
 Display: "Re-analyzing your sessions to update your profile."
@@ -271,7 +271,7 @@ write updated analysis JSON back to `$ANALYSIS_PATH`.
 Display: "◆ Writing profile..."
 
 ```bash
-gsd-sdk query write-profile --input "$ANALYSIS_PATH" --json 2>/dev/null
+gsd-sdk query write-profile --input "$ANALYSIS_PATH" --json
 ```
 
 Display: "✓ Profile written to $HOME/.config/opencode/get-shit-done/USER-PROFILE.md"
@@ -337,7 +337,7 @@ Use question with multiSelect:
 - options (ALL pre-selected by default):
   - "/gsd-dev-preferences command file" -- "Load your preferences in any session"
   - "AGENTS.md profile section" -- "Add profile to this project's AGENTS.md"
-  - "Global AGENTS.md" -- "Add profile to $HOME/.OpenCode/AGENTS.md for all projects"
+  - "Global AGENTS.md" -- "Add profile to $HOME/.claude/AGENTS.md for all projects"
 
 **If no artifacts selected:** Display "No artifacts generated. Your profile is saved at $HOME/.config/opencode/get-shit-done/USER-PROFILE.md" and jump to step 10.
 
@@ -350,15 +350,15 @@ Generate selected artifacts sequentially (file I/O is fast, no benefit from para
 **For /gsd-dev-preferences (if selected):**
 
 ```bash
-gsd-sdk query generate-dev-preferences --analysis "$ANALYSIS_PATH" --json 2>/dev/null
+gsd-sdk query generate-dev-preferences --analysis "$ANALYSIS_PATH" --json
 ```
 
-Display: "✓ Generated /gsd-dev-preferences at $HOME/.OpenCode/commands/gsd/dev-preferences.md"
+Display: "✓ Generated /gsd-dev-preferences at $HOME/.claude/commands/gsd/dev-preferences.md"
 
 **For AGENTS.md profile section (if selected):**
 
 ```bash
-gsd-sdk query generate-OpenCode-profile --analysis "$ANALYSIS_PATH" --json 2>/dev/null
+gsd-sdk query generate-claude-profile --analysis "$ANALYSIS_PATH" --json
 ```
 
 Display: "✓ Added profile section to AGENTS.md"
@@ -366,10 +366,10 @@ Display: "✓ Added profile section to AGENTS.md"
 **For Global AGENTS.md (if selected):**
 
 ```bash
-gsd-sdk query generate-OpenCode-profile --analysis "$ANALYSIS_PATH" --global --json 2>/dev/null
+gsd-sdk query generate-claude-profile --analysis "$ANALYSIS_PATH" --global --json
 ```
 
-Display: "✓ Added profile section to $HOME/.OpenCode/AGENTS.md"
+Display: "✓ Added profile section to $HOME/.claude/AGENTS.md"
 
 **Error handling:** If any `gsd-sdk query` or gsd-tools.cjs call fails, display the error message and use question to offer "Retry" or "Skip this artifact". On retry, re-run the command. On skip, continue to next artifact.
 
@@ -383,7 +383,7 @@ read both old backup and new analysis to compare dimension ratings/confidence.
 
 read the backed-up profile:
 ```bash
-BACKUP_PATH="$HOME/.OpenCode/USER-PROFILE.backup.md"
+BACKUP_PATH="$HOME/.claude/USER-PROFILE.backup.md"
 ```
 
 Compare each dimension's rating and confidence between old and new. Display diff table showing only changed dimensions:
@@ -412,9 +412,9 @@ Your profile:    $HOME/.config/opencode/get-shit-done/USER-PROFILE.md
 Then list paths for each generated artifact:
 ```
 Artifacts:
-  ✓ /gsd-dev-preferences   $HOME/.OpenCode/commands/gsd/dev-preferences.md
+  ✓ /gsd-dev-preferences   $HOME/.claude/commands/gsd/dev-preferences.md
   ✓ AGENTS.md section       ./AGENTS.md
-  ✓ Global AGENTS.md        $HOME/.OpenCode/AGENTS.md
+  ✓ Global AGENTS.md        $HOME/.claude/AGENTS.md
 ```
 
 (Only show artifacts that were actually generated.)
