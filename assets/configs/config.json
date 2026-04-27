@@ -17,6 +17,7 @@
     "node_modules/**",
     "gsd-opencode/node_modules/**",
     "gsd-opencode/get-shit-done/bin/test/**",
+    "gsd-opencode/sdk/package.json",
     ".git/**",
     ".translate-backups/**",
     "assets/**",
