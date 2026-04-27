@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.38.2] - 2026-04-26
+
+Overview: Added complete GSD SDK with TypeScript source, compiled distribution, query layer, golden fixtures, and comprehensive test suite. Fixed SDK runtime dependency resolution by adding @anthropic-ai/claude-agent-sdk and ws to parent package.json. Updated installer to handle SDK runtime dependencies for pre-built distributions.
+
+### Added
+
+- Complete GSD SDK (`gsd-opencode/sdk/`) with 50+ TypeScript source files, compiled JavaScript distribution, type definitions, and source maps
+- SDK query layer with 50+ handlers for phase lifecycle, state management, roadmap, templates, profiles, validation, verification, audit, UAT, and workspace operations in `gsd-opencode/sdk/src/query/`
+- SDK golden fixtures and parity testing infrastructure for capturing and validating deterministic outputs in `gsd-opencode/sdk/src/golden/`
+- SDK CLI entry point (`gsd-sdk`) with run, init, query, and milestone subcommands in `gsd-opencode/sdk/src/cli.ts`
+- SDK session runner for executing plans via Agent SDK query() calls in `gsd-opencode/sdk/src/session-runner.ts`
+- SDK phase runner for orchestrating wave-based parallel plan execution in `gsd-opencode/sdk/src/phase-runner.ts`
+- SDK init runner for project initialization, research, stack analysis, and roadmap generation in `gsd-opencode/sdk/src/init-runner.ts`
+- SDK event stream for mapping SDK messages to typed GSD events in `gsd-opencode/sdk/src/event-stream.ts`
+- SDK context engine for context budget tracking and token management in `gsd-opencode/sdk/src/context-engine.ts`
+- SDK prompt builder for constructing executor prompts with tool scoping and model resolution in `gsd-opencode/sdk/src/prompt-builder.ts`
+- SDK plan parser for parsing PLAN.md files into typed Plan objects in `gsd-opencode/sdk/src/plan-parser.ts`
+- SDK configuration loader for project config.json and profile resolution in `gsd-opencode/sdk/src/config.ts`
+- SDK GSD tools registry for phase, agent, skill, template, workflow, and query commands in `gsd-opencode/sdk/src/gsd-tools.ts`
+- SDK types for all domain models including GSDSessionInitEvent, GSDToolCallEvent, PlanResult, PhaseResult, and milestone types in `gsd-opencode/sdk/src/types.ts`
+- SDK comprehensive test suite with 40+ test files covering unit, integration, and golden parity tests in `gsd-opencode/sdk/src/`
+- SDK documentation for caching, handover parity, query layer, and golden fixtures in `gsd-opencode/sdk/docs/` and `gsd-opencode/sdk/HANDOVER-*.md`
+- SDK prompt templates for project, requirements, research, roadmap, and state in `gsd-opencode/sdk/prompts/templates/`
+- SDK TypeScript configuration and Vitest test configuration in `gsd-opencode/sdk/tsconfig.json` and `gsd-opencode/sdk/vitest.config.ts`
+- `gsd-sdk.cjs` CommonJS shim for external gsd-sdk callers resolving sdk/dist/cli.js in `gsd-opencode/bin/gsd-sdk.cjs`
+- `install.js` legacy installer script (7452 lines) providing comprehensive multi-runtime installation and uninstallation support in `gsd-opencode/bin/install.js`
+- `@anthropic-ai/claude-agent-sdk` and `ws` as runtime dependencies in `gsd-opencode/package.json` for SDK resolution from parent package location
+- `.npmignore` for SDK package excluding node_modules, test-fixtures, and src from published tarball in `gsd-opencode/sdk/.npmignore`
+
+### Changed
+
+- Updated `installSdk()` in DM install command to run `npm install` and verify `@anthropic-ai/claude-agent-sdk` exists when pre-built dist is present in `gsd-opencode/bin/dm/src/commands/install.js`
+- Updated `installSdkIfNeeded()` in legacy installer to check for actual dependency path and show warning if missing in `gsd-opencode/bin/install.js`
+- Updated `SyncService.js` with 177 lines of changes to sync logic in `assets/copy-services/SyncService.js`
+- Updated `M-COPY-AND-TRANSLATE.md` to add step 4d for SDK dist rebuild with `npm install` and `npm run build` in `assets/prompts/M-COPY-AND-TRANSLATE.md`
+- Updated translation config with 4 new replacement rules in `assets/configs/config.json`
+- Updated health-checker with 207 lines of changes to verification logic in `gsd-opencode/bin/dm/src/services/health-checker.js`
+- Updated check command with 21 lines of changes to integrity verification in `gsd-opencode/bin/dm/src/commands/check.js`
+- Updated uninstall command to include SDK directory in removal list in `gsd-opencode/bin/dm/src/commands/uninstall.js`
+- Updated DM constants to include sdk in directories to copy and orphan patterns in `gsd-opencode/bin/dm/lib/constants.js`
+
 ## [1.38.1] - 2026-04-26
 
 Overview: Rewrote health check integrity verification to use installation manifest with SHA-256 hash comparison instead of sample file checks. Added install.js and gsd-sdk.js scripts for streamlined OpenCode tooling. Fixed false negatives in check command and integrity verification.
