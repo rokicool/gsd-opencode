@@ -69,7 +69,7 @@ async function checkPhaseCompletion(phaseArg, projectDir) {
         const planId = p.replace('-PLAN.md', '').replace('PLAN.md', '');
         return !summaryIds.has(planId);
     });
-    // read VERIFICATION.md and UAT.md if phase was found
+    // Read VERIFICATION.md and UAT.md if phase was found
     let verificationContent = null;
     let uatContent = null;
     if (found && pdata.directory) {

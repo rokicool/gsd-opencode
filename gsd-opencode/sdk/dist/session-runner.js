@@ -4,7 +4,7 @@
  * Takes a parsed plan, builds the executor prompt, configures query() options,
  * processes the message stream, and extracts results into a typed PlanResult.
  */
-import { query } from '@anthropic-ai/OpenCode-agent-sdk';
+import { query } from '@anthropic-ai/claude-agent-sdk';
 import { GSDEventType, PhaseType } from './types.js';
 import { buildExecutorPrompt, parseAgentTools, DEFAULT_ALLOWED_TOOLS } from './prompt-builder.js';
 import { getToolsForPhase } from './tool-scoping.js';
@@ -20,9 +20,9 @@ function resolveModel(options, config) {
     // Map model_profile names to model IDs
     if (config?.model_profile) {
         const profileMap = {
-            balanced: 'OpenCode-sonnet-4-6',
-            quality: 'OpenCode-opus-4-6',
-            speed: 'OpenCode-haiku-4-5',
+            balanced: 'claude-sonnet-4-6',
+            quality: 'claude-opus-4-6',
+            speed: 'claude-haiku-4-5',
         };
         return profileMap[config.model_profile] ?? config.model_profile;
     }

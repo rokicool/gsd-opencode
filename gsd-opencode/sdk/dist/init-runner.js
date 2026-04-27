@@ -18,7 +18,7 @@ import { runPhaseStepSession } from './session-runner.js';
 import { sanitizePrompt } from './prompt-sanitizer.js';
 import { resolveAgentsDir } from './query/helpers.js';
 // ─── Constants ───────────────────────────────────────────────────────────────
-const GSD_TEMPLATES_DIR = join(homedir(), '.OpenCode', 'get-shit-done', 'templates');
+const GSD_TEMPLATES_DIR = join(homedir(), '.claude', 'get-shit-done', 'templates');
 const GSD_AGENTS_DIR = resolveAgentsDir();
 const RESEARCH_TYPES = ['STACK', 'FEATURES', 'ARCHITECTURE', 'PITFALLS'];
 const RESEARCH_STEP_MAP = {
@@ -101,7 +101,7 @@ export class InitRunner {
                 // Ensure .planning/ directory exists
                 const planningDir = join(this.projectDir, '.planning');
                 await mkdir(planningDir, { recursive: true });
-                // write config.json
+                // Write config.json
                 const configPath = join(planningDir, 'config.json');
                 await writeFile(configPath, JSON.stringify(AUTO_MODE_CONFIG, null, 2) + '\n', 'utf-8');
                 artifacts.push('.planning/config.json');
@@ -311,7 +311,7 @@ export class InitRunner {
         const template = await this.readGSDFile('templates/project.md');
         return sanitizePrompt([
             'You are creating the PROJECT.md for a new software project.',
-            'write .planning/PROJECT.md based on the template structure below and the user\'s project description.',
+            'Write .planning/PROJECT.md based on the template structure below and the user\'s project description.',
             '',
             '<project_template>',
             template,
@@ -321,7 +321,7 @@ export class InitRunner {
             input,
             '</user_input>',
             '',
-            'write the file to .planning/PROJECT.md. Follow the template structure but fill in with real content derived from the user input.',
+            'Write the file to .planning/PROJECT.md. Follow the template structure but fill in with real content derived from the user input.',
             'Be specific and opinionated — make decisions, don\'t list options.',
         ].join('\n'), this.projectDir);
     }
@@ -332,7 +332,7 @@ export class InitRunner {
     async buildResearchPrompt(researchType, input) {
         const agentDef = await this.readAgentFile('gsd-project-researcher.md');
         const template = await this.readGSDFile(`templates/research-project/${researchType}.md`);
-        // read PROJECT.md if it exists (it should by now)
+        // Read PROJECT.md if it exists (it should by now)
         let projectContent = '';
         try {
             projectContent = await readFile(join(this.projectDir, '.planning', 'PROJECT.md'), 'utf-8');
@@ -347,7 +347,7 @@ export class InitRunner {
             '</agent_definition>',
             '',
             `You are researching the ${researchType} aspect of this project.`,
-            `write your findings to .planning/research/${researchType}.md`,
+            `Write your findings to .planning/research/${researchType}.md`,
             '',
             '<files_to_read>',
             '.planning/PROJECT.md',
@@ -361,7 +361,7 @@ export class InitRunner {
             template,
             '</research_template>',
             '',
-            `write .planning/research/${researchType}.md following the template structure.`,
+            `Write .planning/research/${researchType}.md following the template structure.`,
             'Be comprehensive but opinionated. "Use X because Y" not "Options are X, Y, Z."',
         ].join('\n'), this.projectDir);
     }
@@ -373,7 +373,7 @@ export class InitRunner {
         const agentDef = await this.readAgentFile('gsd-research-synthesizer.md');
         const summaryTemplate = await this.readGSDFile('templates/research-project/SUMMARY.md');
         const researchDir = join(this.projectDir, '.planning', 'research');
-        // read whatever research files exist
+        // Read whatever research files exist
         const researchContent = [];
         for (const rt of RESEARCH_TYPES) {
             try {
@@ -404,7 +404,7 @@ export class InitRunner {
             summaryTemplate,
             '</summary_template>',
             '',
-            'write .planning/research/SUMMARY.md synthesizing all research findings.',
+            'Write .planning/research/SUMMARY.md synthesizing all research findings.',
             'Also commit all research files: git add .planning/research/ && git commit.',
         ].join('\n'), this.projectDir);
     }
@@ -445,7 +445,7 @@ export class InitRunner {
             reqTemplate,
             '</requirements_template>',
             '',
-            'write .planning/REQUIREMENTS.md following the template structure.',
+            'Write .planning/REQUIREMENTS.md following the template structure.',
             'Every requirement must be testable and specific. No vague aspirations.',
         ].join('\n'), this.projectDir);
     }
@@ -513,9 +513,9 @@ export class InitRunner {
     }
     // ─── File reading helpers ──────────────────────────────────────────────────
     /**
-     * read a file from the GSD templates directory.
+     * Read a file from the GSD templates directory.
      * Tries sdk/prompts/{relativePath} first (headless versions), then
-     * falls back to GSD-1 originals ($HOME/.config/opencode/get-shit-done/).
+     * falls back to GSD-1 originals (~/.claude/get-shit-done/).
      */
     async readGSDFile(relativePath) {
         // Try installed GSD first (complete, up-to-date versions)
@@ -536,7 +536,7 @@ export class InitRunner {
         }
     }
     /**
-     * read an agent definition.
+     * Read an agent definition.
      * Tries installed agents first (complete, up-to-date versions), then
      * falls back to SDK bundled copies.
      */

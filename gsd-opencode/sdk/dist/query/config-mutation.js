@@ -26,7 +26,7 @@ import { VALID_CONFIG_KEYS, DYNAMIC_KEY_PATTERNS } from './config-schema.js';
 import { planningPaths } from './helpers.js';
 import { acquireStateLock, releaseStateLock } from './state-mutation.js';
 /**
- * write config JSON atomically via temp file + rename to prevent
+ * Write config JSON atomically via temp file + rename to prevent
  * partial writes on process interruption.
  */
 async function atomicWriteConfig(configPath, config) {
@@ -170,7 +170,7 @@ function setConfigValue(obj, dotPath, value) {
 }
 // ─── configSet ────────────────────────────────────────────────────────────
 /**
- * write a validated key-value pair to config.json.
+ * Write a validated key-value pair to config.json.
  *
  * Validates key against VALID_CONFIG_KEYS allowlist, coerces value
  * from CLI string to native type, and writes config.json.

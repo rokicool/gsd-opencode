@@ -65,13 +65,13 @@ export declare class InitRunner {
      */
     private runSession;
     /**
-     * read a file from the GSD templates directory.
+     * Read a file from the GSD templates directory.
      * Tries sdk/prompts/{relativePath} first (headless versions), then
-     * falls back to GSD-1 originals ($HOME/.config/opencode/get-shit-done/).
+     * falls back to GSD-1 originals (~/.claude/get-shit-done/).
      */
     private readGSDFile;
     /**
-     * read an agent definition.
+     * Read an agent definition.
      * Tries installed agents first (complete, up-to-date versions), then
      * falls back to SDK bundled copies.
      */

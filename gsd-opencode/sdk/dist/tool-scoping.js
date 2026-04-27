@@ -2,9 +2,9 @@
  * Tool scoping — maps phase types to allowed tool sets.
  *
  * Per R015, different phases get different tool access:
- * - Research: read-only + web search (no write/edit on source)
+ * - Research: read-only + web search (no Write/Edit on source)
  * - Execute: full read/write
- * - Verify: read-only (no write/edit)
+ * - Verify: read-only (no Write/Edit)
  * - Discuss: read-only
  * - Plan: read/write + web (for creating plan files)
  */
@@ -12,12 +12,12 @@ import { PhaseType } from './types.js';
 import { parseAgentTools } from './prompt-builder.js';
 // ─── Phase default tool sets ─────────────────────────────────────────────────
 const PHASE_DEFAULT_TOOLS = {
-    [PhaseType.Research]: ['read', 'grep', 'glob', 'bash', 'websearch'],
-    [PhaseType.Execute]: ['read', 'write', 'edit', 'bash', 'grep', 'glob'],
-    [PhaseType.Verify]: ['read', 'bash', 'grep', 'glob'],
-    [PhaseType.Discuss]: ['read', 'bash', 'grep', 'glob'],
-    [PhaseType.Plan]: ['read', 'write', 'bash', 'glob', 'grep', 'webfetch'],
-    [PhaseType.Repair]: ['read', 'write', 'edit', 'bash', 'grep', 'glob'],
+    [PhaseType.Research]: ['Read', 'Grep', 'Glob', 'Bash', 'WebSearch'],
+    [PhaseType.Execute]: ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
+    [PhaseType.Verify]: ['Read', 'Bash', 'Grep', 'Glob'],
+    [PhaseType.Discuss]: ['Read', 'Bash', 'Grep', 'Glob'],
+    [PhaseType.Plan]: ['Read', 'Write', 'Bash', 'Glob', 'Grep', 'WebFetch'],
+    [PhaseType.Repair]: ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
 };
 // ─── Phase → agent definition filename ──────────────────────────────────────
 /**

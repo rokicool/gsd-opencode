@@ -80,8 +80,8 @@ export async function streamExtractMessages(filePath, filterFn, maxMessages) {
 export async function runExtractMessages(projectArg, options, overridePath) {
     const sessionsDir = getScanSessionsRoot(overridePath);
     if (!sessionsDir) {
-        const searchedPath = overridePath || '$HOME/.config/opencode/projects';
-        throw new GSDError(`No OpenCode sessions found at ${searchedPath}.${overridePath ? '' : ' Is OpenCode installed?'}`, ErrorClassification.Validation);
+        const searchedPath = overridePath || '~/.claude/projects';
+        throw new GSDError(`No Claude Code sessions found at ${searchedPath}.${overridePath ? '' : ' Is Claude Code installed?'}`, ErrorClassification.Validation);
     }
     let projectDirs;
     try {

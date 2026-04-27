@@ -7,7 +7,7 @@
  * against a temporary directory clone of .planning/ instead of the real
  * project, and the before/after diff is returned without writing to disk.
  *
- * read commands are always executed normally — they are side-effect-free.
+ * Read commands are always executed normally — they are side-effect-free.
  *
  * @example
  * ```typescript

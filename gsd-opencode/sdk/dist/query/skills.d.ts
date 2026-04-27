@@ -1,6 +1,6 @@
 /**
  * Agent skills query handler — read configured skills from `.planning/config.json`
- * and emit the `<agent_skills>` XML block workflows interpolate into task() prompts.
+ * and emit the `<agent_skills>` XML block workflows interpolate into Task() prompts.
  *
  * Ports `buildAgentSkillsBlock` semantics from
  * `get-shit-done/bin/lib/init.cjs` so the SDK path honors
@@ -11,9 +11,9 @@
  * ```typescript
  * import { agentSkills } from './skills.js';
  *
- * // With config.agent_skills = { "gsd-planner": [".OpenCode/skills/demo-skill"] }
+ * // With config.agent_skills = { "gsd-planner": [".claude/skills/demo-skill"] }
  * await agentSkills(['gsd-planner'], '/project');
- * // { data: '<agent_skills>\nRead these user-configured skills:\n- @.OpenCode/skills/demo-skill/SKILL.md\n</agent_skills>' }
+ * // { data: '<agent_skills>\nRead these user-configured skills:\n- @.claude/skills/demo-skill/SKILL.md\n</agent_skills>' }
  *
  * // No agent type → empty string (matches gsd-tools cmdAgentSkills).
  * await agentSkills([], '/project');

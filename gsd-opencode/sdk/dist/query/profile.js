@@ -189,7 +189,7 @@ export const learningsDelete = async (args) => {
 };
 // ─── extractMessages — session message extraction for profiling ───────────
 /**
- * Extract user messages from OpenCode session files for a given project.
+ * Extract user messages from Claude Code session files for a given project.
  *
  * Port of `cmdExtractMessages` from profile-pipeline.cjs — JSON matches `gsd-tools extract-messages`
  * (`output_file` JSONL + metadata). Uses `--session` (CJS); `--session-id` is accepted as an alias.
@@ -216,8 +216,8 @@ export const scanSessions = async (args) => {
     const overridePath = pathIdx !== -1 ? args[pathIdx + 1] : null;
     const verboseFlag = args.includes('--verbose');
     if (getScanSessionsRoot(overridePath) === null) {
-        const searchedPath = overridePath || '$HOME/.config/opencode/projects';
-        throw new GSDError(`No OpenCode sessions found at ${searchedPath}.${overridePath ? '' : ' Is OpenCode installed?'}`, ErrorClassification.Validation);
+        const searchedPath = overridePath || '~/.claude/projects';
+        throw new GSDError(`No Claude Code sessions found at ${searchedPath}.${overridePath ? '' : ' Is Claude Code installed?'}`, ErrorClassification.Validation);
     }
     const projects = buildScanSessionsProjects(overridePath, { verbose: verboseFlag });
     return { data: projects };

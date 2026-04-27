@@ -2,7 +2,7 @@
  * Phase-aware prompt factory — assembles complete prompts for each phase type.
  *
  * Reads workflow .md + agent .md files from disk (D006), extracts structured
- * blocks (<role>, <objective>, <process>), and composes system prompts with
+ * blocks (<role>, <purpose>, <process>), and composes system prompts with
  * injected context files per phase type.
  */
 import type { ContextFiles, ParsedPlan } from './types.js';
@@ -12,7 +12,7 @@ import { PhaseType } from './types.js';
  */
 declare const PHASE_WORKFLOW_MAP: Record<PhaseType, string>;
 /**
- * Extract content from an XML-style block (e.g., <objective>...</objective>).
+ * Extract content from an XML-style block (e.g., <purpose>...</purpose>).
  * Returns the trimmed inner content, or empty string if not found.
  */
 export declare function extractBlock(content: string, tagName: string): string;

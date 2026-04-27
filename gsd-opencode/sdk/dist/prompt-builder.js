@@ -6,7 +6,7 @@
  * verify each one, and produce a SUMMARY.md at the end.
  */
 // ─── Constants ───────────────────────────────────────────────────────────────
-const DEFAULT_ALLOWED_TOOLS = ['read', 'write', 'edit', 'bash', 'grep', 'glob'];
+const DEFAULT_ALLOWED_TOOLS = ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'];
 // ─── Agent definition parsing ────────────────────────────────────────────────
 /**
  * Extract the tools list from a gsd-executor.md agent definition.
@@ -40,12 +40,12 @@ export function parseAgentRole(agentDef) {
  */
 function formatTask(task, index) {
     const lines = [];
-    lines.push(`### task ${index + 1}: ${task.name}`);
+    lines.push(`### Task ${index + 1}: ${task.name}`);
     if (task.files.length > 0) {
         lines.push(`**Files:** ${task.files.join(', ')}`);
     }
     if (task.read_first.length > 0) {
-        lines.push(`**read first:** ${task.read_first.join(', ')}`);
+        lines.push(`**Read first:** ${task.read_first.join(', ')}`);
     }
     lines.push('');
     lines.push('**Action:**');

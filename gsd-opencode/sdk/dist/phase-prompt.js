@@ -2,7 +2,7 @@
  * Phase-aware prompt factory — assembles complete prompts for each phase type.
  *
  * Reads workflow .md + agent .md files from disk (D006), extracts structured
- * blocks (<role>, <objective>, <process>), and composes system prompts with
+ * blocks (<role>, <purpose>, <process>), and composes system prompts with
  * injected context files per phase type.
  */
 import { readFile } from 'node:fs/promises';
@@ -27,7 +27,7 @@ const PHASE_WORKFLOW_MAP = {
 };
 // ─── XML block extraction ────────────────────────────────────────────────────
 /**
- * Extract content from an XML-style block (e.g., <objective>...</objective>).
+ * Extract content from an XML-style block (e.g., <purpose>...</purpose>).
  * Returns the trimmed inner content, or empty string if not found.
  */
 export function extractBlock(content, tagName) {
@@ -68,9 +68,9 @@ export class PromptFactory {
     sdkPromptsDir;
     projectDir;
     constructor(options) {
-        const gsdInstallDir = options?.gsdInstallDir ?? join(homedir(), '.OpenCode', 'get-shit-done');
+        const gsdInstallDir = options?.gsdInstallDir ?? join(homedir(), '.claude', 'get-shit-done');
         this.workflowsDir = join(gsdInstallDir, 'workflows');
-        this.agentsDir = options?.agentsDir ?? join(homedir(), '.OpenCode', 'agents');
+        this.agentsDir = options?.agentsDir ?? join(homedir(), '.claude', 'agents');
         this.projectAgentsDir = options?.projectAgentsDir;
         this.projectDir = options?.projectDir;
         // SDK prompts dir: explicit override → package-relative default via import.meta.url

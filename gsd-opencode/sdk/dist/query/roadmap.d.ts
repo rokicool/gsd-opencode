@@ -13,7 +13,7 @@
  * // { data: { phases: [...], phase_count: 6, progress_percent: 50, ... } }
  *
  * const phase = await roadmapGetPhase(['10'], '/project');
- * // { data: { found: true, phase_number: '10', phase_name: 'read-Only Queries', ... } }
+ * // { data: { found: true, phase_number: '10', phase_name: 'Read-Only Queries', ... } }
  * ```
  */
 import type { QueryHandler } from './utils.js';

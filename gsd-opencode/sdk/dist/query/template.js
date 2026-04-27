@@ -58,7 +58,7 @@ export const templateSelect = async (args, projectDir, workstream) => {
     if (!phaseDir) {
         return { data: { template: 'plan' } };
     }
-    // read directory contents and check for plans/summaries
+    // Read directory contents and check for plans/summaries
     try {
         const files = await readdir(phaseDir);
         const plans = files.filter(f => f.match(/-PLAN\.md$/i));
@@ -137,7 +137,7 @@ export const templateFill = async (args, projectDir) => {
                 '',
                 '## Accomplishments',
                 '',
-                '## task Commits',
+                '## Task Commits',
                 '',
                 '## Files Created/Modified',
                 '',

@@ -38,7 +38,7 @@ export declare const learningsPrune: QueryHandler;
 /** Port of `cmdLearningsDelete`. */
 export declare const learningsDelete: QueryHandler;
 /**
- * Extract user messages from OpenCode session files for a given project.
+ * Extract user messages from Claude Code session files for a given project.
  *
  * Port of `cmdExtractMessages` from profile-pipeline.cjs — JSON matches `gsd-tools extract-messages`
  * (`output_file` JSONL + metadata). Uses `--session` (CJS); `--session-id` is accepted as an alias.

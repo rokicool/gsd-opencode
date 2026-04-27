@@ -2,9 +2,9 @@
  * Tool scoping — maps phase types to allowed tool sets.
  *
  * Per R015, different phases get different tool access:
- * - Research: read-only + web search (no write/edit on source)
+ * - Research: read-only + web search (no Write/Edit on source)
  * - Execute: full read/write
- * - Verify: read-only (no write/edit)
+ * - Verify: read-only (no Write/Edit)
  * - Discuss: read-only
  * - Plan: read/write + web (for creating plan files)
  */

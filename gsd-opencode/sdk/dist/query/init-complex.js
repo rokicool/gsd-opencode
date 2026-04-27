@@ -95,7 +95,7 @@ export const initNewProject = async (_args, projectDir, _workstream) => {
         '.r', '.R', '.zig', '.ex', '.exs', '.clj',
     ]);
     const skipDirs = new Set([
-        'node_modules', '.git', '.planning', '.OpenCode', '.codex',
+        'node_modules', '.git', '.planning', '.claude', '.codex',
         '__pycache__', 'target', 'dist', 'build',
     ]);
     function findCodeFiles(dir, depth) {
@@ -562,7 +562,7 @@ export const initManager = async (_args, projectDir, _workstream) => {
         }
     }
     catch { /* queued_phases is a non-critical enhancement */ }
-    // read manager flags from config
+    // Read manager flags from config
     const managerConfig = config.manager;
     const sanitizeFlags = (raw) => {
         const val = typeof raw === 'string' ? raw : '';

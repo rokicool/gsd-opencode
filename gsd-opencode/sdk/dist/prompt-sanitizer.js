@@ -2,15 +2,15 @@
  * Prompt sanitizer — resolves @-file references and strips interactive CLI
  * patterns from GSD-1 prompts so they're safe for headless SDK use.
  *
- * @-file references (e.g., @$HOME/.config/opencode/get-shit-done/references/foo.md) are
+ * @-file references (e.g., @~/.claude/get-shit-done/references/foo.md) are
  * resolved by reading the file and inlining the content. This preserves the
  * critical instructions that the real agent prompts depend on.
  *
  * Patterns removed (interactive-only, not useful headless):
  * - /gsd-... skill commands (can't invoke skills in Agent SDK)
- * - question(...) calls
+ * - AskUserQuestion(...) calls
  * - STOP directives in interactive contexts
- * - command() calls
+ * - SlashCommand() calls
  * - 'wait for user' / 'ask the user' instructions
  */
 import { readFileSync } from 'node:fs';
@@ -18,8 +18,8 @@ import { homedir } from 'node:os';
 // ─── @-reference resolution ──────────────────────────────────────────────────
 /**
  * Matches @-file references in prompt text. Handles:
- * - @$HOME/.config/opencode/get-shit-done/references/foo.md
- * - @$HOME/.config/opencode/get-shit-done/workflows/bar.md
+ * - @~/.claude/get-shit-done/references/foo.md
+ * - @~/.claude/get-shit-done/workflows/bar.md
  * - @.planning/PROJECT.md (project-relative)
  *
  * Only resolves references that start a line or follow whitespace,
@@ -63,10 +63,10 @@ const LINE_PATTERNS = [
     /^.*@file:\S+.*$/gm,
     // /gsd-command references — entire line containing a skill command
     /^.*\/gsd[:-]\S+.*$/gm,
-    // question(...) calls — entire line
-    /^.*question\s*\(.*$/gm,
-    // command() calls — entire line
-    /^.*command\s*\(.*$/gm,
+    // AskUserQuestion(...) calls — entire line
+    /^.*AskUserQuestion\s*\(.*$/gm,
+    // SlashCommand() calls — entire line
+    /^.*SlashCommand\s*\(.*$/gm,
     // STOP directives — lines that are primarily "STOP" instructions
     /^.*\bSTOP\b(?:\s+(?:and\s+)?(?:wait|ask|here|now)).*$/gm,
     /^\s*STOP\s*[.!]?\s*$/gm,

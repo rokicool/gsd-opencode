@@ -19,7 +19,7 @@
 /**
  * Supported GSD runtimes. Kept in sync with `bin/install.js:getGlobalDir()`.
  */
-export declare const SUPPORTED_RUNTIMES: readonly ["OpenCode", "opencode", "kilo", "gemini", "codex", "copilot", "antigravity", "cursor", "windsurf", "augment", "trae", "qwen", "codebuddy", "cline"];
+export declare const SUPPORTED_RUNTIMES: readonly ["claude", "opencode", "kilo", "gemini", "codex", "copilot", "antigravity", "cursor", "windsurf", "augment", "trae", "qwen", "codebuddy", "cline"];
 export type Runtime = (typeof SUPPORTED_RUNTIMES)[number];
 /**
  * Resolve the per-runtime config directory, mirroring
@@ -30,7 +30,7 @@ export declare function getRuntimeConfigDir(runtime: Runtime): string;
  * Detect the invoking runtime using issue #2402 precedence:
  *   1. `GSD_RUNTIME` env var
  *   2. `config.runtime` field (from `.planning/config.json` when loaded)
- *   3. Fallback to `'OpenCode'`
+ *   3. Fallback to `'claude'`
  *
  * Unknown values fall through to the next tier rather than throwing, so
  * stale env values don't hard-block workflows.
@@ -45,8 +45,8 @@ export declare function detectRuntime(config?: {
  *   1. `GSD_AGENTS_DIR` — explicit SDK override (wins over runtime selection)
  *   2. `<getRuntimeConfigDir(runtime)>/agents` — installer-parity default
  *
- * Defaults to OpenCode when no runtime is passed, matching prior behavior
- * (see `init-runner.ts`, which is OpenCode-only by design).
+ * Defaults to Claude when no runtime is passed, matching prior behavior
+ * (see `init-runner.ts`, which is Claude-only by design).
  */
 export declare function resolveAgentsDir(runtime?: Runtime): string;
 /** Paths to common .planning files. */

@@ -13,7 +13,7 @@
  * // { data: { phases: [...], phase_count: 6, progress_percent: 50, ... } }
  *
  * const phase = await roadmapGetPhase(['10'], '/project');
- * // { data: { found: true, phase_number: '10', phase_name: 'read-Only Queries', ... } }
+ * // { data: { found: true, phase_number: '10', phase_name: 'Read-Only Queries', ... } }
  * ```
  */
 import { existsSync } from 'node:fs';
@@ -37,7 +37,7 @@ export function stripShippedMilestones(content) {
     return result;
 }
 /**
- * read milestone + name from STATE.md frontmatter when ROADMAP does not encode them.
+ * Read milestone + name from STATE.md frontmatter when ROADMAP does not encode them.
  */
 async function parseMilestoneFromState(projectDir, workstream) {
     try {

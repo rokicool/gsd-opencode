@@ -183,7 +183,7 @@ export const validateConsistency = async (_args, projectDir, workstream) => {
     const paths = planningPaths(projectDir, workstream);
     const errors = [];
     const warnings = [];
-    // read ROADMAP.md
+    // Read ROADMAP.md
     let roadmapContent;
     try {
         roadmapContent = await readFile(paths.roadmap, 'utf-8');
@@ -640,7 +640,7 @@ export const validateHealth = async (args, projectDir, _workstream) => {
                 switch (repair) {
                     case 'createConfig':
                     case 'resetConfig': {
-                        // T-12-11: write known-safe defaults only
+                        // T-12-11: Write known-safe defaults only
                         const defaults = {
                             model_profile: 'balanced',
                             commit_docs: false,
