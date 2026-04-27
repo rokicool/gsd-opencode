@@ -20,12 +20,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rokicool/gsd-opencode.git",
+    "url": "git+https://github.com/gsd-build/get-shit-done.git",
     "directory": "sdk"
   },
-  "homepage": "https://github.com/rokicool/gsd-opencode/tree/main/sdk",
+  "homepage": "https://github.com/gsd-build/get-shit-done/tree/main/sdk",
   "bugs": {
-    "url": "https://github.com/rokicool/gsd-opencode/issues"
+    "url": "https://github.com/gsd-build/get-shit-done/issues"
   },
   "author": "TÂCHES",
   "license": "MIT",
@@ -40,7 +40,7 @@
     "test:integration": "vitest run --project integration"
   },
   "dependencies": {
-    "@anthropic-ai/OpenCode-agent-sdk": "^0.2.84",
+    "@anthropic-ai/claude-agent-sdk": "^0.2.84",
     "ws": "^8.20.0"
   },
   "devDependencies": {
