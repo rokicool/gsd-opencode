@@ -10,7 +10,7 @@
  *   - **D-01:** First decision text
  *   - **D-02 [folded]:** Second decision text
  *
- *   ### Claude's Discretion
+ *   ### OpenCode's Discretion
  *   - free-form, never tracked
  *
  *   ### Folded Todos
@@ -35,7 +35,7 @@ const MINIMAL = `# Phase 17 Context
 - **D-03 [informational]:** Backing store is on disk
 - **D-04:** Persist via SQLite WAL mode
 
-### Claude's Discretion
+### OpenCode's Discretion
 - Naming of internal helpers is up to the implementer
 - **D-99:** This should be ignored — it lives under Discretion
 
@@ -64,7 +64,7 @@ describe('parseDecisions (#2492)', () => {
     expect(d03?.tags).toContain('informational');
   });
 
-  it('marks Claude\'s Discretion entries as non-trackable', () => {
+  it('marks OpenCode\'s Discretion entries as non-trackable', () => {
     const decisions = parseDecisions(MINIMAL);
     const d99 = decisions.find((d) => d.id === 'D-99');
     expect(d99).toBeDefined();
@@ -168,10 +168,10 @@ Some prose.
     expect(ids).toContain('D-02');
   });
 
-  it('treats curly-quote variants of "Claude\u2019s Discretion" as non-trackable (review F20)', () => {
+  it('treats curly-quote variants of "OpenCode\u2019s Discretion" as non-trackable (review F20)', () => {
     // U+201B (single high-reversed-9 quotation mark) — uncommon but legal unicode.
     const content =
-      '<decisions>\n### Claude\u201Bs Discretion\n- **D-50:** Should be non-trackable\n</decisions>';
+      '<decisions>\n### OpenCode\u201Bs Discretion\n- **D-50:** Should be non-trackable\n</decisions>';
     const decisions = parseDecisions(content);
     const d50 = decisions.find((d) => d.id === 'D-50');
     expect(d50?.trackable).toBe(false);

@@ -27,8 +27,8 @@ const BUNDLED_CORE_CJS = fileURLToPath(
 function resolveCoreCjsPath(projectDir: string): string | null {
   const candidates = [
     BUNDLED_CORE_CJS,
-    join(projectDir, '.claude', 'get-shit-done', 'bin', 'lib', 'core.cjs'),
-    join(homedir(), '.claude', 'get-shit-done', 'bin', 'lib', 'core.cjs'),
+    join(projectDir, '.OpenCode', 'get-shit-done', 'bin', 'lib', 'core.cjs'),
+    join(homedir(), '.OpenCode', 'get-shit-done', 'bin', 'lib', 'core.cjs'),
   ];
   return candidates.find(p => existsSync(p)) ?? null;
 }
@@ -37,7 +37,7 @@ function loadConfigCjs(projectDir: string): Record<string, unknown> {
   const corePath = resolveCoreCjsPath(projectDir);
   if (!corePath) {
     throw new GSDError(
-      'state load: get-shit-done/bin/lib/core.cjs not found. Install GSD (e.g. npm i -g get-shit-done-cc) or clone with get-shit-done next to the SDK.',
+      'state load: get-shit-done/bin/lib/core.cjs not found. Install GSD (e.g. npm i -g gsd-opencode) or clone with get-shit-done next to the SDK.',
       ErrorClassification.Blocked,
     );
   }

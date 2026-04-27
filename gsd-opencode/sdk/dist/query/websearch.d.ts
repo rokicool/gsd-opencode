@@ -3,7 +3,7 @@
  *
  * Provides web search for researcher agents. Returns { available: false }
  * gracefully when BRAVE_API_KEY is missing so agents can fall back to
- * built-in WebSearch tools.
+ * built-in websearch tools.
  *
  * @example
  * ```typescript

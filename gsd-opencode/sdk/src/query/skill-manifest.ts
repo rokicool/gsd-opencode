@@ -1,5 +1,5 @@
 /**
- * Skill manifest — multi-root skill discovery scan.
+ * skill manifest — multi-root skill discovery scan.
  *
  * Full port of `buildSkillManifest` / `cmdSkillManifest` from
  * `get-shit-done/bin/lib/init.cjs` (lines 1640–1847).
@@ -59,23 +59,23 @@ export function buildSkillManifest(cwd: string, skillsDir: string | null = null)
       kind: 'skills' as const,
     }]
     : [
-      { root: '.claude/skills', path: join(cwd, '.claude', 'skills'), scope: 'project', kind: 'skills' as const },
+      { root: '.OpenCode/skills', path: join(cwd, '.OpenCode', 'skills'), scope: 'project', kind: 'skills' as const },
       { root: '.agents/skills', path: join(cwd, '.agents', 'skills'), scope: 'project', kind: 'skills' as const },
       { root: '.cursor/skills', path: join(cwd, '.cursor', 'skills'), scope: 'project', kind: 'skills' as const },
       { root: '.github/skills', path: join(cwd, '.github', 'skills'), scope: 'project', kind: 'skills' as const },
       { root: '.codex/skills', path: join(cwd, '.codex', 'skills'), scope: 'project', kind: 'skills' as const },
-      { root: '~/.claude/skills', path: join(homedir(), '.claude', 'skills'), scope: 'global', kind: 'skills' as const },
+      { root: '$HOME/.config/opencode/skills', path: join(homedir(), '.OpenCode', 'skills'), scope: 'global', kind: 'skills' as const },
       { root: '~/.codex/skills', path: join(homedir(), '.codex', 'skills'), scope: 'global', kind: 'skills' as const },
       {
-        root: '.claude/get-shit-done/skills',
-        path: join(homedir(), '.claude', 'get-shit-done', 'skills'),
+        root: '.OpenCode/get-shit-done/skills',
+        path: join(homedir(), '.OpenCode', 'get-shit-done', 'skills'),
         scope: 'import-only',
         kind: 'skills' as const,
         deprecated: true,
       },
       {
-        root: '.claude/commands/gsd',
-        path: join(homedir(), '.claude', 'commands', 'gsd'),
+        root: '.OpenCode/commands/gsd',
+        path: join(homedir(), '.OpenCode', 'commands', 'gsd'),
         scope: 'legacy-commands',
         kind: 'commands' as const,
         deprecated: true,

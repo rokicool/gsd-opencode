@@ -17,8 +17,8 @@ export const PROFILING_QUESTIONS: ProfilingQuestion[] = [
   {
     dimension: 'communication_style',
     header: 'Communication Style',
-    context: 'Think about the last few times you asked Claude to build or change something. How did you frame the request?',
-    question: 'When you ask Claude to build something, how much context do you typically provide?',
+    context: 'Think about the last few times you asked OpenCode to build or change something. How did you frame the request?',
+    question: 'When you ask OpenCode to build something, how much context do you typically provide?',
     options: [
       { label: 'Minimal -- "fix the bug", "add dark mode", just say what\'s needed', value: 'a', rating: 'terse-direct' },
       { label: 'Some context -- explain what and why in a paragraph or two', value: 'b', rating: 'conversational' },
@@ -29,20 +29,20 @@ export const PROFILING_QUESTIONS: ProfilingQuestion[] = [
   {
     dimension: 'decision_speed',
     header: 'Decision Making',
-    context: 'Think about times when Claude presented you with multiple options -- like choosing a library, picking an architecture, or selecting an approach.',
-    question: 'When Claude presents you with options, how do you typically decide?',
+    context: 'Think about times when OpenCode presented you with multiple options -- like choosing a library, picking an architecture, or selecting an approach.',
+    question: 'When OpenCode presents you with options, how do you typically decide?',
     options: [
       { label: 'Pick quickly based on gut feeling or past experience', value: 'a', rating: 'fast-intuitive' },
       { label: 'Ask for a comparison table or pros/cons, then decide', value: 'b', rating: 'deliberate-informed' },
       { label: 'Research independently (read docs, check GitHub stars) before deciding', value: 'c', rating: 'research-first' },
-      { label: 'Let Claude recommend -- I generally trust the suggestion', value: 'd', rating: 'delegator' },
+      { label: 'Let OpenCode recommend -- I generally trust the suggestion', value: 'd', rating: 'delegator' },
     ],
   },
   {
     dimension: 'explanation_depth',
     header: 'Explanation Preferences',
-    context: 'Think about when Claude explains code it wrote or an approach it took. How much detail feels right?',
-    question: 'When Claude explains something, how much detail do you want?',
+    context: 'Think about when OpenCode explains code it wrote or an approach it took. How much detail feels right?',
+    question: 'When OpenCode explains something, how much detail do you want?',
     options: [
       { label: 'Just the code -- I\'ll read it and figure it out myself', value: 'a', rating: 'code-only' },
       { label: 'Brief explanation with the code -- a sentence or two about the approach', value: 'b', rating: 'concise' },
@@ -53,12 +53,12 @@ export const PROFILING_QUESTIONS: ProfilingQuestion[] = [
   {
     dimension: 'debugging_approach',
     header: 'Debugging Style',
-    context: 'Think about the last few times something broke in your code. How did you approach it with Claude?',
-    question: 'When something breaks, how do you typically approach debugging with Claude?',
+    context: 'Think about the last few times something broke in your code. How did you approach it with OpenCode?',
+    question: 'When something breaks, how do you typically approach debugging with OpenCode?',
     options: [
       { label: 'Paste the error and say "fix it" -- get it working fast', value: 'a', rating: 'fix-first' },
-      { label: 'Share the error plus context, ask Claude to diagnose what went wrong', value: 'b', rating: 'diagnostic' },
-      { label: 'Investigate myself first, then ask Claude about my specific theories', value: 'c', rating: 'hypothesis-driven' },
+      { label: 'Share the error plus context, ask OpenCode to diagnose what went wrong', value: 'b', rating: 'diagnostic' },
+      { label: 'Investigate myself first, then ask OpenCode about my specific theories', value: 'c', rating: 'hypothesis-driven' },
       { label: 'Walk through the code together step by step to understand the issue', value: 'd', rating: 'collaborative' },
     ],
   },
@@ -80,7 +80,7 @@ export const PROFILING_QUESTIONS: ProfilingQuestion[] = [
     context: 'Think about the last time you needed a library or service for a project. How did you go about choosing it?',
     question: 'When choosing libraries or services, what is your typical approach?',
     options: [
-      { label: 'Use whatever Claude suggests -- speed matters more than the perfect choice', value: 'a', rating: 'pragmatic-fast' },
+      { label: 'Use whatever OpenCode suggests -- speed matters more than the perfect choice', value: 'a', rating: 'pragmatic-fast' },
       { label: 'Prefer well-known, battle-tested options (React, PostgreSQL, Express)', value: 'b', rating: 'conservative' },
       { label: 'Research alternatives, read docs, compare benchmarks before committing', value: 'c', rating: 'thorough-evaluator' },
       { label: 'Strong opinions -- I already know what I like and I stick with it', value: 'd', rating: 'opinionated' },
@@ -104,9 +104,9 @@ export const PROFILING_QUESTIONS: ProfilingQuestion[] = [
     context: 'Think about encountering something new -- an unfamiliar library, a codebase you inherited, a concept you hadn\'t used before.',
     question: 'When you encounter something new in your codebase, how do you prefer to learn about it?',
     options: [
-      { label: 'Read the code directly -- I figure things out by reading and experimenting', value: 'a', rating: 'self-directed' },
-      { label: 'Ask Claude to explain the relevant parts to me', value: 'b', rating: 'guided' },
-      { label: 'Read official docs and tutorials first, then try things', value: 'c', rating: 'documentation-first' },
+      { label: 'read the code directly -- I figure things out by reading and experimenting', value: 'a', rating: 'self-directed' },
+      { label: 'Ask OpenCode to explain the relevant parts to me', value: 'b', rating: 'guided' },
+      { label: 'read official docs and tutorials first, then try things', value: 'c', rating: 'documentation-first' },
       { label: 'See a working example, then modify it to understand how it works', value: 'd', rating: 'example-driven' },
     ],
   },

@@ -38,7 +38,7 @@ import type {
   SDKStatusMessage,
   SDKCompactBoundaryMessage,
   SDKPartialAssistantMessage,
-} from '@anthropic-ai/claude-agent-sdk';
+} from '@anthropic-ai/OpenCode-agent-sdk';
 import type { UUID } from 'crypto';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -55,9 +55,9 @@ function makeSystemInit(): SDKSystemMessage {
     betas: [],
     claude_code_version: '1.0.0',
     cwd: '/test',
-    tools: ['Read', 'Write', 'Bash'],
+    tools: ['read', 'write', 'bash'],
     mcp_servers: [],
-    model: 'claude-sonnet-4-6',
+    model: 'OpenCode-sonnet-4-6',
     permissionMode: 'bypassPermissions',
     slash_commands: [],
     output_style: 'text',
@@ -75,7 +75,7 @@ function makeAssistantMsg(content: Array<{ type: string; [key: string]: unknown 
       id: 'msg-1',
       type: 'message',
       role: 'assistant',
-      model: 'claude-sonnet-4-6',
+      model: 'OpenCode-sonnet-4-6',
       stop_reason: 'end_turn',
       stop_sequence: null,
       usage: { input_tokens: 100, output_tokens: 50 },
@@ -94,7 +94,7 @@ function makeResultSuccess(costUsd = 0.05): SDKResultSuccess {
     duration_api_ms: 4000,
     is_error: false,
     num_turns: 3,
-    result: 'Task completed successfully',
+    result: 'task completed successfully',
     stop_reason: 'end_turn',
     total_cost_usd: costUsd,
     usage: { input_tokens: 1000, output_tokens: 500, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
@@ -128,7 +128,7 @@ function makeToolProgress(): SDKToolProgressMessage {
   return {
     type: 'tool_progress',
     tool_use_id: 'tu-1',
-    tool_name: 'Bash',
+    tool_name: 'bash',
     parent_tool_use_id: null,
     elapsed_time_seconds: 5.2,
     uuid: TEST_UUID,
@@ -165,7 +165,7 @@ function makeTaskProgress(): SDKTaskProgressMessage {
     task_id: 'task-1',
     description: 'Running tests',
     usage: { total_tokens: 500, tool_uses: 3, duration_ms: 2000 },
-    last_tool_name: 'Bash',
+    last_tool_name: 'bash',
     uuid: TEST_UUID,
     session_id: TEST_SESSION,
   } as SDKTaskProgressMessage;
@@ -250,8 +250,8 @@ describe('GSDEventStream', () => {
       expect(event!.type).toBe(GSDEventType.SessionInit);
 
       const init = event as GSDSessionInitEvent;
-      expect(init.model).toBe('claude-sonnet-4-6');
-      expect(init.tools).toEqual(['Read', 'Write', 'Bash']);
+      expect(init.model).toBe('OpenCode-sonnet-4-6');
+      expect(init.tools).toEqual(['read', 'write', 'bash']);
       expect(init.cwd).toBe('/test');
       expect(init.sessionId).toBe(TEST_SESSION);
     });
@@ -269,14 +269,14 @@ describe('GSDEventStream', () => {
 
     it('maps assistant tool_use blocks → ToolCall', () => {
       const msg = makeAssistantMsg([
-        { type: 'tool_use', id: 'tu-1', name: 'Read', input: { path: 'test.ts' } },
+        { type: 'tool_use', id: 'tu-1', name: 'read', input: { path: 'test.ts' } },
       ]);
       const event = stream.mapSDKMessage(msg);
       expect(event).not.toBeNull();
       expect(event!.type).toBe(GSDEventType.ToolCall);
 
       const tc = event as GSDToolCallEvent;
-      expect(tc.toolName).toBe('Read');
+      expect(tc.toolName).toBe('read');
       expect(tc.toolUseId).toBe('tu-1');
       expect(tc.input).toEqual({ path: 'test.ts' });
     });
@@ -287,7 +287,7 @@ describe('GSDEventStream', () => {
 
       const msg = makeAssistantMsg([
         { type: 'text', text: 'Let me check that.' },
-        { type: 'tool_use', id: 'tu-1', name: 'Read', input: { path: 'f.ts' } },
+        { type: 'tool_use', id: 'tu-1', name: 'read', input: { path: 'f.ts' } },
       ]);
 
       // mapAndEmit will emit the text event directly and return the tool_call
@@ -310,7 +310,7 @@ describe('GSDEventStream', () => {
       expect(complete.totalCostUsd).toBe(0.05);
       expect(complete.durationMs).toBe(5000);
       expect(complete.numTurns).toBe(3);
-      expect(complete.result).toBe('Task completed successfully');
+      expect(complete.result).toBe('task completed successfully');
     });
 
     it('maps SDKResultError → SessionError', () => {
@@ -330,7 +330,7 @@ describe('GSDEventStream', () => {
       expect(event!.type).toBe(GSDEventType.ToolProgress);
 
       const tp = event as GSDToolProgressEvent;
-      expect(tp.toolName).toBe('Bash');
+      expect(tp.toolName).toBe('bash');
       expect(tp.toolUseId).toBe('tu-1');
       expect(tp.elapsedSeconds).toBe(5.2);
     });
@@ -365,7 +365,7 @@ describe('GSDEventStream', () => {
       expect(tp.taskId).toBe('task-1');
       expect(tp.totalTokens).toBe(500);
       expect(tp.toolUses).toBe(3);
-      expect(tp.lastToolName).toBe('Bash');
+      expect(tp.lastToolName).toBe('bash');
     });
 
     it('maps SDKTaskNotificationMessage → TaskNotification', () => {

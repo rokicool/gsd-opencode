@@ -932,7 +932,7 @@ function formatRoadmapEvolutionEntry(opts: {
  * `## Accumulated Context` in STATE.md. Creates the subsection if missing.
  * Deduplicates on exact line match against existing entries.
  *
- * Canonical replacement for the raw `Edit`/`Write` instructions in
+ * Canonical replacement for the raw `edit`/`write` instructions in
  * `insert-phase.md` / `add-phase.md` step "update_project_state" so that
  * projects with a `protect-files.sh` PreToolUse hook blocking direct
  * STATE.md writes still update the Roadmap Evolution log.
@@ -1128,7 +1128,7 @@ export const statePlannedPhase: QueryHandler = async (args, projectDir, workstre
  * Query handler for `state.milestone-switch` — resets STATE.md for a new
  * milestone cycle (bug #2630 regression guard).
  *
- * The `/gsd:new-milestone` workflow only rewrote STATE.md's body (Current
+ * The `/gsd-new-milestone` workflow only rewrote STATE.md's body (Current
  * Position section). The YAML frontmatter (`milestone`, `milestone_name`,
  * `status`, `progress.*`) was never touched on a mid-flight switch, so queries
  * that read frontmatter (`state.json`, `getMilestoneInfo`, every handler that
@@ -1151,7 +1151,7 @@ export const statePlannedPhase: QueryHandler = async (args, projectDir, workstre
  *
  * Sibling CJS parity: `cmdInitNewMilestone` in `init.cjs` is read-only (like
  * the TS `initNewMilestone`). The workflow-level fix is to call
- * `state.milestone-switch` from `/gsd:new-milestone` Step 5 in place of the
+ * `state.milestone-switch` from `/gsd-new-milestone` Step 5 in place of the
  * manual body rewrite.
  */
 export const stateMilestoneSwitch: QueryHandler = async (args, projectDir, workstream) => {

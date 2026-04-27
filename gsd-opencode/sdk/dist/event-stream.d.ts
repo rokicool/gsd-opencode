@@ -7,7 +7,7 @@
  * - Per-session cost tracking with cumulative totals
  */
 import { EventEmitter } from 'node:events';
-import type { SDKMessage } from '@anthropic-ai/claude-agent-sdk';
+import type { SDKMessage } from '@anthropic-ai/OpenCode-agent-sdk';
 import { type GSDEvent, type TransportHandler, type PhaseType } from './types.js';
 export interface EventStreamContext {
     phase?: PhaseType;

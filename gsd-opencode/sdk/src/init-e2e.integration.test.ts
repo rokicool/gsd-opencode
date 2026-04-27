@@ -2,7 +2,7 @@
  * E2E integration test — proves InitRunner.run() drives real Agent SDK
  * sessions for the gsd-sdk init workflow.
  *
- * Requires Claude Code CLI (`claude`) installed and authenticated.
+ * Requires OpenCode CLI (`OpenCode`) installed and authenticated.
  * Skips gracefully if CLI is unavailable.
  *
  * This test proves the headless init pipeline can bootstrap a real project
@@ -28,7 +28,7 @@ import type { GSDEvent } from './types.js';
 
 let cliAvailable = false;
 try {
-  execSync('which claude', { stdio: 'ignore' });
+  execSync('which OpenCode', { stdio: 'ignore' });
   cliAvailable = true;
 } catch {
   cliAvailable = false;
@@ -90,7 +90,7 @@ describe.skipIf(!cliAvailable || !gsdToolsAvailable)('E2E: InitRunner.run() full
     expect(pipelineProgressed).toBe(true);
 
     // ── Assert: config.json artifact created ──
-    // config.json is written directly by InitRunner (not by Claude session)
+    // config.json is written directly by InitRunner (not by OpenCode session)
     // so it should always exist if the config step succeeded
     const configStep = result.steps.find(s => s.step === 'config');
     if (configStep?.success) {

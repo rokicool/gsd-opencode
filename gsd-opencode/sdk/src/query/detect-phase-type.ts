@@ -53,7 +53,7 @@ export const detectPhaseType: QueryHandler = async (args, projectDir, workstream
 
   const phaseNumForRoadmap = (pdata.phase_number as string) || phaseArg;
 
-  // Read ROADMAP heading — try both normalized forms
+  // read ROADMAP heading — try both normalized forms
   let heading = await roadmapHeadingForPhase(projectDir, phaseNumForRoadmap, workstream);
   if (!heading && phaseNumForRoadmap !== phaseArg) {
     heading = await roadmapHeadingForPhase(projectDir, phaseArg, workstream);

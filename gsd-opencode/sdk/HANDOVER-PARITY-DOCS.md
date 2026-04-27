@@ -11,7 +11,7 @@ Paste this document (or `@sdk/HANDOVER-PARITY-DOCS.md`) at the start of a new ch
 
 ## Parent tracking
 
-- **Issue:** [gsd-build/get-shit-done#2302](https://github.com/gsd-build/get-shit-done/issues/2302) — Phase 3 SDK query parity, registry, docs (parent umbrella #2007).
+- **Issue:** [gsd-build/get-shit-done#2302](https://github.com/rokicool/gsd-opencode/issues/2302) — Phase 3 SDK query parity, registry, docs (parent umbrella #2007).
 - **Acceptance criteria touched here:** parity coverage/exceptions documented; registry audit reflected in a **matrix** (issue wording: “every required CJS surface either has a handler or appears in the CJS-only matrix with justification”).
 
 ## Repo / branch

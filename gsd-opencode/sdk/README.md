@@ -50,4 +50,4 @@ If no native handler is registered for a command, the CLI can transparently shel
 | Variable | Purpose |
 |----------|---------|
 | `GSD_QUERY_FALLBACK` | `off` / `never` disables CLI fallback to `gsd-tools.cjs` for unknown commands |
-| `GSD_AGENTS_DIR` | Override directory scanned for installed GSD agents (`~/.claude/agents` by default) |
+| `GSD_AGENTS_DIR` | Override directory scanned for installed GSD agents (`$HOME/.config/opencode/agents` by default) |

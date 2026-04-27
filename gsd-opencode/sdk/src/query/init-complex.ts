@@ -119,7 +119,7 @@ export const initNewProject: QueryHandler = async (_args, projectDir, _workstrea
     '.r', '.R', '.zig', '.ex', '.exs', '.clj',
   ]);
   const skipDirs = new Set([
-    'node_modules', '.git', '.planning', '.claude', '.codex',
+    'node_modules', '.git', '.planning', '.OpenCode', '.codex',
     '__pycache__', 'target', 'dist', 'build',
   ]);
 
@@ -622,7 +622,7 @@ export const initManager: QueryHandler = async (_args, projectDir, _workstream) 
     }
   } catch { /* queued_phases is a non-critical enhancement */ }
 
-  // Read manager flags from config
+  // read manager flags from config
   const managerConfig = (config as Record<string, unknown>).manager as Record<string, Record<string, string>> | undefined;
   const sanitizeFlags = (raw: unknown): string => {
     const val = typeof raw === 'string' ? raw : '';

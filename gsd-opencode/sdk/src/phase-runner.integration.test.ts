@@ -2,7 +2,7 @@
  * Integration test — proves PhaseRunner state machine works against real gsd-tools.cjs.
  *
  * Creates a temp `.planning/` directory structure, instantiates real GSDTools,
- * and exercises the state machine. Sessions will fail (no Claude CLI in CI) but
+ * and exercises the state machine. Sessions will fail (no OpenCode CLI in CI) but
  * the state machine's control flow, event emission, and error capture are proven.
  */
 

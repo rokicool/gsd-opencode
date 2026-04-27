@@ -85,11 +85,11 @@ export const verifyPlanStructure: QueryHandler = async (args, projectDir) => {
     const hasVerify = /<verify>/.test(taskContent);
     const hasDone = /<done>/.test(taskContent);
 
-    if (!nameMatch) errors.push('Task missing <name> element');
-    if (!hasAction) errors.push(`Task '${taskName}' missing <action>`);
-    if (!hasVerify) warnings.push(`Task '${taskName}' missing <verify>`);
-    if (!hasDone) warnings.push(`Task '${taskName}' missing <done>`);
-    if (!hasFiles) warnings.push(`Task '${taskName}' missing <files>`);
+    if (!nameMatch) errors.push('task missing <name> element');
+    if (!hasAction) errors.push(`task '${taskName}' missing <action>`);
+    if (!hasVerify) warnings.push(`task '${taskName}' missing <verify>`);
+    if (!hasDone) warnings.push(`task '${taskName}' missing <done>`);
+    if (!hasFiles) warnings.push(`task '${taskName}' missing <files>`);
 
     tasks.push({ name: taskName, hasFiles, hasAction, hasVerify, hasDone });
   }
@@ -649,7 +649,7 @@ export const verifySchemaDrift: QueryHandler = async (args, projectDir, workstre
  *
  * Non-blocking by contract: every failure mode returns a successful response
  * with `{ skipped: true, reason }`. The post-execute drift gate in
- * `/gsd:execute-phase` relies on this guarantee.
+ * `/gsd-execute-phase` relies on this guarantee.
  *
  * Delegates to the Node-side implementation in `bin/lib/drift.cjs` and
  * `bin/lib/verify.cjs` via a child process so the drift logic stays in one

@@ -27,7 +27,7 @@ const MINIMAL_ROADMAP = `# Roadmap
 Plans:
 - [x] 09-01 (Foundation setup)
 
-### Phase 10: Read-Only Queries
+### Phase 10: read-Only Queries
 
 **Goal:** Port queries.
 **Requirements**: TBD
@@ -61,7 +61,7 @@ const ROADMAP_WITH_DETAILS = `# Roadmap
 **Requirements**: TBD
 **Plans:** 3 plans
 
-### Phase 10: Read-Only Queries
+### Phase 10: read-Only Queries
 
 **Goal:** Port queries.
 **Requirements**: TBD
@@ -82,7 +82,7 @@ status: executing
 
 ## Current Position
 
-Phase: 10 (Read-Only Queries) — EXECUTING
+Phase: 10 (read-Only Queries) — EXECUTING
 Plan: 2 of 3
 Status: Executing Phase 10
 
@@ -707,7 +707,7 @@ const ROADMAP_FOR_COMPLETE = `# Roadmap
 | 11.   | 0/2   | Not Started |  |
 
 - [x] Phase 9: Foundation (completed 2026-04-01)
-- [ ] Phase 10: Read-Only Queries
+- [ ] Phase 10: read-Only Queries
 - [ ] Phase 11: Final Phase
 
 ### Phase 9: Foundation
@@ -722,7 +722,7 @@ Plans:
 - [x] 09-02 (Foundation core)
 - [x] 09-03 (Foundation tests)
 
-### Phase 10: Read-Only Queries
+### Phase 10: read-Only Queries
 
 **Goal:** Port queries
 **Requirements**: QUERY-01
@@ -766,7 +766,7 @@ progress:
 
 ## Current Position
 
-Phase: 10 of 3 (Read-Only Queries) — EXECUTING
+Phase: 10 of 3 (read-Only Queries) — EXECUTING
 Plan: 3 of 3
 Status: Executing Phase 10
 Last activity: 2026-04-08

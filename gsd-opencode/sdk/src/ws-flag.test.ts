@@ -98,12 +98,12 @@ describe('parseCliArgs --ws flag', () => {
     const result = parseCliArgs([
       'run', 'build auth',
       '--ws', 'backend',
-      '--model', 'claude-sonnet-4-6',
+      '--model', 'OpenCode-sonnet-4-6',
       '--project-dir', '/tmp/test',
     ]);
 
     expect(result.ws).toBe('backend');
-    expect(result.model).toBe('claude-sonnet-4-6');
+    expect(result.model).toBe('OpenCode-sonnet-4-6');
     expect(result.projectDir).toBe('/tmp/test');
   });
 });

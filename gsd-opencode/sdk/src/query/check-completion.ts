@@ -77,7 +77,7 @@ async function checkPhaseCompletion(phaseArg: string, projectDir: string): Promi
       return !summaryIds.has(planId);
     });
 
-  // Read VERIFICATION.md and UAT.md if phase was found
+  // read VERIFICATION.md and UAT.md if phase was found
   let verificationContent: string | null = null;
   let uatContent: string | null = null;
 

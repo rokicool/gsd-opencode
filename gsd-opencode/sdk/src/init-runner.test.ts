@@ -80,9 +80,9 @@ function makeErrorResult(overrides: Partial<PlanResult> = {}): PlanResult {
 
 function makeProjectInfo(overrides: Partial<InitNewProjectInfo> = {}): InitNewProjectInfo {
   return {
-    researcher_model: 'claude-sonnet-4-6',
-    synthesizer_model: 'claude-sonnet-4-6',
-    roadmapper_model: 'claude-sonnet-4-6',
+    researcher_model: 'OpenCode-sonnet-4-6',
+    synthesizer_model: 'OpenCode-sonnet-4-6',
+    roadmapper_model: 'OpenCode-sonnet-4-6',
     commit_docs: false, // false for tests — no git operations
     project_exists: false,
     has_codebase_map: false,
@@ -532,7 +532,7 @@ describe('InitRunner', () => {
     }, {
       maxBudgetPerSession: 10.0,
       maxTurnsPerSession: 50,
-      orchestratorModel: 'claude-opus-4-6',
+      orchestratorModel: 'OpenCode-opus-4-6',
     });
 
     await runner.run('build a todo app');
@@ -547,7 +547,7 @@ describe('InitRunner', () => {
       return options?.model;
     });
     // When projectInfo model is undefined, ?? falls through to orchestratorModel
-    expect(modelsUsed.some(m => m === 'claude-opus-4-6')).toBe(true);
+    expect(modelsUsed.some(m => m === 'OpenCode-opus-4-6')).toBe(true);
   });
 
   // ─── Session count validation ────────────────────────────────────────────
@@ -572,7 +572,7 @@ describe('InitRunner', () => {
       await mkdir(join(sdkPromptsDir, 'templates', 'research-project'), { recursive: true });
       await mkdir(join(sdkPromptsDir, 'agents'), { recursive: true });
 
-      // Write headless templates (with known marker text for assertion)
+      // write headless templates (with known marker text for assertion)
       await writeFile(
         join(sdkPromptsDir, 'templates', 'project.md'),
         '# PROJECT Template\nSDK_HEADLESS_MARKER_PROJECT\n',
@@ -594,7 +594,7 @@ describe('InitRunner', () => {
         '# STACK Template\nSDK_HEADLESS_MARKER_STACK\n',
       );
 
-      // Write headless agents (with known marker text)
+      // write headless agents (with known marker text)
       await writeFile(
         join(sdkPromptsDir, 'agents', 'gsd-project-researcher.md'),
         '# Project Researcher Agent\nSDK_HEADLESS_MARKER_RESEARCHER\n',
@@ -681,7 +681,7 @@ describe('InitRunner', () => {
       await mkdir(join(emptySdkDir, 'templates', 'research-project'), { recursive: true });
       await mkdir(join(emptySdkDir, 'agents'), { recursive: true });
 
-      // Write templates so we get past buildProjectPrompt
+      // write templates so we get past buildProjectPrompt
       await writeFile(join(emptySdkDir, 'templates', 'project.md'), '# project\n');
       await writeFile(join(emptySdkDir, 'templates', 'research-project', 'STACK.md'), '# stack\n');
       await writeFile(join(emptySdkDir, 'templates', 'research-project', 'FEATURES.md'), '# features\n');
@@ -707,34 +707,34 @@ describe('InitRunner', () => {
       expect(researchPrompt).toContain('You are researching the');
     });
 
-    it('buildProjectPrompt output passes through sanitizePrompt (no /gsd: patterns)', async () => {
+    it('buildProjectPrompt output passes through sanitizePrompt (no /gsd- patterns)', async () => {
       const { runner } = createRunnerWithSdkPrompts();
       await runner.run('build a todo app');
 
       const projectPrompt = mockRunSession.mock.calls[0]![0] as string;
-      // sanitizePrompt should strip any /gsd: patterns from the assembled prompt
-      expect(projectPrompt).not.toMatch(/\/gsd:\S+/);
+      // sanitizePrompt should strip any /gsd- patterns from the assembled prompt
+      expect(projectPrompt).not.toMatch(/\/gsd-\S+/);
       expect(projectPrompt).toContain('PROJECT.md');
     });
 
-    it('buildResearchPrompt output passes through sanitizePrompt (no /gsd: patterns)', async () => {
+    it('buildResearchPrompt output passes through sanitizePrompt (no /gsd- patterns)', async () => {
       const { runner } = createRunnerWithSdkPrompts();
       await runner.run('build a todo app');
 
       const researchPrompt = mockRunSession.mock.calls[1]![0] as string;
-      // sanitizePrompt should strip any /gsd: patterns from the assembled prompt
-      expect(researchPrompt).not.toMatch(/\/gsd:\S+/);
+      // sanitizePrompt should strip any /gsd- patterns from the assembled prompt
+      expect(researchPrompt).not.toMatch(/\/gsd-\S+/);
       expect(researchPrompt).toContain('You are researching the');
     });
 
-    it('buildRoadmapPrompt output passes through sanitizePrompt (no /gsd: patterns)', async () => {
+    it('buildRoadmapPrompt output passes through sanitizePrompt (no /gsd- patterns)', async () => {
       const { runner } = createRunnerWithSdkPrompts();
       await runner.run('build a todo app');
 
       // Roadmap prompt is the last session call (index 7)
       const roadmapPrompt = mockRunSession.mock.calls[7]![0] as string;
-      // sanitizePrompt should strip any /gsd: patterns from the assembled prompt
-      expect(roadmapPrompt).not.toMatch(/\/gsd:\S+/);
+      // sanitizePrompt should strip any /gsd- patterns from the assembled prompt
+      expect(roadmapPrompt).not.toMatch(/\/gsd-\S+/);
     });
   });
 });

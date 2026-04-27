@@ -4,7 +4,7 @@ Paste this document (or `@sdk/HANDOVER-QUERY-LAYER.md`) at the start of a new se
 
 ## Parent tracking
 
-- **Issue:** [gsd-build/get-shit-done#2302](https://github.com/gsd-build/get-shit-done/issues/2302) — Phase 3 SDK query parity, registry, docs (umbrella #2007).
+- **Issue:** [gsd-build/get-shit-done#2302](https://github.com/rokicool/gsd-opencode/issues/2302) — Phase 3 SDK query parity, registry, docs (umbrella #2007).
 - **Workspace:** `D:\Repos\get-shit-done` (PBR backport). **Upstream:** `gsd-build/get-shit-done`. Confirm branch with `git branch` (typical: `feat/sdk-phase3-query-layer`).
 
 ### Scope anchors (do not confuse issues)
@@ -12,9 +12,9 @@ Paste this document (or `@sdk/HANDOVER-QUERY-LAYER.md`) at the start of a new se
 
 | Role                                    | GitHub                                                                                 | Notes                                                                                                                                                                                                                                       |
 | --------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Product / requirements anchor**       | [#2007](https://github.com/gsd-build/get-shit-done/issues/2007)                        | Problem statement, user stories, and target architecture for the SDK-first migration. **Do not** treat its original acceptance-checklist boxes as proof of what is merged upstream; work was split into phased PRs after maintainer review. |
-| **Phase 3 execution scope**             | [#2302](https://github.com/gsd-build/get-shit-done/issues/2302) **+ this handover**    | What this branch is actually doing now: registry/CLI parity, docs, harness gaps, runner alignment follow-ups as listed below.                                                                                                               |
-| **Patch mine (if local tree is short)** | [PR #2008](https://github.com/gsd-build/get-shit-done/pull/2008) and matching branches | Large pre-phasing PR; cherry-pick or compare when something looks missing vs that line of work.                                                                                                                                             |
+| **Product / requirements anchor**       | [#2007](https://github.com/rokicool/gsd-opencode/issues/2007)                        | Problem statement, user stories, and target architecture for the SDK-first migration. **Do not** treat its original acceptance-checklist boxes as proof of what is merged upstream; work was split into phased PRs after maintainer review. |
+| **Phase 3 execution scope**             | [#2302](https://github.com/rokicool/gsd-opencode/issues/2302) **+ this handover**    | What this branch is actually doing now: registry/CLI parity, docs, harness gaps, runner alignment follow-ups as listed below.                                                                                                               |
+| **patch mine (if local tree is short)** | [PR #2008](https://github.com/rokicool/gsd-opencode/pull/2008) and matching branches | Large pre-phasing PR; cherry-pick or compare when something looks missing vs that line of work.                                                                                                                                             |
 
 
 ---
@@ -46,7 +46,7 @@ Paste this document (or `@sdk/HANDOVER-QUERY-LAYER.md`) at the start of a new se
 Previously `state.json` and `state.load` were easy to confuse: CJS has two different commands — `cmdStateJson` (`state json`, rebuilt frontmatter) vs `cmdStateLoad` (`state load`, `loadConfig` + `state_raw` + existence flags).
 
 - `stateJson` — `sdk/src/query/state.ts`; registry key `state.json`.
-- `stateProjectLoad` — `sdk/src/query/state-project-load.ts`; registry key `state.load`. Uses `createRequire` to call `core.cjs` `loadConfig(projectDir)` from the same resolution paths as a normal install (bundled monorepo path, `projectDir/.claude/get-shit-done/...`, `~/.claude/get-shit-done/...`). `GSDTools.stateLoad()` and `formatRegistryRawStdout` for `--raw` no longer force a subprocess solely for this command.
+- `stateProjectLoad` — `sdk/src/query/state-project-load.ts`; registry key `state.load`. Uses `createRequire` to call `core.cjs` `loadConfig(projectDir)` from the same resolution paths as a normal install (bundled monorepo path, `projectDir/.OpenCode/get-shit-done/...`, `$HOME/.config/opencode/get-shit-done/...`). `GSDTools.stateLoad()` and `formatRegistryRawStdout` for `--raw` no longer force a subprocess solely for this command.
 - **Risk:** If `core.cjs` is absent (e.g. some `@gsd-build/sdk`-only layouts), `state.load` throws `GSDError` — document; future option is a TS `loadConfig` port or bundling.
 - **Goldens:** `read-only-parity.integration.test.ts` — one block compares `state.json` to `state json` (strip `last_updated`); another compares `state.load` to `state load` (full `toEqual`). `read-only-golden-rows.ts` `readOnlyGoldenCanonicals()` includes both `state.json` and `state.load`.
 

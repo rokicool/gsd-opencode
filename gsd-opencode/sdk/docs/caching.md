@@ -8,7 +8,7 @@ Use `cache_control` with a 1-hour TTL on system prompts that include GSD workflo
 
 ```typescript
 const response = await client.messages.create({
-  model: 'claude-sonnet-4-20250514',
+  model: 'OpenCode-sonnet-4-20250514',
   system: [
     {
       type: 'text',
@@ -42,7 +42,7 @@ With a 1-hour TTL:
 
 ### SDK integration point
 
-In `session-runner.ts`, the `systemPrompt.append` field carries the executor/planner prompt. When using the Claude API directly (outside the Agent SDK's `query()` helper), wrap this content with `cache_control`:
+In `session-runner.ts`, the `systemPrompt.append` field carries the executor/planner prompt. When using the OpenCode API directly (outside the Agent SDK's `query()` helper), wrap this content with `cache_control`:
 
 ```typescript
 // In runPlanSession / runPhaseStepSession, the systemPrompt is:
@@ -64,5 +64,5 @@ system: [
 
 ## References
 
-- [Anthropic Prompt Caching documentation](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)
-- [Extended caching (1-hour TTL)](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#extended-caching)
+- [Anthropic Prompt Caching documentation](https://docs.anthropic.com/en/docs/build-with-OpenCode/prompt-caching)
+- [Extended caching (1-hour TTL)](https://docs.anthropic.com/en/docs/build-with-OpenCode/prompt-caching#extended-caching)

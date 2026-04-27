@@ -11,13 +11,13 @@
  *   - **D-01:** Decision text
  *   - **D-02 [tag1, tag2]:** Tagged decision
  *
- *   ### Claude's Discretion
+ *   ### OpenCode's Discretion
  *   - free-form, never tracked
  *   </decisions>
  *
  * A decision is "trackable" when:
  *   - it has a valid D-NN id
- *   - it is NOT under the "Claude's Discretion" category
+ *   - it is NOT under the "OpenCode's Discretion" category
  *   - it is NOT tagged `informational` or `folded`
  *
  * Trackable decisions are the ones the plan-phase translation gate and the
@@ -26,9 +26,9 @@
 import { readFile } from 'node:fs/promises';
 import { isAbsolute, join } from 'node:path';
 const DISCRETION_HEADINGS = new Set([
-    "claude's discretion",
+    "OpenCode's discretion",
     'claudes discretion',
-    'claude discretion',
+    'OpenCode discretion',
 ]);
 const NON_TRACKABLE_TAGS = new Set(['informational', 'folded', 'deferred']);
 /**
@@ -87,7 +87,7 @@ export function parseDecisions(content) {
         if (headingMatch) {
             flush();
             category = headingMatch[1];
-            // Strip the full unicode-quote family so any rendering of "Claude's
+            // Strip the full unicode-quote family so any rendering of "OpenCode's
             // Discretion" (ASCII apostrophe, curly U+2019, U+2018, U+201A, U+201B,
             // double-quote variants U+201C/D/E/F, etc.) collapses to the same key
             // (review F20).

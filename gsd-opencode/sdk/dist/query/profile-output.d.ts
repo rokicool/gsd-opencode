@@ -1,5 +1,5 @@
 /**
- * Profile output handlers — USER-PROFILE.md, dev-preferences, CLAUDE.md sections.
+ * Profile output handlers — USER-PROFILE.md, dev-preferences, AGENTS.md sections.
  * Ported from `get-shit-done/bin/lib/profile-output.cjs` (`cmdWriteProfile`,
  * `cmdGenerateDevPreferences`, `cmdGenerateClaudeProfile`, `cmdGenerateClaudeMd`).
  */

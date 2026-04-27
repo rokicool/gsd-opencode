@@ -37,8 +37,8 @@ Output: User model, API endpoints, and UI components.
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/execute-plan.md
-@~/.claude/get-shit-done/templates/summary.md
+@$HOME/.config/opencode/get-shit-done/workflows/execute-plan.md
+@$HOME/.config/opencode/get-shit-done/templates/summary.md
 </execution_context>
 
 <context>
@@ -53,7 +53,7 @@ Output: User model, API endpoints, and UI components.
 <tasks>
 
 <task type="auto">
-  <name>Task 1: Create User model</name>
+  <name>task 1: Create User model</name>
   <files>src/models/user.ts</files>
   <read_first>src/existing/types.ts, src/config/db.ts</read_first>
   <action>Define User type with id, email, name, createdAt. Export TypeScript interface.</action>
@@ -66,7 +66,7 @@ Output: User model, API endpoints, and UI components.
 </task>
 
 <task type="auto">
-  <name>Task 2: Create User API endpoints</name>
+  <name>task 2: Create User API endpoints</name>
   <files>src/api/users.ts, src/api/middleware.ts</files>
   <action>GET /users (list), GET /users/:id (single), POST /users (create). Use User type from model.</action>
   <verify>fetch tests pass for all endpoints</verify>
@@ -303,7 +303,7 @@ describe('parsePlan — XML tasks', () => {
 
     const task1 = result.tasks[0];
     expect(task1.type).toBe('auto');
-    expect(task1.name).toBe('Task 1: Create User model');
+    expect(task1.name).toBe('task 1: Create User model');
     expect(task1.files).toEqual(['src/models/user.ts']);
     expect(task1.read_first).toEqual(['src/existing/types.ts', 'src/config/db.ts']);
     expect(task1.action).toBe(
@@ -337,7 +337,7 @@ describe('parsePlan — XML tasks', () => {
   it('handles missing optional elements', () => {
     const result = parsePlan(FULL_PLAN);
     const task2 = result.tasks[1];
-    // Task 2 has no read_first or acceptance_criteria
+    // task 2 has no read_first or acceptance_criteria
     expect(task2.read_first).toEqual([]);
     expect(task2.acceptance_criteria).toEqual([]);
   });
@@ -370,8 +370,8 @@ describe('parsePlan — sections', () => {
   it('extracts execution_context references', () => {
     const result = parsePlan(FULL_PLAN);
     expect(result.execution_context).toEqual([
-      '~/.claude/get-shit-done/workflows/execute-plan.md',
-      '~/.claude/get-shit-done/templates/summary.md',
+      '$HOME/.config/opencode/get-shit-done/workflows/execute-plan.md',
+      '$HOME/.config/opencode/get-shit-done/templates/summary.md',
     ]);
   });
 

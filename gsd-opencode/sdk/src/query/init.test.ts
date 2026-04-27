@@ -72,7 +72,7 @@ beforeEach(async () => {
     '',
     '**Goal:** Build foundation',
     '',
-    '### Phase 10: Read-Only Queries',
+    '### Phase 10: read-Only Queries',
     '',
     '**Goal:** Implement queries',
     '',
@@ -119,8 +119,8 @@ describe('withProjectRoot', () => {
   });
 
   // Regression: #2400 — checkAgentsInstalled was looking at the wrong default
-  // directory (~/.claude/get-shit-done/agents) while the installer writes to
-  // ~/.claude/agents, causing agents_installed: false even on clean installs.
+  // directory ($HOME/.config/opencode/get-shit-done/agents) while the installer writes to
+  // $HOME/.config/opencode/agents, causing agents_installed: false even on clean installs.
   it('reports agents_installed: true when all expected agents exist in GSD_AGENTS_DIR', async () => {
     const { MODEL_PROFILES } = await import('./config-query.js');
     const agentsDir = join(tmpDir, 'fake-agents');
@@ -156,11 +156,11 @@ describe('withProjectRoot', () => {
   });
 
   // Regression: #2400 follow-up — installer honors CLAUDE_CONFIG_DIR for custom
-  // Claude install roots. The SDK check must follow the same precedence or it
+  // OpenCode install roots. The SDK check must follow the same precedence or it
   // false-negatives agent presence on non-default installs.
   it('honors CLAUDE_CONFIG_DIR when GSD_AGENTS_DIR is unset', async () => {
     const { MODEL_PROFILES } = await import('./config-query.js');
-    const configDir = join(tmpDir, 'custom-claude');
+    const configDir = join(tmpDir, 'custom-OpenCode');
     const agentsDir = join(configDir, 'agents');
     await mkdir(agentsDir, { recursive: true });
     for (const name of Object.keys(MODEL_PROFILES)) {
@@ -183,7 +183,7 @@ describe('withProjectRoot', () => {
   });
 
   // #2402 — runtime-aware resolution: GSD_RUNTIME selects which runtime's
-  // config-dir env chain to consult, so non-Claude installs stop
+  // config-dir env chain to consult, so non-OpenCode installs stop
   // false-negating.
   it('GSD_RUNTIME=codex resolves agents under CODEX_HOME/agents', async () => {
     const { MODEL_PROFILES } = await import('./config-query.js');
@@ -268,13 +268,13 @@ describe('withProjectRoot', () => {
     }
   });
 
-  it('unknown GSD_RUNTIME falls through to config/Claude default', () => {
+  it('unknown GSD_RUNTIME falls through to config/OpenCode default', () => {
     const prevAgents = process.env.GSD_AGENTS_DIR;
     const prevRuntime = process.env.GSD_RUNTIME;
     delete process.env.GSD_AGENTS_DIR;
     process.env.GSD_RUNTIME = 'not-a-runtime';
     try {
-      // Should not throw; falls back to Claude — missing_agents on a blank tmpDir.
+      // Should not throw; falls back to OpenCode — missing_agents on a blank tmpDir.
       const enriched = withProjectRoot(tmpDir, {}) as Record<string, unknown>;
       expect(typeof enriched.agents_installed).toBe('boolean');
     } finally {

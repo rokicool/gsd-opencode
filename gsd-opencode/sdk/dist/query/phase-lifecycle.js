@@ -1413,7 +1413,7 @@ export const milestoneComplete = async (args, projectDir, workstream) => {
                     }
                     else {
                         const xmlTaskMatches = content.match(/<task[\s>]/gi) || [];
-                        const mdTaskMatches = content.match(/##\s*Task\s*\d+/gi) || [];
+                        const mdTaskMatches = content.match(/##\s*task\s*\d+/gi) || [];
                         totalTasks += xmlTaskMatches.length || mdTaskMatches.length;
                     }
                 }

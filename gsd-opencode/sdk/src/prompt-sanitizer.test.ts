@@ -38,7 +38,7 @@ describe('sanitizePrompt', () => {
         '@file:simple.md',
         '@file:./relative/path.md',
         '@file:/absolute/path/to/file.md',
-        '@file:~/.claude/get-shit-done/workflows/execute-plan.md',
+        '@file:$HOME/.config/opencode/get-shit-done/workflows/execute-plan.md',
       ].join('\n');
       expect(sanitizePrompt(input)).toBe('');
     });
@@ -64,62 +64,62 @@ describe('sanitizePrompt', () => {
       expect(sanitizePrompt(input)).toBe('');
     });
 
-    it('strips legacy /gsd: slash commands for backward compatibility', () => {
-      const input = 'Before\nRun /gsd:execute-plan to proceed\nAfter';
+    it('strips legacy /gsd- slash commands for backward compatibility', () => {
+      const input = 'Before\nRun /gsd-execute-plan to proceed\nAfter';
       const result = sanitizePrompt(input);
-      expect(result).not.toContain('/gsd:');
+      expect(result).not.toContain('/gsd-');
       expect(result).toContain('Before');
       expect(result).toContain('After');
     });
 
-    it('strips various legacy /gsd: command formats', () => {
+    it('strips various legacy /gsd- command formats', () => {
       const input = [
-        'Use /gsd:research-phase',
-        'Then /gsd:plan-phase --auto',
-        'Finally /gsd:verify-phase',
+        'Use /gsd-research-phase',
+        'Then /gsd-plan-phase --auto',
+        'Finally /gsd-verify-phase',
       ].join('\n');
       expect(sanitizePrompt(input)).toBe('');
     });
   });
 
-  // ─── AskUserQuestion() calls ─────────────────────────────────────────────
+  // ─── question() calls ─────────────────────────────────────────────
 
-  describe('AskUserQuestion() calls', () => {
-    it('strips AskUserQuestion lines', () => {
+  describe('question() calls', () => {
+    it('strips question lines', () => {
       const input = 'Before\nAskUserQuestion("What should we do?")\nAfter';
       const result = sanitizePrompt(input);
-      expect(result).not.toContain('AskUserQuestion');
+      expect(result).not.toContain('question');
       expect(result).toContain('Before');
       expect(result).toContain('After');
     });
 
-    it('strips AskUserQuestion with various argument styles', () => {
+    it('strips question with various argument styles', () => {
       const input = [
-        'AskUserQuestion("simple")',
-        'AskUserQuestion( "with spaces" )',
-        '  AskUserQuestion("indented")',
-        'Use AskUserQuestion("inline") here',
+        'question("simple")',
+        'question( "with spaces" )',
+        '  question("indented")',
+        'Use question("inline") here',
       ].join('\n');
       expect(sanitizePrompt(input)).toBe('');
     });
   });
 
-  // ─── SlashCommand() calls ────────────────────────────────────────────────
+  // ─── command() calls ────────────────────────────────────────────────
 
-  describe('SlashCommand() calls', () => {
-    it('strips SlashCommand lines', () => {
-      const input = 'Before\nSlashCommand("/gsd:execute")\nAfter';
+  describe('command() calls', () => {
+    it('strips command lines', () => {
+      const input = 'Before\nSlashCommand("/gsd-execute")\nAfter';
       const result = sanitizePrompt(input);
-      expect(result).not.toContain('SlashCommand');
+      expect(result).not.toContain('command');
       expect(result).toContain('Before');
       expect(result).toContain('After');
     });
 
-    it('strips SlashCommand with various forms', () => {
+    it('strips command with various forms', () => {
       const input = [
-        'SlashCommand("proceed")',
-        'SlashCommand( "next" )',
-        '  SlashCommand("indented")',
+        'command("proceed")',
+        'command( "next" )',
+        '  command("indented")',
       ].join('\n');
       expect(sanitizePrompt(input)).toBe('');
     });
@@ -209,11 +209,11 @@ describe('sanitizePrompt', () => {
         '',
         'When done, run /gsd-plan-phase to proceed.',
         '',
-        'If unclear, AskUserQuestion("What should I focus on?")',
+        'If unclear, question("What should I focus on?")',
         '',
         'STOP and wait for user input.',
         '',
-        'Use SlashCommand("next") to continue.',
+        'Use command("next") to continue.',
         '',
         'Wait for user confirmation before executing.',
         '',
@@ -223,9 +223,9 @@ describe('sanitizePrompt', () => {
       const result = sanitizePrompt(input);
       expect(result).not.toContain('@file:');
       expect(result).not.toContain('/gsd-');
-      expect(result).not.toContain('/gsd:');
-      expect(result).not.toContain('AskUserQuestion');
-      expect(result).not.toContain('SlashCommand');
+      expect(result).not.toContain('/gsd-');
+      expect(result).not.toContain('question');
+      expect(result).not.toContain('command');
       expect(result).not.toMatch(/\bSTOP\b/);
       expect(result).not.toMatch(/wait for user/i);
       expect(result).toContain('## Research Phase');
@@ -249,7 +249,7 @@ describe('sanitizePrompt', () => {
       const input = [
         'Before',
         '',
-        'AskUserQuestion("something")',
+        'question("something")',
         '',
         'After',
       ].join('\n');

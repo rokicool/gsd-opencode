@@ -364,7 +364,7 @@ async function writeEnvFile(targetDir, scope) {
 # This file should be sourced before running GSD tools or SDK
 
 # Override directory scanned for installed GSD agents
-# Default is ~/.claude/agents; this points to gsd-opencode agents
+# Default is $HOME/.config/opencode/agents; this points to gsd-opencode agents
 GSD_AGENTS_DIR=${agentsDir}
 `;
 
@@ -662,7 +662,7 @@ export async function installCommand(options = {}) {
     // Step 7: Install and build SDK from bundled source
     const sdkBuilt = await installSdk(targetDir);
 
-    // Step 8: Write .env file with GSD_AGENTS_DIR for SDK integration
+    // Step 8: write .env file with GSD_AGENTS_DIR for SDK integration
     await writeEnvFile(targetDir, scope);
 
     // Step 9: Create VERSION file

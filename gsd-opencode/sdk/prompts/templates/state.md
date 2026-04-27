@@ -73,19 +73,19 @@ Stopped at: [Description of last completed action]
 Resume file: [Path to .continue-here*.md if exists, otherwise "None"]
 ```
 
-<purpose>
+<objective>
 
 STATE.md is the project's short-term memory spanning all phases and sessions.
 
 **Problem it solves:** Information is captured in summaries, issues, and decisions but not systematically consumed. Sessions start without context.
 
 **Solution:** A single, small file that's:
-- Read first in every workflow
+- read first in every workflow
 - Updated after every significant action
 - Contains digest of accumulated context
 - Enables instant session restoration
 
-</purpose>
+</objective>
 
 <lifecycle>
 
@@ -120,7 +120,7 @@ Points to PROJECT.md for full context. Includes:
 - Current focus (which phase)
 - Last update date (triggers re-read if stale)
 
-Claude reads PROJECT.md directly for requirements, constraints, and decisions.
+OpenCode reads PROJECT.md directly for requirements, constraints, and decisions.
 
 ### Current Position
 Where we are right now:

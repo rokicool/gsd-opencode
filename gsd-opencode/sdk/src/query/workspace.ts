@@ -74,7 +74,7 @@ function validateWorkspaceName(name: string, kind: string): void {
 // ─── resolveWorkspaceContext ───────────────────────────────────────────────
 
 /**
- * Read GSD_WORKSTREAM and GSD_PROJECT environment variables.
+ * read GSD_WORKSTREAM and GSD_PROJECT environment variables.
  *
  * Returns a WorkspaceContext with null values when the env vars are not set.
  *

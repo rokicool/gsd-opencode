@@ -47,7 +47,7 @@ const STATE = [
 ].join('\n');
 
 /**
- * Write a ROADMAP.md with the given phase list. Each entry is
+ * write a ROADMAP.md with the given phase list. Each entry is
  * `{num, name, checked}`. Emits both the checkbox summary lines AND the
  * `### Phase N:` heading sections (so initManager picks them up).
  */

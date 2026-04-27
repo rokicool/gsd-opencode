@@ -55,7 +55,7 @@ beforeEach(async () => {
     '',
     '**Depends on:** None',
     '',
-    '### Phase 10: Read-Only Queries',
+    '### Phase 10: read-Only Queries',
     '',
     '**Goal:** Implement queries',
     '',

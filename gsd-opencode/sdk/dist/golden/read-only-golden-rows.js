@@ -1,5 +1,5 @@
 /**
- * Read-only subprocess golden rows: SDK `registry.dispatch` vs `gsd-tools.cjs` JSON on stdout.
+ * read-only subprocess golden rows: SDK `registry.dispatch` vs `gsd-tools.cjs` JSON on stdout.
  * Imported by `read-only-parity.integration.test.ts` and `golden-policy.ts` coverage accounting.
  */
 /** Repo-relative fixtures (cwd = get-shit-done repo root). */

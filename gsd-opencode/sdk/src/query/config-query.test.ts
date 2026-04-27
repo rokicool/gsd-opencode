@@ -95,7 +95,7 @@ describe('configGet', () => {
 
   it('reads raw config without merging defaults', async () => {
     const { configGet } = await import('./config-query.js');
-    // Write config with only model_profile -- no workflow section
+    // write config with only model_profile -- no workflow section
     await writeFile(
       join(tmpDir, '.planning', 'config.json'),
       JSON.stringify({ model_profile: 'balanced' }),
@@ -175,7 +175,7 @@ describe('MODEL_PROFILES', () => {
     expect(Object.keys(MODEL_PROFILES)).toHaveLength(18);
   });
 
-  it('has quality/balanced/budget/adaptive for each agent', async () => {
+  it('has simple/smart/genius/adaptive for each agent', async () => {
     const { MODEL_PROFILES } = await import('./config-query.js');
     for (const agent of Object.keys(MODEL_PROFILES)) {
       expect(MODEL_PROFILES[agent]).toHaveProperty('quality');

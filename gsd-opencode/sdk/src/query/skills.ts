@@ -1,6 +1,6 @@
 /**
  * Agent skills query handler — read configured skills from `.planning/config.json`
- * and emit the `<agent_skills>` XML block workflows interpolate into Task() prompts.
+ * and emit the `<agent_skills>` XML block workflows interpolate into task() prompts.
  *
  * Ports `buildAgentSkillsBlock` semantics from
  * `get-shit-done/bin/lib/init.cjs` so the SDK path honors
@@ -11,9 +11,9 @@
  * ```typescript
  * import { agentSkills } from './skills.js';
  *
- * // With config.agent_skills = { "gsd-planner": [".claude/skills/demo-skill"] }
+ * // With config.agent_skills = { "gsd-planner": [".OpenCode/skills/demo-skill"] }
  * await agentSkills(['gsd-planner'], '/project');
- * // { data: '<agent_skills>\nRead these user-configured skills:\n- @.claude/skills/demo-skill/SKILL.md\n</agent_skills>' }
+ * // { data: '<agent_skills>\nRead these user-configured skills:\n- @.OpenCode/skills/demo-skill/SKILL.md\n</agent_skills>' }
  *
  * // No agent type → empty string (matches gsd-tools cmdAgentSkills).
  * await agentSkills([], '/project');
@@ -76,13 +76,13 @@ export const agentSkills: QueryHandler = async (args, projectDir) => {
   }
   if (skillPaths.length === 0) return { data: '' };
 
-  const globalSkillsBase = join(homedir(), '.claude', 'skills');
+  const globalSkillsBase = join(homedir(), '.OpenCode', 'skills');
   const validEntries: Array<{ ref: string }> = [];
 
   for (const entry of skillPaths) {
     if (typeof entry !== 'string') continue;
 
-    // `global:<name>` — skill installed under ~/.claude/skills/<name>/ (#1992).
+    // `global:<name>` — skill installed under $HOME/.config/opencode/skills/<name>/ (#1992).
     if (entry.startsWith('global:')) {
       const skillName = entry.slice(7);
       if (!skillName) {
@@ -96,14 +96,14 @@ export const agentSkills: QueryHandler = async (args, projectDir) => {
       const skillDir = join(globalSkillsBase, skillName);
       const skillMd = join(skillDir, 'SKILL.md');
       if (!existsSync(skillMd)) {
-        process.stderr.write(`[agent-skills] WARNING: Global skill not found at "~/.claude/skills/${skillName}/SKILL.md" — skipping\n`);
+        process.stderr.write(`[agent-skills] WARNING: Global skill not found at "$HOME/.config/opencode/skills/${skillName}/SKILL.md" — skipping\n`);
         continue;
       }
       if (resolveWithinBase(skillMd, globalSkillsBase) === null) {
         process.stderr.write(`[agent-skills] WARNING: Global skill "${skillName}" failed path check (symlink escape?) — skipping\n`);
         continue;
       }
-      validEntries.push({ ref: `~/.claude/skills/${skillName}/SKILL.md` });
+      validEntries.push({ ref: `$HOME/.config/opencode/skills/${skillName}/SKILL.md` });
       continue;
     }
 
@@ -114,7 +114,7 @@ export const agentSkills: QueryHandler = async (args, projectDir) => {
     }
     const skillMd = join(projectDir, entry, 'SKILL.md');
     if (!existsSync(skillMd)) {
-      process.stderr.write(`[agent-skills] WARNING: Skill not found at "${entry}/SKILL.md" — skipping\n`);
+      process.stderr.write(`[agent-skills] WARNING: skill not found at "${entry}/SKILL.md" — skipping\n`);
       continue;
     }
     validEntries.push({ ref: `${entry}/SKILL.md` });

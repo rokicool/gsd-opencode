@@ -113,9 +113,9 @@ export async function runExtractMessages(
 ): Promise<ExtractMessagesResult> {
   const sessionsDir = getScanSessionsRoot(overridePath);
   if (!sessionsDir) {
-    const searchedPath = overridePath || '~/.claude/projects';
+    const searchedPath = overridePath || '$HOME/.config/opencode/projects';
     throw new GSDError(
-      `No Claude Code sessions found at ${searchedPath}.${overridePath ? '' : ' Is Claude Code installed?'}`,
+      `No OpenCode sessions found at ${searchedPath}.${overridePath ? '' : ' Is OpenCode installed?'}`,
       ErrorClassification.Validation,
     );
   }

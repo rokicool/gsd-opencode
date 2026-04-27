@@ -7,7 +7,7 @@
  * against a temporary directory clone of .planning/ instead of the real
  * project, and the before/after diff is returned without writing to disk.
  *
- * Read commands are always executed normally — they are side-effect-free.
+ * read commands are always executed normally — they are side-effect-free.
  *
  * @example
  * ```typescript
@@ -69,7 +69,7 @@ async function copyPlanningTree(sourceDir, destDir) {
     }
 }
 /**
- * Read all files from .planning/ in a directory into a map of relPath → content.
+ * read all files from .planning/ in a directory into a map of relPath → content.
  */
 async function readPlanningState(projectDir) {
     const planningDir = join(projectDir, '.planning');

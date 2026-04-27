@@ -60,7 +60,13 @@ function makePlan(overrides: Partial<ParsedPlan> = {}): ParsedPlan {
 const SAMPLE_AGENT_DEF = `---
 name: gsd-executor
 description: Executes GSD plans
-tools: Read, Write, Edit, Bash, Grep, Glob
+tools:
+  read: true
+  write: true
+  edit: true
+  bash: true
+  grep: true
+  glob: true
 permissionMode: acceptEdits
 ---
 
@@ -77,7 +83,7 @@ Some flow content
 describe('parseAgentTools', () => {
   it('extracts tools from agent definition frontmatter', () => {
     const tools = parseAgentTools(SAMPLE_AGENT_DEF);
-    expect(tools).toEqual(['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob']);
+    expect(tools).toEqual(['read', 'write', 'edit', 'bash', 'grep', 'glob']);
   });
 
   it('returns defaults when no frontmatter found', () => {
@@ -197,7 +203,7 @@ describe('buildExecutorPrompt', () => {
     const prompt = buildExecutorPrompt(plan);
     expect(prompt).toContain('@src/config.ts');
     expect(prompt).toContain('@docs/architecture.md');
-    expect(prompt).toContain('Read these files for context');
+    expect(prompt).toContain('read these files for context');
   });
 
   it('omits context section when no refs', () => {

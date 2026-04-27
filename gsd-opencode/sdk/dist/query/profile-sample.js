@@ -13,8 +13,8 @@ import { isGenuineUserMessage, streamExtractMessages, truncateContent } from './
 export async function runProfileSample(overridePath, options) {
     const sessionsDir = getScanSessionsRoot(overridePath);
     if (!sessionsDir) {
-        const searchedPath = overridePath || '~/.claude/projects';
-        throw new GSDError(`No Claude Code sessions found at ${searchedPath}.${overridePath ? '' : ' Is Claude Code installed?'}`, ErrorClassification.Validation);
+        const searchedPath = overridePath || '$HOME/.config/opencode/projects';
+        throw new GSDError(`No OpenCode sessions found at ${searchedPath}.${overridePath ? '' : ' Is OpenCode installed?'}`, ErrorClassification.Validation);
     }
     const limit = options.limit || 150;
     const maxChars = options.maxChars || 500;
