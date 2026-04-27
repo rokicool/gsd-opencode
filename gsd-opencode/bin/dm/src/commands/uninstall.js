@@ -296,6 +296,7 @@ async function buildFallbackManifest(targetDir) {
     "command/gsd", // Old structure (singular)
     "commands/gsd", // New structure (plural)
     "rules",
+    "sdk",
     "skills",
     "get-shit-done",
   ];
@@ -411,6 +412,7 @@ async function categorizeItems(files, targetDir) {
     "command",
     "commands",
     "rules",
+    "sdk",
     "skills",
     "get-shit-done",
   ];
