@@ -34,7 +34,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "rm -rf dist && tsc && chmod +x dist/cli.js",
+    "prepublishOnly": "test -d src && (rm -rf dist && tsc && chmod +x dist/cli.js) || echo 'Pre-built dist/ shipped — skipping rebuild'",
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration"
