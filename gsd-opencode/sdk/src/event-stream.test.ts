@@ -38,7 +38,7 @@ import type {
   SDKStatusMessage,
   SDKCompactBoundaryMessage,
   SDKPartialAssistantMessage,
-} from '@anthropic-ai/OpenCode-agent-sdk';
+} from '@anthropic-ai/claude-agent-sdk';
 import type { UUID } from 'crypto';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ function makeSystemInit(): SDKSystemMessage {
     cwd: '/test',
     tools: ['read', 'write', 'bash'],
     mcp_servers: [],
-    model: 'OpenCode-sonnet-4-6',
+    model: 'claude-sonnet-4-6',
     permissionMode: 'bypassPermissions',
     slash_commands: [],
     output_style: 'text',
@@ -75,7 +75,7 @@ function makeAssistantMsg(content: Array<{ type: string; [key: string]: unknown 
       id: 'msg-1',
       type: 'message',
       role: 'assistant',
-      model: 'OpenCode-sonnet-4-6',
+      model: 'claude-sonnet-4-6',
       stop_reason: 'end_turn',
       stop_sequence: null,
       usage: { input_tokens: 100, output_tokens: 50 },
@@ -250,7 +250,7 @@ describe('GSDEventStream', () => {
       expect(event!.type).toBe(GSDEventType.SessionInit);
 
       const init = event as GSDSessionInitEvent;
-      expect(init.model).toBe('OpenCode-sonnet-4-6');
+      expect(init.model).toBe('claude-sonnet-4-6');
       expect(init.tools).toEqual(['read', 'write', 'bash']);
       expect(init.cwd).toBe('/test');
       expect(init.sessionId).toBe(TEST_SESSION);

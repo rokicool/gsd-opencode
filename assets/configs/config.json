@@ -419,6 +419,7 @@
     {
       "pattern": "Claude",
       "replacement": "OpenCode",
+      "caseSensitive": true,
       "description": "Transform standalone Claude references to OpenCode"
     },
     {

@@ -24,7 +24,7 @@ import type {
   SDKStatusMessage,
   SDKCompactBoundaryMessage,
   SDKPartialAssistantMessage,
-} from '@anthropic-ai/OpenCode-agent-sdk';
+} from '@anthropic-ai/claude-agent-sdk';
 import {
   GSDEventType,
   type GSDEvent,
