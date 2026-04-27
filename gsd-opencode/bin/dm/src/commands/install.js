@@ -325,7 +325,10 @@ async function installSdk(targetDir) {
     const hasSrc = await fs.access(srcPath).then(() => true).catch(() => false);
 
     if (hasDist && !hasSrc) {
-      logger.debug("Pre-built SDK dist found, skipping build");
+      logger.debug("Pre-built SDK dist found, installing production dependencies");
+      // Still need runtime dependencies (e.g., @anthropic-ai/claude-agent-sdk)
+      logger.info("Installing SDK runtime dependencies...");
+      await execAsync("npm install --omit=dev 2>&1", { cwd: sdkDir });
       // Ensure cli.js is executable
       const cliPath = path.join(sdkDir, "dist", "cli.js");
       try {

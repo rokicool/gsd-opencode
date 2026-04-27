@@ -7242,6 +7242,20 @@ function installSdkIfNeeded(opts) {
     // `node sdkCliPath` invocation in bin/gsd-sdk.js.
   }
 
+  // Install runtime dependencies for the SDK if node_modules is missing.
+  // The dist files (e.g., session-runner.js) import @anthropic-ai/claude-agent-sdk
+  // which must be available at runtime even when using pre-built dist.
+  const sdkNodeModules = path.join(sdkDir, 'node_modules');
+  if (!fs.existsSync(sdkNodeModules)) {
+    const { execSync } = require('child_process');
+    try {
+      console.log(`  ${dim}Installing SDK runtime dependencies...${reset}`);
+      execSync('npm install --omit=dev 2>&1', { cwd: sdkDir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    } catch {
+      // Non-fatal: the shim still works if dependencies are already available globally
+    }
+  }
+
   console.log(`  ${green}✓${reset} GSD SDK ready (sdk/dist/cli.js)`);
 
   // #2620: warn if npm's global bin is not on PATH, suppressing the
