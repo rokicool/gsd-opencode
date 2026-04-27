@@ -17,6 +17,8 @@
     "node_modules/**",
     "gsd-opencode/node_modules/**",
     "gsd-opencode/get-shit-done/bin/test/**",
+    "gsd-opencode/sdk/package.json",
+    "gsd-opencode/sdk/package-lock.json",
     ".git/**",
     ".translate-backups/**",
     "assets/**",
@@ -26,6 +28,7 @@
     "**/*.gif",
     "**/*.ico",
     "**/*.svg",
+    "**/package-lock.json",
     "**/oc-*",
     "**/*-oc-*"
   ],
@@ -416,6 +419,7 @@
     {
       "pattern": "Claude",
       "replacement": "OpenCode",
+      "caseSensitive": true,
       "description": "Transform standalone Claude references to OpenCode"
     },
     {

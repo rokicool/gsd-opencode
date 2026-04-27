@@ -16,13 +16,22 @@
  * The gsd-opencode/ folder should be processed by translate.js later.
  */
 
-import { copyFile, mkdir, rm, rename, access, readdir, stat, mkdtemp } from 'fs/promises';
-import { existsSync } from 'fs';
-import { join, dirname, relative, resolve, basename } from 'path';
-import { tmpdir } from 'os';
-import { computeHash, filesAreEqual, getFileDiff } from '../utils/file-diff.js';
-import { createBackup } from '../utils/backup.js';
-import { isBinary } from '../utils/binary-check.js';
+import {
+  copyFile,
+  mkdir,
+  rm,
+  rename,
+  access,
+  readdir,
+  stat,
+  mkdtemp,
+} from "fs/promises";
+import { existsSync } from "fs";
+import { join, dirname, relative, resolve, basename } from "path";
+import { tmpdir } from "os";
+import { computeHash, filesAreEqual, getFileDiff } from "../utils/file-diff.js";
+import { createBackup } from "../utils/backup.js";
+import { isBinary } from "../utils/binary-check.js";
 
 /**
  * Directory mapping from original to gsd-opencode
@@ -30,13 +39,14 @@ import { isBinary } from '../utils/binary-check.js';
  * Value: corresponding path prefix in gsd-opencode/
  */
 const DIRECTORY_MAPPING = {
-  'agents/': 'gsd-opencode/agents/',
-  'commands/gsd/': 'gsd-opencode/commands/gsd/',
-  'docs/': 'gsd-opencode/docs/',
-  'get-shit-done/bin/': 'gsd-opencode/get-shit-done/bin/',
-  'get-shit-done/references/': 'gsd-opencode/get-shit-done/references/',
-  'get-shit-done/templates/': 'gsd-opencode/get-shit-done/templates/',
-  'get-shit-done/workflows/': 'gsd-opencode/get-shit-done/workflows/'
+  "agents/": "gsd-opencode/agents/",
+  "bin/": "gsd-opencode/bin/",
+  "commands/gsd/": "gsd-opencode/commands/gsd/",
+  "docs/": "gsd-opencode/docs/",
+  "sdk/": "gsd-opencode/sdk/",
+  "get-shit-done/references/": "gsd-opencode/get-shit-done/references/",
+  "get-shit-done/templates/": "gsd-opencode/get-shit-done/templates/",
+  "get-shit-done/workflows/": "gsd-opencode/get-shit-done/workflows/",
 };
 
 /**
@@ -70,7 +80,7 @@ const DIRECTORY_MAPPING = {
 export class SyncError extends Error {
   constructor(message, code, details = null) {
     super(message);
-    this.name = 'SyncError';
+    this.name = "SyncError";
     this.code = code;
     this.details = details;
   }
@@ -90,17 +100,19 @@ export class SyncService {
    */
   constructor(options) {
     if (!options.submoduleService) {
-      throw new SyncError('submoduleService is required', 'MISSING_DEPENDENCY');
+      throw new SyncError("submoduleService is required", "MISSING_DEPENDENCY");
     }
     if (!options.syncManifest) {
-      throw new SyncError('syncManifest is required', 'MISSING_DEPENDENCY');
+      throw new SyncError("syncManifest is required", "MISSING_DEPENDENCY");
     }
 
     this.submoduleService = options.submoduleService;
     this.syncManifest = options.syncManifest;
     this.projectRoot = resolve(options.projectRoot || process.cwd());
-    this.originalPath = resolve(options.originalPath || './original/get-shit-done');
-    this.targetPath = resolve(options.targetPath || './gsd-opencode');
+    this.originalPath = resolve(
+      options.originalPath || "./original/get-shit-done",
+    );
+    this.targetPath = resolve(options.targetPath || "./gsd-opencode");
   }
 
   /**
@@ -113,17 +125,17 @@ export class SyncService {
     for (const [from, to] of Object.entries(DIRECTORY_MAPPING)) {
       if (sourcePath.startsWith(from)) {
         let targetPath = sourcePath.replace(from, to);
-        
+
         // Add 'gsd-' prefix to files in commands/gsd/ directory
-        if (to === 'gsd-opencode/commands/gsd/') {
+        if (to === "gsd-opencode/commands/gsd/") {
           const dir = dirname(targetPath);
           const filename = basename(targetPath);
           // Only add prefix if filename doesn't already start with 'gsd-'
-          if (!filename.startsWith('gsd-')) {
+          if (!filename.startsWith("gsd-")) {
             targetPath = join(dir, `gsd-${filename}`);
           }
         }
-        
+
         return targetPath;
       }
     }
@@ -140,17 +152,17 @@ export class SyncService {
     for (const [from, to] of Object.entries(DIRECTORY_MAPPING)) {
       if (targetPath.startsWith(to)) {
         let sourcePath = targetPath.replace(to, from);
-        
+
         // Remove 'gsd-' prefix from files in commands/gsd/ directory for reverse mapping
-        if (to === 'gsd-opencode/commands/gsd/') {
+        if (to === "gsd-opencode/commands/gsd/") {
           const dir = dirname(sourcePath);
           const filename = basename(sourcePath);
           // Remove 'gsd-' prefix if present
-          if (filename.startsWith('gsd-')) {
+          if (filename.startsWith("gsd-")) {
             sourcePath = join(dir, filename.slice(4)); // Remove 'gsd-' prefix
           }
         }
-        
+
         return sourcePath;
       }
     }
@@ -224,7 +236,7 @@ export class SyncService {
         // Get file status from manifest
         const fileStatus = await this.syncManifest.getFileStatus(targetPath);
         if (fileStatus && fileStatus.destHash !== destHash) {
-          divergences[sourcePath] = 'Local modifications detected';
+          divergences[sourcePath] = "Local modifications detected";
         }
       }
     }
@@ -232,7 +244,7 @@ export class SyncService {
     return {
       hasChanges: divergedFiles.length > 0,
       files: divergedFiles,
-      divergences
+      divergences,
     };
   }
 
@@ -257,7 +269,7 @@ export class SyncService {
 
       if (entry.isDirectory()) {
         // Skip hidden directories and common ignore patterns
-        if (entry.name.startsWith('.') || entry.name === 'node_modules') {
+        if (entry.name.startsWith(".") || entry.name === "node_modules") {
           continue;
         }
         const subFiles = await this.findFiles(fullPath, baseDir);
@@ -326,7 +338,12 @@ export class SyncService {
       await access(destFullPath);
     } catch {
       // Destination doesn't exist, no divergence
-      return { diverged: false, message: null, destHash: null, lastSyncHash: null };
+      return {
+        diverged: false,
+        message: null,
+        destHash: null,
+        lastSyncHash: null,
+      };
     }
 
     // Get destination hash
@@ -342,9 +359,10 @@ export class SyncService {
       if (destHash !== sourceHash) {
         return {
           diverged: true,
-          message: 'Destination file exists and differs from source (no previous sync record)',
+          message:
+            "Destination file exists and differs from source (no previous sync record)",
           destHash,
-          lastSyncHash: null
+          lastSyncHash: null,
         };
       }
       return { diverged: false, message: null, destHash, lastSyncHash: null };
@@ -358,17 +376,18 @@ export class SyncService {
         // Both source and destination have changed - true divergence
         return {
           diverged: true,
-          message: 'Both source and destination have been modified since last sync',
+          message:
+            "Both source and destination have been modified since last sync",
           destHash,
-          lastSyncHash
+          lastSyncHash,
         };
       }
       // Only destination changed
       return {
         diverged: true,
-        message: 'Destination file has been modified since last sync',
+        message: "Destination file has been modified since last sync",
         destHash,
-        lastSyncHash
+        lastSyncHash,
       };
     }
 
@@ -382,7 +401,12 @@ export class SyncService {
    * @returns {Promise<SyncResult>}
    */
   async sync(options = {}) {
-    const { dryRun = false, force = false, showDiff = false, files = null } = options;
+    const {
+      dryRun = false,
+      force = false,
+      showDiff = false,
+      files = null,
+    } = options;
 
     const result = {
       copied: [],
@@ -390,7 +414,7 @@ export class SyncService {
       warnings: [],
       orphans: [],
       diffs: {},
-      divergences: {}
+      divergences: {},
     };
 
     // Verify submodule is initialized
@@ -400,28 +424,30 @@ export class SyncService {
 
     if (files && files.length > 0) {
       // Use provided files (resync mode)
-      mappedFiles = files.filter(f => this.isMapped(f));
+      mappedFiles = files.filter((f) => this.isMapped(f));
     } else {
       // Get changed files from submodule
       const lastSync = await this.syncManifest.getLastSync();
-      const changes = await this.submoduleService.detectChanges(lastSync?.commit || null);
+      const changes = await this.submoduleService.detectChanges(
+        lastSync?.commit || null,
+      );
 
       if (!changes.hasChanges && lastSync) {
-        result.warnings.push('Already up to date - no changes since last sync');
+        result.warnings.push("Already up to date - no changes since last sync");
         return result;
       }
 
       // Filter to only mapped files
-      mappedFiles = changes.files.filter(f => this.isMapped(f));
+      mappedFiles = changes.files.filter((f) => this.isMapped(f));
     }
 
     if (mappedFiles.length === 0) {
-      result.warnings.push('No mapped files to sync');
+      result.warnings.push("No mapped files to sync");
       return result;
     }
 
     // Create temp directory for atomic operations
-    const tempDir = await mkdtemp(join(tmpdir(), 'gsd-sync-'));
+    const tempDir = await mkdtemp(join(tmpdir(), "gsd-sync-"));
 
     // Track files staged for sync
     const stagedFiles = [];
@@ -442,7 +468,7 @@ export class SyncService {
 
         // Check if binary
         if (await isBinary(sourceFullPath)) {
-          result.skipped.push({ path: sourcePath, reason: 'binary' });
+          result.skipped.push({ path: sourcePath, reason: "binary" });
           continue;
         }
 
@@ -450,8 +476,10 @@ export class SyncService {
         const divergence = await this.detectDivergence(sourcePath, targetPath);
         if (divergence.diverged && !force) {
           result.divergences[targetPath] = divergence.message;
-          result.warnings.push(`Divergence detected: ${targetPath} - ${divergence.message}`);
-          result.skipped.push({ path: sourcePath, reason: 'diverged' });
+          result.warnings.push(
+            `Divergence detected: ${targetPath} - ${divergence.message}`,
+          );
+          result.skipped.push({ path: sourcePath, reason: "diverged" });
           continue;
         }
 
@@ -463,7 +491,9 @@ export class SyncService {
               result.diffs[targetPath] = diff;
             }
           } catch (e) {
-            result.warnings.push(`Could not generate diff for ${targetPath}: ${e.message}`);
+            result.warnings.push(
+              `Could not generate diff for ${targetPath}: ${e.message}`,
+            );
           }
         }
 
@@ -471,7 +501,12 @@ export class SyncService {
         const tempFilePath = join(tempDir, targetPath);
         await mkdir(dirname(tempFilePath), { recursive: true });
         await copyFile(sourceFullPath, tempFilePath);
-        stagedFiles.push({ sourcePath, targetPath, destFullPath, tempFilePath });
+        stagedFiles.push({
+          sourcePath,
+          targetPath,
+          destFullPath,
+          tempFilePath,
+        });
 
         // Track for backup (only if destination exists and we're not in dry run)
         if (existsSync(destFullPath) && !dryRun) {
@@ -481,16 +516,22 @@ export class SyncService {
 
       // If dry run, return what would happen (including orphans)
       if (dryRun) {
-        result.copied = stagedFiles.map(f => f.targetPath);
-        result.warnings.push(`DRY RUN: Would sync ${stagedFiles.length} file(s)`);
-        result.warnings.push(`DRY RUN: Would skip ${result.skipped.length} file(s)`);
-        
+        result.copied = stagedFiles.map((f) => f.targetPath);
+        result.warnings.push(
+          `DRY RUN: Would sync ${stagedFiles.length} file(s)`,
+        );
+        result.warnings.push(
+          `DRY RUN: Would skip ${result.skipped.length} file(s)`,
+        );
+
         // Find orphaned files even in dry-run
         result.orphans = await this.findOrphanedFiles();
         if (result.orphans.length > 0) {
-          result.warnings.push(`Found ${result.orphans.length} orphaned file(s) in gsd-opencode`);
+          result.warnings.push(
+            `Found ${result.orphans.length} orphaned file(s) in gsd-opencode`,
+          );
         }
-        
+
         return result;
       }
 
@@ -504,7 +545,12 @@ export class SyncService {
       }
 
       // Apply all changes atomically
-      for (const { sourcePath, targetPath, destFullPath, tempFilePath } of stagedFiles) {
+      for (const {
+        sourcePath,
+        targetPath,
+        destFullPath,
+        tempFilePath,
+      } of stagedFiles) {
         try {
           // Ensure destination directory exists
           await mkdir(dirname(destFullPath), { recursive: true });
@@ -513,18 +559,20 @@ export class SyncService {
           await rename(tempFilePath, destFullPath);
 
           // Update manifest
-          const sourceHash = await computeHash(join(this.originalPath, sourcePath));
+          const sourceHash = await computeHash(
+            join(this.originalPath, sourcePath),
+          );
           const destHash = await computeHash(destFullPath);
           await this.syncManifest.updateFile(targetPath, {
             sourceHash,
             destHash,
-            transformed: false
+            transformed: false,
           });
 
           result.copied.push(targetPath);
         } catch (e) {
           result.warnings.push(`Failed to sync ${targetPath}: ${e.message}`);
-          result.skipped.push({ path: sourcePath, reason: 'error' });
+          result.skipped.push({ path: sourcePath, reason: "error" });
         }
       }
 
@@ -532,15 +580,16 @@ export class SyncService {
       const commitInfo = await this.submoduleService.getCommitInfo();
       await this.syncManifest.setLastSync({
         commit: commitInfo.hash,
-        version: commitInfo.version
+        version: commitInfo.version,
       });
 
       // Find orphaned files
       result.orphans = await this.findOrphanedFiles();
       if (result.orphans.length > 0) {
-        result.warnings.push(`Found ${result.orphans.length} orphaned file(s) in gsd-opencode`);
+        result.warnings.push(
+          `Found ${result.orphans.length} orphaned file(s) in gsd-opencode`,
+        );
       }
-
     } finally {
       // Cleanup temp directory
       try {
@@ -583,7 +632,7 @@ export class SyncService {
       lastSync,
       trackedFileCount: trackedFiles.length,
       orphanCount: orphans.length,
-      orphans
+      orphans,
     };
   }
 

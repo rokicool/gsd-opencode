@@ -13,6 +13,7 @@ This project maintains `gsd-opencode/` as an adapted fork of the upstream `origi
 3. **Add Agents Mode** -- inject `mode: subagent` into all agent definition files
 4. **Modify Agent Calls** -- replace `task()` calls with `@subagent_type` shorthand syntax
 5. **Validate** -- ensure zero forbidden strings remain in the translated files
+6. **Rebuild SDK** -- compile `@gsd-build/sdk` dist files from TypeScript source
 
 ### Tools
 
@@ -319,7 +320,29 @@ node assets/bin/gsd-translate-in-place.js assets/configs/config.json assets/conf
 node assets/bin/check-forbidden-strings.js
 ```
 
-#### 4d. Iterate if needed
+#### 4d. Rebuild SDK dist files
+
+The sync may delete or invalidate compiled SDK dist files (`gsd-opencode/sdk/dist/`). Rebuild them and install runtime dependencies to ensure the `gsd-sdk` CLI works:
+
+```bash
+# Install SDK dependencies (runtime deps like @anthropic-ai/claude-agent-sdk)
+npm install --prefix gsd-opencode/sdk
+
+# Build dist from TypeScript source
+npm run build --prefix gsd-opencode/sdk
+```
+
+**What to check:**
+- No TypeScript compilation errors
+- Key files exist after build: `dist/event-stream.d.ts`, `dist/session-runner.js`, `dist/index.js`
+- `dist/cli.js` is executable (the prepublishOnly script handles this)
+- `gsd-opencode/sdk/node_modules/@anthropic-ai/claude-agent-sdk` exists (runtime dependency)
+
+**Recovery if build fails:**
+- Check that source files copied from submodule are valid TypeScript
+- Run `rm -rf gsd-opencode/sdk/dist && npm install --prefix gsd-opencode/sdk && npm run build --prefix gsd-opencode/sdk` for a clean rebuild
+
+#### 4e. Iterate if needed
 
 Repeat steps 4a-4c. **Maximum 3 iterations.** If violations persist after 3 attempts:
 - List remaining violations with file paths and line numbers
@@ -364,6 +387,11 @@ When the workflow completes (forbidden strings check passes), produce this repor
 - Forbidden strings check: PASSED
 - Iterations required: N
 
+### Step 4d: Rebuild SDK
+- SDK dist rebuilt: YES
+- Build errors: NONE
+- Key files verified: event-stream.d.ts, session-runner.js, index.js
+
 ### Protected Files
 - oc-/\-oc- files verified untouched: YES
 ```
@@ -379,6 +407,7 @@ If anything goes wrong at any step:
 | Copy corrupted files | Restore from `.planning/backups/` (auto-created by copy-service) |
 | Translation produced wrong output | Restore from `.translate-backups/` (auto-created by translate-service) |
 | Need to start over completely | `git checkout -- gsd-opencode/` to reset all changes |
+| SDK build fails | Run `npm install --prefix gsd-opencode/sdk` first; check TypeScript source validity |
 
 ---
 
@@ -388,5 +417,6 @@ If anything goes wrong at any step:
 - **Always preview** before applying (both copy and translate)
 - **Always verify** after applying (re-run in dry-run mode)
 - **Always validate** with the forbidden strings checker before declaring success
+- **Always rebuild** the SDK dist after sync (`npm run build --prefix gsd-opencode/sdk`)
 - **Config files go in** `assets/configs/` (not `assets/config/`)
 - **Translation scope is** `gsd-opencode/**` only -- never translate files in `assets/`, `original/`, or project root

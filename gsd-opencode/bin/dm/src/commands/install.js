@@ -39,6 +39,10 @@ import {
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+import { exec } from "child_process";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 // Colors for banner
 const cyan = "\x1b[36m";
@@ -289,6 +293,132 @@ async function preflightChecks(sourceDir, targetDir) {
 }
 
 /**
+ * Installs and builds the SDK in the target installation directory.
+ *
+ * Copies the SDK source (already in the target from file-ops) and runs
+ * `npm install` followed by `npm run build` to produce sdk/dist/cli.js.
+ *
+ * Follows the same pattern as original/get-shit-done/bin/install.js:
+ * the SDK source ships in the tarball; this step compiles it on the
+ * client's machine.
+ *
+ * @param {string} targetDir - Target installation directory
+ * @returns {Promise<boolean>} True if SDK was installed and built successfully
+ * @private
+ */
+async function installSdk(targetDir) {
+  const sdkDir = path.join(targetDir, "sdk");
+
+  try {
+    const pkgPath = path.join(sdkDir, "package.json");
+    try {
+      await fs.access(pkgPath);
+    } catch {
+      logger.debug("SDK package.json not found in target, skipping SDK build");
+      return { success: false, message: "skipped (no package.json)" };
+    }
+
+    // Check if pre-built dist exists and src is missing
+    const distPath = path.join(sdkDir, "dist");
+    const srcPath = path.join(sdkDir, "src");
+    const hasDist = await fs.access(distPath).then(() => true).catch(() => false);
+    const hasSrc = await fs.access(srcPath).then(() => true).catch(() => false);
+
+    if (hasDist && !hasSrc) {
+      logger.debug("Pre-built SDK dist found, installing production dependencies");
+      // Still need runtime dependencies (e.g., @anthropic-ai/claude-agent-sdk)
+      logger.info("Installing SDK runtime dependencies...");
+      const { stdout, stderr } = await execAsync("npm install", { cwd: sdkDir, encoding: 'utf8' });
+      if (stdout) logger.debug(`npm install stdout: ${stdout}`);
+      if (stderr) logger.debug(`npm install stderr: ${stderr}`);
+      // Verify the key dependency was actually installed
+      const nodeModules = path.join(sdkDir, "node_modules", "@anthropic-ai", "claude-agent-sdk");
+      const hasDep = await fs.access(nodeModules).then(() => true).catch(() => false);
+      if (!hasDep) {
+        logger.warning("SDK runtime dependency @anthropic-ai/claude-agent-sdk not installed — /gsd-* commands may fail");
+        logger.debug(`Expected at: ${nodeModules}`);
+      }
+      // Ensure cli.js is executable
+      const cliPath = path.join(sdkDir, "dist", "cli.js");
+      try {
+        const stat = await fs.stat(cliPath);
+        if (!(stat.mode & 0o111)) {
+          await fs.chmod(cliPath, stat.mode | 0o111);
+        }
+      } catch {
+        logger.warning("Could not set execute bit on sdk/dist/cli.js");
+      }
+      return { success: true, message: "pre-built (dist ready)" };
+    }
+
+    if (!hasSrc) {
+      logger.debug("SDK source not found, skipping build");
+      return { success: false, message: "skipped (no source)" };
+    }
+
+    logger.info("Installing SDK dependencies...");
+    await execAsync("npm install", { cwd: sdkDir });
+
+    logger.info("Building SDK...");
+    try {
+      await execAsync("npm run build 2>&1", { cwd: sdkDir });
+    } catch (buildError) {
+      throw new Error(`npm run build failed: ${buildError.message}\n${buildError.stdout || ''}\n${buildError.stderr || ''}`.trim());
+    }
+
+    const cliPath = path.join(sdkDir, "dist", "cli.js");
+    try {
+      const stat = await fs.stat(cliPath);
+      if (!(stat.mode & 0o111)) {
+        await fs.chmod(cliPath, stat.mode | 0o111);
+      }
+    } catch {
+      logger.warning("Could not set execute bit on sdk/dist/cli.js");
+    }
+
+    logger.debug("SDK installed and built successfully");
+    return { success: true, message: "installed and built" };
+  } catch (error) {
+    logger.warning(`SDK build failed: ${error.message.split('\n')[0]}`);
+    const errorLines = error.message.split('\n').slice(1).filter(l => l.trim());
+    if (errorLines.length > 0) {
+      logger.debug(`Build output:\n${errorLines.join('\n')}`);
+    }
+    logger.debug("Continuing installation without SDK...");
+    return { success: false, message: "build failed" };
+  }
+}
+
+/**
+ * Writes a .env file to the installation directory with GSD_AGENTS_DIR
+ * set to the agents directory for the installed scope.
+ *
+ * This allows the @gsd-build/sdk and GSD tools to discover installed
+ * GSD agents without requiring manual environment configuration.
+ *
+ * @param {string} targetDir - Target installation directory
+ * @param {string} scope - Installation scope (global or local)
+ * @returns {Promise<void>}
+ * @private
+ */
+async function writeEnvFile(targetDir, scope) {
+  const envPath = path.join(targetDir, ".env");
+  const agentsDir = path.join(targetDir, "agents");
+
+  const envContent = `# GSD-OpenCode environment configuration
+# Generated by gsd-opencode install
+# This file should be sourced before running GSD tools or SDK
+
+# Override directory scanned for installed GSD agents
+# Default is $HOME/.config/opencode/agents; this points to gsd-opencode agents
+GSD_AGENTS_DIR=${agentsDir}
+`;
+
+  await fs.writeFile(envPath, envContent, "utf-8");
+  logger.debug(`Written .env file with GSD_AGENTS_DIR=${agentsDir}`);
+}
+
+/**
  * Cleans up empty directories in allowed namespaces.
  * Only removes directories that are empty and within gsd-opencode namespaces.
  *
@@ -302,6 +432,7 @@ async function cleanupEmptyDirectories(targetDir, namespaces, logger) {
   // Directories to check (in reverse order to remove deepest first)
   const dirsToCheck = [
     "get-shit-done",
+    "sdk",
     "commands/gsd",
     "command/gsd",
     "agents/gsd-debugger",
@@ -346,6 +477,7 @@ async function conservativeCleanup(targetDir, logger) {
   const filesToRemove = [
     "get-shit-done/VERSION",
     "get-shit-done/INSTALLED_FILES.json",
+    ".env",
   ];
 
   for (const file of filesToRemove) {
@@ -504,7 +636,7 @@ export async function installCommand(options = {}) {
 
           // Forcefully remove structure directories to ensure fresh install works
           // This handles cases where files remain in the structure directories
-          const structureDirs = ["commands/gsd", "command/gsd"];
+          const structureDirs = ["commands/gsd", "command/gsd", "sdk"];
           for (const dir of structureDirs) {
             const fullPath = path.join(targetDir, dir);
             try {
@@ -512,6 +644,16 @@ export async function installCommand(options = {}) {
               logger.debug(`Removed structure directory: ${dir}`);
             } catch (error) {
               // Directory might not exist, ignore
+            }
+          }
+
+          // Remove .env file (written after install, not in manifest)
+          try {
+            await fs.unlink(path.join(targetDir, ".env"));
+            logger.debug("Removed: .env");
+          } catch (error) {
+            if (error.code !== "ENOENT") {
+              logger.debug(`Could not remove .env: ${error.message}`);
             }
           }
 
@@ -526,7 +668,7 @@ export async function installCommand(options = {}) {
           await conservativeCleanup(targetDir, logger);
 
           // Forcefully remove structure directories to ensure fresh install works
-          const structureDirs = ["commands/gsd", "command/gsd"];
+          const structureDirs = ["commands/gsd", "command/gsd", "sdk"];
           for (const dir of structureDirs) {
             const fullPath = path.join(targetDir, dir);
             try {
@@ -563,11 +705,17 @@ export async function installCommand(options = {}) {
     const fileOps = new FileOperations(scopeManager, logger);
     const result = await fileOps.install(sourceDir, targetDir);
 
-    // Step 7: Create VERSION file
+    // Step 7: Install and build SDK from bundled source
+    const sdkResult = await installSdk(targetDir);
+
+    // Step 8: write .env file with GSD_AGENTS_DIR for SDK integration
+    await writeEnvFile(targetDir, scope);
+
+    // Step 9: Create VERSION file
     await config.setVersion(version);
     logger.debug(`Created VERSION file with version: ${version}`);
 
-    // Step 8: Show success summary
+    // Step 10: Show success summary
     logger.success("Installation complete!");
     logger.dim("");
     logger.dim("Summary:");
@@ -575,6 +723,8 @@ export async function installCommand(options = {}) {
     logger.dim(`  Directories: ${result.directories}`);
     logger.dim(`  Location: ${pathPrefix}`);
     logger.dim(`  Version: ${version}`);
+    logger.dim(`  SDK: ${sdkResult.message}`);
+    logger.dim(`  GSD_AGENTS_DIR: ${pathPrefix}/agents`);
 
     if (verbose) {
       logger.dim("");
