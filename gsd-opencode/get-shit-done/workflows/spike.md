@@ -48,7 +48,7 @@ Otherwise, load in this order:
 
 **a. MANIFEST.md** — the overall idea, requirements, and spike table with verdicts.
 
-**b. Findings skills** — glob `./.OpenCode/skills/spike-findings-*/SKILL.md` and read any that exist, plus their `references/*.md`. These contain curated knowledge from prior wrap-ups.
+**b. Findings skills** — glob `./.claude/skills/spike-findings-*/SKILL.md` and read any that exist, plus their `references/*.md`. These contain curated knowledge from prior wrap-ups.
 
 **c. CONVENTIONS.md** — read `.planning/spikes/CONVENTIONS.md` if it exists. Established stack and patterns.
 
@@ -124,7 +124,7 @@ If `.planning/spikes/` has existing content, load context in this priority order
 
 **a. Conventions:** read `.planning/spikes/CONVENTIONS.md` if it exists.
 
-**b. Findings skills:** glob for `./.OpenCode/skills/spike-findings-*/SKILL.md` and read any that exist, plus their `references/*.md` files.
+**b. Findings skills:** glob for `./.claude/skills/spike-findings-*/SKILL.md` and read any that exist, plus their `references/*.md` files.
 
 **c. Manifest:** read `.planning/spikes/MANIFEST.md` for the index of all spikes.
 

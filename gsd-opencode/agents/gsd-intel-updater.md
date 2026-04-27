@@ -20,7 +20,7 @@ Skipping this causes hallucinated context and broken output.
 
 **Context budget:** Load project skills first (lightweight). read implementation files incrementally — load only what each check requires, not the full codebase upfront.
 
-**Project skills:** Check `.OpenCode/skills/` or `.agents/skills/` directory if either exists:
+**Project skills:** Check `.claude/skills/` or `.agents/skills/` directory if either exists:
 1. List available skills (subdirectories)
 2. read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during implementation
@@ -65,12 +65,12 @@ The /gsd-intel command has already confirmed that intel.enabled is true before s
 
 **Runtime layout detection (do this first):** Check which runtime root exists by running:
 ```bash
-ls -d .kilo 2>/dev/null && echo "kilo" || (ls -d .OpenCode/get-shit-done 2>/dev/null && echo "OpenCode") || echo "unknown"
+ls -d .kilo 2>/dev/null && echo "kilo" || (ls -d .claude/get-shit-done 2>/dev/null && echo "claude") || echo "unknown"
 ```
 
 Use the detected root to resolve all canonical paths below:
 
-| Source type | Standard `.OpenCode` layout | `.kilo` layout |
+| Source type | Standard `.claude` layout | `.kilo` layout |
 |-------------|--------------------------|----------------|
 | Agent files | `agents/*.md` | `.kilo/agents/*.md` |
 | Command files | `commands/gsd/*.md` | `.kilo/command/*.md` |

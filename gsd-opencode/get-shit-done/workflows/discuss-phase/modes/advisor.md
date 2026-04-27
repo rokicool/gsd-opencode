@@ -87,21 +87,21 @@ research agents.
 
 1. Display brief status: `Researching {N} areas...`
 
-2. For EACH user-selected gray area, spawn a `@gsd-advisor-researcher` in parallel:
+2. For EACH user-selected gray area, spawn a `task()` in parallel:
 
    ```
    @gsd-advisor-researcher "First, read @$HOME/.config/opencode/agents/gsd-advisor-researcher.md for your role and instructions.
 
-   <gray_area>{area_name}: {area_description from gray area identification}</gray_area>
-   <phase_context>{phase_goal and description from ROADMAP.md}</phase_context>
-   <project_context>{project name and brief description from PROJECT.md}</project_context>
-   <calibration_tier>{resolved calibration tier: full_maturity | standard | minimal_decisive}</calibration_tier>
+     <gray_area>{area_name}: {area_description from gray area identification}</gray_area>
+     <phase_context>{phase_goal and description from ROADMAP.md}</phase_context>
+     <project_context>{project name and brief description from PROJECT.md}</project_context>
+     <calibration_tier>{resolved calibration tier: full_maturity | standard | minimal_decisive}</calibration_tier>
 
-   Research this gray area and return a structured comparison table with rationale.
-   ${AGENT_SKILLS_ADVISOR}"
+     Research this gray area and return a structured comparison table with rationale.
+     ${AGENT_SKILLS_ADVISOR}"
    ```
 
-   All subagents spawn simultaneously — do NOT wait for one before
+   All `task()` calls spawn simultaneously — do NOT wait for one before
    starting the next.
 
 3. After ALL agents return, **synthesize results** before presenting:

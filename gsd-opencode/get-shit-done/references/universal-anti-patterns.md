@@ -8,20 +8,20 @@ Rules that apply to ALL workflows and agents. Individual workflows may have addi
 
 1. **Never** read agent definition files (`agents/*.md`) -- `@<custom_agent>` call auto-loads them. Reading agent definitions into the orchestrator wastes context for content automatically injected into subagent sessions.
 2. **Never** inline large files into subagent prompts -- tell agents to read files from disk instead. Agents have their own context windows.
-3. **read depth scales with context window** -- check `context_window_tokens` in `.planning/config.json`. At < 500000: read only frontmatter, status fields, or summaries. At >= 500000 (1M model): full body reads permitted when content is needed for inline decisions. See `references/context-budget.md` for the complete table.
+3. **read depth scales with context window** -- check `context_window` in `.planning/config.json`. At < 500000: read only frontmatter, status fields, or summaries. At >= 500000 (1M model): full body reads permitted when content is needed for inline decisions. See `references/context-budget.md` for the complete table.
 4. **Delegate** heavy work to subagents -- the orchestrator routes, it does not build, analyze, research, investigate, or verify.
 5. **Proactive pause warning**: If you have already consumed significant context (large file reads, multiple subagent results), warn the user: "Context budget is getting heavy. Consider checkpointing progress."
 
 ## File Reading Rules
 
-6. **SUMMARY.md read depth scales with context window** -- at context_window_tokens < 500000: read frontmatter only from prior phase SUMMARYs. At >= 500000: full body reads permitted for direct-dependency phases. Transitive dependencies (2+ phases back) remain frontmatter-only regardless.
+6. **SUMMARY.md read depth scales with context window** -- at context_window < 500000: read frontmatter only from prior phase SUMMARYs. At >= 500000: full body reads permitted for direct-dependency phases. Transitive dependencies (2+ phases back) remain frontmatter-only regardless.
 7. **Never** read full PLAN.md files from other phases -- only current phase plans.
 8. **Never** read `.planning/logs/` files -- only the health workflow reads these.
 9. **Do not** re-read full file contents when frontmatter is sufficient -- frontmatter contains status, key_files, commits, and provides fields. Exception: at >= 500000, re-reading full body is acceptable when semantic content is needed.
 
 ## Subagent Rules
 
-10. **NEVER** use non-GSD agent types (`generic`, `Explore`, `Plan`, `bash`, `feature-dev`, etc.) -- ALWAYS use `@gsd-{agent}` call (e.g., `@gsd-phase-researcher`, `@gsd-executor`, `@gsd-planner`). GSD agents have project-aware prompts, audit logging, and workflow context. Generic agents bypass all of this.
+10. **NEVER** use non-GSD agent types (`gsd-general`, `Explore`, `Plan`, `bash`, `feature-dev`, etc.) -- ALWAYS use `@gsd-{agent}` call (e.g., `@gsd-phase-researcher`, `@gsd-executor`, `@gsd-planner`). GSD agents have project-aware prompts, audit logging, and workflow context. Generic agents bypass all of this.
 11. **Do not** re-litigate decisions that are already locked in CONTEXT.md (or PROJECT.md ## Context section) -- respect locked decisions unconditionally.
 
 ## Questioning Anti-Patterns
@@ -34,7 +34,7 @@ Reference: `references/questioning.md` for the full anti-pattern list.
 
 ## State Management Anti-Patterns
 
-15. **No direct write/edit to STATE.md or ROADMAP.md for mutations.** Always use `gsd-tools.cjs` CLI commands (`state update`, `state advance-plan`, `roadmap update-status`) for mutations. Direct write tool usage bypasses safe update logic and is unsafe in multi-session environments. Exception: first-time creation of STATE.md from template is allowed.
+15. **No direct write/edit to STATE.md or ROADMAP.md for mutations.** Always use `gsd-sdk query` for registered state/roadmap handlers (e.g. `state.update`, `state.advance-plan`, `roadmap.update-plan-progress`), or legacy `node …/gsd-tools.cjs` for CLI-only commands. Direct write tool usage bypasses safe update logic and is unsafe in multi-session environments. Exception: first-time creation of STATE.md from template is allowed.
 
 ## Behavioral Rules
 
@@ -53,7 +53,7 @@ Reference: `references/questioning.md` for the full anti-pattern list.
 ## GSD-Specific Rules
 
 24. **Do not** check for `mode === 'auto'` or `mode === 'autonomous'` -- GSD uses `yolo` config flag. Check `yolo: true` for autonomous mode, absence or `false` for interactive mode.
-25. **Always use `gsd-tools.cjs`** (not `gsd-tools.js` or any other variant) -- GSD uses CommonJS for Node.js CLI compatibility.
+25. **Prefer `gsd-sdk query`** for orchestration when a handler exists; when shelling out to the legacy CLI, use **`gsd-tools.cjs`** (not `gsd-tools.js` or any other filename) — GSD ships the programmatic API as CommonJS for Node.js CLI compatibility.
 26. **Plan files MUST follow `{padded_phase}-{NN}-PLAN.md` pattern** (e.g., `01-01-PLAN.md`). Never use `PLAN-01.md`, `plan-01.md`, or any other variation -- gsd-tools detection depends on this exact pattern.
 27. **Do not start executing the next plan before writing the SUMMARY.md for the current plan** -- downstream plans may reference it via `@` includes.
 

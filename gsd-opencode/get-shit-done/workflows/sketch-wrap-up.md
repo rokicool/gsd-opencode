@@ -1,6 +1,6 @@
 <objective>
 Curate sketch design findings and package them into a persistent project skill for future
-UI implementation. Reads from `.planning/sketches/`, writes skill to `./.OpenCode/skills/sketch-findings-[project]/`
+UI implementation. Reads from `.planning/sketches/`, writes skill to `./.claude/skills/sketch-findings-[project]/`
 (project-local) and summary to `.planning/sketches/WRAP-UP-SUMMARY.md`.
 Companion to `/gsd-sketch`.
 </objective>
@@ -24,7 +24,7 @@ read all files referenced by the invoking prompt's execution_context before star
 
 1. read `.planning/sketches/MANIFEST.md` for the design direction and reference points
 2. glob `.planning/sketches/*/README.md` and parse YAML frontmatter from each
-3. Check if `./.OpenCode/skills/sketch-findings-*/SKILL.md` exists for this project
+3. Check if `./.claude/skills/sketch-findings-*/SKILL.md` exists for this project
    - If yes: read its `processed_sketches` list and filter those out
    - If no: all sketches are candidates
 
@@ -93,7 +93,7 @@ Each group becomes one reference file in the generated skill.
 <step name="skill_name">
 ## Determine Output skill Name
 
-Derive from the project directory name: `./.OpenCode/skills/sketch-findings-[project-dir-name]/`
+Derive from the project directory name: `./.claude/skills/sketch-findings-[project-dir-name]/`
 
 If a skill already exists at that path (append mode), update in place.
 </step>
@@ -198,7 +198,7 @@ write `.planning/sketches/WRAP-UP-SUMMARY.md` for project history:
 **Date:** [date]
 **Sketches processed:** [count]
 **Design areas:** [list]
-**skill output:** `./.OpenCode/skills/sketch-findings-[project]/`
+**skill output:** `./.claude/skills/sketch-findings-[project]/`
 
 ## Included Sketches
 | # | Name | Winner | Design Area |
@@ -244,7 +244,7 @@ gsd-sdk query commit "docs(sketch-wrap-up): package [N] sketch findings into pro
 
 **Curated:** {N} sketches ({included} included, {excluded} excluded)
 **Design areas:** {list}
-**skill:** `./.OpenCode/skills/sketch-findings-[project]/`
+**skill:** `./.claude/skills/sketch-findings-[project]/`
 **Summary:** `.planning/sketches/WRAP-UP-SUMMARY.md`
 **AGENTS.md:** routing line added
 
@@ -275,7 +275,7 @@ The sketch-findings skill will auto-load when building the UI.
 <success_criteria>
 - [ ] Every unprocessed sketch presented for individual curation
 - [ ] Design-area grouping proposed and approved
-- [ ] Sketch-findings skill exists at `./.OpenCode/skills/` with SKILL.md, references/, sources/
+- [ ] Sketch-findings skill exists at `./.claude/skills/` with SKILL.md, references/, sources/
 - [ ] Winning theme.css copied into skill sources
 - [ ] Reference files contain design decisions, CSS patterns, HTML structures, anti-patterns
 - [ ] `.planning/sketches/WRAP-UP-SUMMARY.md` written for project history

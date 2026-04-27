@@ -53,7 +53,7 @@ Otherwise, load in this order:
 
 **a. MANIFEST.md** — the design direction, reference points, and sketch table with winners.
 
-**b. Findings skills** — glob `./.OpenCode/skills/sketch-findings-*/SKILL.md` and read any that exist, plus their `references/*.md`. These contain curated design decisions from prior wrap-ups.
+**b. Findings skills** — glob `./.claude/skills/sketch-findings-*/SKILL.md` and read any that exist, plus their `references/*.md`. These contain curated design decisions from prior wrap-ups.
 
 **c. All sketch READMEs** — read `.planning/sketches/*/README.md` for design questions, winners, and tags.
 
@@ -128,7 +128,7 @@ Only proceed when the user says go.
 
 If spikes exist for this project, read them to ground the sketches in reality. Mockups are still pure HTML, but they should reflect what's actually been proven — real data shapes, real component names, real interaction patterns.
 
-**a.** glob for `./.OpenCode/skills/spike-findings-*/SKILL.md` and read any that exist, plus their `references/*.md`. These contain validated patterns and requirements.
+**a.** glob for `./.claude/skills/spike-findings-*/SKILL.md` and read any that exist, plus their `references/*.md`. These contain validated patterns and requirements.
 
 **b.** read `.planning/spikes/MANIFEST.md` if it exists — check the Requirements section for non-negotiable design constraints (e.g., "must support streaming", "must render markdown"). These requirements should be visible in the mockup even though the mockup doesn't implement them for real.
 

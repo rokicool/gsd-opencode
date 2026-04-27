@@ -2,7 +2,7 @@
  * E2E integration test — proves full SDK pipeline:
  * parse → prompt → query() → SUMMARY.md
  *
- * Requires OpenCode CLI (`OpenCode`) installed and authenticated.
+ * Requires OpenCode CLI (`claude`) installed and authenticated.
  * Skips gracefully if CLI is unavailable.
  */
 
@@ -20,7 +20,7 @@ import type { GSDEvent } from './index.js';
 
 let cliAvailable = false;
 try {
-  execSync('which OpenCode', { stdio: 'ignore' });
+  execSync('which claude', { stdio: 'ignore' });
   cliAvailable = true;
 } catch {
   cliAvailable = false;

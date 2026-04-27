@@ -37,5 +37,5 @@ forbidden_strings = [
         'model: haiku'
         ]
 forbidden_regexp_strings = [
-        'task\(\n'
+        '^task\(\s*\n\s*(prompt|subagent_type|description)'
         ]

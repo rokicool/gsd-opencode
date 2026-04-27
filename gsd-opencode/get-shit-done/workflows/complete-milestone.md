@@ -40,10 +40,8 @@ When a milestone completes:
 <step name="pre_close_artifact_audit">
 Before proceeding with milestone close, run the comprehensive open artifact audit.
 
-`audit-open` is not registered on `gsd-sdk query` yet; use the installed CJS CLI:
-
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" audit-open 2>/dev/null
+gsd-sdk query audit-open
 ```
 
 If the output contains open items (any section with count > 0):
@@ -59,7 +57,7 @@ These items are open. Choose an action:
 ```
 
 If user chooses [A] (Acknowledge):
-1. Re-run `audit-open --json` to get structured data
+1. Re-run `gsd-sdk query audit-open --json` to get structured data
 2. write acknowledged items to STATE.md under `## Deferred Items` section:
    ```markdown
    ## Deferred Items
@@ -78,7 +76,7 @@ If user chooses [A] (Acknowledge):
 
 If output shows all clear (no open items): print `All artifact types clear.` and proceed.
 
-SECURITY: Audit JSON output is structured data from `audit-open` (gsd-tools.cjs) — validated and sanitized at source. When writing to STATE.md, item slugs and descriptions are sanitized via `sanitizeForDisplay()` before inclusion. Never inject raw user-supplied content into STATE.md without sanitization.
+SECURITY: Audit JSON output is structured data from the `audit-open` query handler (same JSON contract as legacy `gsd-tools.cjs audit-open`) — validated and sanitized at source. When writing to STATE.md, item slugs and descriptions are sanitized via `sanitizeForDisplay()` before inclusion. Never inject raw user-supplied content into STATE.md without sanitization.
 </step>
 
 <step name="verify_readiness">

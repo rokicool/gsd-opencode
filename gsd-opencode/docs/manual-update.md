@@ -17,7 +17,7 @@ git pull --rebase origin main
 node scripts/build-hooks.js
 
 # 3. Run the installer directly
-node bin/install.js --OpenCode --global
+node bin/install.js --claude --global
 
 # 4. Clear the update cache so the statusline indicator resets
 rm -f ~/.cache/gsd/gsd-update-check.json
@@ -27,11 +27,11 @@ rm -f ~/.cache/gsd/gsd-update-check.json
 
 ## Runtime flags
 
-Replace `--OpenCode` with the flag for your runtime:
+Replace `--claude` with the flag for your runtime:
 
 | Runtime | Flag |
 |---|---|
-| OpenCode | `--OpenCode` |
+| OpenCode | `--claude` |
 | Gemini CLI | `--gemini` |
 | OpenCode | `--opencode` |
 | Kilo | `--kilo` |

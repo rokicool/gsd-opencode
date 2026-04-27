@@ -8,7 +8,7 @@
 
 ## 동작 방식
 
-1. statusline 훅이 컨텍스트 메트릭을 `/tmp/OpenCode-ctx-{session_id}.json`에 기록합니다.
+1. statusline 훅이 컨텍스트 메트릭을 `/tmp/claude-ctx-{session_id}.json`에 기록합니다.
 2. 각 도구 사용 후 context monitor가 해당 메트릭을 읽습니다.
 3. 남은 컨텍스트가 임계값 아래로 떨어지면 `additionalContext`로 경고를 주입합니다.
 4. 에이전트는 대화에서 경고를 받고 그에 맞게 대응할 수 있습니다.
@@ -34,7 +34,7 @@
 Statusline Hook (gsd-statusline.js)
     | 기록
     v
-/tmp/OpenCode-ctx-{session_id}.json
+/tmp/claude-ctx-{session_id}.json
     ^ 읽기
     |
 Context Monitor (gsd-context-monitor.js, PostToolUse/AfterTool)

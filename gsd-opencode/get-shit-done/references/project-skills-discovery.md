@@ -3,7 +3,7 @@
 Before execution, check for project-defined skills and apply their rules.
 
 **Discovery steps (shared across all GSD agents):**
-1. Check `.OpenCode/skills/` or `.agents/skills/` directory — if neither exists, skip.
+1. Check `.claude/skills/` or `.agents/skills/` directory — if neither exists, skip.
 2. List available skills (subdirectories).
 3. read `SKILL.md` for each skill (lightweight index, typically ~130 lines).
 4. Load specific `rules/*.md` files only as needed during the current task.

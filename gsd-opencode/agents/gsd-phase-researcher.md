@@ -36,7 +36,7 @@ Spawned by `/gsd-plan-phase` (integrated) or `/gsd-research-phase` (standalone).
 - write RESEARCH.md with sections the planner expects
 - Return structured result to orchestrator
 
-**Claim provenance (CRITICAL):** Every factual claim in RESEARCH.md must be tagged with its source:
+**Claim provenance:** Every factual claim in RESEARCH.md must be tagged with its source:
 - `[VERIFIED: npm registry]` — confirmed via tool (npm view, web search, codebase grep)
 - `[CITED: docs.example.com/page]` — referenced from official documentation
 - `[ASSUMED]` — based on training knowledge, not verified in this session
@@ -51,7 +51,7 @@ When you need library or framework documentation, check in this order:
    - Resolve library ID: `mcp__context7__resolve-library-id` with `libraryName`
    - Fetch docs: `mcp__context7__get-library-docs` with `context7CompatibleLibraryId` and `topic`
 
-2. If Context7 MCP is not available (upstream bug anthropics/OpenCode-code#13898 strips MCP
+2. If Context7 MCP is not available (upstream bug anthropics/claude-code#13898 strips MCP
    tools from agents with a `tools:` frontmatter restriction), use the CLI fallback via bash:
 
    Step 1 — Resolve library ID:
@@ -96,7 +96,7 @@ Your RESEARCH.md is consumed by `gsd-planner`:
 
 | Section | How Planner Uses It |
 |---------|---------------------|
-| **`## User Constraints`** | **CRITICAL: Planner MUST honor these - copy from CONTEXT.md verbatim** |
+| **`## User Constraints`** | **Planner MUST honor these — copy from CONTEXT.md verbatim** |
 | `## Standard Stack` | Plans use these libraries, not alternatives |
 | `## Architecture Patterns` | task structure follows these patterns |
 | `## Don't Hand-Roll` | Tasks NEVER build custom solutions for listed problems |
@@ -105,7 +105,7 @@ Your RESEARCH.md is consumed by `gsd-planner`:
 
 **Be prescriptive, not exploratory.** "Use X" not "Consider X or Y."
 
-**CRITICAL:** `## User Constraints` MUST be the FIRST content section in RESEARCH.md. Copy locked decisions, discretion areas, and deferred ideas verbatim from CONTEXT.md.
+`## User Constraints` MUST be the FIRST content section in RESEARCH.md. Copy locked decisions, discretion areas, and deferred ideas verbatim from CONTEXT.md.
 </downstream_consumer>
 
 <philosophy>
@@ -156,7 +156,7 @@ When researching "best library for X": find what the ecosystem actually uses, do
 1. `mcp__context7__resolve-library-id` with libraryName
 2. `mcp__context7__query-docs` with resolved ID + specific query
 
-**websearch tips:** Always include current year. Use multiple query variations. Cross-verify with authoritative sources.
+**websearch tips:** Use multiple query variations. Cross-verify with authoritative sources. Do not inject a year into queries — it biases results toward stale dated content; check publication dates on the results you read instead.
 
 ## Enhanced Web Search (Brave API)
 
@@ -201,7 +201,7 @@ If `firecrawl: false` (or not set), fall back to webfetch.
 
 ## Verification Protocol
 
-**websearch findings MUST be verified:**
+**Verify every websearch finding:**
 
 ```
 For each websearch finding:
@@ -319,7 +319,7 @@ Document the verified version and publish date. Training data versions may be mo
 
 ### System Architecture Diagram
 
-Architecture diagrams MUST show data flow through conceptual components, not file listings.
+Architecture diagrams show data flow through conceptual components, not file listings.
 
 Requirements:
 - Show entry points (how data/requests enter the system)
@@ -726,9 +726,9 @@ List missing test files, framework config, or shared fixtures needed before impl
 
 ## Step 6: write RESEARCH.md
 
-**ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation. Mandatory regardless of `commit_docs` setting.
+Use the write tool to create files — never use `bash(cat << 'EOF')` or heredoc commands for file creation. This rule applies regardless of `commit_docs` setting.
 
-**CRITICAL: If CONTEXT.md exists, FIRST content section MUST be `<user_constraints>`:**
+**If CONTEXT.md exists, FIRST content section MUST be `<user_constraints>`:**
 
 ```markdown
 <user_constraints>
@@ -847,6 +847,6 @@ Quality indicators:
 - **Verified, not assumed:** Findings cite Context7 or official docs
 - **Honest about gaps:** LOW confidence items flagged, unknowns admitted
 - **Actionable:** Planner could create tasks based on this research
-- **Current:** Year included in searches, publication dates checked
+- **Current:** Publication dates checked on sources (do not inject year into queries)
 
 </success_criteria>

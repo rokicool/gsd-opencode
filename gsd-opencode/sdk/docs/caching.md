@@ -8,7 +8,7 @@ Use `cache_control` with a 1-hour TTL on system prompts that include GSD workflo
 
 ```typescript
 const response = await client.messages.create({
-  model: 'OpenCode-sonnet-4-20250514',
+  model: 'claude-sonnet-4-20250514',
   system: [
     {
       type: 'text',
@@ -64,5 +64,5 @@ system: [
 
 ## References
 
-- [Anthropic Prompt Caching documentation](https://docs.anthropic.com/en/docs/build-with-OpenCode/prompt-caching)
-- [Extended caching (1-hour TTL)](https://docs.anthropic.com/en/docs/build-with-OpenCode/prompt-caching#extended-caching)
+- [Anthropic Prompt Caching documentation](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)
+- [Extended caching (1-hour TTL)](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#extended-caching)

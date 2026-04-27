@@ -426,7 +426,7 @@ $HOME/.config/opencode/                          # OpenCode (전역 설치)
 
 인스톨러(`bin/install.js`, ~3,000줄)는 다음을 처리합니다.
 
-1. **런타임 감지** — 대화형 프롬프트 또는 CLI 플래그 (`--OpenCode`, `--opencode`, `--gemini`, `--kilo`, `--codex`, `--copilot`, `--antigravity`, `--all`)
+1. **런타임 감지** — 대화형 프롬프트 또는 CLI 플래그 (`--claude`, `--opencode`, `--gemini`, `--kilo`, `--codex`, `--copilot`, `--antigravity`, `--all`)
 2. **위치 선택** — 전역(`--global`) 또는 로컬(`--local`)
 3. **파일 배포** — commands, workflows, references, templates, agents, hooks 복사
 4. **런타임 적응** — 런타임별 파일 내용 변환.
@@ -460,10 +460,10 @@ Runtime Engine (OpenCode / Gemini CLI)
     │
     ├── statusLine event ──► gsd-statusline.js
     │   Reads: stdin (session JSON)
-    │   Writes: stdout (formatted status), /tmp/OpenCode-ctx-{session}.json (bridge)
+    │   Writes: stdout (formatted status), /tmp/claude-ctx-{session}.json (bridge)
     │
     ├── PostToolUse/AfterTool event ──► gsd-context-monitor.js
-    │   Reads: stdin (tool event JSON), /tmp/OpenCode-ctx-{session}.json (bridge)
+    │   Reads: stdin (tool event JSON), /tmp/claude-ctx-{session}.json (bridge)
     │   Writes: stdout (hookSpecificOutput with additionalContext warning)
     │
     └── SessionStart event ──► gsd-check-update.js

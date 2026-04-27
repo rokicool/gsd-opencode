@@ -223,7 +223,7 @@ Detalhes completos: [Configuration Reference](../CONFIGURATION.md).
 ### Projeto novo
 
 ```bash
-OpenCode --dangerously-skip-permissions
+claude --dangerously-skip-permissions
 /gsd-new-project
 /gsd-discuss-phase 1
 /gsd-ui-phase 1

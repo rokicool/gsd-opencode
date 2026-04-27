@@ -39,10 +39,10 @@ const CLAUDE_MD_FALLBACKS = {
   conventions: 'Conventions not yet established. Will populate as patterns emerge during development.',
   architecture: 'Architecture not yet mapped. Follow existing patterns found in the codebase.',
   skills:
-    'No project skills found. Add skills to any of: `.OpenCode/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.',
+    'No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.',
 };
 
-const SKILL_SEARCH_DIRS = ['.OpenCode/skills', '.agents/skills', '.cursor/skills', '.github/skills', '.codex/skills'];
+const SKILL_SEARCH_DIRS = ['.claude/skills', '.agents/skills', '.cursor/skills', '.github/skills', '.codex/skills'];
 
 const CLAUDE_MD_WORKFLOW_ENFORCEMENT = [
   'Before using edit, write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.',
@@ -60,7 +60,7 @@ const CLAUDE_MD_PROFILE_PLACEHOLDER = [
   '## Developer Profile',
   '',
   '> Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.',
-  '> This section is managed by `generate-OpenCode-profile` -- do not edit manually.',
+  '> This section is managed by `generate-claude-profile` -- do not edit manually.',
   '<!-- GSD:profile-end -->',
 ].join('\n');
 
@@ -481,7 +481,7 @@ function cmdWriteProfileLogic(
 
   let outputPath = options.output;
   if (!outputPath) {
-    outputPath = join(homedir(), '.OpenCode', 'get-shit-done', 'USER-PROFILE.md');
+    outputPath = join(homedir(), '.claude', 'get-shit-done', 'USER-PROFILE.md');
   } else if (!isAbsolute(outputPath)) {
     outputPath = join(cwd, outputPath);
   }
@@ -600,7 +600,7 @@ export const generateDevPreferences: QueryHandler = async (args, projectDir) => 
 
   let outPath = outputPathOpt;
   if (!outPath) {
-    outPath = join(homedir(), '.OpenCode', 'commands', 'gsd', 'dev-preferences.md');
+    outPath = join(homedir(), '.claude', 'commands', 'gsd', 'dev-preferences.md');
   } else if (!isAbsolute(outPath)) {
     outPath = join(projectDir, outPath);
   }
@@ -704,7 +704,7 @@ export const generateClaudeProfile: QueryHandler = async (args, projectDir) => {
 
   let targetPath: string;
   if (globalFlag) {
-    targetPath = join(homedir(), '.OpenCode', 'AGENTS.md');
+    targetPath = join(homedir(), '.claude', 'AGENTS.md');
   } else if (outputPathOpt) {
     targetPath = isAbsolute(outputPathOpt) ? outputPathOpt : join(projectDir, outputPathOpt);
   } else {

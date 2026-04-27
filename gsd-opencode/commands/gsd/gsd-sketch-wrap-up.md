@@ -13,7 +13,7 @@ permissions:
 <objective>
 Curate sketch design findings and package them into a persistent project skill that OpenCode
 auto-loads when building the real UI. Also writes a summary to `.planning/sketches/` for
-project history. Output skill goes to `./.OpenCode/skills/sketch-findings-[project]/` (project-local).
+project history. Output skill goes to `./.claude/skills/sketch-findings-[project]/` (project-local).
 </objective>
 
 <execution_context>

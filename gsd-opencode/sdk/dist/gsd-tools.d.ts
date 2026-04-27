@@ -125,7 +125,7 @@ export declare class GSDTools {
 export declare function runGsdToolsQuery(projectDir: string, queryArgv: string[]): Promise<unknown>;
 /**
  * Resolve gsd-tools.cjs path.
- * Probe order: SDK-bundled repo copy → `project/.OpenCode/get-shit-done/` →
+ * Probe order: SDK-bundled repo copy → `project/.claude/get-shit-done/` →
  * `$HOME/.config/opencode/get-shit-done/`.
  */
 export declare function resolveGsdToolsPath(projectDir: string): string;

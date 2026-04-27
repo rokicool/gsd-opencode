@@ -16,23 +16,39 @@ Check which AI CLIs are available on the system:
 ```bash
 # Check each CLI
 command -v gemini >/dev/null 2>&1 && echo "gemini:available" || echo "gemini:missing"
-command -v OpenCode >/dev/null 2>&1 && echo "OpenCode:available" || echo "OpenCode:missing"
+command -v claude >/dev/null 2>&1 && echo "claude:available" || echo "claude:missing"
 command -v codex >/dev/null 2>&1 && echo "codex:available" || echo "codex:missing"
 command -v coderabbit >/dev/null 2>&1 && echo "coderabbit:available" || echo "coderabbit:missing"
 command -v opencode >/dev/null 2>&1 && echo "opencode:available" || echo "opencode:missing"
 command -v qwen >/dev/null 2>&1 && echo "qwen:available" || echo "qwen:missing"
 command -v cursor >/dev/null 2>&1 && echo "cursor:available" || echo "cursor:missing"
+
+# Check local model servers (OpenAI-compatible HTTP API — no CLI binary required)
+OLLAMA_HOST=$(gsd-sdk query config-get review.ollama_host 2>/dev/null | jq -r '.' 2>/dev/null || echo "")
+if [ -z "$OLLAMA_HOST" ] || [ "$OLLAMA_HOST" = "null" ]; then OLLAMA_HOST="http://localhost:11434"; fi
+curl -s --max-time 2 "${OLLAMA_HOST}/v1/models" >/dev/null 2>&1 && echo "ollama:available" || echo "ollama:missing"
+
+LM_STUDIO_HOST=$(gsd-sdk query config-get review.lm_studio_host 2>/dev/null | jq -r '.' 2>/dev/null || echo "")
+if [ -z "$LM_STUDIO_HOST" ] || [ "$LM_STUDIO_HOST" = "null" ]; then LM_STUDIO_HOST="http://localhost:1234"; fi
+curl -s --max-time 2 "${LM_STUDIO_HOST}/v1/models" >/dev/null 2>&1 && echo "lm_studio:available" || echo "lm_studio:missing"
+
+LLAMA_CPP_HOST=$(gsd-sdk query config-get review.llama_cpp_host 2>/dev/null | jq -r '.' 2>/dev/null || echo "")
+if [ -z "$LLAMA_CPP_HOST" ] || [ "$LLAMA_CPP_HOST" = "null" ]; then LLAMA_CPP_HOST="http://localhost:8080"; fi
+curl -s --max-time 2 "${LLAMA_CPP_HOST}/v1/models" >/dev/null 2>&1 && echo "llama_cpp:available" || echo "llama_cpp:missing"
 ```
 
 Parse flags from `$ARGUMENTS`:
 - `--gemini` → include Gemini
-- `--OpenCode` → include OpenCode
+- `--claude` → include OpenCode
 - `--codex` → include Codex
 - `--coderabbit` → include CodeRabbit
 - `--opencode` → include OpenCode
 - `--qwen` → include Qwen Code
 - `--cursor` → include Cursor
-- `--all` → include all available
+- `--ollama` → include Ollama (local server, OpenAI-compatible)
+- `--lm-studio` → include LM Studio (local server, OpenAI-compatible)
+- `--llama-cpp` → include llama.cpp (local server, OpenAI-compatible)
+- `--all` → include all available (CLIs + running local servers)
 - No flags → include all available
 
 If no CLIs are available:
@@ -40,7 +56,7 @@ If no CLIs are available:
 No external AI CLIs found. Install at least one:
 - gemini: https://github.com/google-gemini/gemini-cli
 - codex: https://github.com/openai/codex
-- OpenCode: https://github.com/anthropics/OpenCode-code
+- claude: https://github.com/anthropics/claude-code
 - opencode: https://opencode.ai (leverages GitHub Copilot subscription models)
 - qwen: https://github.com/nicepkg/qwen-code (Alibaba Qwen models)
 - cursor: https://cursor.com (Cursor IDE agent mode)
@@ -60,8 +76,8 @@ elif [ -n "$CURSOR_SESSION_ID" ]; then
   # Running inside Cursor agent — skip cursor for independence
   SELF_CLI="cursor"
 elif [ -n "$CLAUDE_CODE_ENTRYPOINT" ]; then
-  # Running inside OpenCode CLI — skip OpenCode for independence
-  SELF_CLI="OpenCode"
+  # Running inside OpenCode CLI — skip claude for independence
+  SELF_CLI="claude"
 else
   # Other environments (Gemini CLI, Codex CLI, etc.)
   # Fall back to AI self-identification to decide which CLI to skip
@@ -71,7 +87,7 @@ fi
 
 Rules:
 - If `SELF_CLI="none"` → invoke ALL available CLIs (no skip)
-- If `SELF_CLI="OpenCode"` → skip OpenCode, use gemini/codex
+- If `SELF_CLI="claude"` → skip claude, use gemini/codex
 - If `SELF_CLI="auto"` → the executing AI identifies itself and skips its own CLI
 - At least one DIFFERENT CLI must be available for the review to proceed.
 </step>
@@ -153,7 +169,7 @@ read model preferences from planning config. Null/missing values fall back to CL
 ```bash
 # JSON scalars from gsd-sdk query; use jq -r to strip JSON string quotes (install jq if missing)
 GEMINI_MODEL=$(gsd-sdk query config-get review.models.gemini 2>/dev/null | jq -r '.' 2>/dev/null || true)
-CLAUDE_MODEL=$(gsd-sdk query config-get review.models.OpenCode 2>/dev/null | jq -r '.' 2>/dev/null || true)
+CLAUDE_MODEL=$(gsd-sdk query config-get review.models.claude 2>/dev/null | jq -r '.' 2>/dev/null || true)
 CODEX_MODEL=$(gsd-sdk query config-get review.models.codex 2>/dev/null | jq -r '.' 2>/dev/null || true)
 OPENCODE_MODEL=$(gsd-sdk query config-get review.models.opencode 2>/dev/null | jq -r '.' 2>/dev/null || true)
 ```
@@ -172,9 +188,9 @@ fi
 **OpenCode (separate session):**
 ```bash
 if [ -n "$CLAUDE_MODEL" ] && [ "$CLAUDE_MODEL" != "null" ]; then
-  cat /tmp/gsd-review-prompt-{phase}.md | OpenCode --model "$CLAUDE_MODEL" -p - 2>/dev/null > /tmp/gsd-review-OpenCode-{phase}.md
+  cat /tmp/gsd-review-prompt-{phase}.md | claude --model "$CLAUDE_MODEL" -p - 2>/dev/null > /tmp/gsd-review-claude-{phase}.md
 else
-  cat /tmp/gsd-review-prompt-{phase}.md | OpenCode -p - 2>/dev/null > /tmp/gsd-review-OpenCode-{phase}.md
+  cat /tmp/gsd-review-prompt-{phase}.md | claude -p - 2>/dev/null > /tmp/gsd-review-claude-{phase}.md
 fi
 ```
 
@@ -223,7 +239,70 @@ if [ ! -s /tmp/gsd-review-cursor-{phase}.md ]; then
 fi
 ```
 
-If a CLI fails, log the error and continue with remaining CLIs.
+**Ollama (local, OpenAI-compatible):**
+
+read host and model from config. All three local backends share the same `/v1/chat/completions` endpoint — only host and model differ. Use `jq --rawfile` to safely encode the multi-line prompt as JSON without shell-escaping issues.
+
+```bash
+OLLAMA_HOST=$(gsd-sdk query config-get review.ollama_host 2>/dev/null | jq -r '.' 2>/dev/null || echo "")
+if [ -z "$OLLAMA_HOST" ] || [ "$OLLAMA_HOST" = "null" ]; then OLLAMA_HOST="http://localhost:11434"; fi
+OLLAMA_MODEL=$(gsd-sdk query config-get review.models.ollama 2>/dev/null | jq -r '.' 2>/dev/null || echo "")
+if [ -z "$OLLAMA_MODEL" ] || [ "$OLLAMA_MODEL" = "null" ]; then
+  OLLAMA_MODEL=$(curl -s --max-time 2 "${OLLAMA_HOST}/v1/models" 2>/dev/null | jq -r '.data[0].id // "llama3"' 2>/dev/null || echo "llama3")
+fi
+jq -n --rawfile content /tmp/gsd-review-prompt-{phase}.md \
+  --arg model "$OLLAMA_MODEL" \
+  '{model: $model, messages: [{role: "user", content: $content}]}' | \
+  curl -s --max-time 120 -X POST "${OLLAMA_HOST}/v1/chat/completions" \
+    -H "Content-Type: application/json" -d @- 2>/dev/null | \
+  jq -r '.choices[0].message.content // "Ollama review failed or returned empty output."' \
+  > /tmp/gsd-review-ollama-{phase}.md
+if [ ! -s /tmp/gsd-review-ollama-{phase}.md ]; then
+  echo "Ollama review failed or returned empty output." > /tmp/gsd-review-ollama-{phase}.md
+fi
+```
+
+**LM Studio (local, OpenAI-compatible):**
+```bash
+LM_STUDIO_HOST=$(gsd-sdk query config-get review.lm_studio_host 2>/dev/null | jq -r '.' 2>/dev/null || echo "")
+if [ -z "$LM_STUDIO_HOST" ] || [ "$LM_STUDIO_HOST" = "null" ]; then LM_STUDIO_HOST="http://localhost:1234"; fi
+LM_STUDIO_MODEL=$(gsd-sdk query config-get review.models.lm_studio 2>/dev/null | jq -r '.' 2>/dev/null || echo "")
+if [ -z "$LM_STUDIO_MODEL" ] || [ "$LM_STUDIO_MODEL" = "null" ]; then
+  LM_STUDIO_MODEL=$(curl -s --max-time 2 "${LM_STUDIO_HOST}/v1/models" 2>/dev/null | jq -r '.data[0].id // "local-model"' 2>/dev/null || echo "local-model")
+fi
+jq -n --rawfile content /tmp/gsd-review-prompt-{phase}.md \
+  --arg model "$LM_STUDIO_MODEL" \
+  '{model: $model, messages: [{role: "user", content: $content}]}' | \
+  curl -s --max-time 120 -X POST "${LM_STUDIO_HOST}/v1/chat/completions" \
+    -H "Content-Type: application/json" -d @- 2>/dev/null | \
+  jq -r '.choices[0].message.content // "LM Studio review failed or returned empty output."' \
+  > /tmp/gsd-review-lm_studio-{phase}.md
+if [ ! -s /tmp/gsd-review-lm_studio-{phase}.md ]; then
+  echo "LM Studio review failed or returned empty output." > /tmp/gsd-review-lm_studio-{phase}.md
+fi
+```
+
+**llama.cpp (local, OpenAI-compatible):**
+```bash
+LLAMA_CPP_HOST=$(gsd-sdk query config-get review.llama_cpp_host 2>/dev/null | jq -r '.' 2>/dev/null || echo "")
+if [ -z "$LLAMA_CPP_HOST" ] || [ "$LLAMA_CPP_HOST" = "null" ]; then LLAMA_CPP_HOST="http://localhost:8080"; fi
+LLAMA_CPP_MODEL=$(gsd-sdk query config-get review.models.llama_cpp 2>/dev/null | jq -r '.' 2>/dev/null || echo "")
+if [ -z "$LLAMA_CPP_MODEL" ] || [ "$LLAMA_CPP_MODEL" = "null" ]; then
+  LLAMA_CPP_MODEL=$(curl -s --max-time 2 "${LLAMA_CPP_HOST}/v1/models" 2>/dev/null | jq -r '.data[0].id // "local-model"' 2>/dev/null || echo "local-model")
+fi
+jq -n --rawfile content /tmp/gsd-review-prompt-{phase}.md \
+  --arg model "$LLAMA_CPP_MODEL" \
+  '{model: $model, messages: [{role: "user", content: $content}]}' | \
+  curl -s --max-time 120 -X POST "${LLAMA_CPP_HOST}/v1/chat/completions" \
+    -H "Content-Type: application/json" -d @- 2>/dev/null | \
+  jq -r '.choices[0].message.content // "llama.cpp review failed or returned empty output."' \
+  > /tmp/gsd-review-llama_cpp-{phase}.md
+if [ ! -s /tmp/gsd-review-llama_cpp-{phase}.md ]; then
+  echo "llama.cpp review failed or returned empty output." > /tmp/gsd-review-llama_cpp-{phase}.md
+fi
+```
+
+If a CLI or local server fails, log the error and continue with remaining reviewers.
 
 Display progress:
 ```
@@ -242,7 +321,7 @@ Combine all review responses into `{phase_dir}/{padded_phase}-REVIEWS.md`:
 ```markdown
 ---
 phase: {N}
-reviewers: [gemini, OpenCode, codex, coderabbit, opencode, qwen, cursor]
+reviewers: [gemini, claude, codex, coderabbit, opencode, qwen, cursor, ollama, lm_studio, llama_cpp]  # populate at runtime with only the reviewers actually invoked
 reviewed_at: {ISO timestamp}
 plans_reviewed: [{list of PLAN.md files}]
 ---
@@ -257,7 +336,7 @@ plans_reviewed: [{list of PLAN.md files}]
 
 ## OpenCode Review
 
-{OpenCode review content}
+{claude review content}
 
 ---
 
@@ -288,6 +367,24 @@ plans_reviewed: [{list of PLAN.md files}]
 ## Cursor Review
 
 {cursor review content}
+
+---
+
+## Ollama Review
+
+{ollama review content}
+
+---
+
+## LM Studio Review
+
+{lm_studio review content}
+
+---
+
+## llama.cpp Review
+
+{llama_cpp review content}
 
 ---
 

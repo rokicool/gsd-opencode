@@ -11,9 +11,9 @@
  * ```typescript
  * import { agentSkills } from './skills.js';
  *
- * // With config.agent_skills = { "gsd-planner": [".OpenCode/skills/demo-skill"] }
+ * // With config.agent_skills = { "gsd-planner": [".claude/skills/demo-skill"] }
  * await agentSkills(['gsd-planner'], '/project');
- * // { data: '<agent_skills>\nRead these user-configured skills:\n- @.OpenCode/skills/demo-skill/SKILL.md\n</agent_skills>' }
+ * // { data: '<agent_skills>\nRead these user-configured skills:\n- @.claude/skills/demo-skill/SKILL.md\n</agent_skills>' }
  *
  * // No agent type → empty string (matches gsd-tools cmdAgentSkills).
  * await agentSkills([], '/project');
@@ -72,7 +72,7 @@ export const agentSkills = async (args, projectDir) => {
     }
     if (skillPaths.length === 0)
         return { data: '' };
-    const globalSkillsBase = join(homedir(), '.OpenCode', 'skills');
+    const globalSkillsBase = join(homedir(), '.claude', 'skills');
     const validEntries = [];
     for (const entry of skillPaths) {
         if (typeof entry !== 'string')

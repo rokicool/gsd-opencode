@@ -426,7 +426,7 @@ $HOME/.config/opencode/                          # OpenCode (global install)
 
 インストーラー（`bin/install.js`、約3,000行）は以下を処理します：
 
-1. **ランタイム検出** — インタラクティブプロンプトまたはCLIフラグ（`--OpenCode`、`--opencode`、`--gemini`、`--kilo`、`--codex`、`--copilot`、`--antigravity`、`--all`）
+1. **ランタイム検出** — インタラクティブプロンプトまたはCLIフラグ（`--claude`、`--opencode`、`--gemini`、`--kilo`、`--codex`、`--copilot`、`--antigravity`、`--all`）
 2. **インストール先の選択** — グローバル（`--global`）またはローカル（`--local`）
 3. **ファイルデプロイ** — コマンド、ワークフロー、リファレンス、テンプレート、エージェント、フックをコピー
 4. **ランタイム適応** — ランタイムごとにファイル内容を変換：
@@ -460,10 +460,10 @@ Runtime Engine (OpenCode / Gemini CLI)
     │
     ├── statusLine event ──► gsd-statusline.js
     │   Reads: stdin (session JSON)
-    │   Writes: stdout (formatted status), /tmp/OpenCode-ctx-{session}.json (bridge)
+    │   Writes: stdout (formatted status), /tmp/claude-ctx-{session}.json (bridge)
     │
     ├── PostToolUse/AfterTool event ──► gsd-context-monitor.js
-    │   Reads: stdin (tool event JSON), /tmp/OpenCode-ctx-{session}.json (bridge)
+    │   Reads: stdin (tool event JSON), /tmp/claude-ctx-{session}.json (bridge)
     │   Writes: stdout (hookSpecificOutput with additionalContext warning)
     │
     └── SessionStart event ──► gsd-check-update.js

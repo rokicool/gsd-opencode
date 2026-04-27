@@ -235,11 +235,11 @@ export class GSD {
     async loadAgentDefinition() {
         const paths = [
             // Repo-local GSD installation
-            join(this.projectDir, '.OpenCode', 'get-shit-done', 'agents', 'gsd-executor.md'),
+            join(this.projectDir, '.claude', 'get-shit-done', 'agents', 'gsd-executor.md'),
             // Repo-local agents directory
-            join(this.projectDir, '.OpenCode', 'agents', 'gsd-executor.md'),
+            join(this.projectDir, '.claude', 'agents', 'gsd-executor.md'),
             // Global home directory
-            join(homedir(), '.OpenCode', 'agents', 'gsd-executor.md'),
+            join(homedir(), '.claude', 'agents', 'gsd-executor.md'),
             join(this.projectDir, 'agents', 'gsd-executor.md'),
         ];
         for (const p of paths) {

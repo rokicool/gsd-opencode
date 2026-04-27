@@ -27,8 +27,8 @@ const BUNDLED_CORE_CJS = fileURLToPath(
 function resolveCoreCjsPath(projectDir: string): string | null {
   const candidates = [
     BUNDLED_CORE_CJS,
-    join(projectDir, '.OpenCode', 'get-shit-done', 'bin', 'lib', 'core.cjs'),
-    join(homedir(), '.OpenCode', 'get-shit-done', 'bin', 'lib', 'core.cjs'),
+    join(projectDir, '.claude', 'get-shit-done', 'bin', 'lib', 'core.cjs'),
+    join(homedir(), '.claude', 'get-shit-done', 'bin', 'lib', 'core.cjs'),
   ];
   return candidates.find(p => existsSync(p)) ?? null;
 }

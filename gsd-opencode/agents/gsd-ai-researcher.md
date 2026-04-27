@@ -32,7 +32,7 @@ When you need library or framework documentation, check in this order:
    - Resolve library ID: `mcp__context7__resolve-library-id` with `libraryName`
    - Fetch docs: `mcp__context7__get-library-docs` with `context7CompatibleLibraryId` and `topic`
 
-2. If Context7 MCP is not available (upstream bug anthropics/OpenCode-code#13898 strips MCP
+2. If Context7 MCP is not available (upstream bug anthropics/claude-code#13898 strips MCP
    tools from agents with a `tools:` frontmatter restriction), use the CLI fallback via bash:
 
    Step 1 — Resolve library ID:
@@ -73,7 +73,7 @@ Use context7 MCP first (fastest). Fall back to webfetch.
 | LangChain | https://python.langchain.com/docs |
 | LangGraph | https://langchain-ai.github.io/langgraph |
 | OpenAI Agents SDK | https://openai.github.io/openai-agents-python |
-| OpenCode Agent SDK | https://docs.anthropic.com/en/docs/OpenCode-code/sdk |
+| OpenCode Agent SDK | https://docs.anthropic.com/en/docs/claude-code/sdk |
 | AutoGen / AG2 | https://ag2ai.github.io/ag2 |
 | Google ADK | https://google.github.io/adk-docs |
 | Haystack | https://docs.haystack.deepset.ai |
@@ -98,7 +98,7 @@ Update AI-SPEC.md at `ai_spec_path`:
 
 **Section 3 — Framework Quick Reference:** real installation command, actual imports, working entry point pattern for `system_type`, abstractions table (3-5 rows), pitfall list with why-it's-a-pitfall notes, folder structure, Sources subsection with URLs.
 
-**Section 4 — Implementation Guidance:** specific model (e.g., `OpenCode-sonnet-4-6`, `gpt-4o`) with params, core pattern as code snippet with inline comments, tool use config, state management approach, context window strategy.
+**Section 4 — Implementation Guidance:** specific model (e.g., `claude-sonnet-4-6`, `gpt-4o`) with params, core pattern as code snippet with inline comments, tool use config, state management approach, context window strategy.
 </step>
 
 <step name="write_section_4b">

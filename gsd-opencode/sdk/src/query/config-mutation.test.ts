@@ -106,7 +106,7 @@ describe('isValidConfigKey', () => {
     const { isValidConfigKey } = await import('./config-mutation.js');
     const samples = [
       'agent_skills.gsd-planner',
-      'review.models.OpenCode',
+      'review.models.claude',
       'features.some_feature',
       'claude_md_assembly.blocks.intro',
       'model_profile_overrides.codex.opus',

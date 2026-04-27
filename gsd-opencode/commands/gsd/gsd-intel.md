@@ -8,11 +8,6 @@ permissions:
    task: true
 ---
 
-<objective>
-Query, inspect, or refresh codebase intelligence files in `.planning/intel/`.
-Supports operations: `query <term>` (search intel files), `status` (check intel freshness), `diff` (show changes since last refresh), `refresh` (rebuild intelligence files).
-</objective>
-
 **STOP -- DO NOT READ THIS FILE. You are already reading it. This prompt was injected into your context by OpenCode's command system. Using the read tool on this file wastes tokens. Begin executing Step 0 immediately.**
 
 ## Step 0 -- Banner
@@ -137,7 +132,7 @@ GSD > Spawning intel-updater agent to analyze codebase...
 Spawn a task:
 
 ```
-@gsd-intel-updater "You are the gsd-intel-updater agent. Your job is to analyze this codebase and write/update intelligence files in .planning/intel/.
+@general "You are the gsd-intel-updater agent. Your job is to analyze this codebase and write/update intelligence files in .planning/intel/.
 
 Project root: ${CWD}
 Prefer: gsd-sdk query <subcommand> (installed gsd-sdk on PATH). Legacy: node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs

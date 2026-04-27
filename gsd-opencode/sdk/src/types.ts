@@ -148,7 +148,7 @@ export interface SessionOptions {
   maxTurns?: number;
   /** Maximum budget in USD. Default: 5.0. */
   maxBudgetUsd?: number;
-  /** Model ID to use (e.g., 'OpenCode-sonnet-4-6'). Falls back to config model_profile. */
+  /** Model ID to use (e.g., 'claude-sonnet-4-6'). Falls back to config model_profile. */
   model?: string;
   /** Working directory for the session. */
   cwd?: string;
@@ -197,7 +197,7 @@ export interface PlanResult {
 export interface GSDOptions {
   /** Root directory of the project. */
   projectDir: string;
-  /** Path to gsd-tools.cjs. Falls back to <projectDir>/.OpenCode/, then the bundled repo path, then $HOME/.config/opencode/. */
+  /** Path to gsd-tools.cjs. Falls back to <projectDir>/.claude/, then the bundled repo path, then $HOME/.config/opencode/. */
   gsdToolsPath?: string;
   /**
    * Optional session correlation id for query mutation events when using {@link GSD.createTools}.

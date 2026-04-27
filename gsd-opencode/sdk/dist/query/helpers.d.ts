@@ -19,7 +19,7 @@
 /**
  * Supported GSD runtimes. Kept in sync with `bin/install.js:getGlobalDir()`.
  */
-export declare const SUPPORTED_RUNTIMES: readonly ["OpenCode", "opencode", "kilo", "gemini", "codex", "copilot", "antigravity", "cursor", "windsurf", "augment", "trae", "qwen", "codebuddy", "cline"];
+export declare const SUPPORTED_RUNTIMES: readonly ["claude", "opencode", "kilo", "gemini", "codex", "copilot", "antigravity", "cursor", "windsurf", "augment", "trae", "qwen", "codebuddy", "cline"];
 export type Runtime = (typeof SUPPORTED_RUNTIMES)[number];
 /**
  * Resolve the per-runtime config directory, mirroring
@@ -30,7 +30,7 @@ export declare function getRuntimeConfigDir(runtime: Runtime): string;
  * Detect the invoking runtime using issue #2402 precedence:
  *   1. `GSD_RUNTIME` env var
  *   2. `config.runtime` field (from `.planning/config.json` when loaded)
- *   3. Fallback to `'OpenCode'`
+ *   3. Fallback to `'claude'`
  *
  * Unknown values fall through to the next tier rather than throwing, so
  * stale env values don't hard-block workflows.

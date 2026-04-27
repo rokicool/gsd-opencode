@@ -296,7 +296,7 @@ describe('getRuntimeConfigDir', () => {
   });
 
   const defaults: Record<Runtime, string> = {
-    OpenCode: join(homedir(), '.OpenCode'),
+    claude: join(homedir(), '.claude'),
     opencode: join(homedir(), '.config', 'opencode'),
     kilo: join(homedir(), '.config', 'kilo'),
     gemini: join(homedir(), '.gemini'),
@@ -319,7 +319,7 @@ describe('getRuntimeConfigDir', () => {
   }
 
   const envOverrides: Array<[Runtime, string, string]> = [
-    ['OpenCode', 'CLAUDE_CONFIG_DIR', '/x/OpenCode'],
+    ['claude', 'CLAUDE_CONFIG_DIR', '/x/claude'],
     ['gemini', 'GEMINI_CONFIG_DIR', '/x/gemini'],
     ['codex', 'CODEX_HOME', '/x/codex'],
     ['copilot', 'COPILOT_CONFIG_DIR', '/x/copilot'],
@@ -369,8 +369,8 @@ describe('detectRuntime', () => {
     }
   });
 
-  it('defaults to OpenCode with no signals', () => {
-    expect(detectRuntime()).toBe('OpenCode');
+  it('defaults to claude with no signals', () => {
+    expect(detectRuntime()).toBe('claude');
   });
 
   it('uses GSD_RUNTIME when set to a known runtime', () => {
@@ -387,14 +387,14 @@ describe('detectRuntime', () => {
     expect(detectRuntime({ runtime: 'gemini' })).toBe('codex');
   });
 
-  it('unknown GSD_RUNTIME falls through to config then OpenCode', () => {
+  it('unknown GSD_RUNTIME falls through to config then claude', () => {
     process.env.GSD_RUNTIME = 'bogus';
     expect(detectRuntime({ runtime: 'gemini' })).toBe('gemini');
-    expect(detectRuntime()).toBe('OpenCode');
+    expect(detectRuntime()).toBe('claude');
   });
 
-  it('unknown config.runtime falls through to OpenCode', () => {
-    expect(detectRuntime({ runtime: 'bogus' })).toBe('OpenCode');
+  it('unknown config.runtime falls through to claude', () => {
+    expect(detectRuntime({ runtime: 'bogus' })).toBe('claude');
   });
 });
 
@@ -411,13 +411,13 @@ describe('resolveAgentsDir (runtime-aware)', () => {
   });
 
   it('defaults to OpenCode agents dir with no args', () => {
-    expect(resolveAgentsDir()).toBe(join(homedir(), '.OpenCode', 'agents'));
+    expect(resolveAgentsDir()).toBe(join(homedir(), '.claude', 'agents'));
   });
 
   it('GSD_AGENTS_DIR short-circuits regardless of runtime', () => {
     process.env.GSD_AGENTS_DIR = '/explicit/agents';
     expect(resolveAgentsDir('codex')).toBe('/explicit/agents');
-    expect(resolveAgentsDir('OpenCode')).toBe('/explicit/agents');
+    expect(resolveAgentsDir('claude')).toBe('/explicit/agents');
   });
 
   it('appends /agents to the per-runtime config dir', () => {

@@ -26,9 +26,9 @@
 import { readFile } from 'node:fs/promises';
 import { isAbsolute, join } from 'node:path';
 const DISCRETION_HEADINGS = new Set([
-    "OpenCode's discretion",
+    "claude's discretion",
     'claudes discretion',
-    'OpenCode discretion',
+    'claude discretion',
 ]);
 const NON_TRACKABLE_TAGS = new Set(['informational', 'folded', 'deferred']);
 /**

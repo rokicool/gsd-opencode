@@ -24,7 +24,7 @@ import type { QueryHandler } from './utils.js';
 const GSD_MARKER = '<!-- generated-by: gsd-doc-writer -->';
 
 const SKIP_DIRS = new Set([
-  'node_modules', '.git', '.planning', '.OpenCode', '__pycache__',
+  'node_modules', '.git', '.planning', '.claude', '__pycache__',
   'target', 'dist', 'build', '.next', '.nuxt', 'coverage',
   '.vscode', '.idea',
 ]);

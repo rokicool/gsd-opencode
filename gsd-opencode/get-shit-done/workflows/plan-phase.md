@@ -22,6 +22,10 @@ Valid GSD subagent types (use exact names — do not fall back to 'general'):
 
 <process>
 
+## 0. Git Branch Invariant
+
+**Do not create, rename, or switch git branches during plan-phase.** Branch identity is established at discuss-phase and is owned by the user's git workflow. A phase rename in ROADMAP.md is a plan-level change only — it does not mutate git branch names. If `phase_slug` in the init JSON differs from the current branch name, that is expected and correct; leave the branch unchanged.
+
 ## 1. Initialize
 
 Load all context in one call (paths only to minimize orchestrator context):
@@ -29,9 +33,9 @@ Load all context in one call (paths only to minimize orchestrator context):
 ```bash
 INIT=$(gsd-sdk query init.plan-phase "$PHASE")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_RESEARCHER=$(gsd-sdk query agent-skills gsd-researcher 2>/dev/null)
-AGENT_SKILLS_PLANNER=$(gsd-sdk query agent-skills gsd-planner 2>/dev/null)
-AGENT_SKILLS_CHECKER=$(gsd-sdk query agent-skills gsd-checker 2>/dev/null)
+AGENT_SKILLS_RESEARCHER=$(gsd-sdk query agent-skills gsd-phase-researcher)
+AGENT_SKILLS_PLANNER=$(gsd-sdk query agent-skills gsd-planner)
+AGENT_SKILLS_CHECKER=$(gsd-sdk query agent-skills gsd-plan-checker)
 CONTEXT_WINDOW=$(gsd-sdk query config-get context_window 2>/dev/null || echo "200000")
 TDD_MODE=$(gsd-sdk query config-get workflow.tdd_mode 2>/dev/null || echo "false")
 ```
@@ -50,7 +54,7 @@ Parse JSON for: `researcher_model`, `planner_model`, `checker_model`, `research_
 
 ## 2. Parse and Normalize Arguments
 
-Extract from $ARGUMENTS: phase number (integer or decimal like `2.1`), flags (`--research`, `--skip-research`, `--gaps`, `--skip-verify`, `--skip-ui`, `--prd <filepath>`, `--reviews`, `--text`, `--bounce`, `--skip-bounce`).
+Extract from $ARGUMENTS: phase number (integer or decimal like `2.1`), flags (`--research`, `--skip-research`, `--gaps`, `--skip-verify`, `--skip-ui`, `--prd <filepath>`, `--reviews`, `--text`, `--bounce`, `--skip-bounce`, `--chunked`).
 
 Set `TEXT_MODE=true` if `--text` is present in $ARGUMENTS OR `text_mode` from init JSON is `true`. When `TEXT_MODE` is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for OpenCode remote sessions (`/rc` mode) where TUI menus don't work through the OpenCode App.
 
@@ -64,6 +68,15 @@ mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 ```
 
 **Existing artifacts from init:** `has_research`, `has_plans`, `plan_count`.
+
+Set `CHUNKED_MODE` from flag or config:
+```bash
+CHUNKED_CFG=$(gsd-sdk query config-get workflow.plan_chunked 2>/dev/null || echo "false")
+CHUNKED_MODE=false
+if [[ "$ARGUMENTS" =~ --chunked ]] || [[ "$CHUNKED_CFG" == "true" ]]; then
+  CHUNKED_MODE=true
+fi
+```
 
 ## 2.5. Validate `--reviews` Prerequisite
 
@@ -361,7 +374,7 @@ ${AGENT_SKILLS_RESEARCHER}
 **Phase requirement IDs (MUST address):** {phase_req_ids}
 
 **Project instructions:** read ./AGENTS.md if exists — follow project-specific guidelines
-**Project skills:** Check .OpenCode/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, research should account for project skill patterns
+**Project skills:** Check .claude/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, research should account for project skill patterns
 </additional_context>
 
 <output>
@@ -466,9 +479,9 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 
 **If UI-SPEC.md missing AND `UI_GATE_CFG` is `true`:**
 
-read auto-chain state:
+read ephemeral chain flag (same field as `check.auto-mode` → `auto_chain_active`):
 ```bash
-AUTO_CHAIN=$(gsd-sdk query config-get workflow._auto_chain_active 2>/dev/null || echo "false")
+AUTO_CHAIN=$(gsd-sdk query check auto-mode --pick auto_chain_active 2>/dev/null || echo "false")
 ```
 
 **If `AUTO_CHAIN` is `true` (running inside a `--chain` or `--auto` pipeline):**
@@ -590,8 +603,8 @@ REVIEWS_PATH=$(_gsd_field "$INIT" reviews_path)
 PATTERNS_PATH=$(_gsd_field "$INIT" patterns_path)
 
 # Detect spike/sketch findings skills (project-local)
-SPIKE_FINDINGS_PATH=$(ls ./.OpenCode/skills/spike-findings-*/SKILL.md 2>/dev/null | head -1)
-SKETCH_FINDINGS_PATH=$(ls ./.OpenCode/skills/sketch-findings-*/SKILL.md 2>/dev/null | head -1)
+SPIKE_FINDINGS_PATH=$(ls ./.claude/skills/spike-findings-*/SKILL.md 2>/dev/null | head -1)
+SKETCH_FINDINGS_PATH=$(ls ./.claude/skills/sketch-findings-*/SKILL.md 2>/dev/null | head -1)
 ```
 
 ## 7.5. Verify Nyquist Artifacts
@@ -660,7 +673,7 @@ Extract the list of files to be created/modified from CONTEXT.md and RESEARCH.md
 
 Spawn with:
 ```
-@gsd-pattern-mapper "{above}"
+@gsd-pattern-mapper {above}
 ```
 
 **Handle return:**
@@ -707,7 +720,8 @@ ${CONTEXT_WINDOW >= 500000 ? `
 **Cross-phase context (1M model enrichment):**
 - CONTEXT.md files from the 3 most recent completed phases (locked decisions — maintain consistency)
 - SUMMARY.md files from the 3 most recent completed phases (what was built — reuse patterns, avoid duplication)
-- CONTEXT.md and SUMMARY.md from any phases listed in the current phase's "Depends on:" field in ROADMAP.md (regardless of recency — explicit dependencies always load, deduplicated against the 3 most recent)
+- LEARNINGS.md files from the 3 most recent completed phases (structured decisions, patterns, lessons, surprises — skip silently if a phase has no LEARNINGS.md; prefix each block with \`[from Phase N LEARNINGS]\` for source attribution; if total size exceeds 15% of context budget, drop oldest first)
+- CONTEXT.md, SUMMARY.md, and LEARNINGS.md from any phases listed in the current phase's "Depends on:" field in ROADMAP.md (regardless of recency — explicit dependencies always load, deduplicated against the 3 most recent)
 - Skip all other prior phases to stay within context budget
 ` : ''}
 </files_to_read>
@@ -717,7 +731,7 @@ ${AGENT_SKILLS_PLANNER}
 **Phase requirement IDs (every ID MUST appear in a plan's `requirements` field):** {phase_req_ids}
 
 **Project instructions:** read ./AGENTS.md if exists — follow project-specific guidelines
-**Project skills:** Check .OpenCode/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, plans should account for project skill rules
+**Project skills:** Check .claude/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, plans should account for project skill rules
 
 ${TDD_MODE === 'true' ? `
 <tdd_mode_active>
@@ -781,9 +795,107 @@ Every task MUST include these fields — they are NOT optional:
 </quality_gate>
 ```
 
+**If `CHUNKED_MODE` is `false` (default):** Spawn the planner as a single long-lived task:
+
 ```
 @gsd-planner filled_prompt
 ```
+
+**If `CHUNKED_MODE` is `true`:** Skip the task() call above — proceed to step 8.5 instead.
+
+## 8.5. Chunked Planning Mode
+
+**Skip if `CHUNKED_MODE` is `false`.**
+
+Chunked mode splits the single long-lived planner task into a short outline task followed by
+N short per-plan Tasks. Each task is bounded to ~3–5 min; each plan is committed individually
+for crash resilience. If any task hangs and the terminal is force-killed, rerunning
+`/gsd-plan-phase {N} --chunked` resumes from the last successfully committed plan.
+
+**Intended for new or in-progress chunked runs.** To recover plans already written by a prior
+*non-chunked* run, use step 6's "Add more plans" or proceed directly to `/gsd-execute-phase`
+— don't start a fresh chunked run over existing non-chunked plans.
+
+### 8.5.1 Outline Phase (outline-only mode, ~2 min)
+
+**Resume detection:** If `${PHASE_DIR}/${PADDED_PHASE}-PLAN-OUTLINE.md` already exists **and
+is valid** (contains the `## OUTLINE COMPLETE` marker), skip this sub-step — the outline
+already exists from a previous run. Proceed directly to 8.5.2.
+
+```bash
+OUTLINE_FILE="${PHASE_DIR}/${PADDED_PHASE}-PLAN-OUTLINE.md"
+if [[ -f "$OUTLINE_FILE" ]] && grep -q "^## OUTLINE COMPLETE" "$OUTLINE_FILE"; then
+  # reuse existing outline — skip to 8.5.2
+fi
+```
+
+Display:
+```text
+◆ Chunked mode: spawning outline planner...
+```
+
+Spawn the planner in **outline-only** mode — it must write only the outline manifest, not any
+PLAN.md files:
+
+```javascript
+@gsd-planner "{same planning_context as step 8, plus:}
+
+  **Chunked mode: outline-only.**
+  Do NOT write any PLAN.md files in this task.
+  write only: {PHASE_DIR}/{PADDED_PHASE}-PLAN-OUTLINE.md
+
+  The outline must be a markdown table with columns:
+  Plan ID | Objective | Wave | Depends On | Requirements
+
+  Return: ## OUTLINE COMPLETE with plan count."
+```
+
+Handle return:
+- **`## OUTLINE COMPLETE`:** read `PLAN-OUTLINE.md`, extract plan list. Continue to 8.5.2.
+- **Any other return or empty:** Display error. Offer: 1) Retry outline, 2) Stop.
+
+### 8.5.2 Per-Plan Tasks (single-plan mode, ~3-5 min each)
+
+For each plan entry extracted from `PLAN-OUTLINE.md`:
+
+1. **Resume check:** If `${PHASE_DIR}/{plan_id}-PLAN.md` already exists on disk **and has
+   valid YAML frontmatter** (opening `---` delimiter present), skip this plan (do not
+   overwrite completed work — resume safety).
+
+   ```bash
+   PLAN_FILE="${PHASE_DIR}/${plan_id}-PLAN.md"
+   if [[ -f "$PLAN_FILE" ]] && head -1 "$PLAN_FILE" | grep -q '^---'; then
+     continue  # plan already written, skip
+   fi
+   ```
+
+2. Display:
+   ```text
+   ◆ Chunked mode: planning {plan_id} ({k}/{N})...
+   ```
+
+3. Spawn the planner in **single-plan** mode — it must write exactly one PLAN.md file:
+   ```javascript
+   @gsd-planner "{same planning_context as step 8, plus:}
+
+     **Chunked mode: single-plan.**
+     write exactly ONE plan file: {PHASE_DIR}/{plan_id}-PLAN.md
+     Plan to write: {plan_id} — {objective}
+     Wave: {wave} | Depends on: {depends_on}
+     Phase requirement IDs to cover in this plan: {plan_requirements}
+
+     Return: ## PLAN COMPLETE with the plan ID."
+   ```
+
+4. **Verify disk:** Check `${PHASE_DIR}/{plan_id}-PLAN.md` exists. If missing: offer 1) Retry, 2) Stop.
+
+5. **Commit per-plan:**
+   ```bash
+   gsd-sdk query commit "docs(${PADDED_PHASE}): plan ${plan_id} (chunked)" "${PHASE_DIR}/${plan_id}-PLAN.md"
+   ```
+
+After all N plans are written and committed, treat this as `## PLANNING COMPLETE` and continue
+to step 9.
 
 ## 9. Handle Planner Return
 
@@ -792,6 +904,35 @@ Every task MUST include these fields — they are NOT optional:
 - **`## ⚠ Source Audit: Unplanned Items Found`:** The planner's multi-source coverage audit found items from REQUIREMENTS.md, RESEARCH.md, ROADMAP goal, or CONTEXT.md decisions that are not covered by any plan. Handle in step 9c.
 - **`## CHECKPOINT REACHED`:** Present to user, get response, spawn continuation (step 12)
 - **`## PLANNING INCONCLUSIVE`:** Show attempts, offer: Add context / Retry / Manual
+- **Empty / truncated / no recognized marker:** → Filesystem fallback (step 9a).
+
+## 9a. Filesystem Fallback (Planner)
+
+**Triggered when:** task() returns but the return contains no recognized marker (`## PLANNING COMPLETE`, `## PHASE SPLIT RECOMMENDED`, `## ⚠ Source Audit`, `## CHECKPOINT REACHED`, `## PLANNING INCONCLUSIVE`).
+
+```bash
+DISK_PLANS=$(ls "${PHASE_DIR}"/*-PLAN.md 2>/dev/null | wc -l | tr -d ' ')
+```
+
+**If `DISK_PLANS` > 0:** The planner wrote plans to disk but the task() return was empty or
+truncated (the Windows stdio hang pattern — the subagent finished but the return never
+arrived). Display:
+
+```text
+◆ Planner wrote {DISK_PLANS} plan(s) to disk but did not emit a PLANNING COMPLETE marker.
+  This is a known Windows stdio hang pattern — work is likely recoverable.
+
+  Plans found on disk:
+  {ls output of *-PLAN.md}
+```
+
+Offer 3 options:
+1. **Accept plans** — treat as `## PLANNING COMPLETE` and continue through step 9 `## PLANNING COMPLETE` handling (so `--skip-verify` / `plan_checker_enabled=false` are honored — may skip to step 13 rather than step 10)
+2. **Retry planner** — re-spawn the planner with the same prompt (return to step 8)
+3. **Stop** — exit; user can re-run `/gsd-plan-phase {N}` to resume
+
+**If `DISK_PLANS` is 0 and no marker:** The planner produced no output. Treat as
+`## PLANNING INCONCLUSIVE` and handle accordingly.
 
 ## 9b. Handle Phase Split Recommendation
 
@@ -884,7 +1025,7 @@ ${AGENT_SKILLS_CHECKER}
 **Phase requirement IDs (MUST ALL be covered):** {phase_req_ids}
 
 **Project instructions:** read ./AGENTS.md if exists — verify plans honor project guidelines
-**Project skills:** Check .OpenCode/skills/ or .agents/skills/ directory (if either exists) — verify plans account for project skill rules
+**Project skills:** Check .claude/skills/ or .agents/skills/ directory (if either exists) — verify plans account for project skill rules
 </verification_context>
 
 <expected_output>
@@ -901,6 +1042,7 @@ ${AGENT_SKILLS_CHECKER}
 
 - **`## VERIFICATION PASSED`:** Display confirmation, proceed to step 13.
 - **`## ISSUES FOUND`:** Display issues, check iteration count, proceed to step 12.
+- **Empty / truncated / no recognized marker:** → Filesystem fallback (step 11a).
 
 **Thinking partner for architectural tradeoffs (conditional):**
 If `features.thinking_partner` is enabled, scan the checker's issues for architectural tradeoff keywords
@@ -920,6 +1062,29 @@ Apply this to the revision? [Yes] / [No, I'll decide]
 
 If yes: include the recommendation in the revision prompt. If no: proceed to revision loop as normal.
 If thinking_partner disabled: skip this block entirely.
+
+## 11a. Filesystem Fallback (Checker)
+
+**Triggered when:** Checker task() returns but the return contains neither `## VERIFICATION PASSED` nor `## ISSUES FOUND`.
+
+```bash
+DISK_PLANS=$(ls "${PHASE_DIR}"/*-PLAN.md 2>/dev/null | wc -l | tr -d ' ')
+```
+
+**If `DISK_PLANS` > 0:** Plans exist on disk; the checker return was empty or truncated (the
+Windows stdio hang pattern — the subagent finished but the return never arrived). Display:
+
+```text
+◆ Checker return was empty or truncated. {DISK_PLANS} plan(s) exist on disk.
+  This is a known Windows stdio hang pattern — checker may have completed without returning.
+```
+
+Offer 3 options:
+1. **Accept verification** — treat as `## VERIFICATION PASSED` and continue to step 13
+2. **Retry checker** — re-spawn the checker with the same prompt (return to step 10)
+3. **Stop** — exit; user can re-run `/gsd-plan-phase {N}` to resume
+
+**If `DISK_PLANS` is 0:** No plans on disk — something is seriously wrong. Display error and stop.
 
 ## 12. Revision Loop (Max 3 Iterations)
 
@@ -1111,6 +1276,72 @@ Options:
 
 If `TEXT_MODE` is true, present as a plain-text numbered list (options already shown in the block above). Otherwise use question to present the options.
 
+## 13a. Decision Coverage Gate
+
+After the requirements coverage gate passes, verify that every trackable
+decision captured by discuss-phase in CONTEXT.md `<decisions>` is referenced
+by at least one plan. This is the **translation gate** from issue #2492 —
+its job is to refuse to mark a phase planned when a discuss-phase decision
+silently dropped on the way into the plans.
+
+**Skip if** `workflow.context_coverage_gate` is explicitly set to `false`
+(absent key = enabled). Also skip if no CONTEXT.md exists for this phase
+(nothing to translate) or if its `<decisions>` block is empty.
+
+```bash
+GATE_CFG=$(gsd-sdk query config-get workflow.context_coverage_gate 2>/dev/null || echo "true")
+if [ "$GATE_CFG" != "false" ]; then
+  GATE_RESULT=$(gsd-sdk query check.decision-coverage-plan "${PHASE_DIR}" "${CONTEXT_PATH}")
+  # BLOCKING: refuse to mark phase planned when a trackable decision is uncovered.
+  # `passed: true` covers both real-pass and skipped cases (gate disabled / no CONTEXT.md /
+  # no trackable decisions). Verify-phase counterpart deliberately omits this exit-1 — that
+  # gate is non-blocking by design (review finding F15).
+  echo "$GATE_RESULT" | jq -e '.data.passed == true' >/dev/null || {
+    echo "$GATE_RESULT" | jq -r '.data.message'
+    exit 1
+  }
+fi
+```
+
+The handler returns JSON:
+```json
+{
+  "passed": true,
+  "skipped": false,
+  "total":  2,
+  "covered": 2,
+  "uncovered": [ { "id": "D-01", "text": "...", "category": "..." } ],
+  "message": "..."
+}
+```
+
+**If `passed` is true (or `skipped` is true):** Display
+`✓ Decision coverage: {M}/{N} CONTEXT.md decisions covered by plans` (or
+`(skipped — gate disabled)` / `(skipped — no decisions)`) and proceed to
+step 13b.
+
+**If `passed` is false:** Display the handler's `message` block. It already
+names each uncovered decision (`D-NN | category | text`) and tells the user
+what to do — cite the id in a relevant plan's `must_haves` / `truths`, or
+move the decision under `### OpenCode's Discretion` / tag it `[informational]`
+if it should not be tracked. Then offer:
+
+```text
+Options:
+1. Re-plan to cover missing decisions (recommended)
+2. edit CONTEXT.md to mark dropped decisions as [informational] / Discretion
+3. Proceed anyway — accept the coverage gap
+```
+
+If `TEXT_MODE` is true, present as a plain-text numbered list. Otherwise use
+question. Selecting "Proceed anyway" continues to step 13b but
+records the override in STATE.md so verify-phase can re-surface it.
+
+**Why this gate blocks:** failing here is cheap. The plans are the contract
+between discuss-phase and execute-phase; if a decision isn't visible in any
+plan, no executor will implement it. Catching that now beats discovering it
+after thousands of dollars of execution.
+
 ## 13b. Record Planning Completion in STATE.md
 
 After plans pass all gates, record that planning is complete so STATE.md reflects the new phase status:
@@ -1120,6 +1351,77 @@ gsd-sdk query state.planned-phase --phase "${PHASE_NUMBER}" --name "${PHASE_NAME
 ```
 
 This updates STATUS to "Ready to execute", sets the correct plan count, and timestamps Last Activity.
+
+## 13c. Annotate ROADMAP with Wave Dependencies and Cross-cutting Constraints
+
+After plans are finalized, annotate the ROADMAP.md plan list for this phase with:
+- **Wave dependency notes** — a bold header before each wave group ("Wave 2 *(blocked on Wave 1 completion)*")
+- **Cross-cutting constraints** — a "Cross-cutting constraints:" subsection listing `must_haves.truths` entries that appear in 2 or more plans
+
+This step is derived entirely from existing PLAN frontmatter — no extra LLM pass is required.
+
+```bash
+gsd-sdk query roadmap.annotate-dependencies "${PHASE_NUMBER}"
+```
+
+This operation is idempotent: if wave headers or cross-cutting constraints already exist in the ROADMAP phase section, the command returns without modifying the file. Skip this step if `plan_count` is 0.
+
+## 13d. Commit Plans if commit_docs is true
+
+If `commit_docs` is true (from the init JSON parsed in step 1), commit the generated plan artifacts (including any ROADMAP.md annotations from step 13c):
+
+```bash
+gsd-sdk query commit "docs(${PADDED_PHASE}): create phase plan" --files "${PHASE_DIR}"/*-PLAN.md .planning/STATE.md .planning/ROADMAP.md
+```
+
+This commits all PLAN.md files for the phase plus the updated STATE.md and ROADMAP.md to version-control the planning artifacts. Skip this step if `commit_docs` is false.
+
+## 13e. Post-Planning Gap Analysis
+
+After all plans are generated, committed, and the Requirements Coverage Gate (§13)
+has run, emit a single unified gap report covering both REQUIREMENTS.md and the
+CONTEXT.md `<decisions>` section. This is a **proactive, post-hoc report** — it
+does not block phase advancement and does not re-plan. It exists so that any
+requirement or decision that slipped through the per-plan checks is surfaced in
+one place before execution begins.
+
+**Skip if:** `workflow.post_planning_gaps` is `false`. Default is `true`.
+
+```bash
+POST_PLANNING_GAPS=$(gsd-sdk query config-get workflow.post_planning_gaps --default true 2>/dev/null || echo true)
+if [ "$POST_PLANNING_GAPS" = "true" ]; then
+  gsd-tools gap-analysis --phase-dir "${PHASE_DIR}"
+fi
+```
+
+(`gsd-tools gap-analysis` reads `.planning/REQUIREMENTS.md`, `${PHASE_DIR}/CONTEXT.md`,
+and `${PHASE_DIR}/*-PLAN.md`, then prints a markdown table with one row per
+REQ-ID and D-ID. Word-boundary matching prevents `REQ-1` from being mistaken for
+`REQ-10`.)
+
+**Output format (deterministic; sorted REQUIREMENTS.md → CONTEXT.md, then natural
+sort within source):**
+
+```
+## Post-Planning Gap Analysis
+
+| Source | Item | Status |
+|--------|------|--------|
+| REQUIREMENTS.md | REQ-01 | ✓ Covered |
+| REQUIREMENTS.md | REQ-02 | ✗ Not covered |
+| CONTEXT.md | D-01 | ✓ Covered |
+| CONTEXT.md | D-02 | ✗ Not covered |
+
+⚠ N items not covered by any plan
+```
+
+**Skip-gracefully behavior:**
+- REQUIREMENTS.md missing → CONTEXT-only report.
+- CONTEXT.md missing → REQUIREMENTS-only report.
+- Both missing or `<decisions>` block missing → "No requirements or decisions to check" line, no error.
+
+This step is non-blocking. If items are reported as not covered, the user may
+re-run `/gsd-plan-phase --gaps` to add plans, or proceed to execute-phase as-is.
 
 ## 14. Present Final Status
 
@@ -1134,7 +1436,7 @@ Check for auto-advance trigger using values already loaded in step 1:
 3. **Sync chain flag with intent** — if user invoked manually (no `--auto` and no `--chain`), clear the ephemeral chain flag from any previous interrupted `--auto` chain. This does NOT touch `workflow.auto_advance` (the user's persistent settings preference):
    ```bash
    if [[ ! "$ARGUMENTS" =~ --auto ]] && [[ ! "$ARGUMENTS" =~ --chain ]]; then
-     gsd-sdk query config-set workflow._auto_chain_active false 2>/dev/null
+     gsd-sdk query config-set workflow._auto_chain_active false || true
    fi
    ```
 
@@ -1231,7 +1533,7 @@ Verification: {Passed | Passed with override | Skipped}
 
 <windows_troubleshooting>
 **Windows users:** If plan-phase freezes during agent spawning (common on Windows due to
-stdio deadlocks with MCP servers — see OpenCode issue anthropics/OpenCode-code#28126):
+stdio deadlocks with MCP servers — see OpenCode issue anthropics/claude-code#28126):
 
 1. **Force-kill:** Close the terminal (Ctrl+C may not work)
 2. **Clean up orphaned processes:**
@@ -1242,7 +1544,7 @@ stdio deadlocks with MCP servers — see OpenCode issue anthropics/OpenCode-code
 3. **Clean up stale task directories:**
    ```powershell
    # Remove stale subagent task dirs (OpenCode never cleans these on crash)
-   Remove-Item -Recurse -Force "$env:USERPROFILE\.OpenCode\tasks\*" -ErrorAction SilentlyContinue
+   Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\tasks\*" -ErrorAction SilentlyContinue
    ```
 4. **Reduce MCP server count:** Temporarily disable non-essential MCP servers in settings.json
 5. **Retry:** Restart OpenCode and run `/gsd-plan-phase` again

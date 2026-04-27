@@ -16,7 +16,7 @@ Ultraplan drafts the plan in a remote cloud session while your terminal stays fr
 Review and comment on the plan in your browser, then import it back via /gsd-import --from.
 
 ⚠ BETA: ultraplan is in research preview. Use /gsd-plan-phase for stable local planning.
-Requirements: OpenCode v2.1.91+, OpenCode.ai account, GitHub repository.
+Requirements: OpenCode v2.1.91+, claude.ai account, GitHub repository.
 </objective>
 
 <execution_context>

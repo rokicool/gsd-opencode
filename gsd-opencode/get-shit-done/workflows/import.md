@@ -192,7 +192,10 @@ write the PLAN.md file to the target directory.
 Delegate validation to gsd-plan-checker:
 
 ```
-@gsd-plan-checker "Validate: .planning/phases/{phase}/{plan}-PLAN.md — check frontmatter completeness, task structure, and GSD conventions. Report any issues."
+task({
+  subagent_type: "gsd-plan-checker",
+  prompt: "Validate: .planning/phases/{phase}/{plan}-PLAN.md — check frontmatter completeness, task structure, and GSD conventions. Report any issues."
+})
 ```
 
 If the checker returns errors:

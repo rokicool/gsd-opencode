@@ -8,7 +8,7 @@
 
 Scan these roots relative to the project root:
 
-- `.OpenCode/skills/`
+- `.claude/skills/`
 - `.agents/skills/`
 - `.cursor/skills/`
 - `.github/skills/`

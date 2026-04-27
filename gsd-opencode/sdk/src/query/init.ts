@@ -82,7 +82,7 @@ function getLatestCompletedMilestone(projectDir: string): { version: string; nam
  * Check which GSD agents are installed on disk.
  *
  * Runtime-aware per issue #2402: detects the invoking runtime
- * (`GSD_RUNTIME` → `config.runtime` → 'OpenCode') and probes that runtime's
+ * (`GSD_RUNTIME` → `config.runtime` → 'claude') and probes that runtime's
  * canonical `agents/` directory. `GSD_AGENTS_DIR` still short-circuits.
  *
  * Port of checkAgentsInstalled from core.cjs lines 1274-1306.

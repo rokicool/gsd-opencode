@@ -8,7 +8,7 @@
 
 ## 仕組み
 
-1. ステータスラインフックがコンテキストメトリクスを `/tmp/OpenCode-ctx-{session_id}.json` に書き込む
+1. ステータスラインフックがコンテキストメトリクスを `/tmp/claude-ctx-{session_id}.json` に書き込む
 2. 各ツール使用後、コンテキストモニターがこのメトリクスを読み取る
 3. 残りコンテキストがしきい値を下回ると、`additionalContext` として警告を注入する
 4. エージェントが会話内で警告を受け取り、適切に対応できる
@@ -34,7 +34,7 @@
 ステータスラインフック (gsd-statusline.js)
     | 書き込み
     v
-/tmp/OpenCode-ctx-{session_id}.json
+/tmp/claude-ctx-{session_id}.json
     ^ 読み取り
     |
 コンテキストモニター (gsd-context-monitor.js, PostToolUse/AfterTool)

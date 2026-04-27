@@ -8,11 +8,6 @@ permissions:
    task: true
 ---
 
-<objective>
-Build, query, and inspect the project knowledge graph in `.planning/graphs/`.
-Supports operations: `build` (construct knowledge graph), `query <term>` (search graph), `status` (check freshness/stats), `diff` (compare changes since last build).
-</objective>
-
 **STOP -- DO NOT READ THIS FILE. You are already reading it. This prompt was injected into your context by OpenCode's command system. Using the read tool on this file wastes tokens. Begin executing Step 0 immediately.**
 
 **CJS-only (graphify):** `graphify` subcommands are not registered on `gsd-sdk query`. Use `node $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs graphify …` as documented in this command and in `docs/CLI-TOOLS.md`. Other tooling may still use `gsd-sdk query` where a handler exists.
@@ -146,7 +141,7 @@ GSD > Spawning graphify-builder agent...
 Spawn a task:
 
 ```
-@graphify-builder "You are the graphify-builder agent. Your job is to build or rebuild the project knowledge graph using the graphify CLI.
+@general "You are the graphify-builder agent. Your job is to build or rebuild the project knowledge graph using the graphify CLI.
 
 Project root: ${CWD}
 gsd-tools path: $HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs

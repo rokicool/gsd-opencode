@@ -11,7 +11,7 @@
 
 ### What it does
 
-`/gsd-ultraplan-phase` offloads GSD's plan-phase drafting to [OpenCode's ultraplan](https://code.OpenCode.ai) cloud infrastructure. Instead of planning locally in the terminal, the plan is drafted in a browser-based session with:
+`/gsd-ultraplan-phase` offloads GSD's plan-phase drafting to [OpenCode's ultraplan](https://code.claude.ai) cloud infrastructure. Instead of planning locally in the terminal, the plan is drafted in a browser-based session with:
 
 - An **outline sidebar** for navigating the plan structure
 - **Inline comments** for annotating and refining tasks
@@ -84,7 +84,7 @@ When you're satisfied with the draft, you save it and import it back into GSD â€
 You're running GSD outside of OpenCode. Switch to a OpenCode terminal session, or use `/gsd-plan-phase` instead.
 
 **Ultraplan browser session never opened**
-Check your OpenCode version: `OpenCode --version`. Requires v2.1.91+. Update with `OpenCode update`.
+Check your OpenCode version: `claude --version`. Requires v2.1.91+. Update with `claude update`.
 
 **`/gsd-import` reports conflicts**
 Ultraplan may have proposed something that contradicts a decision in `PROJECT.md`. The import step will prompt you to resolve each conflict before writing anything.

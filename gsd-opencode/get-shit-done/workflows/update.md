@@ -17,7 +17,7 @@ First, derive `PREFERRED_CONFIG_DIR` and `PREFERRED_RUNTIME` from the invoking p
 - Path contains `/.gemini/` -> `gemini`
 - Path contains `/.config/kilo/` or `/.kilo/`, or `PREFERRED_CONFIG_DIR` contains `kilo.json` / `kilo.jsonc` -> `kilo`
 - Path contains `/.config/opencode/` or `/.opencode/`, or `PREFERRED_CONFIG_DIR` contains `opencode.json` / `opencode.jsonc` -> `opencode`
-- Otherwise -> `OpenCode`
+- Otherwise -> `claude`
 
 Use `PREFERRED_CONFIG_DIR` when available so custom `--config-dir` installs are checked before default locations.
 Use `PREFERRED_RUNTIME` as the first runtime checked so `/gsd-update` targets the runtime that invoked it.
@@ -36,7 +36,7 @@ expand_home() {
 # Using an array instead of a space-separated string ensures correct
 # iteration in both bash and zsh (zsh does not word-split unquoted
 # variables by default). Fixes #1173.
-RUNTIME_DIRS=( "OpenCode:.OpenCode" "opencode:.config/opencode" "opencode:.opencode" "gemini:.gemini" "kilo:.config/kilo" "kilo:.kilo" "codex:.codex" )
+RUNTIME_DIRS=( "claude:.claude" "opencode:.config/opencode" "opencode:.opencode" "gemini:.gemini" "kilo:.config/kilo" "kilo:.kilo" "codex:.codex" )
 ENV_RUNTIME_DIRS=()
 
 # PREFERRED_CONFIG_DIR / PREFERRED_RUNTIME should be set from execution_context
@@ -54,7 +54,7 @@ if [ -n "$PREFERRED_CONFIG_DIR" ]; then
   fi
 fi
 
-# If runtime is still unknown, infer from runtime env vars; fallback to OpenCode.
+# If runtime is still unknown, infer from runtime env vars; fallback to claude.
 if [ -z "$PREFERRED_RUNTIME" ]; then
   if [ -n "$CODEX_HOME" ]; then
     PREFERRED_RUNTIME="codex"
@@ -67,9 +67,9 @@ if [ -z "$PREFERRED_RUNTIME" ]; then
   elif [ -n "$OPENCODE_CONFIG_DIR" ] || [ -n "$OPENCODE_CONFIG" ]; then
     PREFERRED_RUNTIME="opencode"
   elif [ -n "$CLAUDE_CONFIG_DIR" ]; then
-    PREFERRED_RUNTIME="OpenCode"
+    PREFERRED_RUNTIME="claude"
   else
-    PREFERRED_RUNTIME="OpenCode"
+    PREFERRED_RUNTIME="claude"
   fi
 fi
 
@@ -95,7 +95,7 @@ if [ -n "$PREFERRED_CONFIG_DIR" ] && { [ -f "$PREFERRED_CONFIG_DIR/get-shit-done
     printf '%s' "$p"
   }
   normalized_preferred="$(normalize_path "$PREFERRED_CONFIG_DIR")"
-  for dir in .OpenCode .config/opencode .opencode .gemini .config/kilo .kilo .codex; do
+  for dir in .claude .config/opencode .opencode .gemini .config/kilo .kilo .codex; do
     resolved_local="$(cd "./$dir" 2>/dev/null && pwd)"
     normalized_local="$(normalize_path "$resolved_local")"
     if [ -n "$normalized_local" ] && [ "$normalized_local" = "$normalized_preferred" ]; then
@@ -112,13 +112,13 @@ if [ -n "$PREFERRED_CONFIG_DIR" ] && { [ -f "$PREFERRED_CONFIG_DIR/get-shit-done
 
   echo "$INSTALLED_VERSION"
   echo "$INSTALL_SCOPE"
-  echo "${PREFERRED_RUNTIME:-OpenCode}"
+  echo "${PREFERRED_RUNTIME:-claude}"
   exit 0
 fi
 
 # Absolute global candidates from env overrides (covers custom config dirs).
 if [ -n "$CLAUDE_CONFIG_DIR" ]; then
-  ENV_RUNTIME_DIRS+=( "OpenCode:$(expand_home "$CLAUDE_CONFIG_DIR")" )
+  ENV_RUNTIME_DIRS+=( "claude:$(expand_home "$CLAUDE_CONFIG_DIR")" )
 fi
 if [ -n "$GEMINI_CONFIG_DIR" ]; then
   ENV_RUNTIME_DIRS+=( "gemini:$(expand_home "$GEMINI_CONFIG_DIR")" )
@@ -238,7 +238,7 @@ elif [ -n "$GLOBAL_RUNTIME" ] && [ -f "$GLOBAL_MARKER_FILE" ]; then
 else
   INSTALLED_VERSION="0.0.0"
   INSTALL_SCOPE="UNKNOWN"
-  TARGET_RUNTIME="OpenCode"
+  TARGET_RUNTIME="claude"
 fi
 
 echo "$INSTALLED_VERSION"
@@ -249,8 +249,8 @@ echo "$TARGET_RUNTIME"
 Parse output:
 - Line 1 = installed version (`0.0.0` means unknown version)
 - Line 2 = install scope (`LOCAL`, `GLOBAL`, or `UNKNOWN`)
-- Line 3 = target runtime (`OpenCode`, `opencode`, `gemini`, `kilo`, or `codex`)
-- If scope is `UNKNOWN`, proceed to install step using `--OpenCode --global` fallback.
+- Line 3 = target runtime (`claude`, `opencode`, `gemini`, `kilo`, or `codex`)
+- If scope is `UNKNOWN`, proceed to install step using `--claude --global` fallback.
 
 If multiple runtime installs are detected and the invoking runtime cannot be determined from execution_context, ask the user which runtime to update before running install.
 
@@ -313,7 +313,7 @@ If you see a "⚠ dev install — re-run installer to sync hooks" warning in
 your statusline, your hook files are older than your VERSION file. Fix it
 by re-running the local installer from your dev branch:
 
-    node bin/install.js --global --OpenCode
+    node bin/install.js --global --claude
 
 Running /gsd-update would install the npm release (A.B.C) and downgrade
 your dev version — do NOT use it to resolve this warning.
@@ -357,7 +357,7 @@ Exit.
 
 (Paths are relative to detected runtime install location:
 global: `$HOME/.config/opencode/`, `~/.config/opencode/`, `~/.opencode/`, `~/.gemini/`, `~/.config/kilo/`, or `~/.codex/`
-local: `./.OpenCode/`, `./.config/opencode/`, `./.opencode/`, `./.gemini/`, `./.kilo/`, or `./.codex/`)
+local: `./.claude/`, `./.config/opencode/`, `./.opencode/`, `./.gemini/`, `./.kilo/`, or `./.codex/`)
 
 Your custom files in other locations are preserved:
 - Custom commands not in `commands/gsd/` ✓
@@ -388,14 +388,15 @@ installer does not know about and will delete during the wipe.
 **Do not use bash path-stripping (`${filepath#$RUNTIME_DIR/}`) or `node -e require()`
 inline** — those patterns fail when `$RUNTIME_DIR` is unset and the stripped
 relative path may not match manifest key format, which causes CUSTOM_COUNT=0
-even when custom files exist (bug #1997). Use `gsd-tools detect-custom-files`
-instead, which resolves paths reliably with Node.js `path.relative()`.
+even when custom files exist (bug #1997). Use `gsd-sdk query detect-custom-files`
+when `gsd-sdk` is on `PATH`, or the bundled `gsd-tools.cjs detect-custom-files`
+otherwise — both resolve paths reliably with Node.js `path.relative()`.
 
 First, resolve the config directory (`RUNTIME_DIR`) from the install scope
 detected in `get_installed_version`:
 
 ```bash
-# RUNTIME_DIR is the resolved config directory (e.g. $HOME/.config/opencode, ~/.config/opencode)
+# RUNTIME_DIR is the resolved config directory (e.g. ~/.config/opencode, ~/.gemini)
 # It should already be set from get_installed_version as GLOBAL_DIR or LOCAL_DIR.
 # Use the appropriate variable based on INSTALL_SCOPE.
 if [ "$INSTALL_SCOPE" = "LOCAL" ]; then
@@ -410,17 +411,20 @@ fi
 If `RUNTIME_DIR` is empty or does not exist, skip this step (no config dir to
 inspect).
 
-Otherwise, resolve the path to `gsd-tools.cjs` and run:
+Otherwise run `detect-custom-files` (prefer SDK when available):
 
 ```bash
 GSD_TOOLS="$RUNTIME_DIR/get-shit-done/bin/gsd-tools.cjs"
-if [ -f "$GSD_TOOLS" ] && [ -n "$RUNTIME_DIR" ]; then
+CUSTOM_JSON=''
+if [ -n "$RUNTIME_DIR" ] && command -v gsd-sdk >/dev/null 2>&1; then
+  CUSTOM_JSON=$(gsd-sdk query detect-custom-files --config-dir "$RUNTIME_DIR" 2>/dev/null)
+elif [ -f "$GSD_TOOLS" ] && [ -n "$RUNTIME_DIR" ]; then
   CUSTOM_JSON=$(node "$GSD_TOOLS" detect-custom-files --config-dir "$RUNTIME_DIR" 2>/dev/null)
-  CUSTOM_COUNT=$(echo "$CUSTOM_JSON" | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).custom_count);}catch{console.log(0);}})" 2>/dev/null || echo "0")
-else
-  CUSTOM_COUNT=0
+fi
+if [ -z "$CUSTOM_JSON" ]; then
   CUSTOM_JSON='{"custom_files":[],"custom_count":0}'
 fi
+CUSTOM_COUNT=$(echo "$CUSTOM_JSON" | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).custom_count);}catch{console.log(0);}})" 2>/dev/null || echo "0")
 ```
 
 **If `CUSTOM_COUNT` > 0:**
@@ -481,7 +485,7 @@ npx -y gsd-opencode@latest "$RUNTIME_FLAG" --global
 
 **If UNKNOWN install:**
 ```bash
-npx -y gsd-opencode@latest --OpenCode --global
+npx -y gsd-opencode@latest --claude --global
 ```
 
 Capture output. If install fails, show error and exit.
@@ -531,7 +535,7 @@ for dir in "${CACHE_DIRS[@]}"; do
   fi
 done
 
-for dir in .OpenCode .config/opencode .opencode .gemini .config/kilo .kilo .codex; do
+for dir in .claude .config/opencode .opencode .gemini .config/kilo .kilo .codex; do
   rm -f "./$dir/cache/gsd-update-check.json"
   rm -f "$HOME/$dir/cache/gsd-update-check.json"
 done
