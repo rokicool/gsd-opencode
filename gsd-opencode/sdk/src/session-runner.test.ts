@@ -16,7 +16,7 @@ import type { GSDConfig } from './config.js';
 // Capture the query call options so we can assert on them without making real API calls.
 const mockQueryCalls: Array<{ prompt: string; options: Record<string, unknown> }> = [];
 
-vi.mock('@anthropic-ai/claude-agent-sdk', () => {
+vi.mock('@anthropic-ai/OpenCode-agent-sdk', () => {
   async function* fakeQueryStream() {
     // Yield a minimal success result message so processQueryStream completes.
     yield {

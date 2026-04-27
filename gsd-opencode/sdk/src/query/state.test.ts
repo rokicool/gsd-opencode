@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-07)
 
 ## Current Position
 
-Phase: 10 (Read-Only Queries) — EXECUTING
+Phase: 10 (read-Only Queries) — EXECUTING
 Plan: 2 of 3
 Status: Ready to execute
 Last Activity: 2026-04-08
@@ -73,7 +73,7 @@ const ROADMAP_CONTENT = `# Roadmap
 ### Phase 09: Foundation
 - Build infrastructure
 
-### Phase 10: Read-Only Queries
+### Phase 10: read-Only Queries
 - Port state queries
 
 ### Phase 11: Mutations

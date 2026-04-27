@@ -8,7 +8,7 @@
  * prompt, so any `agent_skills.<correct-slug>` configuration in
  * `.planning/config.json` is silently ignored. This test prevents regression.
  *
- * Related: https://github.com/gsd-build/get-shit-done/issues/2615
+ * Related: https://github.com/rokicool/gsd-opencode/issues/2615
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';

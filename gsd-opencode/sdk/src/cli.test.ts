@@ -51,9 +51,9 @@ describe('parseCliArgs', () => {
   });
 
   it('parses --model option', () => {
-    const result = parseCliArgs(['run', 'build X', '--model', 'claude-sonnet-4-6']);
+    const result = parseCliArgs(['run', 'build X', '--model', 'OpenCode-sonnet-4-6']);
 
-    expect(result.model).toBe('claude-sonnet-4-6');
+    expect(result.model).toBe('OpenCode-sonnet-4-6');
   });
 
   it('parses --max-budget option', () => {
@@ -88,7 +88,7 @@ describe('parseCliArgs', () => {
       'run', 'build auth',
       '--project-dir', '/tmp/proj',
       '--ws-port', '9090',
-      '--model', 'claude-sonnet-4-6',
+      '--model', 'OpenCode-sonnet-4-6',
       '--max-budget', '15',
     ]);
 
@@ -96,7 +96,7 @@ describe('parseCliArgs', () => {
     expect(result.prompt).toBe('build auth');
     expect(result.projectDir).toBe('/tmp/proj');
     expect(result.wsPort).toBe(9090);
-    expect(result.model).toBe('claude-sonnet-4-6');
+    expect(result.model).toBe('OpenCode-sonnet-4-6');
     expect(result.maxBudget).toBe(15);
   });
 
@@ -159,12 +159,12 @@ describe('parseCliArgs', () => {
   });
 
   it('parses init with options', () => {
-    const result = parseCliArgs(['init', '@prd.md', '--project-dir', '/tmp/proj', '--model', 'claude-sonnet-4-6']);
+    const result = parseCliArgs(['init', '@prd.md', '--project-dir', '/tmp/proj', '--model', 'OpenCode-sonnet-4-6']);
 
     expect(result.command).toBe('init');
     expect(result.initInput).toBe('@prd.md');
     expect(result.projectDir).toBe('/tmp/proj');
-    expect(result.model).toBe('claude-sonnet-4-6');
+    expect(result.model).toBe('OpenCode-sonnet-4-6');
   });
 
   it('does not set initInput for non-init commands', () => {
@@ -204,14 +204,14 @@ describe('parseCliArgs', () => {
       'auto',
       '--project-dir', '/tmp/proj',
       '--ws-port', '8080',
-      '--model', 'claude-sonnet-4-6',
+      '--model', 'OpenCode-sonnet-4-6',
       '--max-budget', '20',
     ]);
 
     expect(result.command).toBe('auto');
     expect(result.projectDir).toBe('/tmp/proj');
     expect(result.wsPort).toBe(8080);
-    expect(result.model).toBe('claude-sonnet-4-6');
+    expect(result.model).toBe('OpenCode-sonnet-4-6');
     expect(result.maxBudget).toBe(20);
   });
 
@@ -243,14 +243,14 @@ describe('parseCliArgs', () => {
       'auto',
       '--init', '@spec.md',
       '--project-dir', '/tmp/proj',
-      '--model', 'claude-sonnet-4-6',
+      '--model', 'OpenCode-sonnet-4-6',
       '--max-budget', '25',
     ]);
 
     expect(result.command).toBe('auto');
     expect(result.init).toBe('@spec.md');
     expect(result.projectDir).toBe('/tmp/proj');
-    expect(result.model).toBe('claude-sonnet-4-6');
+    expect(result.model).toBe('OpenCode-sonnet-4-6');
     expect(result.maxBudget).toBe(25);
   });
 

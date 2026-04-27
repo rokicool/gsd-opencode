@@ -170,9 +170,9 @@ Commands:
   auto                  Run the full autonomous lifecycle (discover -> execute -> advance)
   init [input]          Bootstrap a new project from a PRD or description
                         input can be:
-                          @path/to/prd.md   Read input from a file
+                          @path/to/prd.md   read input from a file
                           "description"     Use text directly
-                          (empty)           Read from stdin
+                          (empty)           read from stdin
   query <argv...>       Registered query handlers only (longest-prefix argv match; see QUERY-HANDLERS.md)
                         Use --pick <field> to extract a specific field from JSON output
 
@@ -189,7 +189,7 @@ Options:
 `.trim();
 
 /**
- * Read the package version from package.json.
+ * read the package version from package.json.
  */
 async function getVersion(): Promise<string> {
   try {
@@ -236,7 +236,7 @@ export async function resolveInitInput(args: ParsedCliArgs): Promise<string> {
 }
 
 /**
- * Read all data from stdin. Rejects if stdin is a TTY with no piped data.
+ * read all data from stdin. Rejects if stdin is a TTY with no piped data.
  */
 async function readStdin(): Promise<string> {
   const { stdin } = process;

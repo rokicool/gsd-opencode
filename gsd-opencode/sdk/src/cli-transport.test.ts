@@ -42,14 +42,14 @@ describe('CLITransport', () => {
     transport.onEvent({
       ...makeBase(),
       type: GSDEventType.SessionInit,
-      model: 'claude-sonnet-4-20250514',
-      tools: ['Read', 'Write', 'Bash'],
+      model: 'OpenCode-sonnet-4-20250514',
+      tools: ['read', 'write', 'bash'],
       cwd: '/home/project',
     } as GSDEvent);
 
     const output = readOutput(stream);
     expect(output).toBe(
-      '[14:30:45] [INIT] Session started — model: claude-sonnet-4-20250514, tools: 3, cwd: /home/project',
+      '[14:30:45] [INIT] Session started — model: OpenCode-sonnet-4-20250514, tools: 3, cwd: /home/project',
     );
   });
 
@@ -131,15 +131,15 @@ describe('CLITransport', () => {
     transport.onEvent({
       ...makeBase(),
       type: GSDEventType.ToolCall,
-      toolName: 'Write',
+      toolName: 'write',
       toolUseId: 'tool-123',
       input: longInput,
     } as GSDEvent);
 
     const output = readOutput(stream);
-    expect(output).toMatch(/^\[14:30:45\] \[TOOL\] Write\(.+…\)$/);
+    expect(output).toMatch(/^\[14:30:45\] \[TOOL\] write\(.+…\)$/);
     // The truncated input portion (inside parens) should be ≤80 chars
-    const insideParens = output.match(/Write\((.+)\)/)![1]!;
+    const insideParens = output.match(/write\((.+)\)/)![1]!;
     expect(insideParens.length).toBeLessThanOrEqual(80);
   });
 
@@ -186,7 +186,7 @@ describe('CLITransport', () => {
     transport.onEvent({
       ...makeBase(),
       type: GSDEventType.ToolProgress,
-      toolName: 'Bash',
+      toolName: 'bash',
       toolUseId: 'tool-456',
       elapsedSeconds: 12,
     } as GSDEvent);

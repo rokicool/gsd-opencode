@@ -38,7 +38,7 @@ must_haves:
 ---
 
 <task type="auto">
-  <name>Task 1: Do something</name>
+  <name>task 1: Do something</name>
   <files>src/foo.ts</files>
   <action>Implement foo</action>
   <verify>Run tests</verify>
@@ -68,7 +68,7 @@ must_haves:
 ---
 
 <task type="auto">
-  <name>Task 1</name>
+  <name>task 1</name>
   <action>Do it</action>
 </task>
 `;
@@ -101,7 +101,7 @@ must_haves:
     const result = await verifyPlanStructure(['plan.md'], tmpDir);
     const data = result.data as Record<string, unknown>;
     expect(data.valid).toBe(false);
-    expect(data.errors).toContain('Task missing <name> element');
+    expect(data.errors).toContain('task missing <name> element');
   });
 
   it('returns error when task missing <action> element', async () => {
@@ -119,7 +119,7 @@ must_haves:
 ---
 
 <task type="auto">
-  <name>Task 1</name>
+  <name>task 1</name>
   <done>Done</done>
 </task>
 `;
@@ -145,7 +145,7 @@ must_haves:
 ---
 
 <task type="auto">
-  <name>Task 1</name>
+  <name>task 1</name>
   <action>Do it</action>
 </task>
 `;

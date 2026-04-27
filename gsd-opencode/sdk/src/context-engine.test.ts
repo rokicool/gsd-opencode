@@ -68,7 +68,7 @@ describe('ContextEngine', () => {
     it('returns minimal files for execute phase', async () => {
       await createPlanningDir(projectDir, {
         'STATE.md': '# State',
-        'config.json': '{"model":"claude"}',
+        'config.json': '{"model":"OpenCode"}',
         'ROADMAP.md': '# Roadmap — should not be read',
         'CONTEXT.md': '# Context — should not be read',
       });
@@ -77,7 +77,7 @@ describe('ContextEngine', () => {
       const files = await engine.resolveContextFiles(PhaseType.Execute);
 
       expect(files.state).toBe('# State');
-      expect(files.config).toBe('{"model":"claude"}');
+      expect(files.config).toBe('{"model":"OpenCode"}');
       expect(files.roadmap).toBeUndefined();
       expect(files.context).toBeUndefined();
     });

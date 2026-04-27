@@ -29,7 +29,7 @@ export interface WorkspaceContext {
     project: string | null;
 }
 /**
- * Read GSD_WORKSTREAM and GSD_PROJECT environment variables.
+ * read GSD_WORKSTREAM and GSD_PROJECT environment variables.
  *
  * Returns a WorkspaceContext with null values when the env vars are not set.
  *

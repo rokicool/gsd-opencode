@@ -40,7 +40,7 @@ export function checkResearchGate(researchContent) {
     const lines = sectionBody.split('\n');
     for (const line of lines) {
         const trimmed = line.trim();
-        // Match: "1. **Question**", "- **Question**", "* **Question**", "1. Question"
+        // Match: "1. **question**", "- **question**", "* **question**", "1. question"
         const questionMatch = trimmed.match(/^(?:\d+[.)]\s*|\*\s+|-\s+)\*{0,2}([^*\n]+)\*{0,2}/);
         if (questionMatch) {
             totalQuestionLines++;

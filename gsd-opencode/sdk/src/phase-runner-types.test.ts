@@ -63,9 +63,9 @@ describe('Phase lifecycle types', () => {
     it('accepts a valid phase-op output object', () => {
       const info: PhaseOpInfo = {
         phase_found: true,
-        phase_dir: '.planning/phases/05-Skill-Scaffolding',
+        phase_dir: '.planning/phases/05-skill-Scaffolding',
         phase_number: '5',
-        phase_name: 'Skill Scaffolding',
+        phase_name: 'skill Scaffolding',
         phase_slug: 'skill-scaffolding',
         padded_phase: '05',
         has_research: false,
@@ -76,8 +76,8 @@ describe('Phase lifecycle types', () => {
         roadmap_exists: true,
         planning_exists: true,
         commit_docs: true,
-        context_path: '.planning/phases/05-Skill-Scaffolding/CONTEXT.md',
-        research_path: '.planning/phases/05-Skill-Scaffolding/RESEARCH.md',
+        context_path: '.planning/phases/05-skill-Scaffolding/CONTEXT.md',
+        research_path: '.planning/phases/05-skill-Scaffolding/RESEARCH.md',
       };
 
       expect(info.phase_found).toBe(true);
@@ -183,7 +183,7 @@ describe('Phase lifecycle types', () => {
         callbacks: {},
         maxBudgetPerStep: 3.0,
         maxTurnsPerStep: 30,
-        model: 'claude-sonnet-4-6',
+        model: 'OpenCode-sonnet-4-6',
       };
       expect(options.maxBudgetPerStep).toBe(3.0);
     });
@@ -294,9 +294,9 @@ describe('GSDTools typed methods', () => {
     it('returns typed PhaseOpInfo from gsd-tools output', async () => {
       const mockOutput: PhaseOpInfo = {
         phase_found: true,
-        phase_dir: '.planning/phases/05-Skill-Scaffolding',
+        phase_dir: '.planning/phases/05-skill-Scaffolding',
         phase_number: '5',
-        phase_name: 'Skill Scaffolding',
+        phase_name: 'skill Scaffolding',
         phase_slug: 'skill-scaffolding',
         padded_phase: '05',
         has_research: false,
@@ -307,8 +307,8 @@ describe('GSDTools typed methods', () => {
         roadmap_exists: true,
         planning_exists: true,
         commit_docs: true,
-        context_path: '.planning/phases/05-Skill-Scaffolding/CONTEXT.md',
-        research_path: '.planning/phases/05-Skill-Scaffolding/RESEARCH.md',
+        context_path: '.planning/phases/05-skill-Scaffolding/CONTEXT.md',
+        research_path: '.planning/phases/05-skill-Scaffolding/RESEARCH.md',
       };
 
       const scriptPath = await createScript(
@@ -330,7 +330,7 @@ describe('GSDTools typed methods', () => {
 
       expect(result.phase_found).toBe(true);
       expect(result.phase_number).toBe('5');
-      expect(result.phase_name).toBe('Skill Scaffolding');
+      expect(result.phase_name).toBe('skill Scaffolding');
       expect(result.plan_count).toBe(3);
       expect(result.has_context).toBe(true);
       expect(result.has_plans).toBe(true);

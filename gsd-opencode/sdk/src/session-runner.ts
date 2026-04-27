@@ -5,8 +5,8 @@
  * processes the message stream, and extracts results into a typed PlanResult.
  */
 
-import { query } from '@anthropic-ai/claude-agent-sdk';
-import type { SDKMessage, SDKResultMessage, SDKResultSuccess, SDKResultError } from '@anthropic-ai/claude-agent-sdk';
+import { query } from '@anthropic-ai/OpenCode-agent-sdk';
+import type { SDKMessage, SDKResultMessage, SDKResultSuccess, SDKResultError } from '@anthropic-ai/OpenCode-agent-sdk';
 import type { ParsedPlan, PlanResult, SessionOptions, SessionUsage, GSDCostUpdateEvent, PhaseStepType } from './types.js';
 import { GSDEventType, PhaseType } from './types.js';
 import type { GSDConfig } from './config.js';
@@ -27,9 +27,9 @@ function resolveModel(options?: SessionOptions, config?: GSDConfig): string | un
   // Map model_profile names to model IDs
   if (config?.model_profile) {
     const profileMap: Record<string, string> = {
-      balanced: 'claude-sonnet-4-6',
-      quality: 'claude-opus-4-6',
-      speed: 'claude-haiku-4-5',
+      balanced: 'OpenCode-sonnet-4-6',
+      quality: 'OpenCode-opus-4-6',
+      speed: 'OpenCode-haiku-4-5',
     };
     return profileMap[config.model_profile] ?? config.model_profile;
   }

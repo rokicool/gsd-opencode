@@ -126,7 +126,7 @@ export const CONFIG_DEFAULTS: GSDConfig = {
  * Throws on malformed JSON with a helpful error message.
  */
 /**
- * Read user-level defaults from `~/.gsd/defaults.json` (or `$GSD_HOME/.gsd/`
+ * read user-level defaults from `~/.gsd/defaults.json` (or `$GSD_HOME/.gsd/`
  * when set). Returns `{}` when the file is missing, empty, or malformed —
  * matches CJS behavior in `get-shit-done/bin/lib/core.cjs` (#1683, #2652).
  */
@@ -206,7 +206,7 @@ export async function loadConfig(projectDir: string, workstream?: string): Promi
   }
 
   // Project config exists — user-level defaults are ignored (CJS parity).
-  // `buildNewProjectConfig` already baked them into config.json at /gsd:new-project.
+  // `buildNewProjectConfig` already baked them into config.json at /gsd-new-project.
   return mergeDefaults(parsed);
 }
 

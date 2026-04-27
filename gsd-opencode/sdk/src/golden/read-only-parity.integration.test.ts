@@ -1,5 +1,5 @@
 /**
- * Read-only subprocess golden checks (SDK vs gsd-tools.cjs JSON).
+ * read-only subprocess golden checks (SDK vs gsd-tools.cjs JSON).
  * Row data: `read-only-golden-rows.ts`. Policy: `golden-policy.ts`, `QUERY-HANDLERS.md`.
  */
 import { describe, it, expect } from 'vitest';
@@ -13,7 +13,7 @@ import { READ_ONLY_JSON_PARITY_ROWS } from './read-only-golden-rows.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..', '..', '..');
 
-describe('Read-only golden parity (JSON toEqual)', () => {
+describe('read-only golden parity (JSON toEqual)', () => {
   it.each(READ_ONLY_JSON_PARITY_ROWS)('$canonical matches gsd-tools.cjs JSON', async (row) => {
     const gsdOutput = await captureGsdToolsOutput(row.cjs, row.cjsArgs, REPO_ROOT);
     const registry = createRegistry();
@@ -69,7 +69,7 @@ describe('summary.extract golden parity (with array-of-objects fix)', () => {
     const sdkResult = await registry.dispatch('summary.extract', ['sdk/src/golden/fixtures/summary-extract-sample.md'], REPO_ROOT);
     
     // The SDK correctly parses array-of-objects, whereas CJS parses them as strings.
-    // Patch the CJS output to reflect the CodeRabbit bugfix.
+    // patch the CJS output to reflect the CodeRabbit bugfix.
     const patchedGsd = JSON.parse(JSON.stringify(gsdOutput));
     if (patchedGsd.tech_added && Array.isArray(patchedGsd.tech_added)) {
       patchedGsd.tech_added = patchedGsd.tech_added.map((t: any) => 

@@ -390,7 +390,7 @@ describe('GSD.run()', () => {
       .mockResolvedValueOnce(makePhaseResult());
 
     const opts: MilestoneRunnerOptions = {
-      model: 'claude-sonnet-4-6',
+      model: 'OpenCode-sonnet-4-6',
       maxBudgetPerStep: 2.0,
       onPhaseComplete: vi.fn(),
     };

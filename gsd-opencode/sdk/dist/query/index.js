@@ -110,7 +110,7 @@ export const QUERY_MUTATION_COMMANDS = new Set([
     'learnings.prune', 'learnings prune',
     'learnings.delete', 'learnings delete',
     'intel.snapshot', 'intel.patch-meta', 'intel snapshot', 'intel patch-meta',
-    'write-profile', 'generate-claude-profile', 'generate-dev-preferences', 'generate-claude-md',
+    'write-profile', 'generate-OpenCode-profile', 'generate-dev-preferences', 'generate-OpenCode-md',
 ]);
 // ─── Event builder ────────────────────────────────────────────────────────
 /**
@@ -475,13 +475,13 @@ export function createRegistry(eventStream, correlationSessionId) {
     registry.register('intel patch-meta', intelPatchMeta);
     registry.register('intel.update', intelUpdate);
     registry.register('intel update', intelUpdate);
-    registry.register('generate-claude-profile', generateClaudeProfile);
+    registry.register('generate-OpenCode-profile', generateClaudeProfile);
     registry.register('generate-dev-preferences', generateDevPreferences);
     registry.register('write-profile', writeProfile);
     registry.register('profile-questionnaire', profileQuestionnaire);
     registry.register('profile-sample', profileSample);
     registry.register('scan-sessions', scanSessions);
-    registry.register('generate-claude-md', generateClaudeMd);
+    registry.register('generate-OpenCode-md', generateClaudeMd);
     // Wire event emission for mutation commands
     if (eventStream) {
         for (const cmd of QUERY_MUTATION_COMMANDS) {

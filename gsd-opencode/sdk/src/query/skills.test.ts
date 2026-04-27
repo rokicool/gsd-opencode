@@ -3,7 +3,7 @@
  *
  * Verifies the handler reads `config.agent_skills[agentType]` from
  * `.planning/config.json` and returns the `<agent_skills>` XML block
- * workflows interpolate into Task() prompts (regression for #2555).
+ * workflows interpolate into task() prompts (regression for #2555).
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -49,59 +49,59 @@ describe('agentSkills', () => {
   });
 
   it('returns empty string when agent type not in config.agent_skills', async () => {
-    await writeConfig(tmpDir, { agent_skills: { 'gsd-executor': ['.claude/skills/foo'] } });
+    await writeConfig(tmpDir, { agent_skills: { 'gsd-executor': ['.OpenCode/skills/foo'] } });
     const r = await agentSkills(['gsd-planner'], tmpDir);
     expect(r.data).toBe('');
   });
 
   it('returns <agent_skills> block for each configured skill path', async () => {
-    await writeSkill(join(tmpDir, '.claude', 'skills'), 'skill-a');
-    await writeSkill(join(tmpDir, '.claude', 'skills'), 'skill-b');
+    await writeSkill(join(tmpDir, '.OpenCode', 'skills'), 'skill-a');
+    await writeSkill(join(tmpDir, '.OpenCode', 'skills'), 'skill-b');
     await writeConfig(tmpDir, {
       agent_skills: {
-        'gsd-planner': ['.claude/skills/skill-a', '.claude/skills/skill-b'],
+        'gsd-planner': ['.OpenCode/skills/skill-a', '.OpenCode/skills/skill-b'],
       },
     });
 
     const r = await agentSkills(['gsd-planner'], tmpDir);
     expect(r.data).toBe(
       '<agent_skills>\n' +
-        'Read these user-configured skills:\n' +
-        '- @.claude/skills/skill-a/SKILL.md\n' +
-        '- @.claude/skills/skill-b/SKILL.md\n' +
+        'read these user-configured skills:\n' +
+        '- @.OpenCode/skills/skill-a/SKILL.md\n' +
+        '- @.OpenCode/skills/skill-b/SKILL.md\n' +
         '</agent_skills>',
     );
   });
 
   it('accepts a single string skill path (normalizes to array)', async () => {
-    await writeSkill(join(tmpDir, '.claude', 'skills'), 'only-one');
+    await writeSkill(join(tmpDir, '.OpenCode', 'skills'), 'only-one');
     await writeConfig(tmpDir, {
-      agent_skills: { 'gsd-planner': '.claude/skills/only-one' },
+      agent_skills: { 'gsd-planner': '.OpenCode/skills/only-one' },
     });
 
     const r = await agentSkills(['gsd-planner'], tmpDir);
     expect(r.data).toBe(
       '<agent_skills>\n' +
-        'Read these user-configured skills:\n' +
-        '- @.claude/skills/only-one/SKILL.md\n' +
+        'read these user-configured skills:\n' +
+        '- @.OpenCode/skills/only-one/SKILL.md\n' +
         '</agent_skills>',
     );
   });
 
   it('skips skills whose SKILL.md is missing', async () => {
-    await writeSkill(join(tmpDir, '.claude', 'skills'), 'exists');
-    await mkdir(join(tmpDir, '.claude', 'skills', 'missing-md'), { recursive: true });
+    await writeSkill(join(tmpDir, '.OpenCode', 'skills'), 'exists');
+    await mkdir(join(tmpDir, '.OpenCode', 'skills', 'missing-md'), { recursive: true });
     await writeConfig(tmpDir, {
       agent_skills: {
-        'gsd-planner': ['.claude/skills/exists', '.claude/skills/missing-md'],
+        'gsd-planner': ['.OpenCode/skills/exists', '.OpenCode/skills/missing-md'],
       },
     });
 
     const r = await agentSkills(['gsd-planner'], tmpDir);
     expect(r.data).toBe(
       '<agent_skills>\n' +
-        'Read these user-configured skills:\n' +
-        '- @.claude/skills/exists/SKILL.md\n' +
+        'read these user-configured skills:\n' +
+        '- @.OpenCode/skills/exists/SKILL.md\n' +
         '</agent_skills>',
     );
   });

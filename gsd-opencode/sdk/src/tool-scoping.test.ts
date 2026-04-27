@@ -6,55 +6,55 @@ import { PhaseType } from './types.js';
 
 describe('getToolsForPhase', () => {
   describe('default tools per phase', () => {
-    it('research phase: read-only + web search, no Write/Edit', () => {
+    it('research phase: read-only + web search, no write/edit', () => {
       const tools = getToolsForPhase(PhaseType.Research);
-      expect(tools).toContain('Read');
-      expect(tools).toContain('Grep');
-      expect(tools).toContain('Glob');
-      expect(tools).toContain('Bash');
-      expect(tools).toContain('WebSearch');
-      expect(tools).not.toContain('Write');
-      expect(tools).not.toContain('Edit');
+      expect(tools).toContain('read');
+      expect(tools).toContain('grep');
+      expect(tools).toContain('glob');
+      expect(tools).toContain('bash');
+      expect(tools).toContain('websearch');
+      expect(tools).not.toContain('write');
+      expect(tools).not.toContain('edit');
     });
 
     it('execute phase: full read/write', () => {
       const tools = getToolsForPhase(PhaseType.Execute);
-      expect(tools).toContain('Read');
-      expect(tools).toContain('Write');
-      expect(tools).toContain('Edit');
-      expect(tools).toContain('Bash');
-      expect(tools).toContain('Grep');
-      expect(tools).toContain('Glob');
+      expect(tools).toContain('read');
+      expect(tools).toContain('write');
+      expect(tools).toContain('edit');
+      expect(tools).toContain('bash');
+      expect(tools).toContain('grep');
+      expect(tools).toContain('glob');
     });
 
-    it('verify phase: read-only, no Write/Edit', () => {
+    it('verify phase: read-only, no write/edit', () => {
       const tools = getToolsForPhase(PhaseType.Verify);
-      expect(tools).toContain('Read');
-      expect(tools).toContain('Bash');
-      expect(tools).toContain('Grep');
-      expect(tools).toContain('Glob');
-      expect(tools).not.toContain('Write');
-      expect(tools).not.toContain('Edit');
+      expect(tools).toContain('read');
+      expect(tools).toContain('bash');
+      expect(tools).toContain('grep');
+      expect(tools).toContain('glob');
+      expect(tools).not.toContain('write');
+      expect(tools).not.toContain('edit');
     });
 
-    it('discuss phase: read-only, no Write/Edit', () => {
+    it('discuss phase: read-only, no write/edit', () => {
       const tools = getToolsForPhase(PhaseType.Discuss);
-      expect(tools).toContain('Read');
-      expect(tools).toContain('Bash');
-      expect(tools).toContain('Grep');
-      expect(tools).toContain('Glob');
-      expect(tools).not.toContain('Write');
-      expect(tools).not.toContain('Edit');
+      expect(tools).toContain('read');
+      expect(tools).toContain('bash');
+      expect(tools).toContain('grep');
+      expect(tools).toContain('glob');
+      expect(tools).not.toContain('write');
+      expect(tools).not.toContain('edit');
     });
 
-    it('plan phase: read/write + web, has Write but no Edit', () => {
+    it('plan phase: read/write + web, has write but no edit', () => {
       const tools = getToolsForPhase(PhaseType.Plan);
-      expect(tools).toContain('Read');
-      expect(tools).toContain('Write');
-      expect(tools).toContain('Bash');
-      expect(tools).toContain('Glob');
-      expect(tools).toContain('Grep');
-      expect(tools).toContain('WebFetch');
+      expect(tools).toContain('read');
+      expect(tools).toContain('write');
+      expect(tools).toContain('bash');
+      expect(tools).toContain('glob');
+      expect(tools).toContain('grep');
+      expect(tools).toContain('webfetch');
     });
   });
 
@@ -71,13 +71,13 @@ describe('getToolsForPhase', () => {
     it('parses tools from agent def frontmatter when provided', () => {
       const agentDef = `---
 name: test-agent
-tools: Bash, Grep, CustomTool
+tools: bash, grep, CustomTool
 ---
 
 <role>Test agent</role>`;
 
       const tools = getToolsForPhase(PhaseType.Execute, agentDef);
-      expect(tools).toEqual(['Bash', 'Grep', 'CustomTool']);
+      expect(tools).toEqual(['bash', 'grep', 'CustomTool']);
     });
 
     it('falls back to defaults when agent def has no tools line', () => {
@@ -89,7 +89,7 @@ name: test-agent
 
       const tools = getToolsForPhase(PhaseType.Execute, agentDef);
       // parseAgentTools returns DEFAULT_ALLOWED_TOOLS when no tools: line found
-      expect(tools).toEqual(['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob']);
+      expect(tools).toEqual(['read', 'write', 'edit', 'bash', 'grep', 'glob']);
     });
 
     it('falls back to defaults when agent def has no frontmatter', () => {
@@ -97,27 +97,27 @@ name: test-agent
 
       const tools = getToolsForPhase(PhaseType.Research, agentDef);
       // parseAgentTools returns DEFAULT_ALLOWED_TOOLS for no frontmatter
-      expect(tools).toEqual(['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob']);
+      expect(tools).toEqual(['read', 'write', 'edit', 'bash', 'grep', 'glob']);
     });
   });
 
   describe('R015 compliance', () => {
-    it('research has no Write or Edit on source', () => {
+    it('research has no write or edit on source', () => {
       const tools = getToolsForPhase(PhaseType.Research);
-      expect(tools).not.toContain('Write');
-      expect(tools).not.toContain('Edit');
+      expect(tools).not.toContain('write');
+      expect(tools).not.toContain('edit');
     });
 
-    it('execute has Write and Edit for source modification', () => {
+    it('execute has write and edit for source modification', () => {
       const tools = getToolsForPhase(PhaseType.Execute);
-      expect(tools).toContain('Write');
-      expect(tools).toContain('Edit');
+      expect(tools).toContain('write');
+      expect(tools).toContain('edit');
     });
 
-    it('verify has no Write or Edit (read-only verification)', () => {
+    it('verify has no write or edit (read-only verification)', () => {
       const tools = getToolsForPhase(PhaseType.Verify);
-      expect(tools).not.toContain('Write');
-      expect(tools).not.toContain('Edit');
+      expect(tools).not.toContain('write');
+      expect(tools).not.toContain('edit');
     });
   });
 });

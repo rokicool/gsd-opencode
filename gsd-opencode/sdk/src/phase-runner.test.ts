@@ -455,7 +455,7 @@ describe('PhaseRunner', () => {
     });
 
     it('invokes onBlockerDecision when RESEARCH.md has unresolved open questions', async () => {
-      // Write a RESEARCH.md with unresolved questions
+      // write a RESEARCH.md with unresolved questions
       const researchPath = join(tempPhaseDir, '01-RESEARCH.md');
       await writeFile(researchPath, `# Research
 
@@ -1398,7 +1398,7 @@ Use TypeScript.`, 'utf-8');
       await runner.run('1', {
         maxBudgetPerStep: 2.0,
         maxTurnsPerStep: 20,
-        model: 'claude-opus-4-6',
+        model: 'OpenCode-opus-4-6',
       });
 
       // Check session options passed to runPhaseStepSession
@@ -1406,7 +1406,7 @@ Use TypeScript.`, 'utf-8');
       const sessionOpts = call[3] as SessionOptions;
       expect(sessionOpts.maxBudgetUsd).toBe(2.0);
       expect(sessionOpts.maxTurns).toBe(20);
-      expect(sessionOpts.model).toBe('claude-opus-4-6');
+      expect(sessionOpts.model).toBe('OpenCode-opus-4-6');
     });
   });
 

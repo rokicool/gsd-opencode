@@ -11,13 +11,13 @@
  *   - **D-01:** Decision text
  *   - **D-02 [tag1, tag2]:** Tagged decision
  *
- *   ### Claude's Discretion
+ *   ### OpenCode's Discretion
  *   - free-form, never tracked
  *   </decisions>
  *
  * A decision is "trackable" when:
  *   - it has a valid D-NN id
- *   - it is NOT under the "Claude's Discretion" category
+ *   - it is NOT under the "OpenCode's Discretion" category
  *   - it is NOT tagged `informational` or `folded`
  *
  * Trackable decisions are the ones the plan-phase translation gate and the
@@ -34,7 +34,7 @@ export interface ParsedDecision {
     /** Bracketed tags from `**D-NN [tag1, tag2]:**`. Lower-cased. */
     tags: string[];
     /**
-     * False when under "Claude's Discretion" or tagged `informational` /
+     * False when under "OpenCode's Discretion" or tagged `informational` /
      * `folded`. Trackable decisions are subject to the coverage gates.
      */
     trackable: boolean;

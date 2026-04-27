@@ -30,7 +30,7 @@ const ROADMAP_CONTENT = `# Roadmap
 **Goal:** Migrate all deterministic orchestration into TypeScript SDK.
 
 - [x] **Phase 9: Foundation and Test Infrastructure**
-- [ ] **Phase 10: Read-Only Queries**
+- [ ] **Phase 10: read-Only Queries**
 - [ ] **Phase 11: Mutations**
 
 ### Phase 9: Foundation and Test Infrastructure
@@ -43,7 +43,7 @@ const ROADMAP_CONTENT = `# Roadmap
 1. Error classification system exists
 2. Query registry works
 
-### Phase 10: Read-Only Queries
+### Phase 10: read-Only Queries
 
 **Goal:** Port read-only query operations.
 
@@ -422,7 +422,7 @@ describe('roadmapGetPhase', () => {
     const data = result.data as Record<string, unknown>;
     expect(data.found).toBe(true);
     expect(data.phase_number).toBe('10');
-    expect(data.phase_name).toBe('Read-Only Queries');
+    expect(data.phase_name).toBe('read-Only Queries');
     expect(data.goal).toBe('Port read-only query operations.');
     expect((data.success_criteria as string[]).length).toBe(2);
     expect(data.section).toContain('### Phase 10');

@@ -177,7 +177,7 @@ describe('loadConfig', () => {
 
   // ─── User-level defaults (~/.gsd/defaults.json) ─────────────────────────
   // Regression: issue #2652 — SDK loadConfig ignored user-level defaults
-  // for pre-project Codex installs, so init.quick still emitted Claude
+  // for pre-project Codex installs, so init.quick still emitted OpenCode
   // model aliases from MODEL_PROFILES via resolveModel even when the user
   // had `resolve_model_ids: "omit"` in ~/.gsd/defaults.json.
   //
@@ -185,7 +185,7 @@ describe('loadConfig', () => {
   // user-level defaults only apply when no project .planning/config.json
   // exists (pre-project context). Once a project is initialized, its
   // config.json is authoritative — buildNewProjectConfig baked the user
-  // defaults in at /gsd:new-project time.
+  // defaults in at /gsd-new-project time.
 
   it('pre-project: layers user defaults from ~/.gsd/defaults.json', async () => {
     await writeUserDefaults({ resolve_model_ids: 'omit' });

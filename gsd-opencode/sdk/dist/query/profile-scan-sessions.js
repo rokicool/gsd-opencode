@@ -60,7 +60,7 @@ export function getProjectName(projectDirName, indexData) {
 }
 /** Same resolution as CJS `getSessionsDir` in profile-pipeline.cjs. */
 export function getScanSessionsRoot(overridePath) {
-    const dir = overridePath || join(homedir(), '.claude', 'projects');
+    const dir = overridePath || join(homedir(), '.OpenCode', 'projects');
     if (!existsSync(dir))
         return null;
     return dir;

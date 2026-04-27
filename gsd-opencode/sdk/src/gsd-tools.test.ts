@@ -50,7 +50,7 @@ describe('GSDTools', () => {
     });
 
     it('handles @file: prefix by reading referenced file', async () => {
-      // Write a large JSON result to a file
+      // write a large JSON result to a file
       const resultFile = join(fixtureDir, 'big-result.json');
       const bigData = { items: Array.from({ length: 100 }, (_, i) => ({ id: i })) };
       await writeFile(resultFile, JSON.stringify(bigData));
@@ -272,9 +272,9 @@ describe('GSDTools', () => {
   describe('initNewProject()', () => {
     it('calls init new-project and returns typed result', async () => {
       const mockResult = {
-        researcher_model: 'claude-sonnet-4-6',
-        synthesizer_model: 'claude-sonnet-4-6',
-        roadmapper_model: 'claude-sonnet-4-6',
+        researcher_model: 'OpenCode-sonnet-4-6',
+        synthesizer_model: 'OpenCode-sonnet-4-6',
+        roadmapper_model: 'OpenCode-sonnet-4-6',
         commit_docs: true,
         project_exists: false,
         has_codebase_map: false,
@@ -307,7 +307,7 @@ describe('GSDTools', () => {
       const tools = new GSDTools({ projectDir: tmpDir, gsdToolsPath: scriptPath, preferNativeQuery: false });
       const result = await tools.initNewProject();
 
-      expect(result.researcher_model).toBe('claude-sonnet-4-6');
+      expect(result.researcher_model).toBe('OpenCode-sonnet-4-6');
       expect(result.project_exists).toBe(false);
       expect(result.has_git).toBe(true);
       expect(result.is_brownfield).toBe(false);
@@ -329,8 +329,8 @@ describe('GSDTools', () => {
   // ─── resolveGsdToolsPath() tests ────────────────────────────────────────
 
   describe('resolveGsdToolsPath()', () => {
-    it('prefers bundled gsd-tools over project .claude when the bundled file exists', async () => {
-      const localBinDir = join(tmpDir, '.claude', 'get-shit-done', 'bin');
+    it('prefers bundled gsd-tools over project .OpenCode when the bundled file exists', async () => {
+      const localBinDir = join(tmpDir, '.OpenCode', 'get-shit-done', 'bin');
       await mkdir(localBinDir, { recursive: true });
       await writeFile(join(localBinDir, 'gsd-tools.cjs'), '// stub');
 
@@ -346,13 +346,13 @@ describe('GSDTools', () => {
       const result = resolveGsdToolsPath(tmpDir);
       const expected = existsSync(BUNDLED_GSD_TOOLS_PATH)
         ? BUNDLED_GSD_TOOLS_PATH
-        : join(homedir(), '.claude', 'get-shit-done', 'bin', 'gsd-tools.cjs');
+        : join(homedir(), '.OpenCode', 'get-shit-done', 'bin', 'gsd-tools.cjs');
 
       expect(result).toBe(expected);
     });
 
-    it('uses explicit gsdToolsPath when provided (overrides bundled / .claude resolution)', async () => {
-      const localBinDir = join(tmpDir, '.claude', 'get-shit-done', 'bin');
+    it('uses explicit gsdToolsPath when provided (overrides bundled / .OpenCode resolution)', async () => {
+      const localBinDir = join(tmpDir, '.OpenCode', 'get-shit-done', 'bin');
       await mkdir(localBinDir, { recursive: true });
       const scriptPath = join(localBinDir, 'gsd-tools.cjs');
       await writeFile(

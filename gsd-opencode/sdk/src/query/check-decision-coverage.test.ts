@@ -177,7 +177,7 @@ describe('checkDecisionCoveragePlan — translation gate (#2492)', () => {
 - **D-02 [informational]:** opt-out
 - **D-03 [folded]:** opt-out
 
-### Claude's Discretion
+### OpenCode's Discretion
 - **D-99:** never tracked
 </decisions>`,
       {

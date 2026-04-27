@@ -29,7 +29,7 @@ import { acquireStateLock, releaseStateLock } from './state-mutation.js';
 import type { QueryHandler } from './utils.js';
 
 /**
- * Write config JSON atomically via temp file + rename to prevent
+ * write config JSON atomically via temp file + rename to prevent
  * partial writes on process interruption.
  */
 async function atomicWriteConfig(configPath: string, config: Record<string, unknown>): Promise<void> {
@@ -176,7 +176,7 @@ function setConfigValue(obj: Record<string, unknown>, dotPath: string, value: un
 // ─── configSet ────────────────────────────────────────────────────────────
 
 /**
- * Write a validated key-value pair to config.json.
+ * write a validated key-value pair to config.json.
  *
  * Validates key against VALID_CONFIG_KEYS allowlist, coerces value
  * from CLI string to native type, and writes config.json.

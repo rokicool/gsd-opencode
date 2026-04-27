@@ -216,7 +216,7 @@ function buildPlanMessage(uncovered) {
     }
     lines.push('');
     lines.push('Resolve by citing `D-NN:` in a relevant plan\'s `must_haves`/`truths` (or body),');
-    lines.push('OR move the decision to `### Claude\'s Discretion` / tag it `[informational]` if it should not be tracked.');
+    lines.push('OR move the decision to `### OpenCode\'s Discretion` / tag it `[informational]` if it should not be tracked.');
     return lines.join('\n');
 }
 function buildVerifyMessage(notHonored) {
@@ -321,7 +321,7 @@ async function recentCommitMessages(projectDir, limit = 200) {
 }
 /** Per-file size cap when slurping modified-file contents into the verify haystack. */
 const MAX_MODIFIED_FILE_BYTES = 256 * 1024;
-/** Read a file and truncate to MAX_MODIFIED_FILE_BYTES; returns '' on error. */
+/** read a file and truncate to MAX_MODIFIED_FILE_BYTES; returns '' on error. */
 async function readBoundedFile(absPath) {
     try {
         const raw = await readFile(absPath, 'utf-8');
@@ -431,7 +431,7 @@ export const checkDecisionCoverageVerify = async (args, projectDir, workstream) 
     // Verify-phase haystack is intentionally broad — this gate is non-blocking and looks
     // for honored decisions across all phase artifacts, not just plan front-matter sections.
     const planContents = await loadPlanContents(phaseDir);
-    // Read all *-SUMMARY.md files in phaseDir, capped to keep the haystack bounded.
+    // read all *-SUMMARY.md files in phaseDir, capped to keep the haystack bounded.
     const summaryParts = [];
     let summaryContent = '';
     if (existsSync(phaseDir)) {

@@ -97,10 +97,10 @@ describe('GSDLogger', () => {
 
   it('includes extra data when provided', () => {
     const logger = new GSDLogger({ output, level: 'debug' });
-    logger.info('with data', { count: 42, tool: 'Bash' });
+    logger.info('with data', { count: 42, tool: 'bash' });
 
     const entry = parseLogEntry(output.lines[0]!);
-    expect(entry.data).toEqual({ count: 42, tool: 'Bash' });
+    expect(entry.data).toEqual({ count: 42, tool: 'bash' });
   });
 
   it('omits optional fields when not set', () => {

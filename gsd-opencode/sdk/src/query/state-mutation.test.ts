@@ -26,7 +26,7 @@ status: executing
 
 ## Current Position
 
-Phase: 10 (Read-Only Queries) — EXECUTING
+Phase: 10 (read-Only Queries) — EXECUTING
 Plan: 2 of 3
 Status: Executing Phase 10
 Last activity: 2026-04-08 -- Phase 10 execution started
@@ -68,7 +68,7 @@ async function setupTestProject(tmpDir: string, stateContent?: string): Promise<
   await mkdir(join(planningDir, 'phases'), { recursive: true });
   await writeFile(join(planningDir, 'STATE.md'), stateContent || MINIMAL_STATE, 'utf-8');
   // Minimal ROADMAP.md for buildStateFrontmatter
-  await writeFile(join(planningDir, 'ROADMAP.md'), '# Roadmap\n\n## Current Milestone: v3.0 SDK-First Migration\n\n### Phase 10: Read-Only Queries\n\nGoal: Port queries.\n', 'utf-8');
+  await writeFile(join(planningDir, 'ROADMAP.md'), '# Roadmap\n\n## Current Milestone: v3.0 SDK-First Migration\n\n### Phase 10: read-Only Queries\n\nGoal: Port queries.\n', 'utf-8');
   await writeFile(join(planningDir, 'config.json'), '{"model_profile":"balanced"}', 'utf-8');
   return tmpDir;
 }

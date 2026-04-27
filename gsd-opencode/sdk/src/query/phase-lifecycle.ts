@@ -1710,7 +1710,7 @@ export const milestoneComplete: QueryHandler = async (args, projectDir, workstre
             totalTasks += parseInt(tasksFieldMatch[1]!, 10);
           } else {
             const xmlTaskMatches = content.match(/<task[\s>]/gi) || [];
-            const mdTaskMatches = content.match(/##\s*Task\s*\d+/gi) || [];
+            const mdTaskMatches = content.match(/##\s*task\s*\d+/gi) || [];
             totalTasks += xmlTaskMatches.length || mdTaskMatches.length;
           }
         } catch {

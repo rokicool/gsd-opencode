@@ -100,7 +100,7 @@ export declare const verifySchemaDrift: QueryHandler;
  *
  * Non-blocking by contract: every failure mode returns a successful response
  * with `{ skipped: true, reason }`. The post-execute drift gate in
- * `/gsd:execute-phase` relies on this guarantee.
+ * `/gsd-execute-phase` relies on this guarantee.
  *
  * Delegates to the Node-side implementation in `bin/lib/drift.cjs` and
  * `bin/lib/verify.cjs` via a child process so the drift logic stays in one

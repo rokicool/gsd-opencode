@@ -1,5 +1,5 @@
 /**
- * Profile output handlers — USER-PROFILE.md, dev-preferences, CLAUDE.md sections.
+ * Profile output handlers — USER-PROFILE.md, dev-preferences, AGENTS.md sections.
  * Ported from `get-shit-done/bin/lib/profile-output.cjs` (`cmdWriteProfile`,
  * `cmdGenerateDevPreferences`, `cmdGenerateClaudeProfile`, `cmdGenerateClaudeMd`).
  */
@@ -39,13 +39,13 @@ const CLAUDE_MD_FALLBACKS = {
   conventions: 'Conventions not yet established. Will populate as patterns emerge during development.',
   architecture: 'Architecture not yet mapped. Follow existing patterns found in the codebase.',
   skills:
-    'No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.',
+    'No project skills found. Add skills to any of: `.OpenCode/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.',
 };
 
-const SKILL_SEARCH_DIRS = ['.claude/skills', '.agents/skills', '.cursor/skills', '.github/skills', '.codex/skills'];
+const SKILL_SEARCH_DIRS = ['.OpenCode/skills', '.agents/skills', '.cursor/skills', '.github/skills', '.codex/skills'];
 
 const CLAUDE_MD_WORKFLOW_ENFORCEMENT = [
-  'Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.',
+  'Before using edit, write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.',
   '',
   'Use these entry points:',
   '- `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks',
@@ -60,7 +60,7 @@ const CLAUDE_MD_PROFILE_PLACEHOLDER = [
   '## Developer Profile',
   '',
   '> Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.',
-  '> This section is managed by `generate-claude-profile` -- do not edit manually.',
+  '> This section is managed by `generate-OpenCode-profile` -- do not edit manually.',
   '<!-- GSD:profile-end -->',
 ].join('\n');
 
@@ -301,7 +301,7 @@ function generateSkillsSection(cwd: string): { content: string; source: string; 
     return { content: CLAUDE_MD_FALLBACKS.skills, source: 'skills/', hasFallback: true };
   }
 
-  const lines = ['| Skill | Description | Path |', '|-------|-------------|------|'];
+  const lines = ['| skill | Description | Path |', '|-------|-------------|------|'];
   for (const skill of discovered) {
     const desc = skill.description.replace(/\|/g, '\\|').replace(/\n/g, ' ').trim();
     const safeName = skill.name.replace(/\|/g, '\\|');
@@ -481,7 +481,7 @@ function cmdWriteProfileLogic(
 
   let outputPath = options.output;
   if (!outputPath) {
-    outputPath = join(homedir(), '.claude', 'get-shit-done', 'USER-PROFILE.md');
+    outputPath = join(homedir(), '.OpenCode', 'get-shit-done', 'USER-PROFILE.md');
   } else if (!isAbsolute(outputPath)) {
     outputPath = join(cwd, outputPath);
   }
@@ -600,7 +600,7 @@ export const generateDevPreferences: QueryHandler = async (args, projectDir) => 
 
   let outPath = outputPathOpt;
   if (!outPath) {
-    outPath = join(homedir(), '.claude', 'commands', 'gsd', 'dev-preferences.md');
+    outPath = join(homedir(), '.OpenCode', 'commands', 'gsd', 'dev-preferences.md');
   } else if (!isAbsolute(outPath)) {
     outPath = join(projectDir, outPath);
   }
@@ -704,11 +704,11 @@ export const generateClaudeProfile: QueryHandler = async (args, projectDir) => {
 
   let targetPath: string;
   if (globalFlag) {
-    targetPath = join(homedir(), '.claude', 'CLAUDE.md');
+    targetPath = join(homedir(), '.OpenCode', 'AGENTS.md');
   } else if (outputPathOpt) {
     targetPath = isAbsolute(outputPathOpt) ? outputPathOpt : join(projectDir, outputPathOpt);
   } else {
-    let configClaudeMdPath = './CLAUDE.md';
+    let configClaudeMdPath = './AGENTS.md';
     try {
       const config = await loadConfig(projectDir);
       const p = config.claude_md_path;
@@ -802,7 +802,7 @@ export const generateClaudeMd: QueryHandler = async (args, projectDir) => {
 
   let outputPath: string;
   if (!outputPathOpt) {
-    let configClaudeMdPath = './CLAUDE.md';
+    let configClaudeMdPath = './AGENTS.md';
     try {
       const config = await loadConfig(projectDir);
       const p = config.claude_md_path;

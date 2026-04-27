@@ -1,5 +1,5 @@
 /**
- * Skill manifest — multi-root skill discovery scan.
+ * skill manifest — multi-root skill discovery scan.
  *
  * Full port of `buildSkillManifest` / `cmdSkillManifest` from
  * `get-shit-done/bin/lib/init.cjs` (lines 1640–1847).

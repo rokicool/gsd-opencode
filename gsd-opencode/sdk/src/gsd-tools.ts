@@ -581,14 +581,14 @@ export async function runGsdToolsQuery(projectDir: string, queryArgv: string[]):
 
 /**
  * Resolve gsd-tools.cjs path.
- * Probe order: SDK-bundled repo copy → `project/.claude/get-shit-done/` →
- * `~/.claude/get-shit-done/`.
+ * Probe order: SDK-bundled repo copy → `project/.OpenCode/get-shit-done/` →
+ * `$HOME/.config/opencode/get-shit-done/`.
  */
 export function resolveGsdToolsPath(projectDir: string): string {
   const candidates = [
     BUNDLED_GSD_TOOLS_PATH,
-    join(projectDir, '.claude', 'get-shit-done', 'bin', 'gsd-tools.cjs'),
-    join(homedir(), '.claude', 'get-shit-done', 'bin', 'gsd-tools.cjs'),
+    join(projectDir, '.OpenCode', 'get-shit-done', 'bin', 'gsd-tools.cjs'),
+    join(homedir(), '.OpenCode', 'get-shit-done', 'bin', 'gsd-tools.cjs'),
   ];
 
   return candidates.find(candidate => existsSync(candidate)) ?? candidates[candidates.length - 1]!;

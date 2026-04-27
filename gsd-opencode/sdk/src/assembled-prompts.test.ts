@@ -30,9 +30,9 @@ const sdkPromptsDir = join(__dirname, '..', 'prompts');
 // ─── Blocked patterns (aligned with headless-prompts.test.ts) ────────────────
 
 const BLOCKED_PATTERNS: Array<[string, RegExp]> = [
-  ['AskUserQuestion', /AskUserQuestion\s*\(/],
-  ['SlashCommand', /SlashCommand\s*\(/],
-  ['/gsd: command', /\/gsd:\S+/],
+  ['question', /question\s*\(/],
+  ['command', /command\s*\(/],
+  ['/gsd- command', /\/gsd-\S+/],
   ['@file: reference', /@file:\S+/],
   ['STOP + wait directive', /\bSTOP\b\s+(?:and\s+)?(?:wait|ask)/i],
   ['bare STOP directive', /^\s*STOP\s*[.!]?\s*$/m],
@@ -180,7 +180,7 @@ describe('InitRunner assembled output', () => {
     const researchDir = join(planningDir, 'research');
     await mkdir(researchDir, { recursive: true });
 
-    // Write minimal stubs that InitRunner reads
+    // write minimal stubs that InitRunner reads
     await writeFile(
       join(planningDir, 'PROJECT.md'),
       '# Test Project\n\nA minimal test project for contract testing.\n',

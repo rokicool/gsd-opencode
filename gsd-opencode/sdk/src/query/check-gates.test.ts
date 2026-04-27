@@ -14,7 +14,7 @@ describe('checkGates', () => {
   beforeEach(async () => {
     projectDir = join(tmpdir(), `gsd-check-gates-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     await mkdir(join(projectDir, '.planning', 'phases'), { recursive: true });
-    // Write a clean STATE.md
+    // write a clean STATE.md
     await writeFile(
       join(projectDir, '.planning', 'STATE.md'),
       '---\nstatus: active\n---\n\n# Project State\n\nStatus: active\n',

@@ -31,10 +31,10 @@ Build error classification system.
 
 <tasks>
 <task type="auto">
-  <name>Task 1: Create error types</name>
+  <name>task 1: Create error types</name>
 </task>
 <task type="auto">
-  <name>Task 2: Add exit codes</name>
+  <name>task 2: Add exit codes</name>
 </task>
 </tasks>
 `;
@@ -54,10 +54,10 @@ Build query registry.
 
 <tasks>
 <task type="auto">
-  <name>Task 1: Registry class</name>
+  <name>task 1: Registry class</name>
 </task>
 <task type="checkpoint:human-verify">
-  <name>Task 2: Verify registry</name>
+  <name>task 2: Verify registry</name>
 </task>
 </tasks>
 `;
@@ -75,7 +75,7 @@ Golden file tests.
 
 <tasks>
 <task type="auto">
-  <name>Task 1: Setup golden files</name>
+  <name>task 1: Setup golden files</name>
 </task>
 </tasks>
 `;
@@ -106,7 +106,7 @@ beforeEach(async () => {
   // Phase 10
   const phase10 = join(phasesDir, '10-read-only-queries');
   await mkdir(phase10, { recursive: true });
-  await writeFile(join(phase10, '10-01-PLAN.md'), '---\nphase: 10\nplan: 01\n---\n<objective>\nPort helpers.\n</objective>\n<tasks>\n<task type="auto">\n  <name>Task 1</name>\n</task>\n</tasks>');
+  await writeFile(join(phase10, '10-01-PLAN.md'), '---\nphase: 10\nplan: 01\n---\n<objective>\nPort helpers.\n</objective>\n<tasks>\n<task type="auto">\n  <name>task 1</name>\n</task>\n</tasks>');
 });
 
 afterEach(async () => {

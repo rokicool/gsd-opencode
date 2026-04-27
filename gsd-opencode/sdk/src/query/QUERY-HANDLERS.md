@@ -62,12 +62,12 @@ No `gsd-tools.cjs` mirror — agents use these instead of shell `ls`/`find`/`gre
 
 Handlers for `**state.signal-waiting`**, `**state.signal-resume**`, `**state.validate**`, `**state.sync**` (supports `--verify` dry-run), and `**state.prune**` live in `state-mutation.ts`, with dotted and `state …` space aliases in `index.ts`.
 
-**`state.add-roadmap-evolution`** (bug #2662) — appends one entry to the `### Roadmap Evolution` subsection under `## Accumulated Context` in STATE.md, creating the subsection if missing. argv: `--phase`, `--action` (`inserted|removed|moved|edited|added`), optional `--note`, `--after` (for `inserted`), and `--urgent` flag. Returns `{ added: true, entry }` or `{ added: false, reason: 'duplicate', entry }`. Throws `GSDError(Validation)` when `--phase` / `--action` are missing or action is not in the allowed set. Canonical replacement for raw `Edit`/`Write` on STATE.md in `insert-phase.md` / `add-phase.md` workflows — required when projects ship a `protect-files.sh` PreToolUse hook that blocks direct STATE.md writes.
+**`state.add-roadmap-evolution`** (bug #2662) — appends one entry to the `### Roadmap Evolution` subsection under `## Accumulated Context` in STATE.md, creating the subsection if missing. argv: `--phase`, `--action` (`inserted|removed|moved|edited|added`), optional `--note`, `--after` (for `inserted`), and `--urgent` flag. Returns `{ added: true, entry }` or `{ added: false, reason: 'duplicate', entry }`. Throws `GSDError(Validation)` when `--phase` / `--action` are missing or action is not in the allowed set. Canonical replacement for raw `edit`/`write` on STATE.md in `insert-phase.md` / `add-phase.md` workflows — required when projects ship a `protect-files.sh` PreToolUse hook that blocks direct STATE.md writes.
 
 **`state.json` vs `state.load` (different CJS commands):**
 
-- **`state.json`** / `state json` — port of **`cmdStateJson`** (`state.ts` `stateJson`): rebuilt STATE.md frontmatter JSON. Read-only golden: `read-only-parity.integration.test.ts` compares to CJS `state json` with **`last_updated`** stripped.
-- **`state.load`** / `state load` — port of **`cmdStateLoad`** (`state-project-load.ts` `stateProjectLoad`): `{ config, state_raw, state_exists, roadmap_exists, config_exists }`; **`config`** comes from **`get-shit-done/bin/lib/core.cjs`** `loadConfig` (resolved via the same candidate paths as a normal GSD install). Read-only golden: full `toEqual` vs `state load`. If `core.cjs` cannot be resolved, dispatch throws **`GSDError`** (document for minimal `@gsd-build/sdk`-only installs).
+- **`state.json`** / `state json` — port of **`cmdStateJson`** (`state.ts` `stateJson`): rebuilt STATE.md frontmatter JSON. read-only golden: `read-only-parity.integration.test.ts` compares to CJS `state json` with **`last_updated`** stripped.
+- **`state.load`** / `state load` — port of **`cmdStateLoad`** (`state-project-load.ts` `stateProjectLoad`): `{ config, state_raw, state_exists, roadmap_exists, config_exists }`; **`config`** comes from **`get-shit-done/bin/lib/core.cjs`** `loadConfig` (resolved via the same candidate paths as a normal GSD install). read-only golden: full `toEqual` vs `state load`. If `core.cjs` cannot be resolved, dispatch throws **`GSDError`** (document for minimal `@gsd-build/sdk`-only installs).
 
 `stateExtractField` in `helpers.ts` uses **horizontal whitespace only** after `Field:` so YAML keys such as lowercase `progress:` in frontmatter are not mistaken for the body `Progress:` line (see `get-shit-done/bin/lib/state.cjs` — same rule).
 
@@ -82,7 +82,7 @@ Subprocess reference: `captureGsdToolsOutput()` / `captureGsdToolsStdout()` → 
 | File | Role |
 | ---- | ---- |
 | `sdk/src/golden/golden.integration.test.ts` | Primary golden suite: subset/shape/full parity as documented in the tables below. |
-| `sdk/src/golden/read-only-parity.integration.test.ts` | Read-only handlers with full `toEqual` on `sdkResult.data` vs CJS JSON; rows listed in `read-only-golden-rows.ts`. Also `config-path` / `verify.commits`, dedicated blocks for **`state.json`** (strip `last_updated`) and **`state.load`** (full `cmdStateLoad` parity). |
+| `sdk/src/golden/read-only-parity.integration.test.ts` | read-only handlers with full `toEqual` on `sdkResult.data` vs CJS JSON; rows listed in `read-only-golden-rows.ts`. Also `config-path` / `verify.commits`, dedicated blocks for **`state.json`** (strip `last_updated`) and **`state.load`** (full `cmdStateLoad` parity). |
 
 This section summarizes **how** each covered command is compared so readers do not have to infer rules from assertions alone.
 
@@ -152,7 +152,7 @@ From `read-only-parity.integration.test.ts` (full `toEqual` on this repo):
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `audit-open` | `audit-open --json`: `**scanned_at**` stripped before `toEqual` (volatile ISO time). `sanitizeForDisplay` in `audit-open.ts` matches `security.cjs` (CRLF body lines can leave `\r` in `items.todos[].summary`, matching CLI). |
 | `extract.messages` / `extract-messages` | Fixture `sdk/src/golden/fixtures/extract-messages-sessions/` passed as `--path` (sessions root). `**output_file**` stripped before `toEqual` (temp path under `os.tmpdir()`); then the two JSONL files are compared byte-for-byte. Parity with `profile-pipeline.cjs` `cmdExtractMessages` (`streamExtractMessages`, `isGenuineUserMessage`, batch limit 300). |
-| `docs-init` | `existing_docs` sorted by `path` before compare; `**agents_installed`** and `**missing_agents**` omitted (subprocess vs in-process path resolution for `~/.claude/...`). |
+| `docs-init` | `existing_docs` sorted by `path` before compare; `**agents_installed`** and `**missing_agents**` omitted (subprocess vs in-process path resolution for `$HOME/.config/opencode/...`). |
 
 
 ### Structural, subset, or shape-only parity
@@ -290,7 +290,7 @@ Disposition: **Registered** = handled in `createRegistry()` under the listed SDK
 | `websearch`                                                                                                                             | `websearch`                                                               | Registered              |                                                                           |
 | `scan-sessions`                                                                                                                         | `scan-sessions`                                                           | Registered              |                                                                           |
 | `extract-messages`                                                                                                                      | `extract-messages`, `extract.messages`                                    | Registered              | Golden: `output_file` strip + JSONL bytes (see **Normalized** table).      |
-| `profile-sample`, `profile-questionnaire`, `write-profile`, `generate-dev-preferences`, `generate-claude-profile`, `generate-claude-md` | same kebab-case names                                                     | Registered              |                                                                           |
+| `profile-sample`, `profile-questionnaire`, `write-profile`, `generate-dev-preferences`, `generate-OpenCode-profile`, `generate-OpenCode-md` | same kebab-case names                                                     | Registered              |                                                                           |
 | `workstream`                                                                                                                            | `workstream.get`, `workstream.list`, …                                    | Registered              |                                                                           |
 | `intel`                                                                                                                                 | `intel.status`, `intel.diff`, `intel.update`, …                           | Registered              | `**intel.update**`: JSON parity with CJS spawn hint / disabled payload (see **Intel: intel.update**).                                     |
 | `graphify`                                                                                                                              | —                                                                         | CLI-only                | See **CLI-only** table.                                                   |
@@ -305,5 +305,5 @@ Disposition: **Registered** = handled in `createRegistry()` under the listed SDK
 ## Other registered areas
 
 - `**detect-custom-files`**: requires `--config-dir <path>`; scans installer manifest vs GSD-managed dirs (`detect-custom-files.ts`).
-- `**docs-init**`: docs-update workflow payload (`docs-init.ts`), aligned with `docs.cjs`. Golden tests omit `**agents_installed**` / `**missing_agents**` when comparing SDK vs CLI because the subprocess may resolve `~/.claude/...` differently than in-process checks.
+- `**docs-init**`: docs-update workflow payload (`docs-init.ts`), aligned with `docs.cjs`. Golden tests omit `**agents_installed**` / `**missing_agents**` when comparing SDK vs CLI because the subprocess may resolve `$HOME/.config/opencode/...` differently than in-process checks.
 

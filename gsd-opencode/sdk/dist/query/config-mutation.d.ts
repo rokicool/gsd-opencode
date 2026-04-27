@@ -41,7 +41,7 @@ export declare function isValidConfigKey(keyPath: string): {
  */
 export declare function parseConfigValue(value: string): unknown;
 /**
- * Write a validated key-value pair to config.json.
+ * write a validated key-value pair to config.json.
  *
  * Validates key against VALID_CONFIG_KEYS allowlist, coerces value
  * from CLI string to native type, and writes config.json.

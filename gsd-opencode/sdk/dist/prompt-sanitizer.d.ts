@@ -2,15 +2,15 @@
  * Prompt sanitizer — resolves @-file references and strips interactive CLI
  * patterns from GSD-1 prompts so they're safe for headless SDK use.
  *
- * @-file references (e.g., @~/.claude/get-shit-done/references/foo.md) are
+ * @-file references (e.g., @$HOME/.config/opencode/get-shit-done/references/foo.md) are
  * resolved by reading the file and inlining the content. This preserves the
  * critical instructions that the real agent prompts depend on.
  *
  * Patterns removed (interactive-only, not useful headless):
  * - /gsd-... skill commands (can't invoke skills in Agent SDK)
- * - AskUserQuestion(...) calls
+ * - question(...) calls
  * - STOP directives in interactive contexts
- * - SlashCommand() calls
+ * - command() calls
  * - 'wait for user' / 'ask the user' instructions
  */
 /**

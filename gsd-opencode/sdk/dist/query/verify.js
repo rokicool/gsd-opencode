@@ -72,15 +72,15 @@ export const verifyPlanStructure = async (args, projectDir) => {
         const hasVerify = /<verify>/.test(taskContent);
         const hasDone = /<done>/.test(taskContent);
         if (!nameMatch)
-            errors.push('Task missing <name> element');
+            errors.push('task missing <name> element');
         if (!hasAction)
-            errors.push(`Task '${taskName}' missing <action>`);
+            errors.push(`task '${taskName}' missing <action>`);
         if (!hasVerify)
-            warnings.push(`Task '${taskName}' missing <verify>`);
+            warnings.push(`task '${taskName}' missing <verify>`);
         if (!hasDone)
-            warnings.push(`Task '${taskName}' missing <done>`);
+            warnings.push(`task '${taskName}' missing <done>`);
         if (!hasFiles)
-            warnings.push(`Task '${taskName}' missing <files>`);
+            warnings.push(`task '${taskName}' missing <files>`);
         tasks.push({ name: taskName, hasFiles, hasAction, hasVerify, hasDone });
     }
     if (tasks.length === 0)
@@ -585,7 +585,7 @@ export const verifySchemaDrift = async (args, projectDir, workstream) => {
  *
  * Non-blocking by contract: every failure mode returns a successful response
  * with `{ skipped: true, reason }`. The post-execute drift gate in
- * `/gsd:execute-phase` relies on this guarantee.
+ * `/gsd-execute-phase` relies on this guarantee.
  *
  * Delegates to the Node-side implementation in `bin/lib/drift.cjs` and
  * `bin/lib/verify.cjs` via a child process so the drift logic stays in one

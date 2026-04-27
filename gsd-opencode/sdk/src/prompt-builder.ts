@@ -10,7 +10,7 @@ import type { ParsedPlan, PlanTask } from './types.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const DEFAULT_ALLOWED_TOOLS = ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'];
+const DEFAULT_ALLOWED_TOOLS = ['read', 'write', 'edit', 'bash', 'grep', 'glob'];
 
 // ─── Agent definition parsing ────────────────────────────────────────────────
 
@@ -50,14 +50,14 @@ export function parseAgentRole(agentDef: string): string {
  */
 function formatTask(task: PlanTask, index: number): string {
   const lines: string[] = [];
-  lines.push(`### Task ${index + 1}: ${task.name}`);
+  lines.push(`### task ${index + 1}: ${task.name}`);
 
   if (task.files.length > 0) {
     lines.push(`**Files:** ${task.files.join(', ')}`);
   }
 
   if (task.read_first.length > 0) {
-    lines.push(`**Read first:** ${task.read_first.join(', ')}`);
+    lines.push(`**read first:** ${task.read_first.join(', ')}`);
   }
 
   lines.push('');
