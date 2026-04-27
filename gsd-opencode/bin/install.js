@@ -7246,13 +7246,17 @@ function installSdkIfNeeded(opts) {
   // The dist files (e.g., session-runner.js) import @anthropic-ai/claude-agent-sdk
   // which must be available at runtime even when using pre-built dist.
   const sdkNodeModules = path.join(sdkDir, 'node_modules');
-  if (!fs.existsSync(sdkNodeModules)) {
+  const sdkDepPath = path.join(sdkDir, 'node_modules', '@anthropic-ai', 'claude-agent-sdk');
+  if (!fs.existsSync(sdkDepPath)) {
     const { execSync } = require('child_process');
     try {
       console.log(`  ${dim}Installing SDK runtime dependencies...${reset}`);
-      execSync('npm install --omit=dev 2>&1', { cwd: sdkDir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-    } catch {
-      // Non-fatal: the shim still works if dependencies are already available globally
+      const output = execSync('npm install 2>&1', { cwd: sdkDir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      if (!fs.existsSync(sdkDepPath)) {
+        console.warn(`  ${yellow}⚠${reset} SDK dependency @anthropic-ai/claude-agent-sdk not installed — /gsd-* commands may fail`);
+      }
+    } catch (e) {
+      console.warn(`  ${yellow}⚠${reset} SDK dependency install failed — /gsd-* commands may not work`);
     }
   }
 

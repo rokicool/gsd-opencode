@@ -328,7 +328,16 @@ async function installSdk(targetDir) {
       logger.debug("Pre-built SDK dist found, installing production dependencies");
       // Still need runtime dependencies (e.g., @anthropic-ai/claude-agent-sdk)
       logger.info("Installing SDK runtime dependencies...");
-      await execAsync("npm install --omit=dev 2>&1", { cwd: sdkDir });
+      const { stdout, stderr } = await execAsync("npm install", { cwd: sdkDir, encoding: 'utf8' });
+      if (stdout) logger.debug(`npm install stdout: ${stdout}`);
+      if (stderr) logger.debug(`npm install stderr: ${stderr}`);
+      // Verify the key dependency was actually installed
+      const nodeModules = path.join(sdkDir, "node_modules", "@anthropic-ai", "claude-agent-sdk");
+      const hasDep = await fs.access(nodeModules).then(() => true).catch(() => false);
+      if (!hasDep) {
+        logger.warning("SDK runtime dependency @anthropic-ai/claude-agent-sdk not installed — /gsd-* commands may fail");
+        logger.debug(`Expected at: ${nodeModules}`);
+      }
       // Ensure cli.js is executable
       const cliPath = path.join(sdkDir, "dist", "cli.js");
       try {
