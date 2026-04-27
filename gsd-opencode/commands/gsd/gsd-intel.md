@@ -8,6 +8,13 @@ permissions:
    task: true
 ---
 
+<objective>
+Query, inspect, or refresh codebase intelligence files stored in `.planning/intel/`.
+
+Supports subcommands: `query <term>` (search intel), `status` (show intel info), `diff` (show changes since last refresh), `refresh` (re-analyze codebase and update intel files).
+Provides fast codebase understanding without re-scanning source files.
+</objective>
+
 **STOP -- DO NOT READ THIS FILE. You are already reading it. This prompt was injected into your context by OpenCode's command system. Using the read tool on this file wastes tokens. Begin executing Step 0 immediately.**
 
 ## Step 0 -- Banner
