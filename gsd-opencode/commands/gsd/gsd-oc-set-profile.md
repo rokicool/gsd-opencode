@@ -1,12 +1,10 @@
 ---
-name: gsd-set-profile
+name: gsd-oc-set-profile
 description: Switch model profile for GSD agents (simple/smart/genius/inherit)
 argument-hint: "<profile (simple|smart|genius|inherit)>"
 permissions:
-   bash: true
+  bash: true
 ---
-
-
 
 <objective>
       Switch the model profile used by GSD agents. Controls which OpenCode model each agent uses, balancing quality vs token spend.
@@ -31,4 +29,4 @@ permissions:
       3. Config reading and updating
       4. Model table generation from MODEL_PROFILES
       5. Confirmation display
-      </process> 
+      </process>
