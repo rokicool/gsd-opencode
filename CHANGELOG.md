@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.38.5] - 2026-04-28
+
+Overview: Fixed frontmatter command name in gsd-oc-set-profile from incorrect gsd-set-profile to the correct OpenCode-prefixed name.
+
+### Fixed
+
+- Corrected frontmatter `name` field from `gsd-set-profile` to `gsd-oc-set-profile` in `gsd-opencode/commands/gsd/gsd-oc-set-profile.md`
+
 ## [1.38.3] - 2026-04-27
 
 Overview: Synced upstream GSD to v1.38.5 and translated all Claude Code artifacts to OpenCode equivalents across 200+ files. Added `gsd-edit-phase` command and `edit-phase` workflow for modifying existing roadmap phases in place. Introduced post-merge gate to execute-phase workflow. Fixed SDK runtime detection defaults to use `claude` instead of `OpenCode` throughout the query layer. Added missing `<objective>` sections to command files to satisfy CI validation.
