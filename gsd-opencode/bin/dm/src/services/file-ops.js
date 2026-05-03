@@ -110,6 +110,12 @@ export class FileOperations {
     const expandedSource = expandPath(sourceDir);
     const expandedTarget = expandPath(targetDir);
 
+    // Resolve symlinks in target path so we install to the actual directory
+    // rather than replacing the symlink itself during the atomic move.
+    // fs.rename() does NOT follow symlinks for the destination — it would
+    // destroy the symlink and replace it with a real directory.
+    const resolvedTarget = await this._resolveSymlink(expandedTarget);
+
     // Validate source directory exists
     try {
       const sourceStat = await fs.stat(expandedSource);
@@ -124,7 +130,7 @@ export class FileOperations {
     }
 
     // Check for existing installation structure
-    const existingStructure = await detectStructure(expandedTarget);
+    const existingStructure = await detectStructure(resolvedTarget);
     
     if (existingStructure === STRUCTURE_TYPES.OLD) {
       this.logger.warning('Existing installation with old structure detected (command/gsd/).');
@@ -155,7 +161,7 @@ export class FileOperations {
 
     // Create temporary directory with timestamp
     const timestamp = Date.now();
-    const tempDir = `${expandedTarget}.tmp-${timestamp}`;
+    const tempDir = `${resolvedTarget}.tmp-${timestamp}`;
 
     // Register temp dir for cleanup and setup signal handlers
     this._registerTempDir(tempDir);
@@ -183,13 +189,13 @@ export class FileOperations {
       this.logger.debug(`Manifest saved to temp: ${tempManifestPath}`);
 
       // Perform atomic move
-      await this._atomicMove(tempDir, expandedTarget);
+      await this._atomicMove(tempDir, resolvedTarget);
 
       // Update manifest entries to use final target paths instead of temp paths
-      const finalManifestManager = new ManifestManager(expandedTarget);
+      const finalManifestManager = new ManifestManager(resolvedTarget);
       const entries = manifestManager.getAllEntries().map(entry => ({
         ...entry,
-        path: entry.path.replace(tempDir, expandedTarget)
+        path: entry.path.replace(tempDir, resolvedTarget)
       }));
 
       // Clear and re-add entries with updated paths, then save
@@ -213,7 +219,7 @@ export class FileOperations {
         success: true,
         filesCopied: copyResult.filesCopied,
         directories: copyResult.directories,
-        manifestPath: path.join(expandedTarget, MANIFEST_FILENAME)
+        manifestPath: path.join(resolvedTarget, MANIFEST_FILENAME)
       };
     } catch (error) {
       // Ensure cleanup on any error
@@ -589,6 +595,43 @@ export class FileOperations {
     }
 
     return count;
+  }
+
+  /**
+   * Resolves symlinks in the target path.
+   *
+   * If the target path is a symlink, resolves it to the actual directory.
+   * This prevents fs.rename() from destroying the symlink during the atomic
+   * move — fs.rename does NOT follow symlinks for the destination.
+   *
+   * @param {string} targetPath - The expanded target directory path
+   * @returns {Promise<string>} The resolved (real) path, or the original if not a symlink
+   * @throws {Error} If the symlink is broken (target doesn't exist)
+   * @private
+   */
+  async _resolveSymlink(targetPath) {
+    try {
+      const lstat = await fs.lstat(targetPath);
+
+      if (lstat.isSymbolicLink()) {
+        const resolved = await fs.realpath(targetPath);
+        this.logger.info(`Symlink detected: ${targetPath} → ${resolved}`);
+        this.logger.debug(`Using resolved path for installation: ${resolved}`);
+        return resolved;
+      }
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        // Path doesn't exist yet — normal for a fresh install, no symlink to resolve
+        return targetPath;
+      }
+      if (error.code === 'ELOOP') {
+        throw new Error(`Broken symlink detected: ${targetPath} — symlink chain is too deep or circular`);
+      }
+      // If lstat fails for other reasons (permission, etc.), re-throw
+      throw error;
+    }
+
+    return targetPath;
   }
 
   /**
