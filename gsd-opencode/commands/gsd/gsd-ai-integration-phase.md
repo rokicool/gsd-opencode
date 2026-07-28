@@ -10,7 +10,7 @@ permissions:
    grep: true
    task: true
    webfetch: true
-  - websearch
+   websearch: true
    question: true
    mcp__context7__*: true
 ---

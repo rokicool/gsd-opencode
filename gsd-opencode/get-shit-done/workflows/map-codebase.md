@@ -27,16 +27,54 @@ Documents are reference material for OpenCode when planning/executing. Always in
 
 <process>
 
+<step name="parse_paths_flag" priority="first">
+Parse an optional `--paths <p1,p2,...>` argument. When supplied (by the
+post-execute codebase-drift gate in `/gsd-execute-phase` or by a user running
+`/gsd-map-codebase --paths apps/accounting,packages/ui`), the workflow
+operates in **incremental-remap mode**:
+
+- Pass `--paths <p1>,<p2>,...` through to each spawned `gsd-codebase-mapper`
+  agent's prompt. Agents scope their glob/grep/bash exploration to the listed
+  repo-relative prefixes only — no whole-repo scan.
+- Reject path values that contain `..`, start with `/`, or include shell
+  metacharacters (`;`, `` ` ``, `$`, `&`, `|`, `<`, `>`). If all provided
+  paths are invalid, fall back to a normal whole-repo run.
+- On write, each mapper stamps `last_mapped_commit: <HEAD sha>` into the YAML
+  frontmatter of every document it produces (see `bin/lib/drift.cjs:writeMappedCommit`).
+
+**Explicit contract — propagate `--paths` through a single normalized
+variable.** Downstream steps (`spawn_agents`, `sequential_mapping`, and any
+task-mode prompt construction) MUST use `${PATH_SCOPE_HINT}` to ensure every
+mapper receives the same deterministic scope. Without this contract
+incremental-remap can silently regress to a whole-repo scan.
+
+```bash
+# Validated, comma-separated paths (empty if --paths absent or all rejected):
+SCOPED_PATHS="<validated paths or empty>"
+if [ -n "$SCOPED_PATHS" ]; then
+  PATH_SCOPE_HINT="--paths $SCOPED_PATHS"
+else
+  PATH_SCOPE_HINT=""
+fi
+```
+
+All mapper prompts built later in this workflow MUST include
+`${PATH_SCOPE_HINT}` (expanded to empty when full-repo mode is in effect).
+
+When `--paths` is absent, behave exactly as before: full-repo scan, all 7
+documents refreshed.
+</step>
+
 <step name="init_context" priority="first">
 Load codebase mapping context:
 
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init map-codebase)
+INIT=$(gsd-sdk query init.map-codebase)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_MAPPER=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-codebase-mapper 2>/dev/null)
+AGENT_SKILLS_MAPPER=$(gsd-sdk query agent-skills gsd-codebase-mapper)
 ```
 
-Extract from init JSON: `mapper_model`, `commit_docs`, `codebase_dir`, `existing_maps`, `has_maps`, `codebase_dir_exists`, `subagent_timeout`.
+Extract from init JSON: `mapper_model`, `commit_docs`, `codebase_dir`, `existing_maps`, `has_maps`, `codebase_dir_exists`, `subagent_timeout`, `date`.
 </step>
 
 <step name="check_existing">
@@ -109,12 +147,17 @@ Use task tool with `subagent_type="gsd-codebase-mapper"`, `model="{mapper_model}
 
 ```
 @gsd-codebase-mapper "Focus: tech
+Today's date: {date}
 
 Analyze this codebase for technology stack and external integrations.
 
 write these documents to .planning/codebase/:
 - STACK.md - Languages, runtime, frameworks, dependencies, configuration
 - INTEGRATIONS.md - External APIs, databases, auth providers, webhooks
+
+IMPORTANT: Use {date} for all [YYYY-MM-DD] date placeholders in documents.
+
+Scope: ${PATH_SCOPE_HINT:-(full repo)} — when --paths is supplied, restrict exploration to those prefixes only.
 
 Explore thoroughly. write documents directly using templates. Return confirmation only.
 ${AGENT_SKILLS_MAPPER}"
@@ -124,12 +167,17 @@ ${AGENT_SKILLS_MAPPER}"
 
 ```
 @gsd-codebase-mapper "Focus: arch
+Today's date: {date}
 
 Analyze this codebase architecture and directory structure.
 
 write these documents to .planning/codebase/:
 - ARCHITECTURE.md - Pattern, layers, data flow, abstractions, entry points
 - STRUCTURE.md - Directory layout, key locations, naming conventions
+
+IMPORTANT: Use {date} for all [YYYY-MM-DD] date placeholders in documents.
+
+Scope: ${PATH_SCOPE_HINT:-(full repo)} — when --paths is supplied, restrict exploration to those prefixes only.
 
 Explore thoroughly. write documents directly using templates. Return confirmation only.
 ${AGENT_SKILLS_MAPPER}"
@@ -139,12 +187,17 @@ ${AGENT_SKILLS_MAPPER}"
 
 ```
 @gsd-codebase-mapper "Focus: quality
+Today's date: {date}
 
 Analyze this codebase for coding conventions and testing patterns.
 
 write these documents to .planning/codebase/:
 - CONVENTIONS.md - Code style, naming, patterns, error handling
 - TESTING.md - Framework, structure, mocking, coverage
+
+IMPORTANT: Use {date} for all [YYYY-MM-DD] date placeholders in documents.
+
+Scope: ${PATH_SCOPE_HINT:-(full repo)} — when --paths is supplied, restrict exploration to those prefixes only.
 
 Explore thoroughly. write documents directly using templates. Return confirmation only.
 ${AGENT_SKILLS_MAPPER}"
@@ -154,11 +207,16 @@ ${AGENT_SKILLS_MAPPER}"
 
 ```
 @gsd-codebase-mapper "Focus: concerns
+Today's date: {date}
 
 Analyze this codebase for technical debt, known issues, and areas of concern.
 
 write this document to .planning/codebase/:
 - CONCERNS.md - Tech debt, bugs, security, performance, fragile areas
+
+IMPORTANT: Use {date} for all [YYYY-MM-DD] date placeholders in documents.
+
+Scope: ${PATH_SCOPE_HINT:-(full repo)} — when --paths is supplied, restrict exploration to those prefixes only.
 
 Explore thoroughly. write document directly using template. Return confirmation only.
 ${AGENT_SKILLS_MAPPER}"
@@ -207,6 +265,10 @@ Continue to verify_output.
 When the `task` tool is unavailable, perform codebase mapping sequentially in the current context. This replaces `spawn_agents` and `collect_confirmations`.
 
 **IMPORTANT:** Do NOT use `browser_subagent`, `Explore`, or any browser-based tool. Use only file system tools (read, bash, write, grep, glob, list_dir, view_file, grep_search, or equivalent tools available in your runtime).
+
+**IMPORTANT:** Use `{date}` from init context for all `[YYYY-MM-DD]` date placeholders in documents. NEVER guess the date.
+
+**SCOPE:** When `${PATH_SCOPE_HINT}` is non-empty (i.e. `--paths` was supplied), restrict every pass below to the validated path prefixes in `${SCOPED_PATHS}`. Do NOT scan files outside those prefixes. When `${PATH_SCOPE_HINT}` is empty, perform a full-repo scan.
 
 Perform all 4 mapping passes sequentially:
 
@@ -290,7 +352,7 @@ Continue to commit_codebase_map.
 Commit the codebase map:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: map existing codebase" --files .planning/codebase/*.md
+gsd-sdk query commit "docs: map existing codebase" .planning/codebase/*.md
 ```
 
 Continue to offer_next.
@@ -321,7 +383,7 @@ Created .planning/codebase/:
 
 ---
 
-## ▶ Next Up
+## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Initialize project** — use codebase context for planning
 

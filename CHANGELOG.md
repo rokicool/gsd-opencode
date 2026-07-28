@@ -5,6 +5,191 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.38.5] - 2026-04-28
+
+Overview: Fixed frontmatter command name in gsd-oc-set-profile from incorrect gsd-set-profile to the correct OpenCode-prefixed name.
+
+### Fixed
+
+- Corrected frontmatter `name` field from `gsd-set-profile` to `gsd-oc-set-profile` in `gsd-opencode/commands/gsd/gsd-oc-set-profile.md`
+
+## [1.38.3] - 2026-04-27
+
+Overview: Synced upstream GSD to v1.38.5 and translated all Claude Code artifacts to OpenCode equivalents across 200+ files. Added `gsd-edit-phase` command and `edit-phase` workflow for modifying existing roadmap phases in place. Introduced post-merge gate to execute-phase workflow. Fixed SDK runtime detection defaults to use `claude` instead of `OpenCode` throughout the query layer. Added missing `<objective>` sections to command files to satisfy CI validation.
+
+### Added
+
+- `gsd-edit-phase` command in `gsd-opencode/commands/gsd/gsd-edit-phase.md` for editing any field of an existing roadmap phase in place, preserving number and position
+- `edit-phase` workflow in `gsd-opencode/get-shit-done/workflows/edit-phase.md` supporting field-level edits, full regeneration from clarified intent, guarded edits for in-progress/completed phases, depends-on validation, and diff confirmation before writing
+- Post-merge gate in `gsd-opencode/get-shit-done/workflows/execute-phase/steps/post-merge-gate.md` for execute-phase workflow
+- `roadmap-update-plan-progress.test.ts` with 192 lines of unit tests for the `planCountPattern` regex fix in `gsd-opencode/sdk/src/query/`
+
+### Changed
+
+- Synced upstream GSD submodule from v1.38.2 to v1.38.5, copying 49 files from `original/get-shit-done/`
+- Translated 415+ files (6355+ replacements) from Claude Code to OpenCode equivalents using `assets/configs/config.json` and new `assets/configs/v1.38.5.json` supplemental config
+- Added `mode: subagent` declaration to 33 agent definition files in `gsd-opencode/agents/`
+- Replaced `task()` function calls with `@subagent_type` shorthand syntax across commands, workflows, references, and templates
+- Changed SDK runtime detection default from `OpenCode` to `claude` across query layer in `gsd-opencode/sdk/src/query/helpers.ts`, `gsd-opencode/sdk/src/query/init.ts`, `gsd-opencode/sdk/src/query/skills.ts`, and `gsd-opencode/sdk/src/types.ts`
+- Updated agent references from `.OpenCode/skills/` to `.claude/skills/` in `gsd-opencode/agents/gsd-code-fixer.md`, `gsd-opencode/agents/gsd-code-reviewer.md`, and `gsd-opencode/agents/gsd-ai-researcher.md`
+- Updated agent contract references from `OpenCode-code#13898` to `claude-code#13898` in `gsd-opencode/agents/gsd-advisor-researcher.md` and `gsd-opencode/agents/gsd-ai-researcher.md`
+- Updated AI-SPEC.md template section 4 implementation guidance examples from `OpenCode-sonnet-4-6` to `claude-sonnet-4-6` in `gsd-opencode/agents/gsd-ai-researcher.md`
+- Updated `gsd-code-fixer.md` agent to run inside isolated git worktrees using `mktemp`-based paths to prevent racing the foreground session, with unconditional cleanup on exit
+- Updated `gsd-code-reviewer.md` agent to use adversarial stance starting hypothesis that submitted implementations contain defects, with required BLOCKER/WARNING finding classifications
+- Updated `discuss-phase` workflow with 1169 lines of changes to discussion mode handling in `gsd-opencode/get-shit-done/workflows/discuss-phase.md`
+- Updated `execute-phase` workflow with 370 lines of changes to execution handling in `gsd-opencode/get-shit-done/workflows/execute-phase.md`
+- Updated `plan-phase` workflow with 334 lines of changes to planning pipeline in `gsd-opencode/get-shit-done/workflows/plan-phase.md`
+- Updated `quick` workflow with 55 lines of changes to quick task execution in `gsd-opencode/get-shit-done/workflows/quick.md`
+- Updated `review` workflow with 123 lines of changes to code review process in `gsd-opencode/get-shit-done/workflows/review.md`
+- Updated `verify-phase` workflow with 116 lines of changes to verification handling in `gsd-opencode/get-shit-done/workflows/verify-phase.md`
+- Updated `new-milestone` workflow with 92 lines of changes to milestone creation in `gsd-opencode/get-shit-done/workflows/new-milestone.md`
+- Updated `settings` workflow with 186 lines of changes to settings management in `gsd-opencode/get-shit-done/workflows/settings.md`
+- Updated `update` workflow with 50 lines of changes to update process in `gsd-opencode/get-shit-done/workflows/update.md`
+- Updated `transition` workflow with 22 lines of changes to phase transitions in `gsd-opencode/get-shit-done/workflows/transition.md`
+- Updated `map-codebase` workflow with 50 lines of changes to codebase mapping in `gsd-opencode/get-shit-done/workflows/map-codebase.md`
+- Updated `insert-phase` workflow with 33 lines of changes to phase insertion in `gsd-opencode/get-shit-done/workflows/insert-phase.md`
+- Updated SDK query layer handlers in `gsd-opencode/sdk/src/query/` including `helpers.ts` (12 lines), `profile-output.ts` (12 lines), `decisions.ts` (4 lines), `state-project-load.ts` (4 lines), `index.ts` (6 lines), `skills.ts` (6 lines), `skill-manifest.ts` (12 lines), `gsd-tools.ts` (6 lines), `init.ts` (2 lines), `init-complex.ts` (2 lines), `docs-init.ts` (2 lines), `init-runner.ts` (2 lines), `phase-prompt.ts` (4 lines), and `types.ts` (4 lines)
+- Updated SDK test suite files in `gsd-opencode/sdk/src/` including `helpers.test.ts` (20 lines), `skills.test.ts` (26 lines), `cli.test.ts` (20 lines), `init-runner.test.ts` (10 lines), `gsd-tools.test.ts` (18 lines), and various integration tests
+- Updated `gsd-insert-phase.md` command to remove `write: true` permission in `gsd-opencode/commands/gsd/gsd-insert-phase.md`
+- Updated `gsd-debug.md` command to use `workflow.tdd_mode` config path instead of `tdd_mode` in `gsd-opencode/commands/gsd/gsd-debug.md`
+- Added `<objective>` sections to `gsd-graphify.md`, `gsd-intel.md`, and `gsd-set-profile.md` command files to satisfy CI validation
+- Added supplemental translation config `assets/configs/v1.38.5.json` for remaining `task()` call conversions
+- Updated `assets/antipatterns.toml` forbidden regex from `task\(\n` to more precise pattern to avoid false positives in documentation examples
+
+### Fixed
+
+- SDK runtime detection defaulting to `OpenCode` instead of `claude` when no signals present, affecting agent directory resolution and config fallback behavior
+- `planCountPattern` regex in roadmap progress handler overwriting the next line when **Plans:** appeared on its own line followed by a bullet list
+
+## [1.38.2] - 2026-04-26
+
+Overview: Added complete GSD SDK with TypeScript source, compiled distribution, query layer, golden fixtures, and comprehensive test suite. Fixed SDK runtime dependency resolution by adding @anthropic-ai/claude-agent-sdk and ws to parent package.json. Updated installer to handle SDK runtime dependencies for pre-built distributions.
+
+### Added
+
+- Complete GSD SDK (`gsd-opencode/sdk/`) with 50+ TypeScript source files, compiled JavaScript distribution, type definitions, and source maps
+- SDK query layer with 50+ handlers for phase lifecycle, state management, roadmap, templates, profiles, validation, verification, audit, UAT, and workspace operations in `gsd-opencode/sdk/src/query/`
+- SDK golden fixtures and parity testing infrastructure for capturing and validating deterministic outputs in `gsd-opencode/sdk/src/golden/`
+- SDK CLI entry point (`gsd-sdk`) with run, init, query, and milestone subcommands in `gsd-opencode/sdk/src/cli.ts`
+- SDK session runner for executing plans via Agent SDK query() calls in `gsd-opencode/sdk/src/session-runner.ts`
+- SDK phase runner for orchestrating wave-based parallel plan execution in `gsd-opencode/sdk/src/phase-runner.ts`
+- SDK init runner for project initialization, research, stack analysis, and roadmap generation in `gsd-opencode/sdk/src/init-runner.ts`
+- SDK event stream for mapping SDK messages to typed GSD events in `gsd-opencode/sdk/src/event-stream.ts`
+- SDK context engine for context budget tracking and token management in `gsd-opencode/sdk/src/context-engine.ts`
+- SDK prompt builder for constructing executor prompts with tool scoping and model resolution in `gsd-opencode/sdk/src/prompt-builder.ts`
+- SDK plan parser for parsing PLAN.md files into typed Plan objects in `gsd-opencode/sdk/src/plan-parser.ts`
+- SDK configuration loader for project config.json and profile resolution in `gsd-opencode/sdk/src/config.ts`
+- SDK GSD tools registry for phase, agent, skill, template, workflow, and query commands in `gsd-opencode/sdk/src/gsd-tools.ts`
+- SDK types for all domain models including GSDSessionInitEvent, GSDToolCallEvent, PlanResult, PhaseResult, and milestone types in `gsd-opencode/sdk/src/types.ts`
+- SDK comprehensive test suite with 40+ test files covering unit, integration, and golden parity tests in `gsd-opencode/sdk/src/`
+- SDK documentation for caching, handover parity, query layer, and golden fixtures in `gsd-opencode/sdk/docs/` and `gsd-opencode/sdk/HANDOVER-*.md`
+- SDK prompt templates for project, requirements, research, roadmap, and state in `gsd-opencode/sdk/prompts/templates/`
+- SDK TypeScript configuration and Vitest test configuration in `gsd-opencode/sdk/tsconfig.json` and `gsd-opencode/sdk/vitest.config.ts`
+- `gsd-sdk.cjs` CommonJS shim for external gsd-sdk callers resolving sdk/dist/cli.js in `gsd-opencode/bin/gsd-sdk.cjs`
+- `install.js` legacy installer script (7452 lines) providing comprehensive multi-runtime installation and uninstallation support in `gsd-opencode/bin/install.js`
+- `@anthropic-ai/claude-agent-sdk` and `ws` as runtime dependencies in `gsd-opencode/package.json` for SDK resolution from parent package location
+- `.npmignore` for SDK package excluding node_modules, test-fixtures, and src from published tarball in `gsd-opencode/sdk/.npmignore`
+
+### Changed
+
+- Updated `installSdk()` in DM install command to run `npm install` and verify `@anthropic-ai/claude-agent-sdk` exists when pre-built dist is present in `gsd-opencode/bin/dm/src/commands/install.js`
+- Updated `installSdkIfNeeded()` in legacy installer to check for actual dependency path and show warning if missing in `gsd-opencode/bin/install.js`
+- Updated `SyncService.js` with 177 lines of changes to sync logic in `assets/copy-services/SyncService.js`
+- Updated `M-COPY-AND-TRANSLATE.md` to add step 4d for SDK dist rebuild with `npm install` and `npm run build` in `assets/prompts/M-COPY-AND-TRANSLATE.md`
+- Updated translation config with 4 new replacement rules in `assets/configs/config.json`
+- Updated health-checker with 207 lines of changes to verification logic in `gsd-opencode/bin/dm/src/services/health-checker.js`
+- Updated check command with 21 lines of changes to integrity verification in `gsd-opencode/bin/dm/src/commands/check.js`
+- Updated uninstall command to include SDK directory in removal list in `gsd-opencode/bin/dm/src/commands/uninstall.js`
+- Updated DM constants to include sdk in directories to copy and orphan patterns in `gsd-opencode/bin/dm/lib/constants.js`
+
+## [1.38.1] - 2026-04-26
+
+Overview: Rewrote health check integrity verification to use installation manifest with SHA-256 hash comparison instead of sample file checks. Added install.js and gsd-sdk.js scripts for streamlined OpenCode tooling. Fixed false negatives in check command and integrity verification.
+
+### Added
+
+- `install.js` script (7434 lines) providing comprehensive multi-runtime installation and uninstallation support for OpenCode, Codex, Gemini, Copilot, Cursor, Windsurf, Cline, Antigravity, Trae, Qwen, CodeBuddy, Augment, and Kilo in `gsd-opencode/bin/install.js`
+- `gsd-sdk.js` script as SDK entry point in `gsd-opencode/bin/gsd-sdk.js`
+- `gsd-local-patches/` directory support for preserving user modifications across updates in `gsd-opencode/bin/install.js`
+- `gsd-file-manifest.json` generation for tracking installed files with SHA-256 hashes in `gsd-opencode/bin/install.js`
+- JSONC config parsing support for OpenCode and Kilo configuration files in `gsd-opencode/bin/install.js`
+- Runtime-specific permission configuration for OpenCode and Kilo in `gsd-opencode/bin/install.js`
+- User artifact preservation during re-install for `USER-PROFILE.md` and `dev-preferences.md` in `gsd-opencode/bin/install.js`
+- Leaked path detection for unreplaced .OpenCode references in non-OpenCode runtimes in `gsd-opencode/bin/install.js`
+- Codex config.toml generation with agent roles and hooks configuration in `gsd-opencode/bin/install.js`
+- Copilot instructions merging with `copilot-instructions.md` in `gsd-opencode/bin/install.js`
+- Hook file installation with version stamping and executable permissions in `gsd-opencode/bin/install.js`
+- Context monitor hook auto-migration adding matcher and timeout in `gsd-opencode/bin/install.js`
+- Agent frontmatter conversion for all supported runtimes in `gsd-opencode/bin/install.js`
+- Command-to-skill conversion functions for Codex, Copilot, Cursor, Windsurf, Trae, Antigravity, Augment, Codebuddy, and Qwen in `gsd-opencode/bin/install.js`
+
+### Changed
+
+- Rewrote `verifyIntegrity()` in `HealthChecker` to load installation manifest and compare SHA-256 hashes for all installed files instead of checking sample files in `gsd-opencode/bin/dm/src/services/health-checker.js`
+- Added extra file detection to identify files not tracked in the installation manifest in `gsd-opencode/bin/dm/src/services/health-checker.js`
+- Updated integrity check output to show `passedCount/totalChecked files verified` summary instead of listing all files in `gsd-opencode/bin/dm/src/commands/check.js`
+- Fixed package root resolution from `../..` to `../../../..` in check command in `gsd-opencode/bin/dm/src/commands/check.js`
+- Updated health-checker imports to include `ManifestManager` and `MANIFEST_FILENAME` in `gsd-opencode/bin/dm/src/services/health-checker.js`
+- Added `gsd-sdk.js` and `install.js` to package.json bin array in `gsd-opencode/package.json`
+- Added whitespace normalization in `discovery-phase.md` in `gsd-opencode/get-shit-done/workflows/discovery-phase.md`
+
+### Fixed
+
+- Fixed integrity check false negative for `help.md` (renamed to `gsd-help.md`) in `gsd-opencode/bin/dm/src/services/health-checker.js`
+- Fixed check command false negatives for version and integrity checks by using manifest-based verification in `gsd-opencode/bin/dm/src/commands/check.js`
+- Fixed integrity check to only display failed files instead of all files in output in `gsd-opencode/bin/dm/src/commands/check.js`
+
+## [1.38.0] - 2026-04-25
+
+Overview: Major upstream sync from GSD v1.38.5 introducing UI sketching and spiking workflows, Socratic spec refinement phase, plan convergence via external AI reviewers, ultraplan cloud integration, document ingestion pipeline, and enhanced debugging with session management. Added 4 new agents, 18 new commands, 8 new library modules, 19 new reference documents, and comprehensive workflow infrastructure for design exploration and knowledge capture.
+
+### Added
+
+- `gsd-sketch` command and `sketch` workflow for exploring UI/design ideas with throwaway HTML mockups and theme system in `gsd-opencode/commands/gsd/gsd-sketch.md` and `gsd-opencode/get-shit-done/workflows/sketch.md`
+- `gsd-sketch-wrap-up` command and `sketch-wrap-up` workflow for finalizing selected sketch variants into production components in `gsd-opencode/commands/gsd/gsd-sketch-wrap-up.md` and `gsd-opencode/get-shit-done/workflows/sketch-wrap-up.md`
+- `gsd-spike` command and `spike` workflow for experiential idea validation through targeted experiments in `gsd-opencode/commands/gsd/gsd-spike.md` and `gsd-opencode/get-shit-done/workflows/spike.md`
+- `gsd-spike-wrap-up` command and `spike-wrap-up` workflow for consolidating spike findings into documented knowledge in `gsd-opencode/commands/gsd/gsd-spike-wrap-up.md` and `gsd-opencode/get-shit-done/workflows/spike-wrap-up.md`
+- `gsd-spec-phase` command and `spec-phase` workflow for Socratic requirement clarification with ambiguity scoring before planning in `gsd-opencode/commands/gsd/gsd-spec-phase.md` and `gsd-opencode/get-shit-done/workflows/spec-phase.md`
+- `gsd-ultraplan-phase` command for offloading planning to OpenCode's ultraplan cloud infrastructure with browser review in `gsd-opencode/commands/gsd/gsd-ultraplan-phase.md`
+- `gsd-plan-review-convergence` command and workflow for cross-AI plan convergence loop using external AI CLIs (codex, gemini, OpenCode) until no HIGH concerns remain in `gsd-opencode/commands/gsd/gsd-plan-review-convergence.md` and `gsd-opencode/get-shit-done/workflows/plan-review-convergence.md`
+- `gsd-ingest-docs` command and `ingest-docs` workflow for classifying, synthesizing, and consolidating existing planning documents with conflict detection in `gsd-opencode/commands/gsd/gsd-ingest-docs.md` and `gsd-opencode/get-shit-done/workflows/ingest-docs.md`
+- `gsd-extract_learnings` command and `extract_learnings` workflow for capturing and retrieving project learnings in `gsd-opencode/commands/gsd/gsd-extract_learnings.md` and `gsd-opencode/get-shit-done/workflows/extract_learnings.md`
+- `gsd-sync-skills` command and `sync-skills` workflow for synchronizing skill definitions in `gsd-opencode/commands/gsd/gsd-sync-skills.md` and `gsd-opencode/get-shit-done/workflows/sync-skills.md`
+- `gsd-graphify` command for visualizing project structure in `gsd-opencode/commands/gsd/gsd-graphify.md`
+- `gsd-settings-advanced` and `gsd-settings-integrations` commands for advanced configuration and integration management in `gsd-opencode/commands/gsd/`
+- `gsd-oc-set-profile` command for OpenCode profile configuration in `gsd-opencode/commands/gsd/gsd-oc-set-profile.md`
+- `gsd-inbox` command for inbox management in `gsd-opencode/commands/gsd/gsd-inbox.md`
+- `gsd-debug-session-manager` agent for multi-cycle debug checkpoint and continuation loop in isolated context in `gsd-opencode/agents/gsd-debug-session-manager.md`
+- `gsd-doc-classifier` agent for classifying planning documents as ADR, PRD, SPEC, DOC, or UNKNOWN in `gsd-opencode/agents/gsd-doc-classifier.md`
+- `gsd-doc-synthesizer` agent for synthesizing classified docs with precedence rules and conflict detection in `gsd-opencode/agents/gsd-doc-synthesizer.md`
+- `gsd-pattern-mapper` agent for analyzing codebase patterns and producing PATTERNS.md in `gsd-opencode/agents/gsd-pattern-mapper.md`
+- 8 new library modules: `artifacts.cjs`, `audit.cjs`, `config-schema.cjs`, `decisions.cjs`, `drift.cjs`, `gap-checker.cjs`, `graphify.cjs`, `secrets.cjs` in `gsd-opencode/get-shit-done/bin/lib/`
+- `spec.md` template for Socratic specification documents in `gsd-opencode/get-shit-done/templates/spec.md`
+- `README.md` template for project documentation in `gsd-opencode/get-shit-done/templates/README.md`
+- 19 new reference documents: `autonomous-smart-discuss.md`, `debugger-philosophy.md`, `doc-conflict-engine.md`, `executor-examples.md`, `mandatory-initial-read.md`, `planner-antipatterns.md`, `planner-chunked.md`, `planner-source-audit.md`, `project-skills-discovery.md`, `scout-codebase.md`, `sketch-interactivity.md`, `sketch-theme-system.md`, `sketch-tooling.md`, `sketch-variant-patterns.md` in `gsd-opencode/get-shit-done/references/`
+- `discuss-phase/` workflow directory with modes (advisor, all, analyze, auto, batch, chain, default, power, text) and templates in `gsd-opencode/get-shit-done/workflows/discuss-phase/`
+- `execute-phase/` workflow directory with codebase drift gate in `gsd-opencode/get-shit-done/workflows/execute-phase/`
+- `graduation.md` workflow for phase graduation in `gsd-opencode/get-shit-done/workflows/graduation.md`
+- Ultraplan phase design specification in `gsd-opencode/docs/superpowers/specs/2026-04-17-ultraplan-phase-design.md`
+- BETA documentation in `gsd-opencode/docs/BETA.md`
+- INVENTORY documentation and manifest in `gsd-opencode/docs/`
+- SDK query migration blurb in `gsd-opencode/docs/`
+- Skills documentation directory in `gsd-opencode/docs/skills/`
+
+### Changed
+
+- Synced 348 files from upstream GSD submodule at v1.38.5
+- Converted 1 remaining Task() function call to @subagent_type shorthand syntax in `gsd-opencode/commands/gsd/gsd-plan-review-convergence.md`
+- Enhanced all 25 existing agent definitions with updated behavior and tool specifications in `gsd-opencode/agents/`
+- Enhanced 47 existing command files with improved prompts, permissions, and argument hints in `gsd-opencode/commands/gsd/`
+- Enhanced 72 existing workflow files with expanded steps, anti-pattern checks, and integration points in `gsd-opencode/get-shit-done/workflows/`
+- Updated 15 CLI library modules with new functionality and improved error handling in `gsd-opencode/get-shit-done/bin/lib/`
+- Enhanced `gsd-tools.cjs` with new commands for artifacts, audit, decisions, drift, gap-checking, graphify, and secrets in `gsd-opencode/get-shit-done/bin/gsd-tools.cjs`
+- Updated 21 reference documents with improved patterns and expanded guidance in `gsd-opencode/get-shit-done/references/`
+- Updated 4 templates with improved structure and additional fields in `gsd-opencode/get-shit-done/templates/`
+- Updated documentation across 5 locales (en, ja-JP, ko-KR, pt-BR, zh-CN) reflecting new features in `gsd-opencode/docs/`
+- Added 1 translation replacement for whitespace normalization in `gsd-opencode/get-shit-done/workflows/discovery-phase.md`
+
 ## [1.35.0] - 2026-04-13
 
 Overview: Major upstream sync from GSD v1.35.0 introducing code review pipeline with auto-fix loop, codebase intelligence system, explore/scan/explore workflows, AI integration phase, import workflow, eval review, undo, and inbox management. Added 8 new agents, 9 new commands, and 14 new reference documents. Converted all Task() calls to @subagent_type shorthand and added mode: subagent to all agent definitions.

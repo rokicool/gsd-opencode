@@ -76,7 +76,7 @@ export const PATH_PATTERNS = {
  * 
  * @type {string[]}
  */
-export const DIRECTORIES_TO_COPY = ['agents', 'commands', 'get-shit-done', 'rules', 'skills'];
+export const DIRECTORIES_TO_COPY = ['agents', 'commands', 'get-shit-done', 'rules', 'sdk', 'skills'];
 
 /**
  * Command directory mapping for source-to-destination path transformation.
@@ -151,7 +151,9 @@ export const STRUCTURE_TYPES = {
  * - agents/gsd-* (gsd-opencode specific agents)
  * - command/gsd/* (gsd-opencode specific commands - legacy)
  * - commands/gsd/* (gsd-opencode specific commands - new)
+ * - rules/gsd-* (gsd-opencode specific rules)
  * - skills/gsd-* (gsd-opencode specific skills)
+ * - sdk/* (GSD SDK — fully owned by gsd-opencode)
  * - get-shit-done/* (fully owned by gsd-opencode)
  *
  * @type {RegExp[]}
@@ -162,6 +164,7 @@ export const ALLOWED_NAMESPACES = [
   /^commands\/gsd\//,   // commands/gsd/* files (new structure)
   /^rules\/gsd-/,       // rules/gsd-* directories
   /^skills\/gsd-/,      // skills/gsd-* directories
+  /^sdk\//,             // sdk/ directory - fully owned
   /^get-shit-done\//    // get-shit-done/ directory - fully owned
 ];
 

@@ -8,7 +8,7 @@ The statusline shows context usage to the **user**, but the **agent** has no awa
 
 ## How It Works
 
-1. The statusline hook writes context metrics to `/tmp/OpenCode-ctx-{session_id}.json`
+1. The statusline hook writes context metrics to `/tmp/claude-ctx-{session_id}.json`
 2. After each tool use, the context monitor reads these metrics
 3. When remaining context drops below thresholds, it injects a warning as `additionalContext`
 4. The agent receives the warning in its conversation and can act accordingly
@@ -34,7 +34,7 @@ To avoid spamming the agent with repeated warnings:
 Statusline Hook (gsd-statusline.js)
     | writes
     v
-/tmp/OpenCode-ctx-{session_id}.json
+/tmp/claude-ctx-{session_id}.json
     ^ reads
     |
 Context Monitor (gsd-context-monitor.js, PostToolUse/AfterTool)

@@ -1,19 +1,22 @@
 #!/usr/bin/env node
 
 /**
- * gsd-copy-from-original.js - CLI entry point for syncing from TÂCHES repository
+ * gsd-copy-from-original.js - CLI entry point for syncing from original GSD repository
  *
- * Syncs files from the original TÂCHES repository (git submodule) to gsd-opencode.
+ * Syncs files from the original GSD repository (git submodule) to gsd-opencode.
  * This is a maintenance tool for keeping the OpenCode adaptation in sync with upstream.
  *
  * IMPORTANT: This script does NOT apply CC→OC transformations.
  * Transformations are handled separately by translate.js (Phase 10).
  *
+ * This script always overwrites target files with upstream content. Divergence
+ * detection is disabled because translations are expected to alter target files
+ * after each sync cycle.
+ *
  * Usage: node gsd-copy-from-original.js [options]
  *
  * Options:
  *   --apply            Apply changes (copy files)
- *   -f, --force        Overwrite diverged files without warning
  *   --filter <pattern> Filter files by name pattern (e.g., "VALID*")
  *   -v, --verbose      Show detailed output
  *   -h, --help         Show help message
@@ -136,8 +139,10 @@ async function main(options) {
 
   const verbose = options.verbose;
   const apply = options.apply;
-  const force = options.force;
   const filter = options.filter;
+
+  // Always use force mode — translation is expected to alter target files
+  const force = true;
 
   // By default, run in preview mode (dry-run)
   const dryRun = !apply;
@@ -301,9 +306,8 @@ async function main(options) {
 // Configure CLI
 program
   .name('gsd-copy-from-original')
-  .description('Sync files from original TÂCHES repository to gsd-opencode')
+  .description('Sync files from original GSD repository to gsd-opencode (always overwrites target files)')
   .option('--apply', 'Apply changes (copy files)', false)
-  .option('-f, --force', 'Overwrite diverged files without warning', false)
   .option('--filter <pattern>', 'Filter files by name pattern (e.g., "VALID*")')
   .option('-v, --verbose', 'Show detailed output', false)
   .option('--project-root <path>', 'Project root directory', process.cwd())

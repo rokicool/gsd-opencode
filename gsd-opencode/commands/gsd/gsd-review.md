@@ -1,7 +1,7 @@
 ---
 name: gsd-review
 description: Request cross-AI peer review of phase plans from external AI CLIs
-argument-hint: "--phase N [--gemini] [--OpenCode] [--codex] [--opencode] [--qwen] [--cursor] [--all]"
+argument-hint: "--phase N [--gemini] [--claude] [--codex] [--opencode] [--qwen] [--cursor] [--all]"
 permissions:
    read: true
    write: true
@@ -27,7 +27,7 @@ Phase number: extracted from $ARGUMENTS (required)
 
 **Flags:**
 - `--gemini` — Include Gemini CLI review
-- `--OpenCode` — Include OpenCode CLI review (uses separate session)
+- `--claude` — Include OpenCode CLI review (uses separate session)
 - `--codex` — Include Codex CLI review
 - `--opencode` — Include OpenCode review (uses model from user's OpenCode config)
 - `--qwen` — Include Qwen Code review (Alibaba Qwen models)

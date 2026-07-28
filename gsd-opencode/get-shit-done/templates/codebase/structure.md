@@ -193,7 +193,7 @@ get-shit-done/
 **Files:**
 - kebab-case.md: Markdown documents
 - kebab-case.js: JavaScript source files
-- UPPERCASE.md: Important project files (README, OPENCODE, CHANGELOG)
+- UPPERCASE.md: Important project files (README, CLAUDE, CHANGELOG)
 
 **Directories:**
 - kebab-case: All directories

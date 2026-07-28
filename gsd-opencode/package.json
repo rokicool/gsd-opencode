@@ -15,7 +15,8 @@
   "bin": {
     "gsd-opencode": "bin/gsd.js",
     "gsd-install": "bin/gsd-install.js",
-    "skills": "bin/skills.js"
+    "skills": "bin/skills.js",
+    "gsd-sdk": "bin/gsd-sdk.cjs"
   },
   "scripts": {
     "test": "vitest run",
@@ -35,22 +36,26 @@
     "bin/gsd.js",
     "bin/gsd-install.js",
     "bin/skills.js",
+    "bin/gsd-sdk.cjs",
     "bin/dm/lib",
     "bin/dm/src",
     "commands",
     "get-shit-done",
     "rules",
+    "sdk",
     "skills"
   ],
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.84",
     "@iarna/toml": "^2.2.5",
     "@inquirer/prompts": "^8.2.0",
     "chalk": "^5.6.2",
     "commander": "^12.1.0",
-    "ora": "^9.3.0"
+    "ora": "^9.3.0",
+    "ws": "^8.20.0"
   },
   "devDependencies": {
     "vitest": "^3.2.4"

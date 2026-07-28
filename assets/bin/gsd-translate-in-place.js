@@ -163,6 +163,34 @@ function validateConfig(config, configPath) {
       }
     }
   }
+
+  // Validate _forbidden_regex_after_translation option if present
+  if (
+    config._forbidden_regex_after_translation &&
+    config._forbidden_regex_after_translation.length > 0
+  ) {
+    if (!Array.isArray(config._forbidden_regex_after_translation)) {
+      throw new Error(
+        `Config "_forbidden_regex_after_translation" must be an array of regex strings: ${configPath}`,
+      );
+    }
+    for (let i = 0; i < config._forbidden_regex_after_translation.length; i++) {
+      const regexStr = config._forbidden_regex_after_translation[i];
+      if (typeof regexStr !== "string") {
+        throw new Error(
+          `Config "_forbidden_regex_after_translation" item ${i + 1} must be a string in ${configPath}`,
+        );
+      }
+      // Validate it's a valid regex
+      try {
+        new RegExp(regexStr);
+      } catch (error) {
+        throw new Error(
+          `Config "_forbidden_regex_after_translation" item ${i + 1} is not a valid regex: "${regexStr}" in ${configPath}`,
+        );
+      }
+    }
+  }
 }
 
 /**
@@ -183,6 +211,8 @@ function setConfigDefaults(config) {
     rules: config.rules || [],
     _forbidden_strings_after_translation:
       config._forbidden_strings_after_translation || [],
+    _forbidden_regex_after_translation:
+      config._forbidden_regex_after_translation || [],
     ...config,
   };
 }
@@ -236,6 +266,19 @@ function mergeConfigs(configs) {
       ];
     }
 
+    // Merge _forbidden_regex_after_translation: combine and deduplicate
+    if (
+      config._forbidden_regex_after_translation &&
+      config._forbidden_regex_after_translation.length > 0
+    ) {
+      merged._forbidden_regex_after_translation = [
+        ...new Set([
+          ...merged._forbidden_regex_after_translation,
+          ...config._forbidden_regex_after_translation,
+        ]),
+      ];
+    }
+
     // patterns: use first config's patterns (they're defaults)
     // Keep the first config's patterns
 
@@ -252,6 +295,7 @@ function mergeConfigs(configs) {
       "maxFileSize",
       "rules",
       "_forbidden_strings_after_translation",
+      "_forbidden_regex_after_translation",
     ];
     for (const key of Object.keys(config)) {
       if (!knownKeys.includes(key)) {
@@ -514,6 +558,16 @@ async function main() {
       forbiddenPatterns.push({
         pattern: new RegExp(escaped, "g"),
         message: `Found forbidden string "${str}"`,
+        suggestion: "Check translation rules",
+        exceptions: [],
+      });
+    }
+  }
+  if (config._forbidden_regex_after_translation) {
+    for (const regexStr of config._forbidden_regex_after_translation) {
+      forbiddenPatterns.push({
+        pattern: new RegExp(regexStr, "g"),
+        message: `Found forbidden regex match "${regexStr}"`,
         suggestion: "Check translation rules",
         exceptions: [],
       });

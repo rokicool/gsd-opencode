@@ -836,7 +836,7 @@ GSD 업데이트 후 로컬 수정사항을 복원합니다.
 | 플래그 | 설명 |
 |--------|------|
 | `--gemini` | Gemini CLI 리뷰 포함 |
-| `--OpenCode` | OpenCode CLI 리뷰 포함 (별도 세션) |
+| `--claude` | OpenCode CLI 리뷰 포함 (별도 세션) |
 | `--codex` | Codex CLI 리뷰 포함 |
 | `--coderabbit` | CodeRabbit 리뷰 포함 |
 | `--opencode` | OpenCode 리뷰 포함 (GitHub Copilot 경유) |

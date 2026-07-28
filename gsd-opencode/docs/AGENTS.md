@@ -1,6 +1,6 @@
 # GSD Agent Reference
 
-> All 21 specialized agents — roles, tools, spawn patterns, and relationships. For architecture context, see [Architecture](ARCHITECTURE.md).
+> Full role cards for 21 primary agents plus concise stubs for 10 advanced/specialized agents (31 shipped agents total). The `agents/` directory and [`docs/INVENTORY.md`](INVENTORY.md) are the authoritative roster; see [Architecture](ARCHITECTURE.md) for context.
 
 ---
 
@@ -9,6 +9,8 @@
 GSD uses a multi-agent architecture where thin orchestrators (workflow files) spawn specialized agents with fresh context windows. Each agent has a focused role, limited tool access, and produces specific artifacts.
 
 ### Agent Categories
+
+> The table below covers the **21 primary agents** detailed in this section. Ten additional shipped agents (pattern-mapper, debug-session-manager, code-reviewer, code-fixer, ai-researcher, domain-researcher, eval-planner, eval-auditor, framework-selector, intel-updater) have concise stubs in the [Advanced and Specialized Agents](#advanced-and-specialized-agents) section below. For the authoritative 31-agent roster, see [`docs/INVENTORY.md`](INVENTORY.md) and the `agents/` directory.
 
 | Category | Count | Agents |
 |----------|-------|--------|
@@ -341,17 +343,25 @@ GSD uses a multi-agent architecture where thin orchestrators (workflow files) sp
 
 | Property | Value |
 |----------|-------|
-| **Spawned by** | `/gsd-map-codebase` |
+| **Spawned by** | `/gsd-map-codebase`, post-execute drift gate in `/gsd-execute-phase` |
 | **Parallelism** | 4 instances (tech, architecture, quality, concerns) |
 | **Tools** | read, bash, grep, glob, write |
 | **Model (balanced)** | Haiku |
 | **Color** | Cyan |
-| **Produces** | `.planning/codebase/*.md` (7 documents) |
+| **Produces** | `.planning/codebase/*.md` (7 documents, with `last_mapped_commit` frontmatter) |
 
 **Key behaviors:**
 - read-only exploration + structured output
 - Writes documents directly to disk
 - No reasoning required — pattern extraction from file contents
+
+**`--paths <p1,p2,...>` scope hint (#2003):**
+Accepts an optional `--paths` directive in its prompt. When present, the
+mapper restricts glob/grep/bash exploration to the listed repo-relative path
+prefixes — this is the incremental-remap path used by the post-execute
+codebase-drift gate. Path values that contain `..`, start with `/`, or
+include shell metacharacters are rejected. Without the hint, the mapper
+runs its default whole-repo scan.
 
 ---
 
@@ -468,7 +478,251 @@ Communication style, decision patterns, debugging approach, UX preferences, vend
 
 ---
 
+## Advanced and Specialized Agents
+
+Ten additional agents ship under `agents/gsd-*.md` and are used by specialty workflows (`/gsd-ai-integration-phase`, `/gsd-eval-review`, `/gsd-code-review`, `/gsd-code-review-fix`, `/gsd-debug`, `/gsd-intel`, `/gsd-select-framework`) and by the planner pipeline. Each carries full frontmatter in its agent file; the stubs below are concise by design. The authoritative roster (with spawner and primary-doc status per agent) lives in [`docs/INVENTORY.md`](INVENTORY.md).
+
+### gsd-pattern-mapper
+
+**Role:** read-only codebase analysis that maps files-to-be-created or modified to their closest existing analogs, producing `PATTERNS.md` for the planner to consume.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-plan-phase` (between research and planning) |
+| **Parallelism** | Single instance |
+| **Tools** | read, bash, glob, grep, write |
+| **Model (balanced)** | Sonnet |
+| **Color** | Magenta |
+| **Produces** | `PATTERNS.md` in the phase directory |
+
+**Key behaviors:**
+- Extracts file list from CONTEXT.md and RESEARCH.md; classifies each by role (controller, component, service, model, middleware, utility, config, test) and data flow (CRUD, streaming, file I/O, event-driven, request-response)
+- Searches for the closest existing analog per file and extracts concrete code excerpts (imports, auth patterns, core pattern, error handling)
+- Strictly read-only against source; only writes `PATTERNS.md`
+
+---
+
+### gsd-debug-session-manager
+
+**Role:** Runs the full `/gsd-debug` checkpoint-and-continuation loop in an isolated context so the orchestrator's main context stays lean; spawns `gsd-debugger` agents, dispatches specialist skills, and handles user checkpoints via question.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-debug` |
+| **Parallelism** | Single instance (interactive, stateful) |
+| **Tools** | read, write, bash, grep, glob, task, question |
+| **Model (balanced)** | Sonnet |
+| **Color** | Orange |
+| **Produces** | Compact summary returned to main context; evolves the `.planning/debug/{slug}.md` session file |
+
+**Key behaviors:**
+- Reads the debug session file first; passes file paths (not inlined contents) to spawned agents to respect context budget
+- Treats all user-supplied question content as data-only, wrapped in DATA_START/DATA_END markers
+- Coordinates TDD gates and reasoning checkpoints introduced in v1.36.0
+
+---
+
+### gsd-code-reviewer
+
+**Role:** Reviews source files for bugs, security vulnerabilities, and code-quality problems; produces a structured `REVIEW.md` with severity-classified findings.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-code-review` |
+| **Parallelism** | Typically single instance per review scope |
+| **Tools** | read, write, bash, grep, glob |
+| **Model (balanced)** | Sonnet |
+| **Color** | `#F59E0B` (amber) |
+| **Produces** | `REVIEW.md` in the phase directory |
+
+**Key behaviors:**
+- Detects bugs (logic errors, null/undefined checks, off-by-one, type mismatches, unreachable code), security issues (injection, XSS, hardcoded secrets, insecure crypto), and quality issues
+- Honors `AGENTS.md` project conventions and `.claude/skills/` / `.agents/skills/` rules when present
+- read-only against implementation source — never modifies code under review
+
+---
+
+### gsd-code-fixer
+
+**Role:** Applies fixes to findings from `REVIEW.md` with intelligent (non-blind) patching and atomic per-fix commits; produces `REVIEW-FIX.md`.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-code-review-fix` |
+| **Parallelism** | Single instance |
+| **Tools** | read, edit, write, bash, grep, glob |
+| **Model (balanced)** | Sonnet |
+| **Color** | `#10B981` (emerald) |
+| **Produces** | `REVIEW-FIX.md`; one atomic git commit per applied fix |
+
+**Key behaviors:**
+- Treats `REVIEW.md` suggestions as guidance, not a patch to apply literally
+- Commits each fix atomically so review and rollback stay granular
+- Honors `AGENTS.md` and project-skill rules during fixes
+
+---
+
+### gsd-ai-researcher
+
+**Role:** Researches a chosen AI/LLM framework's official documentation and distills it into implementation-ready guidance — framework quick reference, patterns, and pitfalls — for the Section 3–4b body of `AI-SPEC.md`.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-ai-integration-phase` |
+| **Parallelism** | Single instance (sequential with domain-researcher / eval-planner) |
+| **Tools** | read, write, bash, grep, glob, webfetch, websearch, mcp (context7) |
+| **Model (balanced)** | Sonnet |
+| **Color** | `#34D399` (green) |
+| **Produces** | Sections 3–4b of `AI-SPEC.md` (framework quick reference + implementation guidance) |
+
+**Key behaviors:**
+- Uses Context7 MCP when available; falls back to the `ctx7` CLI via bash when MCP tools are stripped from the agent
+- Anchors guidance to the specific use case, not generic framework overviews
+
+---
+
+### gsd-domain-researcher
+
+**Role:** Surfaces the business-domain and real-world evaluation context for an AI system — expert rubric ingredients, failure modes, regulatory context — before the eval-planner turns it into measurable rubrics. Writes Section 1b of `AI-SPEC.md`.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-ai-integration-phase` |
+| **Parallelism** | Single instance |
+| **Tools** | read, write, bash, grep, glob, websearch, webfetch, mcp (context7) |
+| **Model (balanced)** | Sonnet |
+| **Color** | `#A78BFA` (violet) |
+| **Produces** | Section 1b of `AI-SPEC.md` |
+
+**Key behaviors:**
+- Researches the domain, not the technical framework — its output feeds the eval-planner downstream
+- Produces rubric ingredients that downstream evaluators can turn into measurable criteria
+
+---
+
+### gsd-eval-planner
+
+**Role:** Designs the structured evaluation strategy for an AI phase — failure modes, eval dimensions with rubrics, tooling, reference dataset, guardrails, production monitoring. Writes Sections 5–7 of `AI-SPEC.md`.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-ai-integration-phase` |
+| **Parallelism** | Single instance (sequential after domain-researcher) |
+| **Tools** | read, write, bash, grep, glob, question |
+| **Model (balanced)** | Sonnet |
+| **Color** | `#F59E0B` (amber) |
+| **Produces** | Sections 5–7 of `AI-SPEC.md` (Evaluation Strategy, Guardrails, Production Monitoring) |
+
+**Required reading:** `get-shit-done/references/ai-evals.md` (evaluation framework).
+
+**Key behaviors:**
+- Turns domain-researcher rubric ingredients into measurable, tooled evaluation criteria
+- Does not re-derive domain context — reads Section 1 and 1b of `AI-SPEC.md` as established input
+
+---
+
+### gsd-eval-auditor
+
+**Role:** Retroactive audit of an implemented AI phase's evaluation coverage against its planned `AI-SPEC.md` eval strategy. Scores each eval dimension `COVERED` / `PARTIAL` / `MISSING` and produces `EVAL-REVIEW.md`.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-eval-review` |
+| **Parallelism** | Single instance |
+| **Tools** | read, write, bash, grep, glob |
+| **Model (balanced)** | Sonnet |
+| **Color** | `#EF4444` (red) |
+| **Produces** | `EVAL-REVIEW.md` with dimension scores, findings, and remediation guidance |
+
+**Required reading:** `get-shit-done/references/ai-evals.md`.
+
+**Key behaviors:**
+- Compares the implemented codebase against the planned eval strategy — never re-plans
+- Reads implementation files incrementally to respect context budget
+
+---
+
+### gsd-framework-selector
+
+**Role:** Interactive decision-matrix agent that runs a ≤6-question interview, scores candidate AI/LLM frameworks, and returns a ranked recommendation with rationale.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-ai-integration-phase`, `/gsd-select-framework` |
+| **Parallelism** | Single instance (interactive) |
+| **Tools** | read, bash, grep, glob, websearch, question |
+| **Model (balanced)** | Sonnet |
+| **Color** | `#38BDF8` (sky blue) |
+| **Produces** | Scored ranked recommendation (structured return to orchestrator) |
+
+**Required reading:** `get-shit-done/references/ai-frameworks.md` (decision matrix).
+
+**Key behaviors:**
+- Scans `package.json`, `pyproject.toml`, `requirements*.txt` for existing AI libraries before the interview to avoid recommending a rejected framework
+- Asks only what the codebase scan and CONTEXT.md have not already answered
+
+---
+
+### gsd-intel-updater
+
+**Role:** Reads project source and writes structured intel (JSON + Markdown) into `.planning/intel/`, building a queryable codebase knowledge base that other agents use instead of performing expensive fresh exploration.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-intel` (refresh / update flows) |
+| **Parallelism** | Single instance |
+| **Tools** | read, write, bash, glob, grep |
+| **Model (balanced)** | Sonnet |
+| **Color** | Cyan |
+| **Produces** | `.planning/intel/*.json` (and companion Markdown) consumed by `gsd-sdk query intel` |
+
+**Key behaviors:**
+- Writes current state only — no temporal language, every claim references an actual file path
+- Uses glob / read / grep for cross-platform correctness; bash is reserved for `gsd-sdk query intel` CLI calls
+
+---
+
+### gsd-doc-classifier
+
+**Role:** Classifies a single planning document as ADR, PRD, SPEC, DOC, or UNKNOWN. Extracts title, scope summary, and cross-references. Writes a JSON classification file used by `gsd-doc-synthesizer` to build a consolidated context.
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-ingest-docs` (parallel fan-out over the doc corpus) |
+| **Parallelism** | One instance per input document |
+| **Tools** | read, write, grep, glob |
+| **Model (balanced)** | Haiku |
+| **Color** | Yellow |
+| **Produces** | One JSON classification file per input doc (type, title, scope, refs) |
+
+**Key behaviors:**
+- Single-doc scope — never synthesizes or resolves conflicts (that is the synthesizer's job)
+- Heuristic-first classification; returns UNKNOWN when the doc lacks type signals rather than guessing
+
+---
+
+### gsd-doc-synthesizer
+
+**Role:** Synthesizes classified planning docs into a single consolidated context. Applies precedence rules, detects cross-reference cycles, enforces LOCKED-vs-LOCKED hard-blocks, and writes `INGEST-CONFLICTS.md` with three buckets (auto-resolved, competing-variants, unresolved-blockers).
+
+| Property | Value |
+|----------|-------|
+| **Spawned by** | `/gsd-ingest-docs` (after classifier fan-in) |
+| **Parallelism** | Single instance |
+| **Tools** | read, write, grep, glob, bash |
+| **Model (balanced)** | Sonnet |
+| **Color** | Orange |
+| **Produces** | Consolidated context for `.planning/` plus `INGEST-CONFLICTS.md` report |
+
+**Key behaviors:**
+- Hard-blocks on LOCKED-vs-LOCKED ADR contradictions instead of silently picking a winner
+- Follows the `references/doc-conflict-engine.md` contract so `/gsd-import` and `/gsd-ingest-docs` produce consistent conflict reports
+
+---
+
 ## Agent Tool Permissions Summary
+
+> **Scope:** this table covers the 21 primary agents only. The 12 advanced/specialized agents listed above carry their own tool surfaces in their `agents/gsd-*.md` frontmatter (summarized in the per-agent stubs above and in [`docs/INVENTORY.md`](INVENTORY.md)).
 
 | Agent | read | write | edit | bash | grep | glob | websearch | webfetch | MCP |
 |-------|------|-------|------|------|------|------|-----------|----------|-----|

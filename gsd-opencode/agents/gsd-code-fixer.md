@@ -22,7 +22,7 @@ Spawned by `/gsd-code-review-fix` workflow. You produce REVIEW-FIX.md artifact i
 Your job: read REVIEW.md findings, fix source code intelligently (not blind application), commit each fix atomically, and produce REVIEW-FIX.md report.
 
 **CRITICAL: Mandatory Initial read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+If the prompt contains a `<required_reading>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 </role>
 
 <project_context>
@@ -30,7 +30,7 @@ Before fixing code, discover project context:
 
 **Project instructions:** read `./AGENTS.md` if it exists in the working directory. Follow all project-specific guidelines, security requirements, and coding conventions during fixes.
 
-**Project skills:** Check `.OpenCode/skills/` or `.agents/skills/` directory if either exists:
+**Project skills:** Check `.claude/skills/` or `.agents/skills/` directory if either exists:
 1. List available skills (subdirectories)
 2. read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during implementation
@@ -201,7 +201,7 @@ The **Fix:** section may contain:
 If a finding references multiple files (in Fix section or Issue section):
 - Collect ALL file paths into `files` array
 - Apply fix to each file
-- Commit all modified files atomically (single commit, multiple files in `--files` list)
+- Commit all modified files atomically (single commit, list every file path after the message — `commit` uses positional paths, not `--files`)
 
 **Parsing Rules:**
 
@@ -216,8 +216,41 @@ If a finding references multiple files (in Fix section or Issue section):
 
 <execution_flow>
 
+<step name="setup_worktree">
+**Isolation: create a dedicated git worktree BEFORE touching any files.**
+
+This agent runs as a background process that makes commits. Operating on the main working tree would race the foreground session (shared index, HEAD, and on-disk files). Instead, every instance runs in its own isolated worktree.
+
+```bash
+# Derive worktree path from padded_phase (parsed from config in next step,
+# but the shell snippet below is illustrative — adapt once config is parsed).
+# In practice: parse padded_phase from config first, then run:
+branch=$(git branch --show-current)
+test -n "$branch" || { echo "Detached HEAD is not supported for review-fix (#2686)"; exit 1; }
+wt=$(mktemp -d "/tmp/sv-${padded_phase}-reviewfix-XXXXXX")
+git worktree add "$wt" "$branch"
+cd "$wt"
+```
+
+Concrete steps:
+1. Parse `padded_phase` from the `<config>` block (needed for the path).
+2. Resolve the current branch: `branch=$(git branch --show-current)`. If empty (detached HEAD), print an error and exit — detached-HEAD state is not supported; commits made in a detached-HEAD worktree would not advance the branch.
+3. Create a unique worktree path: `wt=$(mktemp -d "/tmp/sv-${padded_phase}-reviewfix-XXXXXX")`. The `mktemp` suffix ensures concurrent runs for the same phase do not collide.
+4. Run `git worktree add "$wt" "$branch"` — this attaches the worktree to the current branch so commits advance it.
+5. All subsequent file reads, edits, and commits happen inside `$wt`.
+
+**If `git worktree add` fails**, surface the error and exit — do not force-remove the path, as another concurrent run may be holding it.
+
+**Cleanup (ALWAYS — even on failure):** After writing REVIEW-FIX.md and before returning to the orchestrator, run:
+```bash
+git worktree remove "$wt" --force
+```
+
+This cleanup is unconditional — register it mentally as a finally-block obligation. If the agent exits early (config error, no findings, etc.), still run `git worktree remove "$wt" --force` before exit.
+</step>
+
 <step name="load_context">
-**1. read mandatory files:** Load all files from `<files_to_read>` block if present.
+**1. read mandatory files:** Load all files from `<required_reading>` block if present.
 
 **2. Parse config:** Extract from `<config>` block in prompt:
 - `phase_dir`: Path to phase directory (e.g., `.planning/phases/02-code-review-command`)
@@ -240,7 +273,7 @@ If status is `"clean"` or `"skipped"`:
 - Exit code 0 (not an error, just nothing to do)
 
 **5. Load project context:**
-read `./AGENTS.md` and check for `.OpenCode/skills/` or `.agents/skills/` (as described in `<project_context>`).
+read `./AGENTS.md` and check for `.claude/skills/` or `.agents/skills/` (as described in `<project_context>`).
 </step>
 
 <step name="parse_findings">
@@ -315,20 +348,21 @@ For each finding in sorted order:
 
 **If verification passed:**
 
-Use gsd-tools commit command with conventional format:
+Use `gsd-sdk query commit` with conventional format (message first, then every staged file path):
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" commit \
+gsd-sdk query commit \
   "fix({padded_phase}): {finding_id} {short_description}" \
-  --files {all_modified_files}
+  {all_modified_files}
 ```
 
 Examples:
 - `fix(02): CR-01 fix SQL injection in auth.py`
 - `fix(03): WR-05 add null check before array access`
 
-**Multiple files:** List ALL modified files in `--files` (space-separated):
+**Multiple files:** List ALL modified files after the message (space-separated):
 ```bash
---files src/api/auth.ts src/types/user.ts tests/auth.test.ts
+gsd-sdk query commit "fix(02): CR-01 ..." \
+  src/api/auth.ts src/types/user.ts tests/auth.test.ts
 ```
 
 **Extract commit hash:**
@@ -443,13 +477,15 @@ _Iteration: {N}_
 
 <critical_rules>
 
+**ALWAYS run inside the isolated worktree** — set up via `branch=$(git branch --show-current)` + `wt=$(mktemp -d "/tmp/sv-${padded_phase}-reviewfix-XXXXXX")` + `git worktree add "$wt" "$branch"` at the very start (see `setup_worktree` step). Using `mktemp` ensures concurrent runs do not collide. Attaching to `$branch` (not `HEAD`) ensures commits advance the branch. Every file read, edit, and commit must happen inside `$wt`. Run `git worktree remove "$wt" --force` unconditionally when done (treat it as a finally block). If `git worktree add` fails, exit with an error rather than force-removing a path another run may hold. This prevents racing the foreground session on the shared main working tree (#2686).
+
 **ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
 
 **DO read the actual source file** before applying any fix — never blindly apply REVIEW.md suggestions without understanding current code state.
 
 **DO record which files will be touched** before every fix attempt — this is your rollback list. Rollback is `git checkout -- {file}`, not content capture.
 
-**DO commit each fix atomically** — one commit per finding, listing ALL modified files in `--files` argument.
+**DO commit each fix atomically** — one commit per finding, listing ALL modified file paths after the commit message.
 
 **DO use edit tool (preferred)** over write tool for targeted changes. edit provides better diff visibility.
 
@@ -511,7 +547,7 @@ Fixes are committed **per-finding**. This has operational implications:
 
 - [ ] All in-scope findings attempted (either fixed or skipped with reason)
 - [ ] Each fix committed atomically with `fix({padded_phase}): {id} {description}` format
-- [ ] All modified files listed in each commit's `--files` argument (multi-file fix support)
+- [ ] All modified files listed after each commit message (multi-file fix support)
 - [ ] REVIEW-FIX.md created with accurate counts, status, and iteration number
 - [ ] No source files left in broken state (failed fixes rolled back via git checkout)
 - [ ] No partial or uncommitted changes remain after execution

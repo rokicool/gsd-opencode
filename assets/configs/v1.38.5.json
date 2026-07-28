@@ -1,0 +1,69 @@
+{
+  "_description": "Supplemental translation rules for v1.38.5 -- fixes remaining task() calls",
+  "include": ["gsd-opencode/**"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    ".translate-backups/**",
+    "**/oc-*",
+    "**/*-oc-*"
+  ],
+  "rules": [
+    {
+      "_comment": "1. task() with expression prompt (+), subagent_type, conditional isolation, description (diagnose-issues pattern)",
+      "pattern": "task\\(\\s*\\n\\s*prompt=([\\w]+\\s*\\+\\s*\"[^\"]+\"),\\s*\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\n\\s*\\$\\{[^}]+\\?\\s*'[^']*'\\s*:\\s*''\\},?\\s*\\n\\s*description=\"[^\"]*\"\\s*\\n\\s*\\)",
+      "replacement": "@$2 $1",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace diagnose-issues style task() with expression prompt"
+    },
+    {
+      "_comment": "2. task() with subagent_type=\"general\", multiline prompt, model, description (advisor pattern)",
+      "pattern": "task\\(\\s*\\n\\s*prompt=\"([\\s\\S]*?)\",\\s*\\n\\s*subagent_type=\"general\",\\s*\\n\\s*model=\"[^\"]*\",\\s*\\n\\s*description=\"[^\"]*\"\\s*\\n\\s*\\)",
+      "replacement": "@gsd-advisor-researcher \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace advisor task() with subagent_type=general to @gsd-advisor-researcher"
+    },
+    {
+      "_comment": "3. task() with subagent_type first, description, prompt (codebase-drift-gate pattern)",
+      "pattern": "task\\(\\s*\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\n\\s*description=\"[^\"]*\",\\s*\\n\\s*prompt=\"([^\"]+)\"\\s*\\n\\s*\\)",
+      "replacement": "@$1 \"$2\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace codebase-drift-gate style task()"
+    },
+    {
+      "_comment": "4. task() with prompt, subagent_type, model only (scan.md pattern)",
+      "pattern": "task\\(\\s*\\n\\s*prompt=\"([^\"]+)\",\\s*\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\n\\s*model=\"[^\"]*\"\\s*\\n\\s*\\)",
+      "replacement": "@$2 \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace scan.md style task()"
+    },
+    {
+      "_comment": "5. task() with description, prompt (with ternary), subagent_type, model (execute-phase verifier pattern)",
+      "pattern": "task\\(\\s*\\n\\s*description=\"[^\"]*\",\\s*\\n\\s*prompt=\"([\\s\\S]*?)\",\\s*\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\n\\s*model=\"[^\"]*\"\\s*\\n\\s*\\)",
+      "replacement": "@$2 \"$1\"",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace execute-phase verifier style task()"
+    },
+    {
+      "_comment": "6. task() with variable prompt {above}, subagent_type, model, trailing comma (plan-phase pattern-mapper)",
+      "pattern": "task\\(\\s*\\n\\s*prompt=\"\\{above\\}\",\\s*\\n\\s*subagent_type=\"(gsd-[^\"]+)\",\\s*\\n\\s*model=\"[^\"]*\",\\s*\\n\\s*\\)",
+      "replacement": "@$1 {above}",
+      "isRegex": true,
+      "caseSensitive": true,
+      "description": "Replace plan-phase pattern-mapper task()"
+    },
+    {
+      "_comment": "7. general-purpose anti-pattern reference",
+      "pattern": "`general-purpose`",
+      "replacement": "`gsd-general`",
+      "isRegex": false,
+      "caseSensitive": true,
+      "description": "Replace general-purpose agent reference in anti-patterns"
+    }
+  ]
+}

@@ -836,7 +836,7 @@ GSDアップデート後にローカルの変更を復元します。
 | フラグ | 説明 |
 |------|-------------|
 | `--gemini` | Gemini CLIレビューを含める |
-| `--OpenCode` | OpenCode CLIレビューを含める（別セッション） |
+| `--claude` | OpenCode CLIレビューを含める（別セッション） |
 | `--codex` | Codex CLIレビューを含める |
 | `--coderabbit` | CodeRabbitレビューを含める |
 | `--opencode` | OpenCodeレビューを含める（GitHub Copilot経由） |

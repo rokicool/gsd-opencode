@@ -10,7 +10,6 @@ permissions:
    bash: true
    grep: true
    glob: true
-  - Agent
    question: true
 ---
 <objective>

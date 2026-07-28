@@ -12,7 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { output, error, safeReadFile } = require('./core.cjs');
+const { output, error, safeReadFile, loadConfig } = require('./core.cjs');
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -177,11 +177,11 @@ const CLAUDE_MD_FALLBACKS = {
   stack: 'Technology stack not yet documented. Will populate after codebase mapping or first phase.',
   conventions: 'Conventions not yet established. Will populate as patterns emerge during development.',
   architecture: 'Architecture not yet mapped. Follow existing patterns found in the codebase.',
-  skills: 'No project skills found. Add skills to any of: `.OpenCode/skills/`, `.agents/skills/`, `.cursor/skills/`, or `.github/skills/` with a `SKILL.md` index file.',
+  skills: 'No project skills found. Add skills to any of: `.OpenCode/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.',
 };
 
 // Directories where project skills may live (checked in order)
-const SKILL_SEARCH_DIRS = ['.OpenCode/skills', '.agents/skills', '.cursor/skills', '.github/skills'];
+const SKILL_SEARCH_DIRS = ['.OpenCode/skills', '.agents/skills', '.cursor/skills', '.github/skills', '.codex/skills'];
 
 const CLAUDE_MD_WORKFLOW_ENFORCEMENT = [
   'Before using edit, write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.',
@@ -870,7 +870,13 @@ function cmdGenerateClaudeProfile(cwd, options, raw) {
   } else if (options.output) {
     targetPath = path.isAbsolute(options.output) ? options.output : path.join(cwd, options.output);
   } else {
-    targetPath = path.join(cwd, 'AGENTS.md');
+    // read claude_md_path from config, default to ./AGENTS.md
+    let configClaudeMdPath = './AGENTS.md';
+    try {
+      const config = loadConfig(cwd);
+      if (config.claude_md_path) configClaudeMdPath = config.claude_md_path;
+    } catch { /* use default */ }
+    targetPath = path.isAbsolute(configClaudeMdPath) ? configClaudeMdPath : path.join(cwd, configClaudeMdPath);
   }
 
   let action;
@@ -944,7 +950,13 @@ function cmdGenerateClaudeMd(cwd, options, raw) {
 
   let outputPath = options.output;
   if (!outputPath) {
-    outputPath = path.join(cwd, 'AGENTS.md');
+    // read claude_md_path from config, default to ./AGENTS.md
+    let configClaudeMdPath = './AGENTS.md';
+    try {
+      const config = loadConfig(cwd);
+      if (config.claude_md_path) configClaudeMdPath = config.claude_md_path;
+    } catch { /* use default */ }
+    outputPath = path.isAbsolute(configClaudeMdPath) ? configClaudeMdPath : path.join(cwd, configClaudeMdPath);
   } else if (!path.isAbsolute(outputPath)) {
     outputPath = path.join(cwd, outputPath);
   }

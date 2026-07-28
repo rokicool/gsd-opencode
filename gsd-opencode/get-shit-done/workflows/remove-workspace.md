@@ -13,7 +13,7 @@ read all files referenced by the invoking prompt's execution_context before star
 Extract workspace name from $ARGUMENTS.
 
 ```bash
-INIT=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" init remove-workspace "$WORKSPACE_NAME")
+INIT=$(gsd-sdk query init.remove-workspace "$WORKSPACE_NAME")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -43,7 +43,7 @@ Cannot remove workspace "$WORKSPACE_NAME" — the following repos have uncommitt
   - repo2
 
 Commit or stash changes in these repos before removing the workspace:
-  cd $WORKSPACE_PATH/repo1
+  cd "$WORKSPACE_PATH/repo1"
   git stash   # or git commit
 ```
 

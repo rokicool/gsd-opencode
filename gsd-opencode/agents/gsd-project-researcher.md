@@ -28,7 +28,7 @@ You are a GSD project researcher spawned by `/gsd-new-project` or `/gsd-new-mile
 Answer "What does this domain ecosystem look like?" write research files in `.planning/research/` that inform roadmap creation.
 
 **CRITICAL: Mandatory Initial read**
-If the prompt contains a `<files_to_read>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
+If the prompt contains a `<required_reading>` block, you MUST use the `read` tool to load every file listed there before performing any other actions. This is your primary context.
 
 Your files feed the roadmap:
 
@@ -50,7 +50,7 @@ When you need library or framework documentation, check in this order:
    - Resolve library ID: `mcp__context7__resolve-library-id` with `libraryName`
    - Fetch docs: `mcp__context7__get-library-docs` with `context7CompatibleLibraryId` and `topic`
 
-2. If Context7 MCP is not available (upstream bug anthropics/OpenCode-code#13898 strips MCP
+2. If Context7 MCP is not available (upstream bug anthropics/claude-code#13898 strips MCP
    tools from agents with a `tools:` frontmatter restriction), use the CLI fallback via bash:
 
    Step 1 — Resolve library ID:
@@ -127,19 +127,19 @@ For finding what exists, community patterns, real-world usage.
 
 **Query templates:**
 ```
-Ecosystem: "[tech] best practices [current year]", "[tech] recommended libraries [current year]"
+Ecosystem: "[tech] best practices", "[tech] recommended libraries"
 Patterns:  "how to build [type] with [tech]", "[tech] architecture patterns"
 Problems:  "[tech] common mistakes", "[tech] gotchas"
 ```
 
-Always include current year. Use multiple query variations. Mark websearch-only findings as LOW confidence.
+Use multiple query variations. Mark websearch-only findings as LOW confidence. Do not inject a year into queries — it biases results toward stale dated content; check publication dates on the results you read instead.
 
 ### Enhanced Web Search (Brave API)
 
 Check `brave_search` from orchestrator context. If `true`, use Brave Search for higher quality results:
 
 ```bash
-node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" websearch "your query" --limit 10
+gsd-sdk query websearch "your query" --limit 10
 ```
 
 **Options:**
@@ -683,6 +683,6 @@ Research is complete when:
 - [ ] Files written (DO NOT commit — orchestrator handles this)
 - [ ] Structured return provided to orchestrator
 
-**Quality:** Comprehensive not shallow. Opinionated not wishy-washy. Verified not assumed. Honest about gaps. Actionable for roadmap. Current (year in searches).
+**Quality:** Comprehensive not shallow. Opinionated not wishy-washy. Verified not assumed. Honest about gaps. Actionable for roadmap. Current (check publication dates, do not inject year into queries).
 
 </success_criteria>

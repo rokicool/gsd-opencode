@@ -25,6 +25,7 @@ Future: `--prd` mode for PRD extraction is planned for a follow-up PR.
 @$HOME/.config/opencode/get-shit-done/workflows/import.md
 @$HOME/.config/opencode/get-shit-done/references/ui-brand.md
 @$HOME/.config/opencode/get-shit-done/references/gate-prompts.md
+@$HOME/.config/opencode/get-shit-done/references/doc-conflict-engine.md
 </execution_context>
 
 <context>

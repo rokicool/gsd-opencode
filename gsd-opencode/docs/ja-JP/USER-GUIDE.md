@@ -580,7 +580,7 @@ quick タスクのブランチ設定例：
 - **quality** -- すべての意思決定エージェントに Opus、読み取り専用の検証に Sonnet。クォータに余裕があり、重要な作業に使用。
 - **balanced** -- プランニング（アーキテクチャの決定が行われる場所）にのみ Opus、それ以外は Sonnet。正当な理由があるデフォルト。
 - **budget** -- コードを書くものには Sonnet、リサーチと検証には Haiku。大量作業や重要度の低いフェーズに使用。
-- **inherit** -- すべてのエージェントが現在のセッションモデルを使用。モデルを動的に切り替える場合（例：OpenCode または Kilo の `/model`）や、OpenCode を非 Anthropic プロバイダー（OpenRouter、ローカルモデル）で使用する場合に最適で、予期しない API コストを回避できます。非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI、Kilo）では、インストーラーが自動的に `resolve_model_ids: "omit"` を設定します -- [非 OpenCode ランタイムの使用](#非-OpenCode-ランタイムの使用codexopencodegemini-clikilo)を参照。
+- **inherit** -- すべてのエージェントが現在のセッションモデルを使用。モデルを動的に切り替える場合（例：OpenCode または Kilo の `/model`）や、OpenCode を非 Anthropic プロバイダー（OpenRouter、ローカルモデル）で使用する場合に最適で、予期しない API コストを回避できます。非 OpenCode ランタイム（Codex、OpenCode、Gemini CLI、Kilo）では、インストーラーが自動的に `resolve_model_ids: "omit"` を設定します -- [非 OpenCode ランタイムの使用](#非-claude-ランタイムの使用codexopencodegemini-clikilo)を参照。
 
 ---
 
@@ -589,7 +589,7 @@ quick タスクのブランチ設定例：
 ### 新規プロジェクト（フルサイクル）
 
 ```bash
-OpenCode --dangerously-skip-permissions
+claude --dangerously-skip-permissions
 /gsd-new-project            # 質問に回答、設定、ロードマップを承認
 /new
 /gsd-discuss-phase 1        # 好みを確定
@@ -742,7 +742,7 @@ budget プロファイルに切り替えてください：`/gsd-set-profile budg
 
 インストーラーは Gemini CLI、OpenCode、Kilo、Codex 用に `resolve_model_ids: "omit"` を自動設定します。非 OpenCode ランタイムを手動で設定する場合は、`.planning/config.json` に自分で追加してください。
 
-完全な説明は[設定リファレンス](../CONFIGURATION.md#non-OpenCode-runtimes-codex-opencode-gemini-cli-kilo)をご覧ください。
+完全な説明は[設定リファレンス](../CONFIGURATION.md#non-claude-runtimes-codex-opencode-gemini-cli-kilo)をご覧ください。
 
 ### 非 Anthropic プロバイダーでの OpenCode の使用（OpenRouter、ローカル）
 
